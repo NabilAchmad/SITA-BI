@@ -62,7 +62,7 @@
 
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#base">
-                        <i class="fas fa-layer-group"></i>
+                        <i class="fas fa-bullhorn"></i>
                         <p>Pengumuman</p>
                         <span class="caret"></span>
                     </a>
@@ -89,7 +89,7 @@
 
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#sidebarLayouts">
-                        <i class="fas fa-th-list"></i>
+                        <i class="fas fa-file-signature"></i>
                         <p>Berita Acara</p>
                         <span class="caret"></span>
                     </a>
@@ -111,7 +111,7 @@
 
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#forms">
-                        <i class="fas fa-pen-square"></i>
+                        <i class="fas fa-chalkboard-teacher"></i>
                         <p>Sidang</p>
                         <span class="caret"></span>
                     </a>
@@ -127,7 +127,7 @@
                 </li>
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#tables">
-                        <i class="fas fa-table"></i>
+                        <i class="fas fa-users-cog"></i>
                         <p>Kelola Akun</p>
                         <span class="caret"></span>
                     </a>
@@ -148,11 +148,33 @@
                 </li>
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#maps">
-                        <i class="fas fa-map-marker-alt"></i>
+                        <i class="fas fa-chart-bar"></i>
                         <p>Laporan dan Statistik</p>
                         <span class="caret"></span>
                     </a>
                     <div class="collapse" id="maps">
+                        <ul class="nav nav-collapse">
+                            <li>
+                                <a href="maps/googlemaps.html">
+                                    <span class="sub-item">Lihat Laporan dan Statistik</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="maps/jsvectormap.html">
+                                    <span class="sub-item">Unduh Laporan dan Statistik</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a data-bs-toggle="collapse" href="#logs">
+                        <i class="fas fa-stream me-2"></i>
+                        <p>Log dan Aktifitas</p>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="collapse" id="logs">
                         <ul class="nav nav-collapse">
                             <li>
                                 <a href="maps/googlemaps.html">

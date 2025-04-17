@@ -10,27 +10,30 @@
         @include('layouts.admin.partials.dosen')
         <!-- End dosen section -->
 
-        <!-- subscriber section -->
-        @include('layouts.admin.partials.subscriber')
-        <!-- End subscriber section -->
+        <!-- Mahasiswa section -->
+        @include('layouts.admin.partials.mahasiswa')
+        <!-- End Mahasiswa section -->
 
-        <!-- Sales section -->
-        @include('layouts.admin.partials.sales')
-        <!-- End Sales section -->
+        <!-- Dosen Penguji section -->
+        @include('layouts.admin.partials.dospeng')
+        <!-- End Sales Dosen Penguji -->
 
-        <!-- Order section -->
-        @include('layouts.admin.partials.order')
-        <!-- End Order section -->
+        <!-- Dosen Pembimbing section -->
+        @include('layouts.admin.partials.dospem')
+        <!-- End Dosen Pembimbing -->
     </div>
 
     <!-- upper main -->
     <div class="row">
-        <!-- user statistics -->
-        @include('layouts.admin.main.upperMain.userstatistics')
-        <!-- end user statistics -->
+        <!-- Log Activity -->
+        @include('layouts.admin.main.upperMain.logactivity')
+        <!-- end Log Activity -->
 
         <!-- Daily Sales -->
-        @include('layouts.admin.main.upperMain.dailysales')
+        <div class="col-md-4">
+            @include('layouts.admin.main.upperMain.proposal')
+            @include('layouts.admin.main.upperMain.dosenaktif')
+        </div>
         <!-- end Daily Sales -->
     </div>
 

@@ -56,10 +56,6 @@
                             @include('layouts.admin.navbar.notification')
                             <!-- End Notification -->
 
-                            <!-- Quick Action -->
-                            @include('layouts.admin.navbar.quickaction')
-                            <!-- End Quick Action -->
-
                             <!-- profile -->
                             @include('layouts.admin.navbar.profile')
                             <!-- End Profile -->

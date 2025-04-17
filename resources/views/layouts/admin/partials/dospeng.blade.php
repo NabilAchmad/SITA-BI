@@ -3,14 +3,14 @@
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-icon">
-                    <div class="icon-big text-center icon-info bubble-shadow-small">
-                        <i class="fas fa-user-check"></i>
+                    <div class="icon-big text-center icon-success bubble-shadow-small">
+                        <i class="fas fa-gavel"></i>
                     </div>
                 </div>
                 <div class="col col-stats ms-3 ms-sm-0">
                     <div class="numbers">
-                        <p class="card-category">Mahasiswa</p>
-                        <h4 class="card-title">1303</h4>
+                        <p class="card-category">Total Dosen Penguji</p>
+                        <h4 class="card-title">32</h4>
                     </div>
                 </div>
             </div>

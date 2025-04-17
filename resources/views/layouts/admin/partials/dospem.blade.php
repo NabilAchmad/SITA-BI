@@ -3,14 +3,14 @@
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-icon">
-                    <div class="icon-big text-center icon-success bubble-shadow-small">
-                        <i class="fas fa-luggage-cart"></i>
+                    <div class="icon-big text-center icon-secondary bubble-shadow-small">
+                        <i class="fas fa-user-tie"></i>
                     </div>
                 </div>
                 <div class="col col-stats ms-3 ms-sm-0">
                     <div class="numbers">
-                        <p class="card-category">Sales</p>
-                        <h4 class="card-title">$ 1,345</h4>
+                        <p class="card-category">Total Dosen Pembimbing</p>
+                        <h4 class="card-title">32</h4>
                     </div>
                 </div>
             </div>

@@ -23,9 +23,8 @@
                     </div>
                     <div class="member-info">
                         <h4>Erland Agsya Agustian</h4>
-                        <span>Chief Executive Officer</span>
-                        <p>Velit aut quia fugit et et. Dolorum ea voluptate vel tempore tenetur ipsa quae aut.
-                            Ipsum exercitationem iure minima enim corporis et voluptate.</p>
+                        <span>Frontend Developer</span>
+                        <p>2311083007</p>
                     </div>
                 </div>
             </div><!-- End Team Member -->
@@ -43,9 +42,8 @@
                     </div>
                     <div class="member-info">
                         <h4>Nabil Achmad Khoir</h4>
-                        <span>Product Manager</span>
-                        <p>Quo esse repellendus quia id. Est eum et accusantium pariatur fugit nihil minima
-                            suscipit corporis. Voluptate sed quas reiciendis animi neque sapiente.</p>
+                        <span>Project Manager</span>
+                        <p>2311082032</p>
                     </div>
                 </div>
             </div><!-- End Team Member -->
@@ -63,9 +61,8 @@
                     </div>
                     <div class="member-info">
                         <h4>Kasih Ananda Nardi</h4>
-                        <span>CTO</span>
-                        <p>Vero omnis enim consequatur. Voluptas consectetur unde qui molestiae deserunt.
-                            Voluptates enim aut architecto porro aspernatur molestiae modi.</p>
+                        <span>Sistem Analis</span>
+                        <p>2311081021</p>
                     </div>
                 </div>
             </div><!-- End Team Member -->
@@ -83,9 +80,8 @@
                     </div>
                     <div class="member-info">
                         <h4>Gilang Dwi Yuwana</h4>
-                        <span>Accountant</span>
-                        <p>Rerum voluptate non adipisci animi distinctio et deserunt amet voluptas. Quia aut
-                            aliquid doloremque ut possimus ipsum officia.</p>
+                        <span>Backend Developer</span>
+                        <p>2311081016</p>
                     </div>
                 </div>
             </div><!-- End Team Member -->
