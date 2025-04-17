@@ -2,8 +2,7 @@
     <div class="sidebar-logo">
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="dark">
-            <a href="index.html"
-                class="logo d-flex align-items-center text-decoration-none px-3 py-2 text-white w-100"
+            <a href="index.html" class="logo d-flex align-items-center text-decoration-none px-3 py-2 text-white w-100"
                 style="max-width: 100%; overflow: hidden; transition: background-color 0.3s ease;">
 
                 <!-- Icon Gear -->

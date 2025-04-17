@@ -10,8 +10,7 @@
 
         <div class="row gy-4">
 
-            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up"
-                data-aos-delay="100">
+            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
                 <div class="team-member">
                     <div class="member-img">
                         <img src="assets/img/team/erland.jpg" class="img-fluid" alt="">
@@ -31,8 +30,7 @@
                 </div>
             </div><!-- End Team Member -->
 
-            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up"
-                data-aos-delay="200">
+            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
                 <div class="team-member">
                     <div class="member-img">
                         <img src="assets/img/team/nabil.jpg" class="img-fluid" alt="">
@@ -52,8 +50,7 @@
                 </div>
             </div><!-- End Team Member -->
 
-            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up"
-                data-aos-delay="300">
+            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
                 <div class="team-member">
                     <div class="member-img">
                         <img src="assets/img/team/kasih.jpg" class="img-fluid" alt="">
@@ -73,8 +70,7 @@
                 </div>
             </div><!-- End Team Member -->
 
-            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up"
-                data-aos-delay="400">
+            <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
                 <div class="team-member">
                     <div class="member-img">
                         <img src="assets/img/team/gilang.jpg" class="img-fluid" alt="">
@@ -98,4 +94,4 @@
 
     </div>
 
-</section>
+</section><!-- End Team Section -->
