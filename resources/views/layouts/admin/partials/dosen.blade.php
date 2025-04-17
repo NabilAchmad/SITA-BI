@@ -9,8 +9,8 @@
                 </div>
                 <div class="col col-stats ms-3 ms-sm-0">
                     <div class="numbers">
-                        <p class="card-category">Visitors</p>
-                        <h4 class="card-title">1,294</h4>
+                        <p class="card-category">Total Dosen Aktif</p>
+                        <h4 class="card-title">64</h4>
                     </div>
                 </div>
             </div>

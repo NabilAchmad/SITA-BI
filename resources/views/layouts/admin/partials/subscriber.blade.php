@@ -9,7 +9,7 @@
                 </div>
                 <div class="col col-stats ms-3 ms-sm-0">
                     <div class="numbers">
-                        <p class="card-category">Subscribers</p>
+                        <p class="card-category">Mahasiswa</p>
                         <h4 class="card-title">1303</h4>
                     </div>
                 </div>

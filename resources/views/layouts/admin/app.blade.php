@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>@yield('title', 'Dashboard')</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
-    {{-- Ganti Icon --}}
+    <!-- Ganti Icon -->
     <link rel="icon" href="assets/img/kaiadmin/favicon.ico" type="image/x-icon" />
 
     <!-- Fonts and icons -->
@@ -48,19 +48,19 @@
                 <!-- Navbar Header -->
                 <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
                     <div class="container-fluid">
-                        {{-- Search Bar --}}
+                        <!-- Search Bar -->
                         @include('layouts.admin.navbar.searchbar')
 
                         <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
                             <!--Notification -->
                             @include('layouts.admin.navbar.notification')
-                            {{-- End Notification --}}
+                            <!-- End Notification -->
 
-                            {{-- Quick Action --}}
+                            <!-- Quick Action -->
                             @include('layouts.admin.navbar.quickaction')
                             <!-- End Quick Action -->
 
-                            {{-- profile --}}
+                            <!-- profile -->
                             @include('layouts.admin.navbar.profile')
                             <!-- End Profile -->
                         </ul>
@@ -73,73 +73,8 @@
             <div class="container">
                 <div class="page-inner">
 
-                    {{-- Header Halaman --}}
-                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
-                        <div>
-                            <h3 class="fw-bold mb-3">Dashboard</h3>
-                        </div>
-                        <div class="ms-md-auto py-2 py-md-0">
-                            <a href="#" class="btn btn-label-info btn-round me-2">Manage</a>
-                            <a href="#" class="btn btn-primary btn-round">Tambah Akun Dosen</a>
-                        </div>
-                    </div>
+                    @yield('content')
 
-                    {{-- Komponen --}}
-                    <div class="row">
-                        {{-- Visitor section --}}
-                        @include('layouts.admin.partials.visitor')
-                        {{-- End Visitor section --}}
-
-                        {{-- subscriber section --}}
-                        @include('layouts.admin.partials.subscriber')
-                        {{-- End subscriber section --}}
-
-                        {{-- Sales section --}}
-                        @include('layouts.admin.partials.sales')
-                        {{-- End Sales section --}}
-
-                        {{-- Order section --}}
-                        @include('layouts.admin.partials.order')
-                        {{-- End Order section --}}
-
-                    </div>
-
-                    {{-- upper main --}}
-                    <div class="row">
-                        {{-- user statistics --}}
-                        @include('layouts.admin.main.upperMain.userstatistics')
-                        {{-- end user statistics --}}
-
-                        {{-- Daily Sales --}}
-                        @include('layouts.admin.main.upperMain.dailysales')
-                        {{-- end Daily Sales --}}
-                    </div>
-
-                    {{-- Lower Main --}}
-                    <div class="row">
-                        <div class="col-md-12">
-                            {{-- Grafik --}}
-                            <div class="card card-round">
-                                <!-- user geolocation -->
-                                @include('layouts.admin.main.lowerMain.headercard')
-                                <!-- end user geolocation -->
-                                
-                                <!--Table-->
-                                @include('layouts.admin.main.lowerMain.grafik')
-                            </div>
-                            {{-- End Grafik --}}
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        {{-- New Customer --}}
-                        @include('layouts.admin.main.lowerMain.customer')
-                        {{-- End New Customer --}}
-
-                        {{-- Transaction History --}}
-                        @include('layouts.admin.main.lowerMain.transactionhistory')
-                        {{-- End Transaction History --}}
-                    </div>
                 </div>
             </div>
 
@@ -186,7 +121,7 @@
     <!-- Kaiadmin DEMO methods, don't include it in your project! -->
     <script src="assets/js/setting-demo.js"></script>
     <script src="assets/js/demo.js"></script>
-    
+
     <script>
         $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
             type: "line",
