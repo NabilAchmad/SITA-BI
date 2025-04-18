@@ -31,7 +31,6 @@
 
         <!-- Daily Sales -->
         <div class="col-md-4">
-            @include('layouts.admin.main.upperMain.proposal')
             @include('layouts.admin.main.upperMain.dosenaktif')
         </div>
         <!-- end Daily Sales -->

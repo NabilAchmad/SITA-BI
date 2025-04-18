@@ -9,7 +9,7 @@
                 </div>
                 <div class="col col-stats ms-3 ms-sm-0">
                     <div class="numbers">
-                        <p class="card-category">Total Dosen Pembimbing</p>
+                        <p class="card-category">Dosen Pembimbing</p>
                         <h4 class="card-title">32</h4>
                     </div>
                 </div>

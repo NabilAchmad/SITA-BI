@@ -170,7 +170,7 @@
 
                 <li class="nav-item">
                     <a data-bs-toggle="collapse" href="#logs">
-                        <i class="fas fa-stream me-2"></i>
+                        <i class="fas fa-terminal"></i>
                         <p>Log dan Aktifitas</p>
                         <span class="caret"></span>
                     </a>
