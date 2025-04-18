@@ -48,8 +48,6 @@
                 <!-- Navbar Header -->
                 <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
                     <div class="container-fluid">
-                        <!-- Search Bar -->
-                        @include('layouts.admin.navbar.searchbar')
 
                         <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
                             <!--Notification -->
