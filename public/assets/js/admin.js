@@ -112,7 +112,6 @@ $(document).ready(function(){
 	});
 
 	var toggle_sidebar = false,
-	toggle_quick_sidebar = false,
 	toggle_topbar = false,
 	minimize_sidebar = false,
 	first_toggle_sidebar = false,

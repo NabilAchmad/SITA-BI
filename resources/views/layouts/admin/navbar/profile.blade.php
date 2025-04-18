@@ -2,7 +2,7 @@
     <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#"
         aria-expanded="false">
         <div class="avatar-sm">
-            <img src="assets/img/team/erland.jpg" alt="..."
+            <img src="{{ asset('assets/img/team/erland.jpg') }}" alt="Erland"
                 class="avatar-img rounded-circle" />
         </div>
         <span class="profile-username">
