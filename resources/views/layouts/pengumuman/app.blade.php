@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>@yield('title', 'Dashboard')</title>
+    <title>@yield('title', 'Buat Pengumuman')</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
     <!-- Ganti Icon -->
     <link rel="icon" href="assets/img/kaiadmin/favicon.ico" type="image/x-icon" />
@@ -44,13 +44,30 @@
 
         <!-- Main Panel -->
         <div class="main-panel">
-            @include('layouts.admin.header')
+            <div class="main-header">
+                <!-- Navbar Header -->
+                <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+                    <div class="container-fluid">
+
+                        <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
+                            <!--Notification -->
+                            @include('layouts.admin.navbar.notification')
+                            <!-- End Notification -->
+
+                            <!-- profile -->
+                            @include('layouts.admin.navbar.profile')
+                            <!-- End Profile -->
+                        </ul>
+
+                    </div>
+                </nav>
+                <!-- End Navbar -->
+            </div>
 
             <div class="container">
+                <!-- Content -->
                 <div class="page-inner">
-
                     @yield('content')
-
                 </div>
             </div>
 

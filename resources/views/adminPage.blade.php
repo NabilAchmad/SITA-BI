@@ -3,8 +3,8 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <!-- Header Halaman -->
-    @include('layouts.admin.header')
+    <!-- Header Main -->
+    @include('layouts.admin.main.header')
     <div class="row">
         <!-- dosen section -->
         @include('layouts.admin.partials.dosen')
@@ -22,8 +22,9 @@
         @include('layouts.admin.partials.dospem')
         <!-- End Dosen Pembimbing -->
     </div>
+    <!-- end header main -->
 
-    <!-- upper main -->
+    <!-- main -->
     <div class="row">
         <!-- Log Activity -->
         @include('layouts.admin.main.logactivity')
@@ -36,14 +37,11 @@
         <!-- end dosen aktif -->
     </div>
 
-    <!-- Lower Main -->
     <div class="row">
         <div class="col-md-12">
             <!-- Pengumuman -->
             <div class="card card-round">
-                <!--Table-->
                 @include('layouts.admin.main.pengumuman')
-                <!--End Table-->
             </div>
             <!-- End Pengumuman -->
         </div>
@@ -54,4 +52,5 @@
         @include('layouts.admin.main.riwayatpengajuanta')
         <!-- End Transaction History -->
     </div>
+    <!-- end main -->
 @endsection

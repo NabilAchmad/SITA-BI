@@ -1,8 +1,19 @@
-<div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
-    <div>
-        <h3 class="fw-bold mb-3">Dashboard</h3>
-    </div>
-    <div class="ms-md-auto py-2 py-md-0">
-        <a href="#" class="btn btn-primary btn-round">Tambah Akun Dosen</a>
-    </div>
+<div class="main-header">
+    <!-- Navbar Header -->
+    <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+        <div class="container-fluid">
+
+            <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
+                <!--Notification -->
+                @include('layouts.admin.navbar.notification')
+                <!-- End Notification -->
+
+                <!-- profile -->
+                @include('layouts.admin.navbar.profile')
+                <!-- End Profile -->
+            </ul>
+
+        </div>
+    </nav>
+    <!-- End Navbar -->
 </div>
