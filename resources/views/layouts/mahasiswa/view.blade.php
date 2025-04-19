@@ -5,9 +5,7 @@
             <h5>Daftar Akun Mahasiswa</h5>
         </div>
         <div class="card-body">
-            <div class="mb-3">
-                <button class="btn btn-primary">Tambah Akun</button>
-            </div>
+
             <table class="table table-bordered">
                 <thead class="table-dark">
                     <tr>

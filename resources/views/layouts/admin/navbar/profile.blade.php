@@ -21,17 +21,12 @@
                     <div class="u-text">
                         <h4>erlaaaand_</h4>
                         <p class="text-muted">erlandagsya2@gmail.com</p>
-                        <a href="profile.html"
+                        <a href="{{ url('/admin/profile') }}"
                             class="btn btn-xs btn-secondary btn-sm">View Profile</a>
                     </div>
                 </div>
             </li>
             <li>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">My Profile</a>
-                <a class="dropdown-item" href="#">Inbox</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Account Setting</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#">Logout</a>
             </li>

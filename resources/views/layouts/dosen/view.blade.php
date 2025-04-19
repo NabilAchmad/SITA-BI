@@ -6,7 +6,7 @@
         </div>
         <div class="card-body">
             <div class="mb-3">
-                <button class="btn btn-primary">Tambah Akun</button>
+                <a href="{{url('/kelola-akun/dosen/tambah')}}" class="btn btn-primary">Tambah Akun</a>
             </div>
             <table class="table table-bordered">
                 <thead class="table-dark">
