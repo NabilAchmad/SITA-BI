@@ -135,8 +135,8 @@
                             </li>
 
                             <li class="{{ request()->is('sidang/lihat-jadwal') ? 'active' : '' }}">
-                                <a href="{{ url('/sidang/lihat-jadwal')}}">
-                                <span class="sub-item">Lihat Jadwal Sidang</span></a>
+                                <a href="{{ url('/sidang/lihat-jadwal') }}">
+                                    <span class="sub-item">Lihat Jadwal Sidang</span></a>
                             </li>
                         </ul>
                     </div>
@@ -184,11 +184,6 @@
                                     <span class="sub-item">Lihat Laporan dan Statistik</span>
                                 </a>
                             </li>
-                            <li class="{{ request()->is('laporan/unduh') ? 'active' : '' }}">
-                                <a href="{{ url('/laporan/unduh') }}">
-                                    <span class="sub-item">Unduh Laporan dan Statistik</span>
-                                </a>
-                            </li>
                         </ul>
                     </div>
                 </li>
@@ -207,11 +202,6 @@
                             <li class="{{ request()->is('logs/lihat') ? 'active' : '' }}">
                                 <a href="{{ url('/logs/lihat') }}">
                                     <span class="sub-item">Lihat Log dan Aktifitas</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('logs/unduh') ? 'active' : '' }}">
-                                <a href="{{ url('/logs/unduh') }}">
-                                    <span class="sub-item">Unduh Log dan Aktifitas</span>
                                 </a>
                             </li>
                         </ul>
