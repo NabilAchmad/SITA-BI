@@ -8,5 +8,6 @@
     @include('layouts.homepage.partials.tawarantopik')
     @include('layouts.homepage.partials.jadwal')
     @include('layouts.homepage.partials.pengumuman')
+    @include('layouts.homepage.partials.nilai')
     @include('layouts.homepage.partials.team')
 @endsection
