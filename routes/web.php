@@ -74,3 +74,24 @@ Route::get('/logs/lihat', function() {
 Route::get('/admin/profile', function() {
     return view('admin/user/profile');
 })->name('profile.detail');
+
+// KETUA JURUSAN
+Route::get('/ketua-jurusan', function () {
+    return view('kajur/dashboard');
+})->name('ketua-jurusan.page');
+
+// lihat jadwal sidang
+Route::get('kajur/sidang/lihat-jadwal', function() {
+    return view('kajur/sidang/lihat-jadwal');
+})->name('jadwal-sidang.kajur.readJadwal');
+
+// lihat mahasiswa sidang
+Route::get('kajur/sidang/lihat-mahasiswa', function() {
+    return view('kajur/sidang/lihat-mahasiswa');
+})->name('mahasiswa-sidang.kajur.readMahasiswa');
+
+// lihat pengumuman
+Route::get('kajur/pengumuman/lihat-pengumuman', function() {
+    return view('kajur/pengumuman/lihat-pengumuman');
+})->name('mahasiswa-sidang.kajur.readPengumuman');
+
