@@ -12,7 +12,6 @@
                 <li><a href="#tawarantopik">Tawaran Topik</a></li>
                 <li><a href="#jadwal">Jadwal</a></li>
                 <li><a href="#pengumuman">Pengumuman</a></li>
-                <li><a href="#nilai">Nilai Sidang</a></li>
                 <li><a href="#team">Team</a></li>
                 <a class="btn-getstarted flex-md-shrink-0" href="index.html#about">Login</a>
     </div>

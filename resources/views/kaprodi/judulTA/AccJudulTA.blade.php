@@ -1,7 +1,7 @@
 @extends('layouts.template.main')
 
-@section('title', 'Lihat Judul TA')
+@section('title', 'Lihat Judul Tugas Akhir')
 
 @section('content')
-    @include('kaprodi.judulTA.crud-JudulTA.read')
+    @include('kaprodi.judulTA.acc-judul.read')
 @endsection

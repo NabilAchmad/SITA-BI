@@ -21,13 +21,15 @@
                         <td>Erlan Nugroho</td>
                         <td>Sistem Informasi Akademik Terintegrasi</td>
                         <td id="status-1">Menunggu</td>
-                        <td><button class="btn btn-success" onclick="accJudul(1)">ACC</button></td>
+                        <td><button class="btn btn-success" onclick="accJudul(1)">ACC Judul</button></td>
+                        <td><button class="btn btn-warning" onclick="tolakJudul(1)">Tolak Judul</button></td>
                     </tr>
                     <tr>
                         <td>Rina Kusuma</td>
                         <td>Aplikasi Manajemen Perpustakaan Digital</td>
                         <td id="status-2">Menunggu</td>
-                        <td><button class="btn btn-success" onclick="accJudul(2)">ACC</button></td>
+                        <td><button class="btn btn-success" onclick="accJudul(2)">ACC Judul</button></td>
+                        <td><button class="btn btn-warning" onclick="tolakJudul(2)">Tolak Judul</button></td>
                     </tr>
                 </tbody>
             </table>

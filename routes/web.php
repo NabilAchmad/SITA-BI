@@ -95,3 +95,7 @@ Route::get('kajur/pengumuman/lihat-pengumuman', function() {
     return view('kajur/pengumuman/lihat-pengumuman');
 })->name('mahasiswa-sidang.kajur.readPengumuman');
 
+// Ketua Program Studi
+Route::get('/ketua-prodi', function () {
+    return view('kaprodi/dashboard');
+})->name('kaprodi.page');
