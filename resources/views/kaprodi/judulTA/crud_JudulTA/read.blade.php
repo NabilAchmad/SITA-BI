@@ -45,6 +45,7 @@
             statusCell.classList.add('text-success');
 
             alert('Judul telah di-ACC!');
+            alert('Judul Ditolak!');
         }
     </script>
 
