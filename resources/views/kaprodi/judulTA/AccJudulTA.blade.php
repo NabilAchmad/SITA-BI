@@ -1,4 +1,4 @@
-@extends('namelayouts.template.kaprodi')
+@extends('layouts.template.kaprodi')
 
 @section('title', 'Acc Judul Tugas Akhir')
 @section('content')

@@ -2,7 +2,7 @@
     <div class="sidebar-logo">
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="dark">
-            <a href="{{ url('/kaprodi') }}"
+            <a href="{{ url('/ketua-prodi') }}"
                 class="logo d-flex align-items-center text-decoration-none px-3 py-2 text-white w-100"
                 style="max-width: 100%; overflow: hidden; transition: background-color 0.3s ease;">
 
@@ -78,8 +78,8 @@
                     <div class="collapse {{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? 'show' : '' }}"
                         id="tables">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('kaprodi/melihatJudul') ? 'active' : '' }}">
-                                <a href="{{ url('/kaprodi/melihatJudul') }}">
+                            <li class="{{ request()->is('ketua-prodi/ACCJudulTA') ? 'active' : '' }}">
+                                <a href="{{ url('/ketua-prodi/ACCJudulTA') }}">
                                     <span class="sub-item">Judul Tugas Akhir</span>
                                 </a>
                             </li>
@@ -88,23 +88,23 @@
                 </li>
 
                 <!-- Sidang -->
-                <li class="nav-item {{ request()->is('kaprodi/sidang') || request()->is('kaprodi/sidang/*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-prodi/sidang') || request()->is('ketua-prodi/sidang/*') ? 'active' : '' }}">
                     <a data-bs-toggle="collapse" href="#forms"
-                        class="{{ request()->is('kaprodi/sidang') || request()->is('kaprodi/sidang/*') ? '' : 'collapsed' }}">
+                        class="{{ request()->is('ketua-prodi/sidang') || request()->is('ketua-prodi/sidang/*') ? '' : 'collapsed' }}">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <p>Sidang</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('sidang') || request()->is('kaprodi/sidang/*') ? 'show' : '' }}"
+                    <div class="collapse {{ request()->is('sidang') || request()->is('ketua-prodi/sidang/*') ? 'show' : '' }}"
                         id="forms">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('kaprodi/sidang/lihat-jadwal') ? 'active' : '' }}">
-                                <a href="{{ url('kaprodi/sidang/lihat-jadwal') }}">
+                            <li class="{{ request()->is('ketua-prodi/sidang/lihat-jadwal') ? 'active' : '' }}">
+                                <a href="{{ url('ketua-prodi/sidang/lihat-jadwal') }}">
                                     <span class="sub-item">Lihat Jadwal Sidang</span></a>
                             </li>
 
-                            <li class="{{ request()->is('kaprodi/sidang/lihat-mahasiswa') ? 'active' : '' }}">
-                                <a href="{{ url('kaprodi/sidang/lihat-mahasiswa') }}">
+                            <li class="{{ request()->is('ketua-prodi/sidang/lihat-mahasiswa') ? 'active' : '' }}">
+                                <a href="{{ url('ketua-prodi/sidang/lihat-mahasiswa') }}">
                                     <span class="sub-item">Mahasiswa Sidang</span></a>
                             </li>
                         </ul>
@@ -112,17 +112,17 @@
                 </li>
 
                 <!-- Pengumuman -->
-                <li class="nav-item {{ request()->is('kaprodi/pengumuman*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-prodi/pengumuman*') ? 'active' : '' }}">
                     <a data-bs-toggle="collapse" href="#pengumuman"
-                        class="{{ request()->is('kaprodi/pengumuman*') ? '' : 'collapsed' }}">
+                        class="{{ request()->is('ketua-prodi/pengumuman*') ? '' : 'collapsed' }}">
                         <i class="fas fa-bullhorn"></i>
                         <p>Pengumuman</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('kaprodi/pengumuman*') ? 'show' : '' }}" id="pengumuman">
+                    <div class="collapse {{ request()->is('ketua-prodi/pengumuman*') ? 'show' : '' }}" id="pengumuman">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('kaprodi/pengumuman/lihat-pengumuman') ? 'active' : '' }}">
-                                <a href="{{ url('kaprodi/pengumuman/lihat-pengumuman') }}">
+                            <li class="{{ request()->is('ketua-prodi/pengumuman/lihat-pengumuman') ? 'active' : '' }}">
+                                <a href="{{ url('ketua-prodi/pengumuman/lihat-pengumuman') }}">
                                     <span class="sub-item">Lihat Pengumuman</span>
                                 </a>
                             </li>
