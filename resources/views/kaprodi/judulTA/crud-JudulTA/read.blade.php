@@ -1,6 +1,4 @@
-<section id="acc-judul" class="values section">
-
-    <!-- Section Title -->
+<!-- Section Title -->
     <div class="container section-title" data-aos="fade-up">
         <h1>ACC Judul Tugas Akhir</h1>
     </div>
@@ -48,5 +46,3 @@
             alert('Judul Ditolak!');
         }
     </script>
-
-</section>

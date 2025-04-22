@@ -10,4 +10,4 @@ Route::get('/ketua-prodi', function () {
 // Dosen
 Route::get('/kaprodi/sidang/lihat-jadwal', function () {
     return view('kaprodi/jadwal/readjadwal');
-})->name('dosen.page');
+})->name('kaprodi/jadwal.page');

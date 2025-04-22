@@ -2,12 +2,12 @@
     <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#"
         aria-expanded="false">
         <div class="avatar-sm">
-            <img src="{{ asset('assets/img/team/erland.jpg') }}" alt="Erland"
+            <img src="{{ asset('assets/img/team/nabil.jpg') }}" alt="Erland"
                 class="avatar-img rounded-circle" />
         </div>
         <span class="profile-username">
             <span class="op-7">Hi,</span>
-            <span class="fw-bold">Erland Agsya Agustian</span>
+            <span class="fw-bold">Nabil Achmad Khoir</span>
         </span>
     </a>
     <ul class="dropdown-menu dropdown-user animated fadeIn">
@@ -15,7 +15,7 @@
             <li>
                 <div class="user-box">
                     <div class="avatar-lg">
-                        <img src="{{ asset('assets/img/team/erland.jpg') }}" alt="image profile"
+                        <img src="{{ asset('assets/img/team/nabil.jpg') }}" alt="image profile"
                             class="avatar-img rounded" />
                     </div>
                     <div class="u-text">

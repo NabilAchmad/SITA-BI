@@ -57,13 +57,34 @@
                         </ul>
                     </div>
                 </li>
-
+                
                 <!-- Akses Section -->
                 <li class="nav-section">
                     <span class="sidebar-mini-icon">
                         <i class="fa fa-ellipsis-h"></i>
                     </span>
                     <h4 class="text-section">Akses</h4>
+                </li>
+
+                {{-- Tugas Akhir --}}
+                <li
+                    class="nav-item {{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? 'active' : '' }}">
+                    <a data-bs-toggle="collapse" href="#tables"
+                        class="{{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? '' : 'collapsed' }}">
+                        <i class="fas fa-users-cog"></i>
+                        <p>Tugas Akhir</p>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="collapse {{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? 'show' : '' }}"
+                        id="tables">
+                        <ul class="nav nav-collapse">
+                            <li class="{{ request()->is('kaprodi/melihatJudul') ? 'active' : '' }}">
+                                <a href="{{ url('/kaprodi/melihatJudul') }}">
+                                    <span class="sub-item">Judul Tugas Akhir</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
 
                 <!-- Sidang -->
@@ -109,31 +130,6 @@
                     </div>
                 </li>
 
-                <!-- Kelola Akun -->
-                <li
-                    class="nav-item {{ request()->is('kelola-akun') || request()->is('kelola-akun/*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#tables"
-                        class="{{ request()->is('kelola-akun') || request()->is('kelola-akun/*') ? '' : 'collapsed' }}">
-                        <i class="fas fa-users-cog"></i>
-                        <p>Kelola Akun</p>
-                        <span class="caret"></span>
-                    </a>
-                    <div class="collapse {{ request()->is('kelola-akun') || request()->is('kelola-akun/*') ? 'show' : '' }}"
-                        id="tables">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('kelola-akun/dosen') ? 'active' : '' }}">
-                                <a href="{{ url('/kelola-akun/dosen') }}">
-                                    <span class="sub-item">Dosen</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('kelola-akun/mahasiswa') ? 'active' : '' }}">
-                                <a href="{{ url('/kelola-akun/mahasiswa') }}">
-                                    <span class="sub-item">Mahasiswa</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
 
                 <!-- Laporan dan Statistik -->
                 <li class="nav-item {{ request()->is('laporan') || request()->is('laporan/*') ? 'active' : '' }}">

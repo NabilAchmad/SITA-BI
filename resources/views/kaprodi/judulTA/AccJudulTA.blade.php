@@ -1,7 +1,6 @@
-@extends('layouts.template.main')
+@extends('namelayouts.template.kaprodi')
 
-@section('title', 'Lihat Judul Tugas Akhir')
-
+@section('title', 'Acc Judul Tugas Akhir')
 @section('content')
-    @include('kaprodi.judulTA.acc-judul.read')
+    @include('kaprodi.judulTA.crud-JudulTA.read')
 @endsection
