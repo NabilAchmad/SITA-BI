@@ -40,6 +40,7 @@
         function accJudul(id) {
             const statusCell = document.getElementById('status-' + id);
             statusCell.innerHTML = 'Disetujui';
+            statusCell.innerHTML = 'Ditolak';
             statusCell.classList.remove('text-warning');
             statusCell.classList.add('text-success');
 
