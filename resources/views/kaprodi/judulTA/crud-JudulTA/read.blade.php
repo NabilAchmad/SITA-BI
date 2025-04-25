@@ -38,11 +38,9 @@
         function accJudul(id) {
             const statusCell = document.getElementById('status-' + id);
             statusCell.innerHTML = 'Disetujui';
-            statusCell.innerHTML = 'Ditolak';
-            statusCell.classList.remove('text-warning');
+            // statusCell.innerHTML = 'Ditolak';
             statusCell.classList.add('text-success');
 
             alert('Judul telah di-ACC!');
-            alert('Judul Ditolak!');
         }
     </script>

@@ -78,8 +78,8 @@
                     <div class="collapse {{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? 'show' : '' }}"
                         id="tables">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('ketua-prodi/ACCJudulTA') ? 'active' : '' }}">
-                                <a href="{{ url('/ketua-prodi/ACCJudulTA') }}">
+                            <li class="{{ request()->is('kaprodi/judulTA/ACCJudulTA') ? 'active' : '' }}">
+                                <a href="{{ route('accjudul.page') }}">
                                     <span class="sub-item">Judul Tugas Akhir</span>
                                 </a>
                             </li>

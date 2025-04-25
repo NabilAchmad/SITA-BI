@@ -7,7 +7,12 @@ Route::get('/ketua-prodi', function () {
     return view('kaprodi/dashboard');
 })->name('kaprodi.page');
 
-// Dosen
+// Jadwal sidang
 Route::get('/kaprodi/sidang/lihat-jadwal', function () {
-    return view('kaprodi/jadwal/readjadwal');
+    return view('kaprodi/jadwal/readJadwal');
 })->name('kaprodijadwal.page');
+
+// Tugas Akhir
+Route::get('/kaprodi/judulTA/tugas-Akhir', function() {
+    return view('kaprodi/judulTA/AccJudulTA');
+})->name('accjudul.page');
