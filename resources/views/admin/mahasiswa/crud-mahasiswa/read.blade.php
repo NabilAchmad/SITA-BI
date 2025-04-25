@@ -23,8 +23,8 @@
                         <td>erland@example.com</td>
                         <td>Teknik Informatika</td>
                         <td>
-                            <button class="btn btn-warning btn-sm">Edit</button>
-                            <button class="btn btn-danger btn-sm">Hapus</button>
+                            <a class="btn btn-warning btn-sm" href="{{ url('/kelola-akun/mahasiswa/edit') }}">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="{{ url('/kelola-akun/mahasiswa/edit') }}">Hapus</a>
                         </td>
                     </tr>
                     <tr>
@@ -33,8 +33,8 @@
                         <td>janedoe@example.com</td>
                         <td>Sistem Informasi</td>
                         <td>
-                            <button class="btn btn-warning btn-sm">Edit</button>
-                            <button class="btn btn-danger btn-sm">Hapus</button>
+                            <a class="btn btn-warning btn-sm" href="{{ url('/kelola-akun/mahasiswa/edit') }}">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="{{ url('/kelola-akun/mahasiswa/edit') }}">Hapus</a>
                         </td>
                     </tr>
                 </tbody>

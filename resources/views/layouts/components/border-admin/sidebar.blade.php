@@ -90,6 +90,27 @@
                     </div>
                 </li>
 
+                <li
+                    class="nav-item {{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? 'active' : '' }}">
+                    <a data-bs-toggle="collapse" href="#ta"
+                        class="{{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? '' : 'collapsed' }}">
+                        <i class="fas fa-graduation-cap"></i>
+                        <p>Tugas Akhir</p>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="collapse {{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? 'show' : '' }}"
+                        id="ta">
+                        <ul class="nav nav-collapse">
+                            <li class="{{ request()->is('tugas-akhir/pilih-pembimbing') ? 'active' : '' }}">
+                                <a href="{{ url('/tugas-akhir/pilih-pembimbing') }}">
+                                    <span class="sub-item">Pilih Dosen Pembimbing</span>
+                                </a>
+                            </li>
+                            <!-- Tambah menu lain nanti, misalnya Lihat Status, Histori Bimbingan, dll -->
+                        </ul>
+                    </div>
+                </li>
+
 
                 <!-- Berita Acara -->
                 <li
@@ -128,9 +149,9 @@
                     <div class="collapse {{ request()->is('sidang') || request()->is('sidang/*') ? 'show' : '' }}"
                         id="forms">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('sidang/tentukan-jadwal') ? 'active' : '' }}">
-                                <a href="{{ url('/sidang/tentukan-jadwal') }}">
-                                    <span class="sub-item">Tentukan Jadwal Sidang</span>
+                            <li class="{{ request()->is('sidang/list-mahasiswa') ? 'active' : '' }}">
+                                <a href="{{ url('/sidang/list-mahasiswa') }}">
+                                    <span class="sub-item">Lihat Mahasiswa Sidang</span>
                                 </a>
                             </li>
 

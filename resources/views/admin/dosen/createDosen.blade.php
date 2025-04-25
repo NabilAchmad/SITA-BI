@@ -3,5 +3,5 @@
 @section('title', 'Tambah Akun Dosen')
 
 @section('content')
-    @include('layouts.dosen.addDosen')
+    @include('admin.dosen.crud-dosen.create')
 @endsection

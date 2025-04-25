@@ -1,4 +1,5 @@
 <form action="" method="POST">
+    <h1>Tambah Akun Dosen</h1>
     @csrf
     <div class="form-floating mb-3">
         <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama dosen" required>

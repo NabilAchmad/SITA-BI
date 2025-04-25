@@ -6,11 +6,13 @@ Route::get('/', function () {
     return view('home/homepage');
 });
 
+// ADMIN
 Route::get('/admin', function () {
     return view('admin/dashboard');
 })->name('admin.page');
 
-// // Buat Pengumuman
+// ----PENGUMUMAN
+// Buat Pengumuman
 Route::get('/pengumuman/create', function() {
     return view('admin/pengumuman/createPengumuman');
 })->name('pengumuman.create');
@@ -25,6 +27,7 @@ Route::get('/pengumuman/edit', function() {
     return view('admin/pengumuman/editPengumuman');
 })->name('pengumuman.edit');
 
+//  ----BERITA ACARA
 // buat berita acara
 Route::get('/berita-acara/create', function() {
     return view('admin/sidang/berita-acara/createBeritaAcara');
@@ -35,42 +38,58 @@ Route::get('/berita-acara/read', function() {
     return view('admin/sidang/berita-acara/readBeritaAcara');
 })->name('berita-acara.read');
 
+// ----SIDANG
 // tentukan jadwal sidang
 Route::get('/sidang/tentukan-jadwal', function() {
     return view('admin/sidang/jadwal/createJadwalSidang');
 })->name('jadwal-sidang.create');
+
+// Edit Jadwal Sidang
+Route::get('/sidang/edit-jadwal', function() {
+    return view('admin/sidang/jadwal/editJadwalSidang');
+})->name('jadwal-sidang.edit');
 
 // lihat jadwal sidang
 Route::get('/sidang/lihat-jadwal', function() {
     return view('admin/sidang/jadwal/readJadwalSidang');
 })->name('jadwal-sidang.read');
 
-// kelola akun dosen
+// lihat mahasiswa sidang
+Route::get('/sidang/list-mahasiswa', function() {
+    return view('admin/sidang/jadwal/read-mhs-sidang');
+})->name('mahasiswa-sidang.read');
+
+// ----KELOLA AKUN
 Route::get('/kelola-akun/dosen', function() {
     return view('admin/dosen/kelolaAkunDosen');
 })->name('akun-dosen.kelola');
 
 // Tambah akun dosen
 Route::get('/kelola-akun/dosen/tambah', function() {
-    return view('createDosen');
+    return view('admin/dosen/createDosen');
 })->name('akun-dosen.tambah');
+
+// edit akun mahasiswa
+Route::get('/kelola-akun/mahasiswa/edit', function() {
+    return view('admin/mahasiswa/editMahasiswa');
+})->name('akun-mahasiswa.edit');
 
 // kelola akun mahasiswa
 Route::get('/kelola-akun/mahasiswa', function() {
     return view('admin/mahasiswa/kelolaMahasiswa');
 })->name('akun-mahasiswa.kelola');
 
-// lihat laporan dan statistik
+// ----lihat laporan dan statistik
 Route::get('/laporan/lihat', function() {
     return view('admin/laporan/lihatLaporanStatistik');
 })->name('laporan.statistik');
 
-// lihat log dan aktifitas
+// ----lihat log dan aktifitas
 Route::get('/logs/lihat', function() {
     return view('admin/log/lihatLogAktifitas');
 })->name('log.aktifitas');
 
-// profile 
+// ----profile 
 Route::get('/admin/profile', function() {
     return view('admin/user/profile');
 })->name('profile.detail');
@@ -79,6 +98,11 @@ Route::get('/admin/profile', function() {
 Route::get('/ketua-jurusan', function () {
     return view('kajur/dashboard');
 })->name('ketua-jurusan.page');
+
+// profile 
+Route::get('/ketua-jurusan/profile', function() {
+    return view('kajur/user/profile');
+})->name('profile.detail');
 
 // lihat jadwal sidang
 Route::get('kajur/sidang/lihat-jadwal', function() {

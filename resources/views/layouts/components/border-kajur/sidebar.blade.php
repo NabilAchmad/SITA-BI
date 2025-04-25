@@ -109,32 +109,6 @@
                     </div>
                 </li>
 
-                <!-- Kelola Akun -->
-                <li
-                    class="nav-item {{ request()->is('kelola-akun') || request()->is('kelola-akun/*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#tables"
-                        class="{{ request()->is('kelola-akun') || request()->is('kelola-akun/*') ? '' : 'collapsed' }}">
-                        <i class="fas fa-users-cog"></i>
-                        <p>Kelola Akun</p>
-                        <span class="caret"></span>
-                    </a>
-                    <div class="collapse {{ request()->is('kelola-akun') || request()->is('kelola-akun/*') ? 'show' : '' }}"
-                        id="tables">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('kelola-akun/dosen') ? 'active' : '' }}">
-                                <a href="{{ url('/kelola-akun/dosen') }}">
-                                    <span class="sub-item">Dosen</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('kelola-akun/mahasiswa') ? 'active' : '' }}">
-                                <a href="{{ url('/kelola-akun/mahasiswa') }}">
-                                    <span class="sub-item">Mahasiswa</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
                 <!-- Laporan dan Statistik -->
                 <li class="nav-item {{ request()->is('laporan') || request()->is('laporan/*') ? 'active' : '' }}">
                     <a data-bs-toggle="collapse" href="#maps"
@@ -149,26 +123,6 @@
                             <li class="{{ request()->is('laporan/lihat') ? 'active' : '' }}">
                                 <a href="{{ url('/laporan/lihat') }}">
                                     <span class="sub-item">Lihat Laporan dan Statistik</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
-                <!-- Log dan Aktifitas -->
-                <li class="nav-item {{ request()->is('logs') || request()->is('logs/*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#logs"
-                        class="{{ request()->is('logs') || request()->is('logs/*') ? '' : 'collapsed' }}">
-                        <i class="fas fa-terminal"></i>
-                        <p>Log dan Aktifitas</p>
-                        <span class="caret"></span>
-                    </a>
-                    <div class="collapse {{ request()->is('logs') || request()->is('logs/*') ? 'show' : '' }}"
-                        id="logs">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('logs/lihat') ? 'active' : '' }}">
-                                <a href="{{ url('/logs/lihat') }}">
-                                    <span class="sub-item">Lihat Log dan Aktifitas</span>
                                 </a>
                             </li>
                         </ul>

@@ -30,13 +30,13 @@
     <!-- main -->
     <div class="row">
         <!-- Log Activity -->
-        @include('layouts.components.content-kajur.logactivity')
+        {{-- @include('layouts.components.content-kajur.logactivity') --}}
         <!-- end Log Activity -->
 
         <!-- dosen aktif -->
-        <div class="col-md-4">
+        {{-- <div class="col-md-4">
             @include('layouts.components.content-kajur.dosenaktif')
-        </div>
+        </div> --}}
         <!-- end dosen aktif -->
     </div>
 

@@ -33,6 +33,7 @@
                     <td>
                         <a href="#" class="btn btn-success btn-sm">Unduh Word</a>
                         <a href="#" class="btn btn-danger btn-sm">Hapus</a>
+                        <a href="#" class="btn btn-warning btn-sm">Edit</a>
                         <a href="#" class="btn btn-secondary btn-sm">Export PDF</a>
                     </td>
                 </tr>
@@ -44,6 +45,7 @@
                     <td>
                         <a href="#" class="btn btn-success btn-sm">Unduh Word</a>
                         <a href="#" class="btn btn-danger btn-sm">Hapus</a>
+                        <a href="#" class="btn btn-warning btn-sm">Edit</a>
                         <a href="#" class="btn btn-secondary btn-sm">Export PDF</a>
                     </td>
                 </tr>

@@ -26,8 +26,8 @@
                 <td>Ruang 101</td>
                 <td>
                     <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-warning btn-sm">Edit</button>
-                        <button class="btn btn-danger btn-sm">Hapus</button>
+                        <a class="btn btn-warning btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Edit</a>
+                        <a class="btn btn-danger btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Hapus</a>
                     </div>
                 </td>
             </tr>
@@ -42,8 +42,8 @@
                 <td>Ruang 102</td>
                 <td>
                     <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-warning btn-sm">Edit</button>
-                        <button class="btn btn-danger btn-sm">Hapus</button>
+                        <a class="btn btn-warning btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Edit</a>
+                        <a class="btn btn-danger btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Hapus</a>
                     </div>
                 </td>
             </tr>
@@ -58,8 +58,8 @@
                 <td>Ruang 103</td>
                 <td>
                     <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-warning btn-sm">Edit</button>
-                        <button class="btn btn-danger btn-sm">Hapus</button>
+                        <a class="btn btn-warning btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Edit</a>
+                        <a class="btn btn-danger btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Hapus</a>
                     </div>
                 </td>
             </tr>
