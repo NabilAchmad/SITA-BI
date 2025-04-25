@@ -13,6 +13,6 @@ Route::get('/kaprodi/sidang/lihat-jadwal', function () {
 })->name('kaprodijadwal.page');
 
 // Tugas Akhir
-Route::get('/kaprodi/judulTA/tugas-Akhir', function() {
+Route::get('/kaprodi/judulTA/AccJudulTA', function() {
     return view('kaprodi/judulTA/AccJudulTA');
 })->name('accjudul.page');
