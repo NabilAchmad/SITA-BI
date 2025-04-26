@@ -77,12 +77,12 @@
                     <div class="collapse {{ request()->is('pengumuman*') ? 'show' : '' }}" id="pengumuman">
                         <ul class="nav nav-collapse">
                             <li class="{{ request()->is('pengumuman/create') ? 'active' : '' }}">
-                                <a href="{{ url('/pengumuman/create') }}">
+                                <a href="{{ route('admin.pengumuman.create') }}">
                                     <span class="sub-item">Buat Pengumuman</span>
                                 </a>
                             </li>
                             <li class="{{ request()->is('pengumuman/read') ? 'active' : '' }}">
-                                <a href="{{ url('/pengumuman/read') }}">
+                                <a href="{{ route('admin.pengumuman.index') }}">
                                     <span class="sub-item">Lihat Pengumuman</span>
                                 </a>
                             </li>
@@ -135,7 +135,7 @@
                             </li>
 
                             <li class="{{ request()->is('sidang/lihat-jadwal') ? 'active' : '' }}">
-                                <a href="{{ url('/sidang/lihat-jadwal') }}">
+                                <a href="{{ route('admin.jadwal.page') }}">
                                     <span class="sub-item">Lihat Jadwal Sidang</span></a>
                             </li>
                         </ul>

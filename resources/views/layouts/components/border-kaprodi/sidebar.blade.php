@@ -122,7 +122,7 @@
                     <div class="collapse {{ request()->is('ketua-prodi/pengumuman*') ? 'show' : '' }}" id="pengumuman">
                         <ul class="nav nav-collapse">
                             <li class="{{ request()->is('ketua-prodi/pengumuman/lihat-pengumuman') ? 'active' : '' }}">
-                                <a href="{{ url('ketua-prodi/pengumuman/lihat-pengumuman') }}">
+                                <a href="{{ route('kaprodipengumuman.page') }}">
                                     <span class="sub-item">Lihat Pengumuman</span>
                                 </a>
                             </li>
@@ -136,15 +136,25 @@
                     <a data-bs-toggle="collapse" href="#maps"
                         class="{{ request()->is('laporan') || request()->is('laporan/*') ? '' : 'collapsed' }}">
                         <i class="fas fa-chart-bar"></i>
-                        <p>Laporan dan Statistik</p>
+                        <p>Nilai Sidang</p>
                         <span class="caret"></span>
                     </a>
                     <div class="collapse {{ request()->is('laporan') || request()->is('laporan/*') ? 'show' : '' }}"
                         id="maps">
                         <ul class="nav nav-collapse">
                             <li class="{{ request()->is('laporan/lihat') ? 'active' : '' }}">
-                                <a href="{{ url('/laporan/lihat') }}">
-                                    <span class="sub-item">Lihat Laporan dan Statistik</span>
+                                <a href="{{ route('kaprodi.nilai.page') }}">
+                                    <span class="sub-item">Lihat Nilai</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="collapse {{ request()->is('laporan') || request()->is('laporan/*') ? 'show' : '' }}"
+                        id="maps">
+                        <ul class="nav nav-collapse">
+                            <li class="{{ request()->is('laporan/lihat') ? 'active' : '' }}">
+                                <a href="{{ route('kaprodi.nilai.create') }}">
+                                    <span class="sub-item">Tambahkan Nilai</span>
                                 </a>
                             </li>
                         </ul>

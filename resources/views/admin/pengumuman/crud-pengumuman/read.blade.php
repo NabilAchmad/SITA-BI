@@ -1,5 +1,5 @@
 <h1 class="mb-4">Daftar Pengumuman</h1>
-<a href="{{url('/pengumuman/create')}}" class="btn btn-primary mb-3">Buat Pengumuman Baru</a>
+<a href="{{route('admin.pengumuman.create')}}" class="btn btn-primary mb-3">Buat Pengumuman Baru</a>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -20,7 +20,7 @@
             <td>Pengguna Terdaftar</td>
             <td>
                 <div class="d-flex gap-2">
-                    <a href="{{url('/pengumuman/edit')}}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{{route('admin.pengumuman.edit')}}" class="btn btn-warning btn-sm">Edit</a>
                     <button class="btn btn-danger btn-sm"
                         onclick="confirm('Apakah Anda yakin ingin menghapus pengumuman ini?')">Hapus</button>
                 </div>
