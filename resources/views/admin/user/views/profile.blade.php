@@ -3,5 +3,5 @@
 @section('title', 'Profile Admin')
 
 @section('content')
-    @include('admin.user.view')
+    @include('admin.user.crud-users.view')
 @endsection
