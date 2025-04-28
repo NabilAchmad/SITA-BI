@@ -10,6 +10,7 @@ Route::prefix('admin')->group(function () {
     Route::view('/pengumuman/create', 'admin/pengumuman/views/createPengumuman')->name('pengumuman.create');
     Route::view('/pengumuman/read', 'admin/pengumuman/views/readPengumuman')->name('pengumuman.read');
     Route::view('/pengumuman/edit', 'admin/pengumuman/views/editPengumuman')->name('pengumuman.edit');
+    Route::view('/pengumuman/trashed', 'admin/pengumuman/views/trashedPengumuman')->name('pengumuman.trashed');
 
     // Tugas Akhir
     Route::view('/tugas-akhir/pilih-pembimbing', 'admin/tugas-akhir/views/pilihPembimbing')->name('tugas-akhir.pilih-pembimbing');

@@ -24,9 +24,9 @@
             <label for="audiens" class="form-label fw-semibold">Pilih Audiens</label>
             <select class="form-select shadow-sm rounded-3" id="audiens" name="audiens" required>
                 <option value="" disabled selected>-- Pilih Audiens --</option>
-                <option value="pengguna_terdaftar">Pengguna Terdaftar</option>
+                <option value="registered_users">Pengguna Terdaftar</option>
                 <option value="guest">Tamu</option>
-                <option value="semua_pengguna">Semua Pengguna</option>
+                <option value="all_users">Semua Pengguna</option>
             </select>
         </div>
 

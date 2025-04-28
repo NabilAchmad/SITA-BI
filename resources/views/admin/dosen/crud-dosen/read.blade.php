@@ -36,7 +36,6 @@
                         <td>Dosen</td>
                         <td>
                             <button class="btn btn-warning btn-sm">Edit</button>
-                            <button class="btn btn-danger btn-sm">Hapus</button>
                         </td>
                     </tr>
                 </tbody>

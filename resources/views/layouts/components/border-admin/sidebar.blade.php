@@ -74,6 +74,11 @@
                                     <span class="sub-item">Lihat Pengumuman</span>
                                 </a>
                             </li>
+                            <li class="{{request()->is('admin/pengumuman/trashed') ? 'active' : '' }}">
+                                <a href="{{route('pengumuman.trashed') }}">
+                                    <span class="sub-item">Pengumuman Dihapus</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
