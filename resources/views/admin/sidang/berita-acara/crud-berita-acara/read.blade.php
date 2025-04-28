@@ -32,9 +32,9 @@
                     <td>2023-10-01</td>
                     <td>
                         <a href="#" class="btn btn-success btn-sm">Unduh Word</a>
-                        <a href="#" class="btn btn-danger btn-sm">Hapus</a>
-                        <a href="#" class="btn btn-warning btn-sm">Edit</a>
                         <a href="#" class="btn btn-secondary btn-sm">Export PDF</a>
+                        <a href="/berita-acara/edit" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="#" class="btn btn-danger btn-sm">Hapus</a>
                     </td>
                 </tr>
                 <tr>
@@ -44,9 +44,9 @@
                     <td>2023-10-05</td>
                     <td>
                         <a href="#" class="btn btn-success btn-sm">Unduh Word</a>
-                        <a href="#" class="btn btn-danger btn-sm">Hapus</a>
-                        <a href="#" class="btn btn-warning btn-sm">Edit</a>
                         <a href="#" class="btn btn-secondary btn-sm">Export PDF</a>
+                        <a href="/berita-acara/edit" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="#" class="btn btn-danger btn-sm">Hapus</a>
                     </td>
                 </tr>
                 <!-- Tambahkan data lainnya -->

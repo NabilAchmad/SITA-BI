@@ -27,33 +27,18 @@
     </div>
     <!-- end main -->
 
-    <!-- main -->
-    <div class="row">
-        <!-- Log Activity -->
-        {{-- @include('layouts.components.content-kajur.logactivity') --}}
-        <!-- end Log Activity -->
-
-        <!-- dosen aktif -->
-        {{-- <div class="col-md-4">
-            @include('layouts.components.content-kajur.dosenaktif')
-        </div> --}}
-        <!-- end dosen aktif -->
-    </div>
-
     <div class="row">
         <div class="col-md-12">
             <!-- Pengumuman -->
-            <div class="card card-round">
-                @include('layouts.components.content-kajur.pengumuman')
-            </div>
+            @include('layouts.components.content-kajur.pengumuman')
             <!-- End Pengumuman -->
         </div>
     </div>
 
     <div class="row">
-        <!-- Transaction History -->
+        <!-- pengajuan TA -->
         @include('layouts.components.content-kajur.riwayatpengajuanta')
-        <!-- End Transaction History -->
+        <!-- End pengajuan TA -->
     </div>
     <!-- end main -->
 @endsection

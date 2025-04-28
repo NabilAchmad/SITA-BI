@@ -1,45 +1,40 @@
 <!-- Pengumuman Card -->
-<div class="card shadow-sm rounded-3" id="pengumumanCard">
-    <div class="card-header">
-        <div class="card-head-row card-tools-still-right d-flex justify-content-between align-items-center">
-            <h4 class="card-title mb-0">Pengumuman</h4>
+<div class="card shadow rounded-4 border-0" id="pengumumanCard">
+    <div class="card-header bg-primary text-white rounded-top-4 py-3 px-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-semibold"><i class="fas fa-bullhorn me-2"></i>Pengumuman</h5>
             <div class="card-tools">
-                <button class="btn btn-icon btn-link btn-primary btn-xs btn-toggle">
+                <button class="btn btn-icon btn-primary btn-sm btn-toggle">
                     <span class="fa fa-angle-down"></span>
                 </button>
-                <button class="btn btn-icon btn-link btn-primary btn-xs btn-refresh-card">
+                <button class="btn btn-icon btn-primary btn-sm btn-refresh-card">
                     <span class="fa fa-sync-alt"></span>
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="card-body">
+    <div class="card-body px-4 pb-4 pt-3">
         <div class="announcement-list">
-            <h5 class="mb-3" style="font-weight: 600; font-size: 1.25rem;">
-                <i class="fas fa-bullhorn me-2 text-primary"></i> Pengumuman
-            </h5>
-
             <div class="announcement-content position-relative" style="max-height: 250px; overflow-y: auto;">
                 <!-- Loader -->
-                <div class="loading-spinner text-center py-2 d-none">
+                <div class="loading-spinner text-center py-2 d-none text-muted">
                     <i class="fa fa-spinner fa-spin me-2"></i>Memuat ulang...
                 </div>
 
                 <!-- List -->
                 <ul class="list-unstyled mb-0" id="announcementList">
-                    <li class="mb-4 d-flex align-items-start justify-content-between">
-                        <div class="flex-grow-1" style="font-size: 0.95rem; line-height: 1.7;">
-                            <strong>[01/04/2025]</strong> - Pendaftaran ulang mahasiswa dibuka hingga 30 April 2025.
+                    <li class="mb-3 pb-3 border-bottom d-flex align-items-start">
+                        <div class="flex-grow-1" style="font-size: 0.95rem; line-height: 1.6;">
+                            <strong class="text-primary">[01/04/2025]</strong> - Pendaftaran ulang mahasiswa dibuka
+                            hingga 30 April 2025.
                         </div>
-
                     </li>
-                    <li class="mb-4 d-flex align-items-start justify-content-between">
-                        <div class="flex-grow-1" style="font-size: 0.95rem; line-height: 1.7;">
-                            <strong>[02/04/2025]</strong> - Pelatihan penggunaan sistem e-learning akan dilaksanakan
-                            minggu depan.
+                    <li class="mb-3 pb-3 border-bottom d-flex align-items-start">
+                        <div class="flex-grow-1" style="font-size: 0.95rem; line-height: 1.6;">
+                            <strong class="text-primary">[02/04/2025]</strong> - Pelatihan penggunaan sistem e-learning
+                            akan dilaksanakan minggu depan.
                         </div>
-
                     </li>
                     <!-- Tambahkan pengumuman lainnya dengan struktur serupa -->
                 </ul>

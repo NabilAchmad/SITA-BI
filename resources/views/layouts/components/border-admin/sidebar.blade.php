@@ -101,9 +101,9 @@
                     <div class="collapse {{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? 'show' : '' }}"
                         id="ta">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('tugas-akhir/pilih-pembimbing') ? 'active' : '' }}">
-                                <a href="{{ url('/tugas-akhir/pilih-pembimbing') }}">
-                                    <span class="sub-item">Pilih Dosen Pembimbing</span>
+                            <li class="{{ request()->is('tugas-akhir/list-mahasiswa') ? 'active' : '' }}">
+                                <a href="{{ url('/tugas-akhir/list-mahasiswa') }}">
+                                    <span class="sub-item">Lihat Mahasiswa Bimbingan</span>
                                 </a>
                             </li>
                             <!-- Tambah menu lain nanti, misalnya Lihat Status, Histori Bimbingan, dll -->

@@ -11,86 +11,103 @@ Route::get('/admin', function () {
     return view('admin/dashboard');
 })->name('admin.page');
 
+// TUGAS AKHIR
+
+// pilih pembimbing
+Route::get('/tugas-akhir/pilih-pembimbing', function () {
+    return view('admin/tugas-akhir/pilihPembimbing');
+})->name('tugas-akhir.pilih-pembimbing');
+
+// list mahasiswa akan bimbingan
+Route::get('/tugas-akhir/list-mahasiswa', function () {
+    return view('admin/tugas-akhir/list-mhs');
+})->name('tugas-akhir.list-mahasiswa');
+
 // ----PENGUMUMAN
 // Buat Pengumuman
-Route::get('/pengumuman/create', function() {
+Route::get('/pengumuman/create', function () {
     return view('admin/pengumuman/createPengumuman');
 })->name('pengumuman.create');
 
 // Lihat Pengumuman
-Route::get('/pengumuman/read', function() {
+Route::get('/pengumuman/read', function () {
     return view('admin/pengumuman/readPengumuman');
 })->name('pengumuman.read');
 
 // edit Pengumuman
-Route::get('/pengumuman/edit', function() {
+Route::get('/pengumuman/edit', function () {
     return view('admin/pengumuman/editPengumuman');
 })->name('pengumuman.edit');
 
 //  ----BERITA ACARA
 // buat berita acara
-Route::get('/berita-acara/create', function() {
+Route::get('/berita-acara/create', function () {
     return view('admin/sidang/berita-acara/createBeritaAcara');
 })->name('berita-acara.create');
 
+// edit berita acara
+Route::get('/berita-acara/edit', function () {
+    return view('admin/sidang/berita-acara/edit-berita-acara');
+})->name('berita-acara.edit');
+
 // lihat berita acara
-Route::get('/berita-acara/read', function() {
+Route::get('/berita-acara/read', function () {
     return view('admin/sidang/berita-acara/readBeritaAcara');
 })->name('berita-acara.read');
 
 // ----SIDANG
 // tentukan jadwal sidang
-Route::get('/sidang/tentukan-jadwal', function() {
+Route::get('/sidang/tentukan-jadwal', function () {
     return view('admin/sidang/jadwal/createJadwalSidang');
 })->name('jadwal-sidang.create');
 
 // Edit Jadwal Sidang
-Route::get('/sidang/edit-jadwal', function() {
+Route::get('/sidang/edit-jadwal', function () {
     return view('admin/sidang/jadwal/editJadwalSidang');
 })->name('jadwal-sidang.edit');
 
 // lihat jadwal sidang
-Route::get('/sidang/lihat-jadwal', function() {
+Route::get('/sidang/lihat-jadwal', function () {
     return view('admin/sidang/jadwal/readJadwalSidang');
 })->name('jadwal-sidang.read');
 
 // lihat mahasiswa sidang
-Route::get('/sidang/list-mahasiswa', function() {
+Route::get('/sidang/list-mahasiswa', function () {
     return view('admin/sidang/jadwal/read-mhs-sidang');
 })->name('mahasiswa-sidang.read');
 
 // ----KELOLA AKUN
-Route::get('/kelola-akun/dosen', function() {
+Route::get('/kelola-akun/dosen', function () {
     return view('admin/dosen/kelolaAkunDosen');
 })->name('akun-dosen.kelola');
 
 // Tambah akun dosen
-Route::get('/kelola-akun/dosen/tambah', function() {
+Route::get('/kelola-akun/dosen/tambah', function () {
     return view('admin/dosen/createDosen');
 })->name('akun-dosen.tambah');
 
 // edit akun mahasiswa
-Route::get('/kelola-akun/mahasiswa/edit', function() {
+Route::get('/kelola-akun/mahasiswa/edit', function () {
     return view('admin/mahasiswa/editMahasiswa');
 })->name('akun-mahasiswa.edit');
 
 // kelola akun mahasiswa
-Route::get('/kelola-akun/mahasiswa', function() {
+Route::get('/kelola-akun/mahasiswa', function () {
     return view('admin/mahasiswa/kelolaMahasiswa');
 })->name('akun-mahasiswa.kelola');
 
 // ----lihat laporan dan statistik
-Route::get('/laporan/lihat', function() {
+Route::get('/laporan/lihat', function () {
     return view('admin/laporan/lihatLaporanStatistik');
 })->name('laporan.statistik');
 
 // ----lihat log dan aktifitas
-Route::get('/logs/lihat', function() {
+Route::get('/logs/lihat', function () {
     return view('admin/log/lihatLogAktifitas');
 })->name('log.aktifitas');
 
 // ----profile 
-Route::get('/admin/profile', function() {
+Route::get('/admin/profile', function () {
     return view('admin/user/profile');
 })->name('profile.detail');
 
@@ -100,22 +117,21 @@ Route::get('/ketua-jurusan', function () {
 })->name('ketua-jurusan.page');
 
 // profile 
-Route::get('/ketua-jurusan/profile', function() {
+Route::get('/ketua-jurusan/profile', function () {
     return view('kajur/user/profile');
 })->name('profile.detail');
 
 // lihat jadwal sidang
-Route::get('kajur/sidang/lihat-jadwal', function() {
+Route::get('kajur/sidang/lihat-jadwal', function () {
     return view('kajur/sidang/lihat-jadwal');
 })->name('jadwal-sidang.kajur.readJadwal');
 
 // lihat mahasiswa sidang
-Route::get('kajur/sidang/lihat-mahasiswa', function() {
+Route::get('kajur/sidang/lihat-mahasiswa', function () {
     return view('kajur/sidang/lihat-mahasiswa');
 })->name('mahasiswa-sidang.kajur.readMahasiswa');
 
 // lihat pengumuman
-Route::get('kajur/pengumuman/lihat-pengumuman', function() {
+Route::get('kajur/pengumuman/lihat-pengumuman', function () {
     return view('kajur/pengumuman/lihat-pengumuman');
 })->name('mahasiswa-sidang.kajur.readPengumuman');
-

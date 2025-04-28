@@ -43,9 +43,7 @@
     <div class="row">
         <div class="col-md-12">
             <!-- Pengumuman -->
-            <div class="card card-round">
-                @include('layouts.components.content-admin.pengumuman')
-            </div>
+            @include('layouts.components.content-admin.pengumuman')
             <!-- End Pengumuman -->
         </div>
     </div>

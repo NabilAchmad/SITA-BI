@@ -1,4 +1,4 @@
-<h2 class="text-center mb-2 fw-bold">Form Berita Acara</h2>
+<h2 class="text-center mb-2 fw-bold">Edit Berita Acara</h2>
 <form action="" method="POST" class="mx-auto" style="max-width: 700px;">
     @csrf
 
