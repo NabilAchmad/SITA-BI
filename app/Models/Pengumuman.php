@@ -4,22 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Pengumuman extends Model
 {
-    use SoftDeletes; // Aktifkan fitur soft delete
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'pengumuman';
 
     protected $fillable = [
         'judul',
         'isi',
+        'dibuat_oleh',
         'audiens',
-        'user_id',
         'tanggal_dibuat'
     ];
 
-    // Relasi ke user (pembuat pengumuman)
-    public function user()
+    public function pembuat()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'dibuat_oleh');
     }
 }

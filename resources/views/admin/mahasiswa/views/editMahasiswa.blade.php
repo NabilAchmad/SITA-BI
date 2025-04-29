@@ -1,4 +1,4 @@
-@extends('layouts.template.kajur')
+@extends('layouts.template.main')
 @section('Edit Akun Mahasiswa')
 
 @section('content')

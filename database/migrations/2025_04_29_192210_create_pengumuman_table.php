@@ -6,20 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('pengumuman', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
             $table->text('isi');
-            $table->enum('audiens', ['registered_users', 'guest', 'all_users'])->default('all_users');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->timestamp('tanggal_dibuat')->useCurrent();
+            $table->foreignId('dibuat_oleh')->constrained('users');
+            $table->enum('audiens', ['guest', 'registered_users', 'all_users', 'dosen', 'mahasiswa']);
+            $table->timestamp('tanggal_dibuat');
             $table->timestamps();
             $table->softDeletes();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('pengumuman');

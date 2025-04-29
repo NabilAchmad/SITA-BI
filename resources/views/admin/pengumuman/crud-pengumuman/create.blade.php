@@ -25,6 +25,8 @@
             <select class="form-select shadow-sm rounded-3" id="audiens" name="audiens" required>
                 <option value="" disabled selected>-- Pilih Audiens --</option>
                 <option value="registered_users">Pengguna Terdaftar</option>
+                <option value="dosen">Dosen</option>
+                <option value="mahasiswa">Mahasiswa</option>
                 <option value="guest">Tamu</option>
                 <option value="all_users">Semua Pengguna</option>
             </select>
