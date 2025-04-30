@@ -1,13 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PengumumanController;
 
 Route::prefix('admin')->group(function () {
 
     Route::view('/', 'admin/views/dashboard')->name('admin.dashboard');
 
     // Pengumuman
-    Route::view('/pengumuman/create', 'admin/pengumuman/views/createPengumuman')->name('pengumuman.create');
+    Route::get('/pengumuman/create', [PengumumanController::class, 'create'])->name('pengumuman.form');  // Untuk menampilkan form
+    Route::post('/pengumuman/create', [PengumumanController::class, 'store'])->name('pengumuman.create'); // Untuk mengirim data
+
     Route::view('/pengumuman/read', 'admin/pengumuman/views/readPengumuman')->name('pengumuman.read');
     Route::view('/pengumuman/edit', 'admin/pengumuman/views/editPengumuman')->name('pengumuman.edit');
     Route::view('/pengumuman/trashed', 'admin/pengumuman/views/trashedPengumuman')->name('pengumuman.trashed');
