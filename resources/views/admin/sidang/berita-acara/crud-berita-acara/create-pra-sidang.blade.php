@@ -1,6 +1,7 @@
-<h2 class="text-center mb-2 fw-bold">Form Berita Acara</h2>
 <form action="" method="POST" class="mx-auto" style="max-width: 700px;">
     @csrf
+
+    <h4 class="mb-3 text-center fw-bold">Form Berita Acara Pra Sidang</h4>
 
     <div class="mb-3">
         <label for="jenis_kegiatan" class="form-label fw-semibold">Jenis Kegiatan</label>
@@ -48,23 +49,38 @@
             required>
     </div>
 
+    {{-- Jumlah Penguji --}}
     <div class="mb-3">
-        <label for="dosen_penguji" class="form-label fw-semibold">Dosen Penguji</label>
-        <input type="text" class="form-control" id="dosen_penguji" name="dosen_penguji"
-            placeholder="Masukkan nama dosen penguji" required>
+        <label for="jumlah_penguji" class="form-label fw-semibold">Jumlah Dosen Penguji</label>
+        <input type="number" class="form-control" id="jumlah_penguji" name="jumlah_penguji" min="1"
+            max="10" placeholder="Masukkan jumlah penguji" required>
     </div>
 
-    <div class="mb-4">
-        <label for="hasil" class="form-label fw-semibold">Hasil Kegiatan</label>
-        <select class="form-select" id="hasil" name="hasil" required>
-            <option value="" disabled selected>Pilih hasil kegiatan</option>
-            <option value="lulus">Lulus</option>
-            <option value="revisi">Revisi</option>
-            <option value="tidak_lulus">Tidak Lulus</option>
-        </select>
-    </div>
+    {{-- Container dinamis untuk input penguji --}}
+    <div id="penguji-container" class="mb-3"></div>
 
     <div class="text-center">
         <button type="submit" class="btn btn-primary px-4">Simpan Berita Acara</button>
     </div>
 </form>
+
+<script>
+    document.getElementById('jumlah_penguji').addEventListener('input', function() {
+        const jumlah = parseInt(this.value);
+        const container = document.getElementById('penguji-container');
+        container.innerHTML = '';
+
+        if (!isNaN(jumlah) && jumlah > 0 && jumlah <= 10) {
+            for (let i = 1; i <= jumlah; i++) {
+                const div = document.createElement('div');
+                div.classList.add('mb-2');
+
+                div.innerHTML = `
+                    <label class="form-label fw-semibold">Nama Dosen Penguji ${i}</label>
+                    <input type="text" name="dosen_penguji_${i}" class="form-control" placeholder="Masukkan nama dosen penguji ${i}" required>
+                `;
+                container.appendChild(div);
+            }
+        }
+    });
+</script>
