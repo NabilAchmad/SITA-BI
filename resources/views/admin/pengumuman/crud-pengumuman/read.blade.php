@@ -25,30 +25,65 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>Libur Nasional</td>
-                <td>Kantor akan libur pada tanggal 1 Mei 2025 dalam rangka Hari Buruh Internasional.</td>
-                <td>18 Apr 2025</td>
-                <td>Pengguna Terdaftar</td>
-                <td>
-                    <div class="d-flex justify-content-center gap-2">
-                        <a href="{{ route('pengumuman.edit') }}" class="btn btn-warning btn-sm">Edit</a>
-                        <button class="btn btn-danger btn-sm btn-hapus" data-id="1">Hapus</button>
-                    </div>
-                </td>
-            </tr>
-            <!-- Tambahkan data lain disini -->
+            @forelse ($pengumuman as $index => $item)
+                <tr>
+                    <td>{{ ($pengumuman->currentPage() - 1) * $pengumuman->perPage() + $loop->iteration }}</td>
+                    <td>{{ $item->judul }}</td>
+                    <td>{{ $item->isi }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->tanggal_dibuat)->format('d M Y, H:i') }}</td>
+                    <td>
+                        @if ($item->audiens === 'registered_users')
+                            Pengguna Terdaftar
+                        @elseif ($item->audiens === 'dosen')
+                            Dosen
+                        @elseif ($item->audiens === 'mahasiswa')
+                            Mahasiswa
+                        @elseif ($item->audiens === 'guest')
+                            Tamu
+                        @elseif ($item->audiens === 'all_users')
+                            Semua Pengguna
+                        @else
+                            -
+                        @endif
+                    </td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{{ route('pengumuman.edit', $item->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                            <form action="{{ route('pengumuman.destroy', $item->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-danger btn-sm btn-hapus"
+                                    data-id="{{ $item->id }}">
+                                    Hapus
+                                </button>
+
+                            </form>
+
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center">Belum ada pengumuman.</td>
+                </tr>
+            @endforelse
         </tbody>
+
+
     </table>
 </div>
 
-<!-- Modal Konfirmasi Hapus -->
+<!-- Pagination -->
+<div>
+    {{ $pengumuman->links('pagination::bootstrap-4') }}
+</div>
+
+<!-- Modal Hapus -->
 <div class="modal fade" id="modalHapus" tabindex="-1" aria-labelledby="modalHapusLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
-                <h5 class="modal-title" id="modalHapusLabel">Konfirmasi Hapus</h5>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalHapusLabel">Konfirmasi Penghapusan</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -56,8 +91,8 @@
                 Apakah Anda yakin ingin menghapus pengumuman ini?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-danger" id="confirmHapus">Hapus</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger" id="confirmHapus">Ya, Hapus</button>
             </div>
         </div>
     </div>
@@ -69,15 +104,35 @@
     $(document).ready(function() {
         let idHapus = null;
 
-        // Fungsi Hapus
-        $('.btn-hapus').click(function() {
+        // Saat tombol "Hapus" ditekan, simpan ID dan tampilkan modal
+        $('.btn-hapus').on('click', function() {
             idHapus = $(this).data('id');
             $('#modalHapus').modal('show');
         });
 
-        $('#confirmHapus').click(function() {
-            $('button[data-id="' + idHapus + '"]').closest('tr').remove();
-            $('#modalHapus').modal('hide');
+        // Saat tombol "Ya, Hapus" di modal ditekan
+        $('#confirmHapus').on('click', function() {
+            $.ajax({
+                url: '/admin/pengumuman/' + idHapus, // pastikan ini sesuai prefix routenya
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    _method: 'DELETE'
+                },
+                success: function(response) {
+                    $('#modalHapus').modal('hide');
+                    $('button[data-id="' + idHapus + '"]').closest('tr').remove();
+
+                    // Perbaiki nomor urut
+                    $('#pengumumanTable tbody tr').each(function(i) {
+                        $(this).find('td:first').text(i + 1);
+                    });
+                },
+                error: function() {
+                    alert('Gagal menghapus pengumuman.');
+                    $('#modalHapus').modal('hide');
+                }
+            });
         });
 
         // Fungsi Cari

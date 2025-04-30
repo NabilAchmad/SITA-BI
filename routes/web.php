@@ -2,18 +2,40 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PengumumanController;
+use App\Models\Pengumuman;
 
 Route::prefix('admin')->group(function () {
 
     Route::view('/', 'admin/views/dashboard')->name('admin.dashboard');
 
-    // Pengumuman
-    Route::get('/pengumuman/create', [PengumumanController::class, 'create'])->name('pengumuman.form');  // Untuk menampilkan form
-    Route::post('/pengumuman/create', [PengumumanController::class, 'store'])->name('pengumuman.create'); // Untuk mengirim data
+    // =========================
+    // ROUTE PENGUMUMAN
+    // =========================
+    Route::prefix('pengumuman')->group(function () {
+        // READ
+        Route::get('/read', [PengumumanController::class, 'read'])->name('pengumuman.read');
 
-    Route::view('/pengumuman/read', 'admin/pengumuman/views/readPengumuman')->name('pengumuman.read');
-    Route::view('/pengumuman/edit', 'admin/pengumuman/views/editPengumuman')->name('pengumuman.edit');
-    Route::view('/pengumuman/trashed', 'admin/pengumuman/views/trashedPengumuman')->name('pengumuman.trashed');
+        // CREATE
+        Route::get('/create', [PengumumanController::class, 'create'])->name('pengumuman.form'); // Form tambah
+        Route::post('/create', [PengumumanController::class, 'store'])->name('pengumuman.create'); // Simpan data baru
+
+        // EDIT / UPDATE
+        Route::get('/edit/{id}', [PengumumanController::class, 'edit'])->name('pengumuman.edit'); // Form edit
+        Route::put('/update/{id}', [PengumumanController::class, 'update'])->name('pengumuman.update'); // Update data
+
+        // DELETE (Soft Delete)
+        Route::delete('/{id}', [PengumumanController::class, 'destroy'])->name('pengumuman.destroy'); // Soft delete
+
+        // TRASHED (Manajemen soft delete)
+        Route::get('/trash', [PengumumanController::class, 'trashed'])->name('pengumuman.trashed'); // Tampilkan data terhapus
+        Route::post('/restore/{id}', [PengumumanController::class, 'restore'])->name('pengumuman.restore'); // Restore data
+        Route::delete('/force-delete/{id}', [PengumumanController::class, 'forceDelete'])->name('pengumuman.force-delete'); // Hapus permanen
+    
+        // DELETE ALL (Force delete)
+        Route::delete('/force-delete-all', [PengumumanController::class, 'forceDeleteAll'])->name('pengumuman.force-delete-all');
+
+    });
+
 
     // Tugas Akhir
     Route::view('/tugas-akhir/pilih-pembimbing', 'admin/tugas-akhir/views/pilihPembimbing')->name('tugas-akhir.pilih-pembimbing');

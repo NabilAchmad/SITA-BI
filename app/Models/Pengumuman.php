@@ -11,6 +11,7 @@ class Pengumuman extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'pengumuman';
+    protected $dates = ['deleted_at']; // penting untuk soft delete
 
     protected $fillable = [
         'judul',
@@ -19,6 +20,7 @@ class Pengumuman extends Model
         'audiens',
         'tanggal_dibuat'
     ];
+
 
     public function pembuat()
     {

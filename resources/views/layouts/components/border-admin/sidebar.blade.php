@@ -64,17 +64,12 @@
                     </a>
                     <div class="collapse {{ request()->is('admin/pengumuman*') ? 'show' : '' }}" id="pengumuman">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/pengumuman/create') ? 'active' : '' }}">
-                                <a href="{{ route('pengumuman.create') }}">
-                                    <span class="sub-item">Buat Pengumuman</span>
-                                </a>
-                            </li>
                             <li class="{{ request()->is('admin/pengumuman/read') ? 'active' : '' }}">
                                 <a href="{{ route('pengumuman.read') }}">
                                     <span class="sub-item">Lihat Pengumuman</span>
                                 </a>
                             </li>
-                            <li class="{{request()->is('admin/pengumuman/trashed') ? 'active' : '' }}">
+                            <li class="{{request()->is('admin/pengumuman/trash') ? 'active' : '' }}">
                                 <a href="{{route('pengumuman.trashed') }}">
                                     <span class="sub-item">Pengumuman Dihapus</span>
                                 </a>
