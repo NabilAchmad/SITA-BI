@@ -1,11 +1,11 @@
 <div class="container mt-4">
-    <h1 class="mb-4">Daftar Berita Acara</h1>
+    <h1 class="mb-4">Daftar Tawaran Topik</h1>
 
     <!-- Search Bar -->
     <div class="mb-4">
         <form action="#" method="GET">
             <div class="input-group">
-                <input type="text" name="search" class="form-control" placeholder="Cari berita acara...">
+                <input type="text" name="search" class="form-control" placeholder="Cari topik...">
                 <button class="btn btn-primary" type="submit">Cari</button>
             </div>
         </form>
@@ -17,9 +17,10 @@
             <thead class="table-light">
                 <tr>
                     <th>No</th>
-                    <th>Judul</th>
-                    <th>Jenis</th>
-                    <th>Tanggal</th>
+                    <th>Judul Topik</th>
+                    <th>Deskripsi</th>
+                    <th>Dosen Penawar</th>
+                    <th>Kuota</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -27,27 +28,29 @@
                 <!-- Contoh data statis -->
                 <tr>
                     <td>1</td>
-                    <td>Berita Acara Rapat</td>
-                    <td>Rapat</td>
-                    <td>2023-10-01</td>
+                    <td>Pengembangan Aplikasi Mobile</td>
+                    <td>Aplikasi mobile berbasis Flutter untuk sistem monitoring tugas akhir.</td>
+                    <td>Dr. Ahmad Basuki</td>
+                    <td>2</td>
                     <td>
-                        <a href="#" class="btn btn-success btn-sm">Unduh Word</a>
-                        <a href="#" class="btn btn-danger btn-sm">Hapus</a>
-                        <a href="#" class="btn btn-secondary btn-sm">Export PDF</a>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="#" class="btn btn-success btn-sm">Ambil Topik</a>
+                        </div>
                     </td>
                 </tr>
                 <tr>
                     <td>2</td>
-                    <td>Berita Acara Kegiatan</td>
-                    <td>Kegiatan</td>
-                    <td>2023-10-05</td>
+                    <td>Sistem Rekomendasi Buku</td>
+                    <td>Penggunaan machine learning untuk rekomendasi buku pada perpustakaan digital.</td>
+                    <td>Ir. Siti Hidayati, M.Kom.</td>
+                    <td>3</td>
                     <td>
-                        <a href="#" class="btn btn-success btn-sm">Unduh Word</a>
-                        <a href="#" class="btn btn-danger btn-sm">Hapus</a>
-                        <a href="#" class="btn btn-secondary btn-sm">Export PDF</a>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="#" class="btn btn-success btn-sm">Ambil Topik</a>
+                        </div>
                     </td>
                 </tr>
-                <!-- Tambahkan data lainnya -->
+                <!-- Tambahkan data lainnya jika diperlukan -->
             </tbody>
         </table>
     </div>

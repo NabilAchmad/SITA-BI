@@ -19,7 +19,7 @@
                             class="avatar-img rounded" />
                     </div>
                     <div class="u-text">
-                        <h4>erlaaaand_</h4>
+                        <h4>Kasih Ananda</h4>
                         <p class="text-muted">Kasih</p>
                         <a href="{{ url('/admin/profile') }}"
                             class="btn btn-xs btn-secondary btn-sm">View Profile</a>
