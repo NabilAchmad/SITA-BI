@@ -28,7 +28,7 @@
                 <option value="dosen">Dosen</option>
                 <option value="mahasiswa">Mahasiswa</option>
                 <option value="guest">Tamu</option>
-                <option value="all_users">Semua Pengguna</option>
+                <option value="all_users">Semua Orang</option>
             </select>
         </div>
 

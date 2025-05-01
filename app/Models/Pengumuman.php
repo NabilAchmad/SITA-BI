@@ -11,6 +11,8 @@ class Pengumuman extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'pengumuman';
+    protected $casts = ['audience' => 'array',];
+
     protected $dates = ['deleted_at']; // penting untuk soft delete
 
     protected $fillable = [
