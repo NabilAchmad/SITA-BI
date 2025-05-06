@@ -5,19 +5,21 @@ use Illuminate\Support\Facades\Route;
 
 
 // Ketua Program Studi
-Route::get('/ketua-prodi', function () {
-    return view('kaprodi/dashboard');
-})->name('kaprodi.page');
+Route::prefix('ketua-prodi')->group(function () {
+    Route::get('/ketua-prodi', function () {
+        return view('kaprodi/dashboard');
+    })->name('kaprodi.page');
 
-// Jadwal sidang
-Route::get('/kaprodi/sidang/lihat-jadwal', function () {
-    return view('kaprodi/jadwal/readJadwal');
-})->name('kaprodijadwal.page');
+    // Jadwal sidang
+    Route::get('/kaprodi/sidang/lihat-jadwal', function () {
+        return view('kaprodi/jadwal/readJadwal');
+    })->name('kaprodijadwal.page');
 
-// Tugas Akhir
-Route::get('/kaprodi/judulTA/AccJudulTA', function() {
-    return view('kaprodi/judulTA/AccJudulTA');
-})->name('accjudul.page');
+    // Tugas Akhir
+    Route::get('/kaprodi/judulTA/AccJudulTA', function() {
+        return view('kaprodi/judulTA/AccJudulTA');
+    })->name('accjudul.page');
+});
 
 // Pengumuman
 Route::get('/kaprodi/pengumuman', function () {
@@ -59,6 +61,7 @@ Route::prefix('admin/pengumuman')->group(function () {
 });
 
 // jadwal sidang
+
 Route::get('/admin/sidang/lihat-jadwal', function () {
     return view('admin/sidang/jadwal/readJadwalSidang');
 })->name('admin.jadwal.page');
