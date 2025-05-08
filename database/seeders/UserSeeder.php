@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
 
         // Dosen
         $dosenId = DB::table('users')->insertGetId([
-            'name' => 'Dr. Dosen',
+            'name' => 'Dr. Sankoro. S.Si., M.Kom.',
             'email' => 'dosen@example.com',
             'password' => Hash::make('password'),
             'created_at' => now(),
@@ -58,7 +58,7 @@ class UserSeeder extends Seeder
 
         // Mahasiswa
         $mahasiswaId = DB::table('users')->insertGetId([
-            'name' => 'Mahasiswa Satu',
+            'name' => 'Ibarahim',
             'email' => 'mahasiswa@example.com',
             'password' => Hash::make('password'),
             'created_at' => now(),
@@ -73,8 +73,8 @@ class UserSeeder extends Seeder
         DB::table('mahasiswa')->insert([
             'user_id' => $mahasiswaId,
             'nim' => '2212345678',
-            'prodi' => 'Teknik Informatika',
-            'angkatan' => '2022',
+            'prodi' => 'D4 Bahasa Inggris',
+            'angkatan' => '22',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

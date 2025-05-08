@@ -19,24 +19,33 @@
             <div class="announcement-content position-relative" style="max-height: 250px; overflow-y: auto;">
                 <!-- Loader -->
                 <div class="loading-spinner text-center py-2 d-none text-muted">
-                    <i class="fa fa-spinner fa-spin me-2"></i>Memuat ulang...
+                    <i class="fa fa-spinner fa-spin me-2"></i> Memuat ulang...
                 </div>
 
                 <!-- List -->
                 <ul class="list-unstyled mb-0" id="announcementList">
-                    <li class="mb-3 pb-3 border-bottom d-flex align-items-start">
-                        <div class="flex-grow-1" style="font-size: 0.95rem; line-height: 1.6;">
-                            <strong class="text-primary">[01/04/2025]</strong> - Pendaftaran ulang mahasiswa dibuka
-                            hingga 30 April 2025.
-                        </div>
-                    </li>
-                    <li class="mb-3 pb-3 border-bottom d-flex align-items-start">
-                        <div class="flex-grow-1" style="font-size: 0.95rem; line-height: 1.6;">
-                            <strong class="text-primary">[02/04/2025]</strong> - Pelatihan penggunaan sistem e-learning
-                            akan dilaksanakan minggu depan.
-                        </div>
-                    </li>
-                    <!-- Tambahkan pengumuman lainnya dengan struktur serupa -->
+                    @foreach ($pengumumans as $pengumuman)
+                        <li class="mb-4 pb-3 border-bottom d-flex align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="mb-1 d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        {{ \Carbon\Carbon::parse($pengumuman->created_at)->format('d M Y') }}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ $pengumuman->pembuat->name ?? 'Admin' }}
+                                    </small>
+                                </div>
+                                <h6 class="fw-semibold text-primary mb-1" style="font-size: 1.05rem;">
+                                    {{ $pengumuman->judul }}
+                                </h6>
+                                <p class="mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                                    {{ \Illuminate\Support\Str::limit(strip_tags($pengumuman->isi), 100, '...') }}
+                                </p>
+                            </div>
+                        </li>
+                    @endforeach
                 </ul>
             </div>
         </div>
@@ -70,31 +79,17 @@
             setTimeout(() => {
                 loader.classList.add('d-none');
                 announcementList.classList.remove('d-none');
-                // Bisa tambahkan logika fetch data baru di sini
+                console.log('Data pengumuman berhasil dimuat');
+                // Bisa tambahkan logika fetch data baru di sini, misalnya menggunakan fetch() atau Axios
             }, 1000);
         });
 
-        // Edit / Hapus tombol
-        announcementList.addEventListener('click', function(e) {
-            if (e.target.closest('.btn-delete')) {
-                const item = e.target.closest('li');
-                if (confirm('Yakin ingin menghapus pengumuman ini?')) {
-                    item.remove();
-                }
-            }
-
-            if (e.target.closest('.btn-edit')) {
-                const item = e.target.closest('li');
-                const content = item.querySelector('div.flex-grow-1');
-                const oldText = content.innerText;
-                const newText = prompt('Edit isi pengumuman:', oldText);
-                if (newText) {
-                    content.innerHTML = newText;
-                }
-            }
-        });
+        // Check if announcements exist
+        if (!announcementList.children.length) {
+            const noAnnouncementMessage = document.createElement('p');
+            noAnnouncementMessage.className = 'text-center text-muted mt-3';
+            noAnnouncementMessage.textContent = 'Tidak ada pengumuman.';
+            contentContainer.appendChild(noAnnouncementMessage);
+        }
     });
 </script>
-
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />

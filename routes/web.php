@@ -6,7 +6,9 @@ use App\Models\Pengumuman;
 
 Route::prefix('admin')->group(function () {
 
-    Route::view('/', 'admin/views/dashboard')->name('admin.dashboard');
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [PengumumanController::class, 'tampil'])->name('admin.dashboard');
+    });
 
     // =========================
     // ROUTE PENGUMUMAN
@@ -37,9 +39,15 @@ Route::prefix('admin')->group(function () {
     });
 
 
-    // Tugas Akhir
-    Route::view('/tugas-akhir/pilih-pembimbing', 'admin/tugas-akhir/views/pilihPembimbing')->name('tugas-akhir.pilih-pembimbing');
-    Route::view('/tugas-akhir/list-mahasiswa', 'admin/tugas-akhir/views/list-mhs')->name('tugas-akhir.list-mahasiswa');
+    // =========================
+    // ROUTE TUGAS AKHIR
+    // =========================
+    Route::prefix('tugas-akhir')->group(function () {
+        // Tugas Akhir
+        Route::view('/list-mahasiswa', 'admin/tugas-akhir/views/list-mhs')->name('list-mahasiswa');
+
+        Route::view('/pilih-pembimbing', 'admin/tugas-akhir/views/pilihPembimbing')->name('pilih-pembimbing');
+    });
 
     // Berita Acara
     Route::view('/berita-acara/create', 'admin/sidang/berita-acara/views/createBeritaAcara')->name('berita-acara.create');

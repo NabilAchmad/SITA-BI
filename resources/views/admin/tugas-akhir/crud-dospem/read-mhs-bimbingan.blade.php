@@ -20,7 +20,7 @@
                         <td>2311083007</td>
                         <td>RPL</td>
                         <td>
-                            <a href="href={{ '/tugas-akhir/pilih-pembimbing' }}" class="btn btn-primary btn-sm">Pilih Pembimbing</a>
+                            <a href="{{route('pilih-pembimbing')}}" class="btn btn-primary btn-sm">Pilih Pembimbing</a>
                         </td>
                     </tr>
                 </tbody>

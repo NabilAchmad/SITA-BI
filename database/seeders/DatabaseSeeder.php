@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             DosenPeranSeeder::class,
+            DosenPembimbingPengujiSeeder::class,
+            MahasiswaSeeder::class,
+            KaprodiSeeder::class,
         ]);
     }
 }

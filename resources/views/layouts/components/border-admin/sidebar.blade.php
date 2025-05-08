@@ -39,7 +39,7 @@
         <div class="sidebar-content">
             <ul class="nav nav-secondary">
                 <!-- Dashboard -->
-                <li class="nav-item {{ request()->is('admin') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}">
                         <i class="fas fa-home"></i>
                         <p>Dashboard</p>
@@ -89,7 +89,7 @@
                     <div class="collapse {{ request()->is('admin/tugas-akhir*') ? 'show' : '' }}" id="ta">
                         <ul class="nav nav-collapse">
                             <li class="{{ request()->is('admin/tugas-akhir/list-mahasiswa') ? 'active' : '' }}">
-                                <a href="{{ route('tugas-akhir.list-mahasiswa') }}">
+                                <a href="{{ route('list-mahasiswa') }}">
                                     <span class="sub-item">Lihat Mahasiswa Bimbingan</span>
                                 </a>
                             </li>
