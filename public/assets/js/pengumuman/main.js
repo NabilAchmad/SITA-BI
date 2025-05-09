@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.target && e.target.classList.contains('btn-hapus')) {
             e.preventDefault();
             idHapus = e.target.dataset.id;
-            document.querySelector('#modalHapus').classList.add('show');
+            $('#modalHapus').modal('show');
         }
     });
 
@@ -40,18 +40,18 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: JSON.stringify({ _method: 'DELETE' })
         })
-        .then(response => {
-            if (response.ok) {
-                document.querySelector('#modalHapus').classList.remove('show');
-                allRows = allRows.filter(row => row.dataset.id !== idHapus);
-                originalRows = originalRows.filter(row => row.dataset.id !== idHapus);
-                idHapus = null;
-                applyFilters();
-            } else {
-                alert('Gagal menghapus pengumuman.');
-                document.querySelector('#modalHapus').classList.remove('show');
-            }
-        });
+            .then(response => {
+                if (response.ok) {
+                    document.querySelector('#modalHapus').classList.remove('show');
+                    allRows = allRows.filter(row => row.dataset.id !== idHapus);
+                    originalRows = originalRows.filter(row => row.dataset.id !== idHapus);
+                    idHapus = null;
+                    applyFilters();
+                } else {
+                    alert('Gagal menghapus pengumuman.');
+                    document.querySelector('#modalHapus').classList.remove('show');
+                }
+            });
     });
 
     // Reset filter
@@ -154,4 +154,68 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Inisialisasi
     applyFilters();
+
+    // ---------------- Bagian: Force Delete ----------------
+    let forceDeleteId = null;
+
+    // Ambil referensi elemen modal
+    const modalForceDeleteSingleEl = document.getElementById('modalForceDeleteSingle');
+    const modalForceDeleteSingle = modalForceDeleteSingleEl ? new bootstrap.Modal(modalForceDeleteSingleEl) : null;
+
+    // Tombol konfirmasi hapus satu
+    const btnConfirmForceDeleteSingle = document.getElementById('btnConfirmForceDeleteSingle');
+    btnConfirmForceDeleteSingle?.addEventListener('click', function () {
+        if (!forceDeleteId) return;
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (!csrfToken) {
+            alert('Token CSRF tidak ditemukan.');
+            return;
+        }
+
+        fetch(`/admin/pengumuman/force-delete/${forceDeleteId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ _method: 'DELETE' })
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Hapus elemen baris dari tabel
+                    const rowToDelete = tbody.querySelector(`tr[data-id="${forceDeleteId}"]`);
+                    if (rowToDelete) rowToDelete.remove();
+
+                    applyFilters();
+
+                    // Tutup modal SETELAH semua selesai
+                    // modalForceDeleteSingle.hide();
+                    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalForceDeleteSingleEl);
+                    modalInstance.hide();
+
+                    forceDeleteId = null;
+                } else {
+                    alert('Gagal menghapus pengumuman secara permanen.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menghapus.');
+            });
+    });
+
+    // Saat tombol force delete diklik
+    document.querySelectorAll('.btn-force-delete').forEach(button => {
+        button.addEventListener('click', function () {
+            const id = this.dataset.id;
+            if (!id) {
+                alert('ID pengumuman tidak valid.');
+                return;
+            }
+            forceDeleteId = id;
+            modalForceDeleteSingle?.show();
+        });
+    });
+
 });

@@ -24,7 +24,7 @@
     <a href="{{ route('pengumuman.create') }}" class="btn btn-primary mb-3">Buat Pengumuman Baru</a>
     @include('admin.pengumuman.crud-pengumuman.partials.search_sort')
     <!-- Table -->
-    <div class="table-responsive">
+    <div class="table-responsive" id="">
         <table class="table table-bordered table-hover align-middle text-center" id="pengumumanTable"
             data-current-page="{{ $pengumuman->currentPage() }}" data-per-page="{{ $pengumuman->perPage() }}">
             <thead class="table-dark">
@@ -88,8 +88,8 @@
     </div>
 
     <!-- Modal Hapus -->
-    @include('admin.pengumuman.crud-pengumuman.partials.delete_modal')
+    @include('admin.pengumuman.crud-pengumuman.partials.delete_modal_single')
 
     <!-- JavaScript -->
     <script src="{{ asset('assets/js/pengumuman/main.js') }}"></script>
-    <script src="{{ asset('assets/js/core/jquery-3.7.1.min.js') }}"></script>
+    

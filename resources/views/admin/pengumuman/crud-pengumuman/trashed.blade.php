@@ -42,8 +42,8 @@
 {{ $pengumuman->links('pagination::bootstrap-4') }}
 
 <!-- Modal Konfirmasi Hapus Semua Pengumuman -->
-@include('admin.pengumuman.crud-pengumuman.partials.modal_delete_all')
+@include('admin.pengumuman.crud-pengumuman.partials.delete_modall_all')
 <!-- Modal Konfirmasi Hapus Satu Pengumuman -->
-@include('admin.pengumuman.crud-pengumuman.partials.delete_modal_single')
+@include('admin.pengumuman.crud-pengumuman.partials.delete_modal_pengumuman')
 <!-- Script Konfirmasi & Penghapusan -->
 <script src="{{ asset('assets/js/pengumuman/trashed.js') }}"></script>
