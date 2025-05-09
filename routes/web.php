@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Route;
 // Ketua Program Studi
 use App\Http\Controllers\KajurController;
 
+Route::get('/', function () {
+    return view('homepage');
+});
+
 Route::prefix('ketua-prodi')->group(function () {
     Route::get('/', [KajurController::class, 'index'])->name('kaprodi.page');
 
