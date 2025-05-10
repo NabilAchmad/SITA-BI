@@ -23,10 +23,6 @@
             <label for="file_ta" class="form-label">Upload File Tugas Akhir</label>
             <input type="file" class="form-control" id="file_ta" name="file_ta" required>
         </div>
-        <div class="mb-3">
-            <label for="tanggal_sidang" class="form-label">Tanggal Sidang</label>
-            <input type="date" class="form-control" id="tanggal_sidang" name="tanggal_sidang" required>
-        </div>
         <button type="submit" class="btn btn-primary">Daftar</button>
     </form>
 </div>

@@ -1,3 +1,4 @@
+<h1 class="text-center text-primary">Ajukan Tugas Akhir</h1>
 <form action="" method="POST">
     @csrf
     <div class="mb-3">

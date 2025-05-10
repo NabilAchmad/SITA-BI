@@ -3,6 +3,6 @@
 @section('title', 'Ajukan TA')
 
 @section('content')
-@include('mahasiswa.TugasAkhir.crud-ta.createTA')
+@include('mahasiswa.TugasAkhir.crud-ta.listTopik')
 
 @endsection

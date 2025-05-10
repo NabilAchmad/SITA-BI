@@ -1,6 +1,7 @@
+<h1 class="text-center text-primary">List Topik Tugas Akhir</h1>
 <table class="table table-bordered mt-4">
     @csrf
-    <thead>
+    <thead class="table-dark">
         <tr>
             <th>No</th>
             <th>Topic</th>

@@ -3,34 +3,67 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TugasAkhirController;
 
-
-
 Route::get('/', function () {
     return view('home/homepage');
 });
 
-// Dashboard Mahasiswa
-Route::get('/mahasiswa', function () {
-    return view('mahasiswa/dashboard');
-});
+Route::prefix('mahasiswa')->group(function () {
 
-// Ajukan Tugas Akhir
-Route::get('/mahasiswa/ajukan-tugas-akhir', function () {
-    return view('mahasiswa/TugasAkhir/form');
-});
+    // Dashboard Mahasiswa
+    Route::get('/', function () {
+        return view('mahasiswa.views.dashboard');
+    });
 
-// Menampilkan form ajukan berdasarkan topik dosen
-Route::get('/tugas-akhir/read', function () {
-    return view('mahasiswa.TugasAkhir.form2');
-});
+    Route::prefix('TugasAkhir')->group(function () {
+        // Ajukan Tugas Akhir
+        Route::get('/ajukan', function () {
+            return view('mahasiswa.TugasAkhir.views.ajukanTA');
+        });
 
-// Menampilkan form batalkan tugas akhir
-Route::get('/tugas-akhir/batal', function () {
-    return view('mahasiswa.TugasAkhir.form3');
-});
+        // Menampilkan form ajukan berdasarkan topik dosen
+        Route::get('/read', function () {
+            return view('mahasiswa.TugasAkhir.views.listTopik');
+        });
 
-//daftar sidang
-Route::get('/mahasiswa/sidang/tentukan-jadwal', function () {
-    return view('mahasiswa/Sidang/form');
-});
+        // Menampilkan form batalkan tugas akhir
+        Route::get('/progress', function () {
+            return view('mahasiswa.TugasAkhir.views.progresTA');
+        });
+    });
 
+    Route::prefix('bimbingan')->group(function () {
+        // Tambahkan route untuk Bimbingan di sini jika diperlukan
+
+        Route::get('/ajukan-jadwal', function () {
+            return view('mahasiswa.Bimbingan.views.ajukanBimbingan');
+        });
+
+        Route::get('/lihat-jadwal', function () {
+            return view('mahasiswa.Bimbingan.views.lihatJadwal');
+        });
+
+        Route::get('/revisi', function () {
+            return view('mahasiswa.Bimbingan.views.revisiTA');
+        });
+
+        Route::get('/perubahan-jadwal', function () {
+            return view('
+            mahasiswa.Bimbingan.views.perubahanJadwal');
+            });
+    });
+
+    Route::prefix('sidang')->group(function () {
+        // Tambahkan route untuk Sidang di sini jika diperlukan
+        Route::get('/daftar-sidang', function () {
+            return view('mahasiswa.sidang.views.form');
+        });
+
+        Route::get('/lihat-nilai', function () {
+            return view('mahasiswa.sidang.views.nilaiSidang');
+        });
+
+        Route::get('/lihat-jadwal', function () {    
+            return view('mahasiswa.sidang.views.jadwal');
+        }); 
+    });
+});
