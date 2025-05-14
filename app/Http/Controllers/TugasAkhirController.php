@@ -14,7 +14,7 @@ class TugasAkhirController extends Controller
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return 1;
+        return 3;
     }
 
     public function store(Request $request)
