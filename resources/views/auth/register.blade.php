@@ -64,15 +64,14 @@
                             </div>
                             <div class="mb-3 position-relative">
                                 <label for="password_confirmation" class="form-label">Confirm Password</label>
-                                <input id="password_confirmation" type="password" name="password_confirmation" required
-                                    class="form-control" />
-                                <button type="button" class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2" 
+                                <input id="password_confirmation" type="password" name="password_confirmation" required class="form-control" />
+                                {{-- <button type="button" class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2" 
                                     style="border:none; background: transparent; padding: 0;" onclick="togglePassword('password_confirmation', this)" aria-label="Toggle password visibility">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
                                         <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"/>
                                         <path d="M8 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>
                                     </svg>
-                                </button>
+                                </button> --}}
                             </div>
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary">
@@ -92,7 +91,7 @@
         </div>
     </div>
 
-    <script>
+    {{-- <script>
         function togglePassword(fieldId, btn) {
             const input = document.getElementById(fieldId);
             const svg = btn.querySelector('svg');
@@ -104,6 +103,6 @@
                 svg.innerHTML = '<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"/><path d="M8 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>';
             }
         }
-    </script>
+    </script> --}}
 </body>
 </html>
