@@ -17,6 +17,11 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Mahasiswa dashboard route
+Route::get('/mahasiswa/dashboard', function () {
+    return view('mahasiswa.dashboard');
+})->name('mahasiswa.dashboard')->middleware('auth');
+
 Route::prefix('ketua-prodi')->group(function () {
     Route::get('/', [KajurController::class, 'index'])->name('kaprodi.page');
 

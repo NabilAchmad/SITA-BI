@@ -26,7 +26,8 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/');
+            // Redirect to mahasiswa dashboard after login
+            return redirect()->intended(route('mahasiswa.dashboard'));
         }
 
         throw ValidationException::withMessages([
