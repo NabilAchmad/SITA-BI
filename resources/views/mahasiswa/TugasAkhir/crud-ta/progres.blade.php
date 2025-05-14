@@ -13,20 +13,48 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>Judul Tugas Akhir Contoh</td>
-                    <td>Dalam Proses</td>
-                    <td>2023-10-01</td>
-                    <td>
-                        <div class="progress" style="height: 20px;">
-                            <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
-                        </div>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger" disabled>Batalkan</button>
-                    </td>
-                </tr>
-            </tbody>
+<tbody>
+    @forelse ($tugasAkhir as $ta)
+        <tr>
+            <td>{{ $ta->judul }}</td>
+            <td>
+                @if ($ta->status === 'diajukan')
+                    Dalam Proses
+                @elseif ($ta->status === 'disetujui')
+                    Disetujui
+                @elseif ($ta->status === 'ditolak')
+                    Ditolak
+                @elseif ($ta->status === 'selesai')
+                    Selesai
+                @endif
+            </td>
+            <td>{{ \Carbon\Carbon::parse($ta->tanggal_pengajuan)->format('Y-m-d') }}</td>
+            <td>
+                @php
+                    // Simulasi progress dummy berdasarkan status
+                    $progress = match($ta->status) {
+                        'diajukan' => 25,
+                        'disetujui' => 50,
+                        'selesai' => 100,
+                        default => 0
+                    };
+                @endphp
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar" role="progressbar" style="width: {{ $progress }}%;" aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100">
+                        {{ $progress }}%
+                    </div>
+                </div>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger" {{ $ta->status !== 'diajukan' ? 'disabled' : '' }}>Batalkan</button>
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="5" class="text-center">Belum ada pengajuan tugas akhir.</td>
+        </tr>
+    @endforelse
+</tbody>
+
         </table>
     </div>

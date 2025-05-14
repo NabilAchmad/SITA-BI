@@ -15,21 +15,24 @@ Route::prefix('mahasiswa')->group(function () {
     });
 
     Route::prefix('TugasAkhir')->group(function () {
-        // Ajukan Tugas Akhir
+        // Tampilkan form ajukan
         Route::get('/ajukan', function () {
             return view('mahasiswa.TugasAkhir.views.ajukanTA');
         });
+
+        // Tangani form POST ajukan TA
+        Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
 
         // Menampilkan form ajukan berdasarkan topik dosen
         Route::get('/read', function () {
             return view('mahasiswa.TugasAkhir.views.listTopik');
         });
 
-        // Menampilkan form batalkan tugas akhir
-        Route::get('/progress', function () {
-            return view('mahasiswa.TugasAkhir.views.progresTA');
-        });
+        // Menampilkan form progress TA
+        Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugasAkhir.progress');
+
     });
+
 
     Route::prefix('bimbingan')->group(function () {
         // Tambahkan route untuk Bimbingan di sini jika diperlukan
@@ -49,7 +52,7 @@ Route::prefix('mahasiswa')->group(function () {
         Route::get('/perubahan-jadwal', function () {
             return view('
             mahasiswa.Bimbingan.views.perubahanJadwal');
-            });
+        });
     });
 
     Route::prefix('sidang')->group(function () {
@@ -62,8 +65,8 @@ Route::prefix('mahasiswa')->group(function () {
             return view('mahasiswa.sidang.views.nilaiSidang');
         });
 
-        Route::get('/lihat-jadwal', function () {    
+        Route::get('/lihat-jadwal', function () {
             return view('mahasiswa.sidang.views.jadwal');
-        }); 
+        });
     });
 });
