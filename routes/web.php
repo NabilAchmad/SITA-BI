@@ -39,7 +39,6 @@ Route::prefix('admin')->group(function () {
 
     });
 
-
     // =========================
     // ROUTE TUGAS AKHIR
     // =========================
@@ -50,10 +49,15 @@ Route::prefix('admin')->group(function () {
         Route::view('/pilih-pembimbing', 'admin/tugas-akhir/views/pilihPembimbing')->name('pilih-pembimbing');
     });
 
-    // Berita Acara
-    Route::view('/berita-acara/create', 'admin/sidang/berita-acara/views/createBeritaAcara')->name('berita-acara.create');
-    Route::view('/berita-acara/edit', 'admin/sidang/berita-acara/views/edit-berita-acara')->name('berita-acara.edit');
-    Route::view('/berita-acara/read', 'admin/sidang/berita-acara/views/readBeritaAcara')->name('berita-acara.read');
+    // =========================
+    // ROUTE BERITA ACARA
+    // =========================
+    Route::prefix('berita-acara')->group(function () {
+        // Berita Acara
+        Route::view('/create', 'admin/sidang/berita-acara/views/createBeritaAcara')->name('berita-acara.create');
+        Route::view('/edit', 'admin/sidang/berita-acara/views/edit-berita-acara')->name('berita-acara.edit');
+        Route::view('/read', 'admin/sidang/berita-acara/views/readBeritaAcara')->name('berita-acara.read'); 
+    });
 
     // Sidang
     Route::view('/sidang/tentukan-jadwal', 'admin/sidang/jadwal/views/createJadwalSidang')->name('jadwal-sidang.create');
