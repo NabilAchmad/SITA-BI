@@ -40,13 +40,13 @@ Route::prefix('admin')->group(function () {
     });
 
     // =========================
-    // ROUTE TUGAS AKHIR
+    // ROUTE Mahasiswa
     // =========================
-    Route::prefix('tugas-akhir')->group(function () {
-        // Tugas Akhir
-        Route::view('/list-mahasiswa', 'admin/tugas-akhir/views/list-mhs')->name('list-mahasiswa');
+    Route::prefix('mahasiswa')->group(function () {
+        // Mahasiswa
+        Route::view('/list-mahasiswa', 'admin/mahasiswa/views/list-mhs')->name('list-mahasiswa');
 
-        Route::view('/pilih-pembimbing', 'admin/tugas-akhir/views/pilihPembimbing')->name('pilih-pembimbing');
+        Route::view('/pilih-pembimbing', 'admin/mahasiswa/views/pilihPembimbing')->name('pilih-pembimbing');
     });
 
     // =========================

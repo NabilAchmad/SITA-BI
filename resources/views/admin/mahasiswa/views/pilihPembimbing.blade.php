@@ -3,5 +3,5 @@
 @section('title', 'Pilih Pembimbing Tugas Akhir')
 
 @section('content')
-@include('admin.tugas-akhir.crud-dospem.create-pembimbing')
+@include('admin.mahasiswa.crud-dospem.create-pembimbing')
 @endsection

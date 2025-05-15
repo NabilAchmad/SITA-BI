@@ -4,7 +4,6 @@
     <h5>Daftar Akun Mahasiswa</h5>
 </div>
 
-
 <table class="table table-bordered rounded">
     <thead class="table-dark">
         <tr>

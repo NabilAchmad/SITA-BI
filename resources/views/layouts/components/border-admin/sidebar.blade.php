@@ -78,17 +78,17 @@
                     </div>
                 </li>
 
-                <!-- Tugas Akhir -->
-                <li class="nav-item {{ request()->is('admin/tugas-akhir*') ? 'active' : '' }}">
+                <!-- Mahasiswa -->
+                <li class="nav-item {{ request()->is('admin/mahasiswa*') ? 'active' : '' }}">
                     <a data-bs-toggle="collapse" href="#ta"
-                        class="{{ request()->is('admin/tugas-akhir*') ? '' : 'collapsed' }}">
+                        class="{{ request()->is('admin/mahasiswa*') ? '' : 'collapsed' }}">
                         <i class="fas fa-graduation-cap"></i>
-                        <p>Tugas Akhir</p>
+                        <p>Mahasiswa</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('admin/tugas-akhir*') ? 'show' : '' }}" id="ta">
+                    <div class="collapse {{ request()->is('admin/mahasiswa*') ? 'show' : '' }}" id="ta">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/tugas-akhir/list-mahasiswa') ? 'active' : '' }}">
+                            <li class="{{ request()->is('admin/mahasiswa/list-mahasiswa') ? 'active' : '' }}">
                                 <a href="{{ route('list-mahasiswa') }}">
                                     <span class="sub-item">Lihat Mahasiswa Bimbingan</span>
                                 </a>

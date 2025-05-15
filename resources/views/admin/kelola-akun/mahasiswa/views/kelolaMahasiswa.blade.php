@@ -3,5 +3,5 @@
 @section('title', 'Kelola Akun Mahasiswa')
 
 @section('content')
-    @include('admin.mahasiswa.crud-mahasiswa.read')
+    @include('admin.kelola-akun.mahasiswa.crud-mahasiswa.read')
 @endsection
