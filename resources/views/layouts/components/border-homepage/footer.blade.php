@@ -16,10 +16,17 @@
             <div class="col-lg-2 col-md-3 footer-links">
                 <h4>Useful Links</h4>
                 <ul>
+<<<<<<< HEAD
                     <li><i class="bi bi-chevron-right"></i> <a href="#hero">Home</a></li>
                     <li><i class="bi bi-chevron-right"></i> <a href="#pengumuman">Pengumuman</a></li>
                     <li><i class="bi bi-chevron-right"></i> <a href="#jadwal">Jadwal</a></li>
                     <li><i class="bi bi-chevron-right"></i> <a href="#team">Team</a></li>
+=======
+                    <li><i class="bi bi-chevron-right"></i> <a href="#">Home</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="#">Pengumuman</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="#">Jadwal</a></li>
+                    <li><i class="bi bi-chevron-right"></i> <a href="#">Team</a></li>
+>>>>>>> kasih
                 </ul>
             </div>
 

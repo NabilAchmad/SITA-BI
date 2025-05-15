@@ -23,7 +23,6 @@ class Pengumuman extends Model
         'tanggal_dibuat'
     ];
 
-
     public function pembuat()
     {
         return $this->belongsTo(User::class, 'dibuat_oleh');
