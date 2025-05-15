@@ -54,9 +54,9 @@ Route::prefix('admin')->group(function () {
     // =========================
     Route::prefix('berita-acara')->group(function () {
         // Berita Acara
-        Route::view('/create', 'admin/sidang/berita-acara/views/createBeritaAcara')->name('berita-acara.create');
-        Route::view('/edit', 'admin/sidang/berita-acara/views/edit-berita-acara')->name('berita-acara.edit');
-        Route::view('/read', 'admin/sidang/berita-acara/views/readBeritaAcara')->name('berita-acara.read'); 
+        Route::view('/create', 'admin/berita-acara/views/createBeritaAcara')->name('berita-acara.create');
+        Route::view('/edit', 'admin/berita-acara/views/edit-berita-acara')->name('berita-acara.edit');
+        Route::view('/read', 'admin/berita-acara/views/readBeritaAcara')->name('berita-acara.read'); 
     });
 
     // Sidang
