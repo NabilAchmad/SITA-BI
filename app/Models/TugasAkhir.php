@@ -15,10 +15,13 @@ class TugasAkhir extends Model
         'mahasiswa_id',
         'judul',
         'abstrak',
+        'file_path',
         'status',
         'tanggal_pengajuan',
-        'file_path', 
+        'alasan_pembatalan',  // Tambahkan kolom alasan_pembatalan
     ];
+
+
 
     public function mahasiswa()
     {

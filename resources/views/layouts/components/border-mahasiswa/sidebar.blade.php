@@ -81,6 +81,11 @@
                                     <span class="sub-item">Progress Tugas Akhir</span>
                                 </a>
                             </li>
+                            <li class="{{ request()->is('mahasiswa/TugasAkhir/cancel') ? 'active' : '' }}">
+                                <a href="{{ url('mahasiswa/TugasAkhir/cancel') }}">
+                                    <span class="sub-item">Tugas akhir yang di batalkan</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
