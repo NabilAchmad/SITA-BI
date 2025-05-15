@@ -2,8 +2,12 @@
 
 <!-- Tombol buka modal -->
 <div class="mb-3">
-    <button type="button" class="btn btn-danger" id="btnHapusSemua">Hapus Semua Pengumuman</button>
+    <button type="button" class="btn btn-danger" id="btnHapusSemua" @if ($pengumuman->isEmpty()) disabled @endif
+        data-bs-toggle="modal" data-bs-target="#modalForceDeleteAll">
+        Hapus Semua Pengumuman
+    </button>
 </div>
+
 
 <table class="table table-bordered table-hover">
     <thead class="table-dark">
@@ -26,9 +30,11 @@
                         <button type="submit" class="btn btn-success btn-sm">Pulihkan</button>
                     </form>
 
-                    <button type="button" class="btn btn-danger btn-sm btn-force-delete" data-id="{{ $item->id }}">
+                    <button type="button" class="btn btn-danger btn-sm btn-force-delete" data-id="{{ $item->id }}"
+                        data-bs-toggle="modal" data-bs-target="#modalHapus">
                         Hapus Permanen
                     </button>
+
                 </td>
             </tr>
         @empty
@@ -41,9 +47,9 @@
 
 {{ $pengumuman->links('pagination::bootstrap-4') }}
 
-<!-- Modal Konfirmasi Hapus Semua Pengumuman -->
-@include('admin.pengumuman.crud-pengumuman.partials.delete_modall_all')
 <!-- Modal Konfirmasi Hapus Satu Pengumuman -->
 @include('admin.pengumuman.crud-pengumuman.partials.delete_modal_pengumuman')
+<!-- Modal Konfirmasi Hapus Semua Pengumuman -->
+@include('admin.pengumuman.crud-pengumuman.partials.delete_modall_all')
 <!-- Script Konfirmasi & Penghapusan -->
 <script src="{{ asset('assets/js/pengumuman/trashed.js') }}"></script>

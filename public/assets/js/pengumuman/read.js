@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#confirmHapus')?.addEventListener('click', function () {
         if (!idHapus) return;
 
-        fetch(`/admin/pengumuman/${idHapus}`, {
+        fetch(`/admin/pengumuman/${idHapus}/soft-delete`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,

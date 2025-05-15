@@ -20,21 +20,22 @@ Route::prefix('admin')->group(function () {
         // CREATE
         Route::get('/create', [PengumumanController::class, 'create'])->name('pengumuman.form'); // Form tambah
         Route::post('/create', [PengumumanController::class, 'store'])->name('pengumuman.create'); // Simpan data baru
-
+        
+        
         // EDIT / UPDATE
-        Route::get('/edit/{id}', [PengumumanController::class, 'edit'])->name('pengumuman.edit'); // Form edit
-        Route::put('/update/{id}', [PengumumanController::class, 'update'])->name('pengumuman.update'); // Update data
-
+        Route::get('/{id}/edit', [PengumumanController::class, 'edit'])->name('pengumuman.edit'); // Form edit
+        Route::put('/{id}/update', [PengumumanController::class, 'update'])->name('pengumuman.update'); // Update data
+        
+        // DELETE (Soft Delete)
+        Route::delete('/{id}/soft-delete', [PengumumanController::class, 'destroy'])->name('pengumuman.destroy'); // Soft delete
+        
         // DELETE ALL (Force delete)
         Route::delete('/force-delete-all', [PengumumanController::class, 'forceDeleteAll'])->name('pengumuman.force-delete-all');
-
-        // DELETE (Soft Delete)
-        Route::delete('/{id}', [PengumumanController::class, 'destroy'])->name('pengumuman.destroy'); // Soft delete
-
+        
         // TRASHED (Manajemen soft delete)
         Route::get('/trash', [PengumumanController::class, 'trashed'])->name('pengumuman.trashed'); // Tampilkan data terhapus
-        Route::post('/restore/{id}', [PengumumanController::class, 'restore'])->name('pengumuman.restore'); // Restore data
-        Route::delete('/force-delete/{id}', [PengumumanController::class, 'forceDelete'])->name('pengumuman.force-delete'); // Hapus permanen
+        Route::post('/{id}/restore', [PengumumanController::class, 'restore'])->name('pengumuman.restore'); // Restore data
+        Route::delete('/{id}/force-delete', [PengumumanController::class, 'forceDelete'])->name('pengumuman.force-delete'); // Hapus permanen
 
     });
 
