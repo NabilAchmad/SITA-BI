@@ -7,6 +7,7 @@
             <th>Nama Mahasiswa</th>
             <th>NIM</th>
             <th>Program Studi</th>
+            <th>Judul Tugas Akhir</th>
             <th>Aksi</th>
         </tr>
     </thead>
@@ -16,6 +17,7 @@
             <td>Erland</td>
             <td>2311083007</td>
             <td>RPL</td>
+            <td>Anjay Mabar</td>
             <td>
                 <a href="{{ route('pilih-pembimbing') }}" class="btn btn-primary btn-sm">Pilih Pembimbing</a>
             </td>
