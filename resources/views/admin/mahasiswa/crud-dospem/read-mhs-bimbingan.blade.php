@@ -1,5 +1,4 @@
 <h2 class="mb-4">Daftar Mahasiswa Tanpa Dosen Pembimbing</h2>
-
 <table class="table table-bordered">
     <thead class="table-dark">
         <tr>

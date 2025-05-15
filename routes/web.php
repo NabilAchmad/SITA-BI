@@ -4,6 +4,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PengumumanController;
 use App\Models\Pengumuman;
 
+Route::prefix('homepage')->group(function () {
+    Route::get('/', function () {
+        return view('home.homepage');
+    });
+});
+
 Route::prefix('admin')->group(function () {
 
     Route::prefix('dashboard')->group(function () {
@@ -20,18 +26,18 @@ Route::prefix('admin')->group(function () {
         // CREATE
         Route::get('/create', [PengumumanController::class, 'create'])->name('pengumuman.form'); // Form tambah
         Route::post('/create', [PengumumanController::class, 'store'])->name('pengumuman.create'); // Simpan data baru
-        
-        
+
+
         // EDIT / UPDATE
         Route::get('/{id}/edit', [PengumumanController::class, 'edit'])->name('pengumuman.edit'); // Form edit
         Route::put('/{id}/update', [PengumumanController::class, 'update'])->name('pengumuman.update'); // Update data
-        
+
         // DELETE (Soft Delete)
         Route::delete('/{id}/soft-delete', [PengumumanController::class, 'destroy'])->name('pengumuman.destroy'); // Soft delete
-        
+
         // DELETE ALL (Force delete)
         Route::delete('/force-delete-all', [PengumumanController::class, 'forceDeleteAll'])->name('pengumuman.force-delete-all');
-        
+
         // TRASHED (Manajemen soft delete)
         Route::get('/trash', [PengumumanController::class, 'trashed'])->name('pengumuman.trashed'); // Tampilkan data terhapus
         Route::post('/{id}/restore', [PengumumanController::class, 'restore'])->name('pengumuman.restore'); // Restore data
@@ -40,13 +46,13 @@ Route::prefix('admin')->group(function () {
     });
 
     // =========================
-    // ROUTE TUGAS AKHIR
+    // ROUTE MAHASISWA
     // =========================
-    Route::prefix('tugas-akhir')->group(function () {
-        // Tugas Akhir
-        Route::view('/list-mahasiswa', 'admin/tugas-akhir/views/list-mhs')->name('list-mahasiswa');
+    Route::prefix('mahasiswa')->group(function () {
+        // Mahasiswa
+        Route::view('/list-mahasiswa', 'admin/mahasiswa/views/list-mhs')->name('list-mahasiswa');
 
-        Route::view('/pilih-pembimbing', 'admin/tugas-akhir/views/pilihPembimbing')->name('pilih-pembimbing');
+        Route::view('/pilih-pembimbing', 'admin/mahasiswa/views/pilihPembimbing')->name('pilih-pembimbing');
     });
 
     // =========================
@@ -56,7 +62,7 @@ Route::prefix('admin')->group(function () {
         // Berita Acara
         Route::view('/create', 'admin/sidang/berita-acara/views/createBeritaAcara')->name('berita-acara.create');
         Route::view('/edit', 'admin/sidang/berita-acara/views/edit-berita-acara')->name('berita-acara.edit');
-        Route::view('/read', 'admin/sidang/berita-acara/views/readBeritaAcara')->name('berita-acara.read'); 
+        Route::view('/read', 'admin/sidang/berita-acara/views/readBeritaAcara')->name('berita-acara.read');
     });
 
     // Sidang
@@ -66,10 +72,10 @@ Route::prefix('admin')->group(function () {
     Route::view('/sidang/list-mahasiswa', 'admin/sidang/jadwal/views/read-mhs-sidang')->name('mahasiswa-sidang.read');
 
     // Kelola Akun
-    Route::view('/kelola-akun/dosen', 'admin/dosen/views/kelolaAkunDosen')->name('akun-dosen.kelola');
-    Route::view('/kelola-akun/dosen/tambah', 'admin/dosen/views/createDosen')->name('akun-dosen.tambah');
-    Route::view('/kelola-akun/mahasiswa', 'admin/mahasiswa/views/kelolaMahasiswa')->name('akun-mahasiswa.kelola');
-    Route::view('/kelola-akun/mahasiswa/edit', 'admin/mahasiswa/views/editMahasiswa')->name('akun-mahasiswa.edit');
+    Route::view('/kelola-akun/dosen', 'admin/kelola-akun/dosen/views/kelolaAkunDosen')->name('akun-dosen.kelola');
+    Route::view('/kelola-akun/dosen/tambah', 'admin/kelola-akun/dosen/views/createDosen')->name('akun-dosen.tambah');
+    Route::view('/kelola-akun/mahasiswa', 'admin/kelola-akun/mahasiswa/views/kelolaMahasiswa')->name('akun-mahasiswa.kelola');
+    Route::view('/kelola-akun/mahasiswa/edit', 'admin/kelola-akun/mahasiswa/views/editMahasiswa')->name('akun-mahasiswa.edit');
 
     // Laporan dan Statistik
     Route::view('/laporan/lihat', 'admin/laporan/views/lihatLaporanStatistik')->name('laporan.statistik');
