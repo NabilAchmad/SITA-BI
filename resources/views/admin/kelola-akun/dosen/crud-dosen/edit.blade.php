@@ -1,29 +1,36 @@
-<form action="" method="POST">
+<h1 class="mb-4">Edit Akun Dosen</h1>
+
+<form action="{{ route('akun-dosen.update', $dosen->id) }}" method="POST">
     @csrf
+    @method('PUT')
+
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama dosen" required>
-        <label for="nama">Nama</label>
+        <input type="text" class="form-control" name="nama" value="{{ old('nama', $dosen->user->name) }}" required>
+        <label>Nama</label>
     </div>
 
     <div class="form-floating mb-3">
-        <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan email dosen" required>
-        <label for="email">Email</label>
+        <input type="email" class="form-control" name="email" value="{{ old('email', $dosen->user->email) }}" required>
+        <label>Email</label>
     </div>
 
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="nidn" name="nidn" placeholder="Masukkan NIDN dosen" required>
-        <label for="nidn">NIDN</label>
+        <input type="text" class="form-control" name="nidn" value="{{ old('nidn', $dosen->nidn) }}" required>
+        <label>NIDN</label>
     </div>
 
     <div class="form-floating mb-3">
-        <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
-        <label for="password">Password</label>
+        <input type="password" class="form-control" name="password" placeholder="Kosongkan jika tidak ingin ganti">
+        <label>Password (opsional)</label>
     </div>
 
     <div class="form-floating mb-4">
-        <input type="password" class="form-control" id="konfirmasi_password" name="konfirmasi_password" placeholder="Masukkan ulang password" required>
-        <label for="konfirmasi_password">Konfirmasi Password</label>
+        <input type="password" class="form-control" name="password_confirmation" placeholder="Ulangi password">
+        <label>Konfirmasi Password</label>
     </div>
 
-    <button type="submit" class="btn btn-primary w-100 py-2">Tambah Akun Dosen</button>
+    <div class="d-flex justify-content-between">
+        <a href="{{ route('akun-dosen.kelola') }}" class="btn btn-secondary">Kembali</a>
+        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+    </div>
 </form>

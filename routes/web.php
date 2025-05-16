@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\PenugasanPembimbingController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\DosenController;
 
 Route::prefix('admin')->group(function () {
 
@@ -65,17 +66,38 @@ Route::prefix('admin')->group(function () {
         Route::view('/read', 'admin/berita-acara/views/readBeritaAcara')->name('berita-acara.read');
     });
 
+    // =========================
+    // ROUTE KELOLA AKUN
+    // =========================
+    Route::prefix('kelola-akun')->group(function () {
+
+        // Dosen
+        Route::prefix('dosen')->group(function () {
+            Route::get('/', [DosenController::class, 'index'])->name('akun-dosen.kelola');
+
+            Route::get('/edit/{id}', [DosenController::class, 'edit'])->name('akun-dosen.edit');
+            Route::put('/update/{id}', [DosenController::class, 'update'])->name('akun-dosen.update');
+            Route::delete('/hapus/{id}', [DosenController::class, 'destroy'])->name('akun-dosen.destroy');
+
+
+            Route::get('/tambah-akun-dosen', [DosenController::class, 'create'])->name('akun-dosen.create');
+            Route::post('/tambah-akun-dosen', [DosenController::class, 'store'])->name('akun-dosen.store');
+        });
+
+        Route::prefix('mahasiswa')->group(function () {
+            // Mahasiswa
+            Route::get('/', [MahasiswaController::class, 'listMahasiswa'])->name('akun-mahasiswa.kelola');
+            Route::get('/edit/{id}', [MahasiswaController::class, 'edit'])->name('akun-mahasiswa.edit');
+
+            Route::view('/mahasiswa/edit', 'admin/kelola-akun/mahasiswa/views/editMahasiswa')->name('akun-mahasiswa.edit');
+        });
+    });
+
     // Sidang
     Route::view('/sidang/tentukan-jadwal', 'admin/sidang/jadwal/views/createJadwalSidang')->name('jadwal-sidang.create');
     Route::view('/sidang/edit-jadwal', 'admin/sidang/jadwal/views/editJadwalSidang')->name('jadwal-sidang.edit');
     Route::view('/sidang/lihat-jadwal', 'admin/sidang/jadwal/views/readJadwalSidang')->name('jadwal-sidang.read');
     Route::view('/sidang/list-mahasiswa', 'admin/sidang/jadwal/views/read-mhs-sidang')->name('mahasiswa-sidang.read');
-
-    // Kelola Akun
-    Route::view('/kelola-akun/dosen', 'admin/kelola-akun/dosen/views/kelolaAkunDosen')->name('akun-dosen.kelola');
-    Route::view('/kelola-akun/dosen/tambah', 'admin/kelola-akun/dosen/views/createDosen')->name('akun-dosen.tambah');
-    Route::view('/kelola-akun/mahasiswa', 'admin/kelola-akun/mahasiswa/views/kelolaMahasiswa')->name('akun-mahasiswa.kelola');
-    Route::view('/kelola-akun/mahasiswa/edit', 'admin/kelola-akun/mahasiswa/views/editMahasiswa')->name('akun-mahasiswa.edit');
 
     // Laporan dan Statistik
     Route::view('/laporan/lihat', 'admin/laporan/views/lihatLaporanStatistik')->name('laporan.statistik');

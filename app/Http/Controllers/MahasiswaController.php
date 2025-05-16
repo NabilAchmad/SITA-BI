@@ -18,4 +18,19 @@ class MahasiswaController extends Controller
 
         return view('admin.mahasiswa.views.list-mhs', compact('mahasiswa'));
     }
+
+    // Tampilkan mahasiswa semua list mahasiswa
+    public function listMahasiswa()
+    {
+        $mahasiswa = Mahasiswa::with([
+            'user',
+        ])->get();
+        return view('admin.kelola-akun.mahasiswa.views.kelolaMahasiswa', compact('mahasiswa'));
+    }
+
+    public function edit($id)
+    {
+        $mahasiswa = Mahasiswa::findOrFail($id);
+        return view('admin.kelola-akun.mahasiswa.views.editMahasiswa', compact('mahasiswa'));
+    }
 }
