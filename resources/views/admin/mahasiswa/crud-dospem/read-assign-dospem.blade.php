@@ -1,29 +1,32 @@
-<h2 class="mb-4">Daftar Mahasiswa Telah Ada Dosen Pembimbing</h2>
+<h2 class="mb-4 fw-bold text-primary">Daftar Mahasiswa Belum Memiliki Pembimbing</h2>
 
-<table class="table table-bordered">
-    <thead class="table-dark">
+<table class="table table-bordered shadow-sm">
+    <thead class="table-dark text-center">
         <tr>
             <th>No</th>
             <th>Nama Mahasiswa</th>
             <th>NIM</th>
             <th>Program Studi</th>
-            <th>Judul Tugas Akhir</th>
             <th>Aksi</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="text-center">
+        @forelse($mahasiswa as $index => $mhs)
         <tr>
-            <td>1 </td>
-            <td>Erland</td>
-            <td>2311083007</td>
-            <td>RPL</td>
-            <td>Anjay Mabar</td>
+            <td>{{ $index + 1 }}</td>
+            <td>{{ $mhs->user->name }}</td>
+            <td>{{ $mhs->nim }}</td>
+            <td>{{ $mhs->prodi }}</td>
             <td>
-                <a href="{{ route('pilih-pembimbing') }}" class="btn btn-primary btn-sm">Pilih Pembimbing</a>
+                <a href="{{ route('penugasan-bimbingan.create', $mhs->id) }}" class="btn btn-primary btn-sm">
+                    Pilih Pembimbing
+                </a>
             </td>
         </tr>
+        @empty
+        <tr>
+            <td colspan="5">Semua mahasiswa sudah memiliki pembimbing.</td>
+        </tr>
+        @endforelse
     </tbody>
 </table>
-
-
-<!-- Modal -->

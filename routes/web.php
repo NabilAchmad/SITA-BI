@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PengumumanController;
-use App\Models\Pengumuman;
+use App\Http\Controllers\PenugasanPembimbingController;
+use App\Http\Controllers\MahasiswaController;
 
 Route::prefix('admin')->group(function () {
 
@@ -20,18 +21,18 @@ Route::prefix('admin')->group(function () {
         // CREATE
         Route::get('/create', [PengumumanController::class, 'create'])->name('pengumuman.form'); // Form tambah
         Route::post('/create', [PengumumanController::class, 'store'])->name('pengumuman.create'); // Simpan data baru
-        
-        
+
+
         // EDIT / UPDATE
         Route::get('/{id}/edit', [PengumumanController::class, 'edit'])->name('pengumuman.edit'); // Form edit
         Route::put('/{id}/update', [PengumumanController::class, 'update'])->name('pengumuman.update'); // Update data
-        
+
         // DELETE (Soft Delete)
         Route::delete('/{id}/soft-delete', [PengumumanController::class, 'destroy'])->name('pengumuman.destroy'); // Soft delete
-        
+
         // DELETE ALL (Force delete)
         Route::delete('/force-delete-all', [PengumumanController::class, 'forceDeleteAll'])->name('pengumuman.force-delete-all');
-        
+
         // TRASHED (Manajemen soft delete)
         Route::get('/trash', [PengumumanController::class, 'trashed'])->name('pengumuman.trashed'); // Tampilkan data terhapus
         Route::post('/{id}/restore', [PengumumanController::class, 'restore'])->name('pengumuman.restore'); // Restore data
@@ -43,12 +44,15 @@ Route::prefix('admin')->group(function () {
     // ROUTE Mahasiswa
     // =========================
     Route::prefix('mahasiswa')->group(function () {
-        // Mahasiswa
-        Route::view('/assign-dospem', 'admin/mahasiswa/views/list-mhs')->name('assign-dospem');
-        
-        Route::view('/list-mahasiswa', 'admin/mahasiswa/views/assign-dospem')->name('list-mahasiswa');
+        // Daftar mahasiswa belum punya pembimbing
+        Route::get('/belum-pembimbing', [PenugasanPembimbingController::class, 'index'])->name('penugasan-bimbingan.index');
 
-        Route::view('/pilih-pembimbing', 'admin/mahasiswa/views/pilihPembimbing')->name('pilih-pembimbing');
+        // Form pilih pembimbing untuk mahasiswa tertentu
+        Route::get('/pilih-pembimbing/{id}', [PenugasanPembimbingController::class, 'create'])->name('penugasan-bimbingan.create');
+        Route::post('/pilih-pembimbing/{id}', [PenugasanPembimbingController::class, 'store'])->name('penugasan-bimbingan.store');
+
+        // Daftar mahasiswa sudah punya pembimbing
+        Route::get('/list-mahasiswa', [MahasiswaController::class, 'index'])->name('list-mahasiswa');
     });
 
     // =========================
@@ -58,7 +62,7 @@ Route::prefix('admin')->group(function () {
         // Berita Acara
         Route::view('/create', 'admin/berita-acara/views/createBeritaAcara')->name('berita-acara.create');
         Route::view('/edit', 'admin/berita-acara/views/edit-berita-acara')->name('berita-acara.edit');
-        Route::view('/read', 'admin/berita-acara/views/readBeritaAcara')->name('berita-acara.read'); 
+        Route::view('/read', 'admin/berita-acara/views/readBeritaAcara')->name('berita-acara.read');
     });
 
     // Sidang

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Mahasiswa extends Model
 {
+    protected $table = 'mahasiswa'; // nama tabel sesuai DB
+
     protected $fillable = ['user_id', 'nim', 'prodi', 'angkatan'];
 
     public function user(): BelongsTo
@@ -15,9 +17,9 @@ class Mahasiswa extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function tugasAkhir(): HasMany
+    public function tugasAkhir()
     {
-        return $this->hasMany(TugasAkhir::class);
+        return $this->hasOne(TugasAkhir::class);
     }
 
     public function historyTopik(): HasMany

@@ -128,8 +128,8 @@
                     </a>
                     <div class="collapse {{ request()->is('admin/mahasiswa*') ? 'show' : '' }}" id="ta">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/mahasiswa/assign-dospem') ? 'active' : '' }}">
-                                <a href="{{ route('assign-dospem') }}">
+                            <li class="{{ request()->is('admin/mahasiswa/belum-pembimbing') ? 'active' : '' }}">
+                                <a href="{{ route('penugasan-bimbingan.index') }}">
                                     <span class="sub-item">Assign Dosen Pembimbing</span>
                                 </a>
                             </li>

@@ -11,8 +11,14 @@ class TugasAkhir extends Model
 {
     use SoftDeletes;
 
+    protected $table = 'tugas_akhir';  // sesuaikan dengan nama tabel di DB
+
     protected $fillable = [
-        'mahasiswa_id', 'judul', 'abstrak', 'status', 'tanggal_pengajuan'
+        'mahasiswa_id',
+        'judul',
+        'abstrak',
+        'status',
+        'tanggal_pengajuan'
     ];
 
     public function mahasiswa(): BelongsTo
@@ -20,9 +26,9 @@ class TugasAkhir extends Model
         return $this->belongsTo(Mahasiswa::class);
     }
 
-    public function peranDosen(): HasMany
+    public function peranDosenTa()
     {
-        return $this->hasMany(PeranDosenTa::class);
+        return $this->hasMany(PeranDosenTa::class, 'tugas_akhir_id');
     }
 
     public function bimbingan(): HasMany

@@ -1,4 +1,4 @@
-@include('layouts.template.main')
+@extends('layouts.template.main')
 
 @section('title', 'Pilih Pembimbing Tugas Akhir')
 
