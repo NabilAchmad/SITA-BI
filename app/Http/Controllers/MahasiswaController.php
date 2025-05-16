@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mahasiswa;
+use Illuminate\Http\Request;
 
 class MahasiswaController extends Controller
 {
@@ -30,7 +31,34 @@ class MahasiswaController extends Controller
 
     public function edit($id)
     {
-        $mahasiswa = Mahasiswa::findOrFail($id);
+        $mahasiswa = Mahasiswa::with('user')->findOrFail($id);
         return view('admin.kelola-akun.mahasiswa.views.editMahasiswa', compact('mahasiswa'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $mahasiswa = Mahasiswa::with('user')->findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $mahasiswa->user->id,
+            'nim' => 'required|string|unique:mahasiswa,nim,' . $mahasiswa->id,
+            'password' => 'nullable|confirmed|min:8',
+        ]);
+
+        // Update user data
+        $mahasiswa->user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            // update password hanya jika ada isian
+            'password' => $request->filled('password') ? bcrypt($request->password) : $mahasiswa->user->password,
+        ]);
+
+        // Update mahasiswa data
+        $mahasiswa->update([
+            'nim' => $request->nim,
+        ]);
+
+        return redirect()->route('akun-mahasiswa.kelola')->with('success', 'Data mahasiswa berhasil diperbarui.');
     }
 }

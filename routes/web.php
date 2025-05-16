@@ -88,8 +88,7 @@ Route::prefix('admin')->group(function () {
             // Mahasiswa
             Route::get('/', [MahasiswaController::class, 'listMahasiswa'])->name('akun-mahasiswa.kelola');
             Route::get('/edit/{id}', [MahasiswaController::class, 'edit'])->name('akun-mahasiswa.edit');
-
-            Route::view('/mahasiswa/edit', 'admin/kelola-akun/mahasiswa/views/editMahasiswa')->name('akun-mahasiswa.edit');
+            Route::put('/update/{id}', [MahasiswaController::class, 'update'])->name('akun-mahasiswa.update');
         });
     });
 

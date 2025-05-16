@@ -10,7 +10,7 @@ class Mahasiswa extends Model
 {
     protected $table = 'mahasiswa'; // nama tabel sesuai DB
 
-    protected $fillable = ['user_id', 'nim', 'prodi', 'angkatan'];
+    protected $fillable = ['user_id', 'nim', 'phone', 'address', 'prodi', 'angkatan'];
 
     public function user(): BelongsTo
     {
