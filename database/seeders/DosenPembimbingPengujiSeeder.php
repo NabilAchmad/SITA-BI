@@ -31,7 +31,9 @@ class DosenPembimbingPengujiSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // Misalnya, menambahkan tugas akhir
+        // Ambil ID dosen dari tabel dosen
+        $dosen = DB::table('dosen')->where('user_id', $dosenPembimbingId)->first();
+
         $tugasAkhirId = DB::table('tugas_akhir')->insertGetId([
             'mahasiswa_id' => 1,
             'judul' => 'Sistem Informasi Akademik',
@@ -42,9 +44,8 @@ class DosenPembimbingPengujiSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // Menambahkan peran pembimbing dan penguji
         DB::table('peran_dosen_ta')->insert([
-            'user_id' => $dosenPembimbingId,
+            'dosen_id' => $dosen->id,
             'tugas_akhir_id' => $tugasAkhirId,
             'peran' => 'pembimbing1',
             'created_at' => now(),
@@ -52,7 +53,7 @@ class DosenPembimbingPengujiSeeder extends Seeder
         ]);
 
         DB::table('peran_dosen_ta')->insert([
-            'user_id' => $dosenPembimbingId,
+            'dosen_id' => $dosen->id,
             'tugas_akhir_id' => $tugasAkhirId,
             'peran' => 'penguji1',
             'created_at' => now(),

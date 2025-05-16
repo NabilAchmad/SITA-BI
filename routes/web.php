@@ -44,7 +44,9 @@ Route::prefix('admin')->group(function () {
     // =========================
     Route::prefix('mahasiswa')->group(function () {
         // Mahasiswa
-        Route::view('/list-mahasiswa', 'admin/mahasiswa/views/list-mhs')->name('list-mahasiswa');
+        Route::view('/assign-dospem', 'admin/mahasiswa/views/list-mhs')->name('assign-dospem');
+        
+        Route::view('/list-mahasiswa', 'admin/mahasiswa/views/assign-dospem')->name('list-mahasiswa');
 
         Route::view('/pilih-pembimbing', 'admin/mahasiswa/views/pilihPembimbing')->name('pilih-pembimbing');
     });
@@ -66,10 +68,10 @@ Route::prefix('admin')->group(function () {
     Route::view('/sidang/list-mahasiswa', 'admin/sidang/jadwal/views/read-mhs-sidang')->name('mahasiswa-sidang.read');
 
     // Kelola Akun
-    Route::view('/kelola-akun/dosen', 'admin/dosen/views/kelolaAkunDosen')->name('akun-dosen.kelola');
-    Route::view('/kelola-akun/dosen/tambah', 'admin/dosen/views/createDosen')->name('akun-dosen.tambah');
-    Route::view('/kelola-akun/mahasiswa', 'admin/mahasiswa/views/kelolaMahasiswa')->name('akun-mahasiswa.kelola');
-    Route::view('/kelola-akun/mahasiswa/edit', 'admin/mahasiswa/views/editMahasiswa')->name('akun-mahasiswa.edit');
+    Route::view('/kelola-akun/dosen', 'admin/kelola-akun/dosen/views/kelolaAkunDosen')->name('akun-dosen.kelola');
+    Route::view('/kelola-akun/dosen/tambah', 'admin/kelola-akun/dosen/views/createDosen')->name('akun-dosen.tambah');
+    Route::view('/kelola-akun/mahasiswa', 'admin/kelola-akun/mahasiswa/views/kelolaMahasiswa')->name('akun-mahasiswa.kelola');
+    Route::view('/kelola-akun/mahasiswa/edit', 'admin/kelola-akun/mahasiswa/views/editMahasiswa')->name('akun-mahasiswa.edit');
 
     // Laporan dan Statistik
     Route::view('/laporan/lihat', 'admin/laporan/views/lihatLaporanStatistik')->name('laporan.statistik');
