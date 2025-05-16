@@ -7,19 +7,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Faker\Factory as Faker;
 
-class MahasiswaSeeder extends Seeder
+class MahasiswaTanpaPembimbingSeeder extends Seeder
 {
     public function run()
     {
         $faker = Faker::create('id_ID');
 
-        for ($i = 1; $i <= 50; $i++) {
-            $prodi = $i % 2 == 0 ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris';
-            $nim = ($prodi == 'D3 Bahasa Inggris' ? '23' : '24') . str_pad($i, 7, '0', STR_PAD_LEFT);
-
+        for ($i = 1; $i <= 10; $i++) {
             $userId = DB::table('users')->insertGetId([
                 'name' => $faker->firstName . ' ' . $faker->lastName,
-                'email' => "mahasiswa$i@example.com",
+                'email' => "mhs_tanpa_pembimbing$i@example.com",
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -30,11 +27,21 @@ class MahasiswaSeeder extends Seeder
                 'role_id' => 5, // mahasiswa
             ]);
 
-            DB::table('mahasiswa')->insert([
+            $mhsId = DB::table('mahasiswa')->insertGetId([
                 'user_id' => $userId,
-                'nim' => $nim,
-                'prodi' => $prodi,
-                'angkatan' => substr($nim, 0, 2),
+                'nim' => '25' . str_pad($i, 7, '0', STR_PAD_LEFT),
+                'prodi' => 'D4 Bahasa Inggris',
+                'angkatan' => '25',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('tugas_akhir')->insert([
+                'mahasiswa_id' => $mhsId,
+                'judul' => 'Analisis Tugas Akhir Tanpa Pembimbing ' . $i,
+                'abstrak' => $faker->paragraph,
+                'status' => 'diajukan',
+                'tanggal_pengajuan' => now()->subDays(rand(1, 30)),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
