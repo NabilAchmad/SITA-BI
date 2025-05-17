@@ -18,11 +18,12 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             DosenSeeder::class,
             MahasiswaSeeder::class,
+            MahasiswaTanpaPembimbingSeeder::class,
             TugasAkhirSeeder::class,
             PeranDosenTaSeeder::class,
             SidangSeeder::class,
+            RuanganSeeder::class,
             JadwalSidangSeeder::class,
-            MahasiswaTanpaPembimbingSeeder::class,
         ]);
     }
 }

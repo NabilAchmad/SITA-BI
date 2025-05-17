@@ -5,6 +5,7 @@ use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\PenugasanPembimbingController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\DosenController;
+use App\Http\Controllers\JadwalSidangController;
 
 Route::prefix('admin')->group(function () {
 
@@ -92,11 +93,20 @@ Route::prefix('admin')->group(function () {
         });
     });
 
-    // Sidang
-    Route::view('/sidang/tentukan-jadwal', 'admin/sidang/jadwal/views/createJadwalSidang')->name('jadwal-sidang.create');
-    Route::view('/sidang/edit-jadwal', 'admin/sidang/jadwal/views/editJadwalSidang')->name('jadwal-sidang.edit');
-    Route::view('/sidang/lihat-jadwal', 'admin/sidang/jadwal/views/readJadwalSidang')->name('jadwal-sidang.read');
-    Route::view('/sidang/list-mahasiswa', 'admin/sidang/jadwal/views/read-mhs-sidang')->name('mahasiswa-sidang.read');
+    // =========================
+    // ROUTE SIDANG
+    // =========================
+    Route::prefix('sidang')->group(function () {
+        Route::get('/list-mahasiswa', [MahasiswaController::class, 'mahasiswaBelumPunyaJadwal'])
+            ->name('mahasiswa-sidang.read');
+
+        // Route::view('/lihat-jadwal', 'admin/sidang/jadwal/views/readJadwalSidang')->name('jadwal-sidang.read');
+        Route::get('/lihat-jadwal', [JadwalSidangController::class, 'index'])->name('jadwal-sidang.read');
+
+        Route::get('/edit-jadwal/{id}', [JadwalSidangController::class, 'edit'])->name('jadwal-sidang.edit');
+        Route::put('/update-jadwal/{id}', [JadwalSidangController::class, 'update'])->name('jadwal-sidang.update');
+        Route::delete('/delete-jadwal/{id}', [JadwalSidangController::class, 'destroy'])->name('jadwal-sidang.destroy');
+    });
 
     // Laporan dan Statistik
     Route::view('/laporan/lihat', 'admin/laporan/views/lihatLaporanStatistik')->name('laporan.statistik');

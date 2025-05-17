@@ -12,14 +12,14 @@ class Mahasiswa extends Model
 
     protected $fillable = ['user_id', 'nim', 'phone', 'address', 'prodi', 'angkatan'];
 
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
     public function tugasAkhir()
     {
-        return $this->hasOne(TugasAkhir::class);
+        return $this->hasMany(TugasAkhir::class);
     }
 
     public function historyTopik(): HasMany

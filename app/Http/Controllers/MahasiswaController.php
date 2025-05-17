@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mahasiswa;
+use App\Models\JadwalSidang;
 use Illuminate\Http\Request;
 
 class MahasiswaController extends Controller
@@ -60,5 +61,15 @@ class MahasiswaController extends Controller
         ]);
 
         return redirect()->route('akun-mahasiswa.kelola')->with('success', 'Data mahasiswa berhasil diperbarui.');
+    }
+
+    public function mahasiswaBelumPunyaJadwal()
+    {
+        $mahasiswa = Mahasiswa::whereHas('tugasAkhir.sidang', function ($q) {
+            $q->where('status', 'dijadwalkan')
+                ->whereDoesntHave('jadwalSidang'); // Belum dijadwalkan
+        })->with(['user', 'tugasAkhir.sidang'])->get();
+
+        return view('admin.sidang.mahasiswa.views.read-mhs-sidang', compact('mahasiswa'));
     }
 }

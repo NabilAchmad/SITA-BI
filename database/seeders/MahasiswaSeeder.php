@@ -14,11 +14,8 @@ class MahasiswaSeeder extends Seeder
         $faker = Faker::create('id_ID');
 
         for ($i = 1; $i <= 50; $i++) {
-            $prodi = $i % 2 == 0 ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris';
-            $nim = ($prodi == 'D3 Bahasa Inggris' ? '23' : '24') . str_pad($i, 7, '0', STR_PAD_LEFT);
-
             $userId = DB::table('users')->insertGetId([
-                'name' => $faker->firstName . ' ' . $faker->lastName,
+                'name' => 'Mahasiswa ' . $i,
                 'email' => "mahasiswa$i@example.com",
                 'password' => Hash::make('password'),
                 'created_at' => now(),
@@ -32,9 +29,9 @@ class MahasiswaSeeder extends Seeder
 
             DB::table('mahasiswa')->insert([
                 'user_id' => $userId,
-                'nim' => $nim,
-                'prodi' => $prodi,
-                'angkatan' => substr($nim, 0, 2),
+                'nim' => '25' . str_pad($i, 7, '0', STR_PAD_LEFT),
+                'prodi' => $i % 2 === 0 ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris',
+                'angkatan' => '25',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

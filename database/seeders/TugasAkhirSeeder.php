@@ -17,10 +17,10 @@ class TugasAkhirSeeder extends Seeder
         foreach ($mahasiswaList as $mhs) {
             DB::table('tugas_akhir')->insert([
                 'mahasiswa_id' => $mhs->id,
-                'judul' => 'Analisis ' . $faker->word . ' pada Sistem Bahasa',
-                'abstrak' => $faker->paragraph(3),
+                'judul' => 'Analisis Sistem Informasi Mahasiswa ' . $mhs->id,
+                'abstrak' => 'Penelitian tentang sistem informasi untuk ' . $mhs->nim,
                 'status' => 'diajukan',
-                'tanggal_pengajuan' => now()->subDays(rand(5, 30)),
+                'tanggal_pengajuan' => now()->subDays(rand(1, 20)),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

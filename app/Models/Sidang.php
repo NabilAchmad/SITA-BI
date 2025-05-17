@@ -20,11 +20,11 @@ class Sidang extends Model
         return $this->belongsTo(TugasAkhir::class);
     }
 
-    public function jadwal(): HasMany
+    public function jadwalSidang()
     {
-        return $this->hasMany(JadwalSidang::class);
+        return $this->hasOne(JadwalSidang::class);
     }
-
+    
     public function nilai(): HasMany
     {
         return $this->hasMany(NilaiSidang::class);

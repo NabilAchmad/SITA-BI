@@ -21,10 +21,11 @@ class TugasAkhir extends Model
         'tanggal_pengajuan'
     ];
 
-    public function mahasiswa(): BelongsTo
+    public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class);
     }
+
 
     public function peranDosenTa()
     {
