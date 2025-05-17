@@ -18,8 +18,6 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.po
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
-
-
 Route::prefix('ketua-prodi')->group(function () {
     Route::get('/', [KajurController::class, 'index'])->name('kaprodi.page');
 
