@@ -32,8 +32,11 @@
             </select>
         </div>
 
-        <!-- Tombol Submit -->
-        <div class="text-end mt-4">
+        <!-- Tombol Submit dan Kembali -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ route('pengumuman.read') }}" class="btn btn-secondary px-4 py-2 rounded-3 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>Kembali
+            </a>
             <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
                 <i class="fas fa-paper-plane me-2"></i>Submit Pengumuman
             </button>

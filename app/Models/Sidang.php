@@ -15,16 +15,16 @@ class Sidang extends Model
 
     protected $fillable = ['tugas_akhir_id', 'jenis_sidang', 'status'];
 
-    public function tugasAkhir(): BelongsTo
+    public function tugasAkhir()
     {
         return $this->belongsTo(TugasAkhir::class);
     }
 
-    public function jadwal(): HasMany
+    public function jadwalSidang()
     {
-        return $this->hasMany(JadwalSidang::class);
+        return $this->hasOne(JadwalSidang::class);
     }
-
+    
     public function nilai(): HasMany
     {
         return $this->hasMany(NilaiSidang::class);

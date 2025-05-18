@@ -8,16 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Mahasiswa extends Model
 {
-    protected $fillable = ['user_id', 'nim', 'prodi', 'angkatan'];
+    protected $table = 'mahasiswa'; // nama tabel sesuai DB
 
-    public function user(): BelongsTo
+    protected $fillable = ['user_id', 'nim', 'phone', 'address', 'prodi', 'angkatan'];
+
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function tugasAkhir(): HasMany
+    public function tugasAkhir()
     {
-        return $this->hasMany(TugasAkhir::class);
+        return $this->hasOne(TugasAkhir::class); // ✔️ Ini yang benar jika hanya 1 TA per mahasiswa
     }
 
     public function historyTopik(): HasMany

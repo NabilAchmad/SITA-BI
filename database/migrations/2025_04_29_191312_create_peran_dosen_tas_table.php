@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('peran_dosen_ta', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('dosen_id')->constrained('dosen')->onDelete('cascade');
             $table->foreignId('tugas_akhir_id')->constrained('tugas_akhir')->onDelete('cascade');
             $table->enum('peran', [
                 'pembimbing1',

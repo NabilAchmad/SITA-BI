@@ -1,11 +1,12 @@
-<h1 class="mb-4">Jadwal Sidang</h1>
+<h1 class="mb-4 fw-bold text-primary">Jadwal Sidang</h1>
+
 <div class="table-responsive">
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark text-center">
             <tr>
                 <th>No</th>
-                <th>Nama Mahasiswa</th>
-                <th>Judul Skripsi</th>
+                <th>Nama</th>
+                <th>Judul Tugas Akhir</th>
                 <th>Penguji 1</th>
                 <th>Penguji 2</th>
                 <th>Tanggal</th>
@@ -15,54 +16,43 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>John Doe</td>
-                <td>Implementasi Sistem Informasi Akademik</td>
-                <td>Dr. Smith</td>
-                <td>Prof. Johnson</td>
-                <td>2023-12-01</td>
-                <td>10:00 - 12:00</td>
-                <td>Ruang 101</td>
-                <td>
-                    <div class="d-flex justify-content-center gap-2">
-                        <a class="btn btn-warning btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Edit</a>
-                        <a class="btn btn-danger btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Hapus</a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Jane Doe</td>
-                <td>Analisis Data Menggunakan Machine Learning</td>
-                <td>Dr. Brown</td>
-                <td>Prof. Taylor</td>
-                <td>2023-12-02</td>
-                <td>13:00 - 15:00</td>
-                <td>Ruang 102</td>
-                <td>
-                    <div class="d-flex justify-content-center gap-2">
-                        <a class="btn btn-warning btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Edit</a>
-                        <a class="btn btn-danger btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Hapus</a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Michael Smith</td>
-                <td>Pengembangan Aplikasi Mobile</td>
-                <td>Dr. Wilson</td>
-                <td>Prof. Davis</td>
-                <td>2023-12-03</td>
-                <td>09:00 - 11:00</td>
-                <td>Ruang 103</td>
-                <td>
-                    <div class="d-flex justify-content-center gap-2">
-                        <a class="btn btn-warning btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Edit</a>
-                        <a class="btn btn-danger btn-sm" href="{{ url('/sidang/edit-jadwal') }}">Hapus</a>
-                    </div>
-                </td>
-            </tr>
+            @forelse ($jadwalList as $index => $jadwal)
+                @php
+                    $ta = $jadwal->sidang->tugasAkhir;
+                    $mahasiswa = $ta?->mahasiswa;
+                    $penguji1 = $ta?->peranDosenTa->firstWhere('peran', 'penguji1')?->dosen?->user?->name ?? '-';
+                    $penguji2 = $ta?->peranDosenTa->firstWhere('peran', 'penguji2')?->dosen?->user?->name ?? '-';
+                @endphp
+
+                <tr>
+                    <td class="text-center">{{ $index + 1 }}</td>
+                    <td>{{ $mahasiswa?->user?->name ?? '-' }}</td>
+                    <td>{{ $ta?->judul ?? '-' }}</td>
+                    <td>{{ $penguji1 }}</td>
+                    <td>{{ $penguji2 }}</td>
+                    <td class="text-center">{{ $jadwal->tanggal }}</td>
+                    <td class="text-center">{{ \Carbon\Carbon::parse($jadwal->waktu_mulai)->format('H:i') }} -
+                        {{ \Carbon\Carbon::parse($jadwal->waktu_selesai)->format('H:i') }}</td>
+                    <td>{{ $jadwal->ruangan?->nama_ruangan ?? '-' }}</td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <a class="btn btn-warning btn-sm" href="{{ route('jadwal-sidang.edit', $jadwal->id) }}">
+                                Edit
+                            </a>
+                            <form action="{{ route('jadwal-sidang.destroy', $jadwal->id) }}" method="POST"
+                                onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="9" class="text-center text-muted">Belum ada jadwal sidang yang tersedia.</td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>

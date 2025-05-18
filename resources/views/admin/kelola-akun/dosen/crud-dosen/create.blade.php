@@ -1,5 +1,10 @@
-<form action="" method="POST">
-    <h1>Tambah Akun Dosen</h1>
+<h1 class="mb-4">Tambah Akun Dosen</h1>
+
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
+<form action="{{ route('akun-dosen.store') }}" method="POST">
     @csrf
     <div class="form-floating mb-3">
         <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama dosen" required>
@@ -12,7 +17,7 @@
     </div>
 
     <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="nidn" name="nidn" placeholder="Masukkan NIDN dosen" required>
+        <input type="text" class="form-control" id="nidn" name="nidn" placeholder="Masukkan NIDN" required>
         <label for="nidn">NIDN</label>
     </div>
 
@@ -22,8 +27,9 @@
     </div>
 
     <div class="form-floating mb-4">
-        <input type="password" class="form-control" id="konfirmasi_password" name="konfirmasi_password" placeholder="Masukkan ulang password" required>
-        <label for="konfirmasi_password">Konfirmasi Password</label>
+        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation"
+            placeholder="Ulangi password" required>
+        <label for="password_confirmation">Konfirmasi Password</label>
     </div>
 
     <button type="submit" class="btn btn-primary w-100 py-2">Tambah Akun Dosen</button>

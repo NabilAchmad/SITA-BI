@@ -2,5 +2,5 @@
 
 @section('title', 'Kelola Akun Dosen')
 @section('content')
-    @include('admin.dosen.crud-dosen.read')
+    @include('admin.kelola-akun.dosen.crud-dosen.read')
 @endsection

@@ -11,7 +11,7 @@ class Dosen extends Model
 {
     use HasFactory;
     protected $fillable = ['user_id', 'nidn'];
-    protected $table = 'dosen'; // ⬅️ Ini wajib untuk hindari pluralisasi salah
+    protected $table = 'dosen'; // Ini wajib untuk hindari pluralisasi salah
 
     public function user(): BelongsTo
     {

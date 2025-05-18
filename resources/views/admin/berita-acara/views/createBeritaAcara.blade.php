@@ -18,14 +18,14 @@
             {{-- Pra Sidang --}}
             <div id="form-pra" class="card shadow-sm mb-4" style="display: none;">
                 <div class="card-body">
-                    @include('admin.sidang.berita-acara.crud-berita-acara.create-pra-sidang')
+                    @include('admin.berita-acara.crud-berita-acara.create-pra-sidang')
                 </div>
             </div>
 
             {{-- Pasca Sidang --}}
             <div id="form-pasca" class="card shadow-sm mb-4" style="display: none;">
                 <div class="card-body">
-                    @include('admin.sidang.berita-acara.crud-berita-acara.create-pasca-sidang')
+                    @include('admin.berita-acara.crud-berita-acara.create-pasca-sidang')
                 </div>
             </div>
         </div>
