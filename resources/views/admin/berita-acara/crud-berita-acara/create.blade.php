@@ -1,10 +1,7 @@
 <h2 class="text-center mb-2 fw-bold">Form Berita Acara</h2>
-<<<<<<< HEAD
-=======
 <p class="text-center text-muted mb-4">Silakan isi form berikut untuk membuat berita acara sidang, sempro, atau semhas.
 </p>
 
->>>>>>> kasih
 <form action="" method="POST" class="mx-auto" style="max-width: 700px;">
     @csrf
 

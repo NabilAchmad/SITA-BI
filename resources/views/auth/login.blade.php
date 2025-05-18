@@ -57,21 +57,28 @@
     </div>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     {{-- <script>
+=======
+    {{-- Toggle Password Script --}}
+    <script>
+>>>>>>> nabil
         function togglePassword(fieldId, btn) {
             const input = document.getElementById(fieldId);
-            const svg = btn.querySelector('svg');
+            const icon = btn.querySelector('i');
             if (input.type === "password") {
                 input.type = "text";
-                svg.innerHTML = '<path d="M13.359 11.238a6.5 6.5 0 0 0 1.292-3.238 6.5 6.5 0 0 0-12.5 0 6.5 6.5 0 0 0 1.292 3.238l-1.415 1.415a.5.5 0 0 0 .708.708l12-12a.5.5 0 0 0-.708-.708l-1.415 1.415z"/><path d="M11.297 9.297a3 3 0 0 1-4.243-4.243"/>';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
             } else {
                 input.type = "password";
-                svg.innerHTML = '<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"/><path d="M8 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
             }
         }
-    </script> --}}
-</body>
+    </script>
 
+<<<<<<< HEAD
 </html>
 =======
     {{-- Toggle Password Script --}}
@@ -93,3 +100,6 @@
 
 @endsection
 >>>>>>> admin
+=======
+@endsection
+>>>>>>> nabil
