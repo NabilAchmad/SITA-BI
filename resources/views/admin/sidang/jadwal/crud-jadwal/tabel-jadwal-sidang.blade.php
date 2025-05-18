@@ -18,13 +18,10 @@
         <tbody>
             @forelse ($jadwalList as $index => $jadwal)
                 @php
-                    $penguji1 =
-                        $jadwal->sidang->tugasAkhir?->peranDosenTa->firstWhere('peran', 'penguji1')?->dosen?->user
-                            ?->name ?? '-';
-
-                    $penguji2 =
-                        $jadwal->sidang->tugasAkhir?->peranDosenTa->firstWhere('peran', 'penguji2')?->dosen?->user
-                            ?->name ?? '-';
+                    $ta = $jadwal->sidang->tugasAkhir;
+                    $mahasiswa = $ta?->mahasiswa;
+                    $penguji1 = $ta?->peranDosenTa->firstWhere('peran', 'penguji1')?->dosen?->user?->name ?? '-';
+                    $penguji2 = $ta?->peranDosenTa->firstWhere('peran', 'penguji2')?->dosen?->user?->name ?? '-';
                 @endphp
 
                 <tr>

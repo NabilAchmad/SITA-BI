@@ -19,7 +19,7 @@ class Mahasiswa extends Model
 
     public function tugasAkhir()
     {
-        return $this->hasMany(TugasAkhir::class);
+        return $this->hasOne(TugasAkhir::class); // ✔️ Ini yang benar jika hanya 1 TA per mahasiswa
     }
 
     public function historyTopik(): HasMany

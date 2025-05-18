@@ -16,9 +16,7 @@ class JadwalSidangController extends Controller
             'sidang.tugasAkhir.mahasiswa.user',
             'sidang.tugasAkhir.peranDosenTa.dosen.user',
             'ruangan'
-        ])->get();
-
-
+        ])->get()->unique(fn($item) => $item->sidang->tugasAkhir->mahasiswa_id);
 
         return view('admin.sidang.jadwal.views.readJadwalSidang', compact('jadwalList'));
     }
