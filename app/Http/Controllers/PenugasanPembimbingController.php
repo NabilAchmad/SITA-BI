@@ -13,9 +13,11 @@ class PenugasanPembimbingController extends Controller
     public function index()
     {
         $mahasiswa = Mahasiswa::whereHas('tugasAkhir')
-            ->whereDoesntHave('tugasAkhir.peranDosenTa', function ($query) {
-                $query->whereIn('peran', ['pembimbing1', 'pembimbing2']);
-            }, '=', 2)
+            ->whereHas('tugasAkhir', function ($query) {
+                $query->whereHas('peranDosenTa', function ($q) {
+                    $q->whereIn('peran', ['pembimbing1', 'pembimbing2']);
+                }, '<', 2);
+            })
             ->with('user')
             ->get();
 

@@ -6,19 +6,33 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 
 class DosenSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create('id_ID'); // Gunakan lokal Indonesia
+        $faker = Faker::create('id_ID');
+
+        $gelarList = ['S.Pd.', 'M.Pd.', 'M.A.', 'Ph.D.'];
 
         for ($i = 1; $i <= 30; $i++) {
-            $namaDosen = $faker->name;
+            // Ambil nama tanpa gelar
+            $namaTanpaGelar = $faker->firstName() . ' ' . $faker->lastName();
+
+            // Pilih gelar secara acak
+            $gelar = $faker->randomElement($gelarList);
+
+            // Tambahkan gelar di akhir nama
+            $namaDosen = $namaTanpaGelar . ', ' . $gelar;
+
+            // Buat email yang natural
+            $emailUsername = Str::slug($namaTanpaGelar, '.'); // Contoh: agus.salim
+            $email = $emailUsername . $i . '@example.com';
 
             $userId = DB::table('users')->insertGetId([
                 'name' => $namaDosen,
-                'email' => "dosen$i@example.com",
+                'email' => $email,
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -29,7 +43,7 @@ class DosenSeeder extends Seeder
                 'role_id' => 4, // dosen
             ]);
 
-            // Beri peran tambahan untuk 3 dosen pertama
+            // Tambahan peran kaprodi dan kajur
             if ($i <= 2) {
                 DB::table('user_roles')->insert([
                     'user_id' => $userId,

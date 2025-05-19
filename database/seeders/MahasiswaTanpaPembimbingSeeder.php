@@ -14,9 +14,12 @@ class MahasiswaTanpaPembimbingSeeder extends Seeder
         $faker = Faker::create('id_ID');
 
         for ($i = 1; $i <= 30; $i++) {
+            // Nama tanpa gelar
+            $namaMahasiswa = $faker->firstName() . ' ' . $faker->lastName();
+
             $userId = DB::table('users')->insertGetId([
-                'name' => $faker->name(),
-                'email' => "mhs_tanpa_pembimbing" . ($i + 100) . "@example.com", 
+                'name' => $namaMahasiswa,
+                'email' => "mhs_tanpa_pembimbing" . ($i + 100) . "@example.com",
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
