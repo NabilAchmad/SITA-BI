@@ -47,9 +47,9 @@ class TugasAkhir extends Model
         return $this->hasMany(RevisiTa::class);
     }
 
-    public function sidang(): HasMany
+    public function sidang()
     {
-        return $this->hasMany(Sidang::class);
+        return $this->hasOne(Sidang::class);
     }
 
     public function notifikasi(): HasMany

@@ -44,6 +44,7 @@ class MahasiswaController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $mahasiswa->user->id,
             'nim' => 'required|string|unique:mahasiswa,nim,' . $mahasiswa->id,
+            'prodi' => 'required|string|max:100', 
             'password' => 'nullable|confirmed|min:8',
         ]);
 
@@ -58,6 +59,7 @@ class MahasiswaController extends Controller
         // Update mahasiswa data
         $mahasiswa->update([
             'nim' => $request->nim,
+            'prodi' => $request->prodi, 
         ]);
 
         return redirect()->route('akun-mahasiswa.kelola')->with('success', 'Data mahasiswa berhasil diperbarui.');

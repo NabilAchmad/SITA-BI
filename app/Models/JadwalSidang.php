@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class JadwalSidang extends Model
 {
-    use SoftDeletes;
 
     protected $table = 'jadwal_sidang';
 
     protected $fillable = [
-        'sidang_id', 'tanggal', 'waktu_mulai', 'waktu_selesai', 'ruangan_id'
+        'sidang_id',
+        'tanggal',
+        'waktu_mulai',
+        'waktu_selesai',
+        'ruangan_id'
     ];
 
     public function sidang(): BelongsTo

@@ -14,9 +14,12 @@ class MahasiswaSeeder extends Seeder
         $faker = Faker::create('id_ID');
 
         for ($i = 1; $i <= 50; $i++) {
+            $name = $faker->name();
+            $email = $faker->unique()->safeEmail();
+
             $userId = DB::table('users')->insertGetId([
-                'name' => 'Mahasiswa ' . $i,
-                'email' => "mahasiswa$i@example.com",
+                'name' => $name,
+                'email' => $email,
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),

@@ -70,30 +70,6 @@
                     <h4 class="text-section">Akses</h4>
                 </li>
 
-                <!-- Berita Acara -->
-                <li class="nav-item {{ request()->is('admin/berita-acara*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#sidebarLayouts"
-                        class="{{ request()->is('admin/berita-acara*') ? '' : 'collapsed' }}">
-                        <i class="fas fa-file-signature"></i>
-                        <p>Berita Acara</p>
-                        <span class="caret"></span>
-                    </a>
-                    <div class="collapse {{ request()->is('admin/berita-acara*') ? 'show' : '' }}" id="sidebarLayouts">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/berita-acara/create') ? 'active' : '' }}">
-                                <a href="{{ route('berita-acara.create') }}">
-                                    <span class="sub-item">Buat Berita Acara</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('admin/berita-acara/read') ? 'active' : '' }}">
-                                <a href="{{ route('berita-acara.read') }}">
-                                    <span class="sub-item">Lihat Berita Acara</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
                 <!-- Kelola Akun -->
                 <li class="nav-item {{ request()->is('admin/kelola-akun*') ? 'active' : '' }}">
                     <a data-bs-toggle="collapse" href="#tables"
@@ -184,6 +160,11 @@
                             <li class="{{ request()->is('admin/sidang/lihat-jadwal') ? 'active' : '' }}">
                                 <a href="{{ route('jadwal-sidang.read') }}">
                                     <span class="sub-item">Lihat Jadwal Sidang</span>
+                                </a>
+                            </li>
+                            <li class="{{ request()->is('admin/sidang/pasca-sidang') ? 'active' : '' }}">
+                                <a href="{{ route('jadwal-sidang.pasca-sidang') }}">
+                                    <span class="sub-item">Pasca Sidang</span>
                                 </a>
                             </li>
                         </ul>

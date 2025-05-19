@@ -11,10 +11,13 @@ class DosenSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create();
+        $faker = Faker::create('id_ID'); // Gunakan lokal Indonesia
+
         for ($i = 1; $i <= 30; $i++) {
+            $namaDosen = $faker->name;
+
             $userId = DB::table('users')->insertGetId([
-                'name' => 'Dosen ' . $i,
+                'name' => $namaDosen,
                 'email' => "dosen$i@example.com",
                 'password' => Hash::make('password'),
                 'created_at' => now(),
@@ -26,6 +29,7 @@ class DosenSeeder extends Seeder
                 'role_id' => 4, // dosen
             ]);
 
+            // Beri peran tambahan untuk 3 dosen pertama
             if ($i <= 2) {
                 DB::table('user_roles')->insert([
                     'user_id' => $userId,
