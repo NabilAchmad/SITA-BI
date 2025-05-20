@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TugasAkhirController;
 
-
-
 Route::get('/', function () {
     return view('home/homepage');
 });
