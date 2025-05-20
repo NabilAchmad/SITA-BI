@@ -15,12 +15,15 @@ class JadwalSidangController extends Controller
 
     public function index()
     {
-        // JadwalSidangController@index misalnya
         $jadwalList = JadwalSidang::with([
             'sidang.tugasAkhir.mahasiswa.user',
             'sidang.tugasAkhir.peranDosenTa.dosen.user',
             'ruangan'
-        ])->get()->unique(fn($item) => $item->sidang->tugasAkhir->mahasiswa_id);
+        ])
+            ->whereHas('sidang', fn($q) => $q->where('status', '!=', 'selesai'))
+            ->get()
+            ->unique(fn($item) => $item->sidang->tugasAkhir->mahasiswa_id);
+
 
         return view('admin.sidang.jadwal.views.readJadwalSidang', compact('jadwalList'));
     }
@@ -164,39 +167,35 @@ class JadwalSidangController extends Controller
 
     public function pascaSidang()
     {
-        $jadwalList = JadwalSidang::with([
-            'sidang.tugasAkhir.mahasiswa.user',
+        $sidangSelesai = JadwalSidang::with([
+            'sidang.tugasAkhir.mahasiswa.user', // pastikan relasi ini valid
             'sidang.tugasAkhir.peranDosenTa.dosen.user',
             'ruangan'
-        ])->get()->unique(fn($item) => $item->sidang->tugasAkhir->mahasiswa_id);
+        ])
+            ->whereHas('sidang', fn($q) => $q->where('status', 'selesai'))
+            ->get()
+            ->unique(fn($item) => optional($item->sidang->tugasAkhir)->mahasiswa_id);
 
-        return view('admin.sidang.jadwal.views.pasca', compact('jadwalList'));
+        return view('admin.sidang.jadwal.views.pasca', compact('sidangSelesai'));
     }
 
     public function tandaiSidang($sidang_id)
     {
         try {
-            // Ambil sidang beserta relasi tugasAkhir dan mahasiswa-nya
             $sidang = Sidang::with('tugasAkhir.mahasiswa')->findOrFail($sidang_id);
 
-            // Update status jadi selesai
+            if ($sidang->status === 'selesai') {
+                return redirect()->back()->with('info', 'Sidang sudah ditandai selesai.');
+            }
+
             $sidang->status = 'selesai';
             $sidang->save();
 
-            // Data mahasiswa terkait sidang
-            $mahasiswa = $sidang->tugasAkhir->mahasiswa;
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Sidang berhasil ditandai selesai.',
-                'sidang' => $sidang,
-                'mahasiswa' => $mahasiswa,
-            ]);
+            return redirect()->route('jadwal-sidang.pasca')
+                ->with('success', 'Sidang berhasil ditandai selesai.');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menandai sidang selesai: ' . $e->getMessage(),
-            ], 500);
+            return redirect()->back()
+                ->with('error', 'Gagal menandai sidang selesai: ' . $e->getMessage());
         }
     }
 }

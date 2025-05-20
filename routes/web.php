@@ -84,7 +84,7 @@ Route::prefix('admin')->group(function () {
     });
 
     // =========================
-    // ROUTE SIDANG
+    // ROUTE SIDANG <!--pindah ke dospem-->
     // =========================
     Route::prefix('sidang')->group(function () {
         Route::get('/list-mahasiswa', [MahasiswaController::class, 'mahasiswaBelumPunyaJadwal'])
@@ -108,15 +108,17 @@ Route::prefix('admin')->group(function () {
         // Lihat Detail Jadwal Sidang
         Route::get('/detail-sidang/{sidang_id}', [JadwalSidangController::class, 'show'])->name('jadwal-sidang.show');
 
-        // Tandai sidang sudah dilaksanakan
-        Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangController::class, 'tandaiSidang'])->name('jadwal-sidang.mark-done');
+        // Tandai sidang selesai
+        Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangController::class, 'tandaiSidang'])
+            ->name('jadwal-sidang.mark-done');
+
+        // Halaman Pasca Sidang
+        Route::get('/pasca-sidang', [JadwalSidangController::class, 'pascaSidang'])
+            ->name('jadwal-sidang.pasca-sidang');
 
         // Edit dan Hapus Jadwal Sidang
         Route::put('/update-jadwal/{id}', [JadwalSidangController::class, 'update'])->name('jadwal-sidang.update');
         Route::delete('/delete-jadwal/{id}', [JadwalSidangController::class, 'destroy'])->name('jadwal-sidang.destroy');
-
-        // Pasca Sidang
-        Route::get('/pasca-sidang', [JadwalSidangController::class, 'pascaSidang'])->name('jadwal-sidang.pasca-sidang');
     });
 
     // Laporan dan Statistik

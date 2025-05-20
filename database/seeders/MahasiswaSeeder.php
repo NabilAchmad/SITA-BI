@@ -59,8 +59,7 @@ class MahasiswaSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
-            // Pilih 1 atau 2 pembimbing secara random
-            $jumlahPembimbing = rand(1, 2);
+            $jumlahPembimbing = 2;
             shuffle($dosenIds); // acak dosen
 
             for ($j = 0; $j < $jumlahPembimbing; $j++) {
