@@ -87,7 +87,7 @@ Route::prefix('admin')->group(function () {
     });
 
     // =========================
-    // ROUTE SIDANG <!--pindah ke dospem-->
+    // ROUTE SIDANG
     // =========================
     Route::prefix('sidang')->group(function () {
         Route::get('/list-mahasiswa', [MahasiswaController::class, 'mahasiswaBelumPunyaJadwal'])

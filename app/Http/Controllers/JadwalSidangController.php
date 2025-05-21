@@ -191,7 +191,7 @@ class JadwalSidangController extends Controller
             $sidang->status = 'selesai';
             $sidang->save();
 
-            return redirect()->route('jadwal-sidang.pasca')
+            return redirect()->route('jadwal-sidang.pasca-sidang')
                 ->with('success', 'Sidang berhasil ditandai selesai.');
         } catch (\Exception $e) {
             return redirect()->back()
