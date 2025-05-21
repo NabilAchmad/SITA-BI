@@ -24,15 +24,19 @@
             <label for="audiens" class="form-label fw-semibold">Pilih Audiens</label>
             <select class="form-select shadow-sm rounded-3" id="audiens" name="audiens" required>
                 <option value="" disabled selected>-- Pilih Audiens --</option>
-                <option value="pengguna_terdaftar">Pengguna Terdaftar</option>
+                <option value="registered_users">Pengguna Terdaftar</option>
+                <option value="dosen">Dosen</option>
+                <option value="mahasiswa">Mahasiswa</option>
                 <option value="guest">Tamu</option>
-                <option value="semua_pengguna">Semua Pengguna</option>
+                <option value="all_users">Semua Orang</option>
             </select>
         </div>
 
-
-        <!-- Tombol Submit -->
-        <div class="text-end mt-4">
+        <!-- Tombol Submit dan Kembali -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ route('pengumuman.read') }}" class="btn btn-secondary px-4 py-2 rounded-3 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>Kembali
+            </a>
             <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
                 <i class="fas fa-paper-plane me-2"></i>Submit Pengumuman
             </button>

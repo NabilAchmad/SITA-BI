@@ -1,7 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\PenugasanPembimbingController;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\DosenController;
+use App\Http\Controllers\JadwalSidangController;
 
+<<<<<<< HEAD
 // Ketua Program Studi
 use App\Http\Controllers\KajurController;
 use App\Http\Controllers\AuthController;
@@ -44,42 +50,121 @@ Route::prefix('ketua-prodi')->group(function () {
 });
 
 // Admin Dashboard and related routes
+=======
+Route::prefix('homepage')->group(function () {
+    Route::get('/', function () {
+        return view('home.homepage');
+    });
+});
+
+>>>>>>> a3c877002252bd25be5c9a61c70e7da7ecab77c6
 Route::prefix('admin')->group(function () {
-    Route::get('/', function(){
-        return view('admin/dashboard');
-    })->name('admin.page');
 
-    // Pengumuman CRUD for Admin
-    Route::prefix('pengumuman')->group(function () {
-        // Read all pengumuman
-        Route::get('/', function () {
-            return view('admin/pengumuman/readPengumuman');
-        })->name('admin.pengumuman.index');
-
-        // Create pengumuman
-        Route::get('/create', function () {
-            return view('admin/pengumuman/createPengumuman');
-        })->name('admin.pengumuman.create');
-        Route::post('/create', function () {
-            // Logic to store pengumuman
-        })->name('admin.pengumuman.store');
-
-        // Update pengumuman
-        Route::get('/edit', function () {
-            return view('admin/pengumuman/editPengumuman');
-        })->name('admin.pengumuman.edit');
-        Route::put('/edit/{id}', function ($id) {
-            // Logic to update pengumuman
-        })->name('admin.pengumuman.update');
-
-        // Delete pengumuman
-        Route::delete('/delete/{id}', function ($id) {
-            // Logic to delete pengumuman
-        })->name('admin.pengumuman.delete');
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [PengumumanController::class, 'tampil'])->name('admin.dashboard');
     });
 
-    // Jadwal sidang
-    Route::get('/sidang/lihat-jadwal', function () {
-        return view('admin/sidang/jadwal/readJadwalSidang');
-    })->name('admin.jadwal.page');
+    // =========================
+    // ROUTE PENGUMUMAN
+    // =========================
+    Route::prefix('pengumuman')->group(function () {
+        // READ
+        Route::get('/read', [PengumumanController::class, 'read'])->name('pengumuman.read');
+
+        // CREATE
+        Route::get('/create', [PengumumanController::class, 'create'])->name('pengumuman.form'); // Form tambah
+        Route::post('/create', [PengumumanController::class, 'store'])->name('pengumuman.create'); // Simpan data baru
+
+
+        // EDIT / UPDATE
+        Route::get('/{id}/edit', [PengumumanController::class, 'edit'])->name('pengumuman.edit'); // Form edit
+        Route::put('/{id}/update', [PengumumanController::class, 'update'])->name('pengumuman.update'); // Update data
+
+        // DELETE (Soft Delete)
+        Route::delete('/{id}/soft-delete', [PengumumanController::class, 'destroy'])->name('pengumuman.destroy'); // Soft delete
+
+        // DELETE ALL (Force delete)
+        Route::delete('/force-delete-all', [PengumumanController::class, 'forceDeleteAll'])->name('pengumuman.force-delete-all');
+
+        // TRASHED (Manajemen soft delete)
+        Route::get('/trash', [PengumumanController::class, 'trashed'])->name('pengumuman.trashed'); // Tampilkan data terhapus
+        Route::post('/{id}/restore', [PengumumanController::class, 'restore'])->name('pengumuman.restore'); // Restore data
+        Route::delete('/{id}/force-delete', [PengumumanController::class, 'forceDelete'])->name('pengumuman.force-delete'); // Hapus permanen
+
+    });
+
+    // =========================
+    // ROUTE Mahasiswa
+    // =========================
+    Route::prefix('mahasiswa')->group(function () {
+        // Daftar mahasiswa belum punya pembimbing
+        Route::get('/belum-pembimbing', [PenugasanPembimbingController::class, 'index'])->name('penugasan-bimbingan.index');
+
+        // Form pilih pembimbing untuk mahasiswa tertentu
+        Route::get('/pilih-pembimbing/{id}', [PenugasanPembimbingController::class, 'create'])->name('penugasan-bimbingan.create');
+        Route::post('/pilih-pembimbing/{id}', [PenugasanPembimbingController::class, 'store'])->name('penugasan-bimbingan.store');
+
+        // Daftar mahasiswa sudah punya pembimbing
+        Route::get('/list-mahasiswa', [MahasiswaController::class, 'index'])->name('list-mahasiswa');
+    });
+
+    // =========================
+    // ROUTE BERITA ACARA
+    // =========================
+    Route::prefix('berita-acara')->group(function () {
+        // Berita Acara
+        Route::view('/create', 'admin/berita-acara/views/createBeritaAcara')->name('berita-acara.create');
+        Route::view('/edit', 'admin/berita-acara/views/edit-berita-acara')->name('berita-acara.edit');
+        Route::view('/read', 'admin/berita-acara/views/readBeritaAcara')->name('berita-acara.read');
+    });
+
+    // =========================
+    // ROUTE KELOLA AKUN
+    // =========================
+    Route::prefix('kelola-akun')->group(function () {
+
+        // Dosen
+        Route::prefix('dosen')->group(function () {
+            Route::get('/', [DosenController::class, 'index'])->name('akun-dosen.kelola');
+
+            Route::get('/edit/{id}', [DosenController::class, 'edit'])->name('akun-dosen.edit');
+            Route::put('/update/{id}', [DosenController::class, 'update'])->name('akun-dosen.update');
+            Route::delete('/hapus/{id}', [DosenController::class, 'destroy'])->name('akun-dosen.destroy');
+
+
+            Route::get('/tambah-akun-dosen', [DosenController::class, 'create'])->name('akun-dosen.create');
+            Route::post('/tambah-akun-dosen', [DosenController::class, 'store'])->name('akun-dosen.store');
+        });
+
+        Route::prefix('mahasiswa')->group(function () {
+            // Mahasiswa
+            Route::get('/', [MahasiswaController::class, 'listMahasiswa'])->name('akun-mahasiswa.kelola');
+            Route::get('/edit/{id}', [MahasiswaController::class, 'edit'])->name('akun-mahasiswa.edit');
+            Route::put('/update/{id}', [MahasiswaController::class, 'update'])->name('akun-mahasiswa.update');
+        });
+    });
+
+    // =========================
+    // ROUTE SIDANG
+    // =========================
+    Route::prefix('sidang')->group(function () {
+        Route::get('/list-mahasiswa', [MahasiswaController::class, 'mahasiswaBelumPunyaJadwal'])
+            ->name('mahasiswa-sidang.read');
+
+        // Route::view('/lihat-jadwal', 'admin/sidang/jadwal/views/readJadwalSidang')->name('jadwal-sidang.read');
+        Route::get('/lihat-jadwal', [JadwalSidangController::class, 'index'])->name('jadwal-sidang.read');
+
+        Route::get('/edit-jadwal/{id}', [JadwalSidangController::class, 'edit'])->name('jadwal-sidang.edit');
+        Route::put('/update-jadwal/{id}', [JadwalSidangController::class, 'update'])->name('jadwal-sidang.update');
+        Route::delete('/delete-jadwal/{id}', [JadwalSidangController::class, 'destroy'])->name('jadwal-sidang.destroy');
+    });
+
+    // Laporan dan Statistik
+    Route::view('/laporan/lihat', 'admin/laporan/views/lihatLaporanStatistik')->name('laporan.statistik');
+
+    // Logs
+    Route::view('/logs/lihat', 'admin/log/views/lihatLogAktifitas')->name('log.aktifitas');
+
+    // Profile
+    Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
 });
