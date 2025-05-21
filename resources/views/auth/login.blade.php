@@ -1,97 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <style>
-        .password-toggle-btn {
-            background: transparent;
-            border: none;
-            position: absolute;
-            top: 50%;
-            right: 0.75rem;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #6c757d;
-            padding: 0;
-            font-size: 1.2rem;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card shadow">
-                    <div class="card-header text-center">
-                        <h3>Login</h3>
-                    </div>
-                    <div class="card-body">
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li>- {{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-                        <form method="POST" action="{{ route('login') }}">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                                    autofocus class="form-control" />
-                            </div>
-                            <div class="mb-3 position-relative">
-                                <label for="password" class="form-label">Password</label>
-                                <input id="password" type="password" name="password" required class="form-control" />
-                                {{-- <button type="button"
-                                    class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
-                                    style="border:none; background: transparent; padding: 0;"
-                                    onclick="togglePassword('password', this)" aria-label="Toggle password visibility">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                        class="bi bi-eye" viewBox="0 0 16 16">
-                                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z" />
-                                        <path d="M8 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
-                                    </svg>
-                                </button> --}}
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
-                                    Login
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="card-footer text-center">
-                        <p class="mb-0">
-                            Don't have an account?
-                            <a href="{{ route('register') }}">Register here</a>
-                        </p>
+@extends('layouts.template.homepage')
+@section('title', 'Login')
+@section('content')
+    <div class="main-panel mt-5">
+        <div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+            <div class="row w-100 justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card shadow-lg border-0 rounded-4">
+                        <div class="card-header bg-primary text-white text-center rounded-top-4">
+                            <h3 class="mb-0">Login</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>- {{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                            <form method="POST" action="{{ route('login') }}">
+                                @csrf
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                                        autofocus class="form-control form-control-lg" placeholder="Enter your email" />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <input id="password" type="password" name="password" required
+                                            class="form-control form-control-lg" placeholder="Enter your password" />
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            onclick="togglePassword('password', this)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        Login
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer text-center bg-white border-0 rounded-bottom-4">
+                            <p class="mb-0">
+                                Don't have an account?
+                                <a href="{{ route('register') }}" class="text-decoration-none">Register here</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- <script>
+    {{-- Toggle Password Script --}}
+    <script>
         function togglePassword(fieldId, btn) {
             const input = document.getElementById(fieldId);
-            const svg = btn.querySelector('svg');
+            const icon = btn.querySelector('i');
             if (input.type === "password") {
                 input.type = "text";
-                svg.innerHTML = '<path d="M13.359 11.238a6.5 6.5 0 0 0 1.292-3.238 6.5 6.5 0 0 0-12.5 0 6.5 6.5 0 0 0 1.292 3.238l-1.415 1.415a.5.5 0 0 0 .708.708l12-12a.5.5 0 0 0-.708-.708l-1.415 1.415z"/><path d="M11.297 9.297a3 3 0 0 1-4.243-4.243"/>';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
             } else {
                 input.type = "password";
-                svg.innerHTML = '<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8z"/><path d="M8 5a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
             }
         }
-    </script> --}}
-</body>
+    </script>
 
-</html>
+@endsection
