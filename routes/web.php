@@ -5,9 +5,15 @@ use Illuminate\Support\Facades\Route;
 // Ketua Program Studi
 use App\Http\Controllers\KajurController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MahasiswaController;
 
 Route::get('/', function () {
     return view('homepage');
+});
+
+// Mahasiswa Dashboard route
+Route::middleware(['auth'])->group(function () {
+    Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
 });
 
 // Authentication routes
