@@ -36,11 +36,46 @@
 
     <script>
         function accJudul(id) {
-            const statusCell = document.getElementById('status-' + id);
-            statusCell.innerHTML = 'Disetujui';
-            // statusCell.innerHTML = 'Ditolak';
-            statusCell.classList.add('text-success');
+            fetch(`/kaprodi/judulTA/approve/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusCell = document.getElementById('status-' + id);
+                statusCell.innerHTML = 'Disetujui';
+                statusCell.classList.remove('text-warning', 'text-danger');
+                statusCell.classList.add('text-success');
+                alert(data.message);
+            })
+            .catch(error => {
+                alert('Terjadi kesalahan saat meng-ACC judul.');
+                console.error('Error:', error);
+            });
+        }
 
-            alert('Judul telah di-ACC!');
+        function tolakJudul(id) {
+            fetch(`/kaprodi/judulTA/reject/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusCell = document.getElementById('status-' + id);
+                statusCell.innerHTML = 'Ditolak';
+                statusCell.classList.remove('text-success');
+                statusCell.classList.add('text-danger');
+                alert(data.message);
+            })
+            .catch(error => {
+                alert('Terjadi kesalahan saat menolak judul.');
+                console.error('Error:', error);
+            });
         }
     </script>

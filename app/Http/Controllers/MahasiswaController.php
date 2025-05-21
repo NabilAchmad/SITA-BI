@@ -2,30 +2,6 @@
 
 namespace App\Http\Controllers;
 
-<<<<<<< HEAD
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Jadwal;
-use App\Models\JudulTA;
-use App\Models\Nilai;
-use App\Models\Pengumuman;
-use App\Models\Sidang;
-
-class MahasiswaController extends Controller
-{
-    public function dashboard()
-    {
-        $user = Auth::user();
-
-        // Fetch mahasiswa related data
-        $jadwal = Jadwal::where('mahasiswa_id', $user->id)->get();
-        $judulTA = JudulTA::where('mahasiswa_id', $user->id)->first();
-        $nilai = Nilai::where('mahasiswa_id', $user->id)->get();
-        $pengumuman = Pengumuman::orderBy('tanggal', 'desc')->limit(5)->get();
-        $sidang = Sidang::where('mahasiswa_id', $user->id)->first();
-
-        return view('mahasiswa.dashboard', compact('jadwal', 'judulTA', 'nilai', 'pengumuman', 'sidang'));
-=======
 use App\Models\Mahasiswa;
 use App\Models\JadwalSidang;
 use Illuminate\Http\Request;
@@ -95,6 +71,5 @@ class MahasiswaController extends Controller
         })->with(['user', 'tugasAkhir.sidang'])->get();
 
         return view('admin.sidang.mahasiswa.views.read-mhs-sidang', compact('mahasiswa'));
->>>>>>> a3c877002252bd25be5c9a61c70e7da7ecab77c6
     }
 }

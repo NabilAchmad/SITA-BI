@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\JudulTA;
 
 class KaprodiController extends Controller
 {
@@ -40,5 +41,25 @@ class KaprodiController extends Controller
     public function showPengumuman()
     {
         return view('kaprodi.Pengumuman.pengumuman');
+    }
+
+    // Approve JudulTA
+    public function approveJudul($id)
+    {
+        $judul = JudulTA::findOrFail($id);
+        $judul->status = 'Disetujui';
+        $judul->save();
+
+        return response()->json(['message' => 'Judul telah di-ACC']);
+    }
+
+    // Reject JudulTA
+    public function rejectJudul($id)
+    {
+        $judul = JudulTA::findOrFail($id);
+        $judul->status = 'Ditolak';
+        $judul->save();
+
+        return response()->json(['message' => 'Judul telah ditolak']);
     }
 }

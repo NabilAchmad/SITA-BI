@@ -56,31 +56,6 @@
         </div>
     </div>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    {{-- <script>
-=======
-    {{-- Toggle Password Script --}}
-    <script>
->>>>>>> nabil
-        function togglePassword(fieldId, btn) {
-            const input = document.getElementById(fieldId);
-            const icon = btn.querySelector('i');
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.remove('bi-eye');
-                icon.classList.add('bi-eye-slash');
-            } else {
-                input.type = "password";
-                icon.classList.remove('bi-eye-slash');
-                icon.classList.add('bi-eye');
-            }
-        }
-    </script>
-
-<<<<<<< HEAD
-</html>
-=======
     {{-- Toggle Password Script --}}
     <script>
         function togglePassword(fieldId, btn) {
@@ -97,9 +72,4 @@
             }
         }
     </script>
-
 @endsection
->>>>>>> admin
-=======
-@endsection
->>>>>>> nabil

@@ -7,14 +7,13 @@ use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\JadwalSidangController;
 
-<<<<<<< HEAD
 // Ketua Program Studi
 use App\Http\Controllers\KajurController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\MahasiswaController;
+// use App\Http\Controllers\MahasiswaController;
 
 Route::get('/', function () {
-    return view('homepage');
+    return view('home.homepage');
 });
 
 // Mahasiswa Dashboard route
@@ -39,6 +38,10 @@ Route::prefix('ketua-prodi')->group(function () {
     // Tugas Akhir
     Route::get('/judulTA/AccJudulTA', [KajurController::class, 'showAccJudulTA'])->name('accjudul.page');
 
+    // Routes for Kaprodi to approve or reject JudulTA
+    Route::post('/kaprodi/judulTA/approve/{id}', [App\Http\Controllers\KaprodiController::class, 'approveJudul'])->name('kaprodi.judulTA.approve');
+    Route::post('/kaprodi/judulTA/reject/{id}', [App\Http\Controllers\KaprodiController::class, 'rejectJudul'])->name('kaprodi.judulTA.reject');
+
     // Nilai sidang
     Route::get('/sidang/lihat-nilai', [KajurController::class, 'showNilaiSidang'])->name('kaprodi.nilai.page');
 
@@ -50,14 +53,7 @@ Route::prefix('ketua-prodi')->group(function () {
 });
 
 // Admin Dashboard and related routes
-=======
-Route::prefix('homepage')->group(function () {
-    Route::get('/', function () {
-        return view('home.homepage');
-    });
-});
 
->>>>>>> a3c877002252bd25be5c9a61c70e7da7ecab77c6
 Route::prefix('admin')->group(function () {
 
     Route::prefix('dashboard')->group(function () {

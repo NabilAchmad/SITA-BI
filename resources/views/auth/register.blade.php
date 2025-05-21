@@ -32,6 +32,11 @@
                                         class="form-control form-control-lg" />
                                 </div>
                                 <div class="mb-3">
+                                    <label for="nim" class="form-label">NIM</label>
+                                    <input id="nim" type="number" name="nim" value="{{ old('nim') }}" required
+                                        class="form-control form-control-lg" />
+                                </div>
+                                <div class="mb-3">
                                     <label for="password" class="form-label">Password</label>
                                     <div class="input-group">
                                         <input id="password" type="password" name="password" required
