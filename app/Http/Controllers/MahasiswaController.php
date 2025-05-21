@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Mahasiswa;
 use App\Models\JadwalSidang;
+use App\Models\Pengumuman;
+use App\Models\JudulTA;
+use App\Models\Sidang;
+use App\Models\Nilai;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MahasiswaController extends Controller
 {
@@ -71,5 +76,25 @@ class MahasiswaController extends Controller
         })->with(['user', 'tugasAkhir.sidang'])->get();
 
         return view('admin.sidang.mahasiswa.views.read-mhs-sidang', compact('mahasiswa'));
+    }
+
+    public function dashboard()
+    {
+        $user = Auth::user();
+        $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+
+        $pengumuman = Pengumuman::latest()->take(5)->get();
+
+        $judulTA = JudulTA::where('mahasiswa_id', $mahasiswa->id)->first();
+
+        $sidang = Sidang::where('tugas_akhir_id', $judulTA ? $judulTA->id : null)->first();
+
+        $jadwal = JadwalSidang::where('sidang_id', $sidang ? $sidang->id : null)->get();
+
+        $nilai = Nilai::whereHas('sidang', function ($query) use ($sidang) {
+            $query->where('id', $sidang ? $sidang->id : 0);
+        })->get();
+
+        return view('mahasiswa.dashboard', compact('pengumuman', 'jadwal', 'judulTA', 'sidang', 'nilai'));
     }
 }
