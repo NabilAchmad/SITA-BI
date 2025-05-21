@@ -1,9 +1,9 @@
-<div class="container">
+<div class="container my-5">
     <div class="row">
         <div class="col-12">
-            <h2 class="text-center">Jadwal Sidang</h2>
-            <table class="table table-bordered mt-4">
-                <thead>
+            <h2 class="text-center mb-4">Jadwal Sidang</h2>
+            <table class="table table-bordered text-center align-middle">
+                <thead class="table-dark text-white">
                     <tr>
                         <th>No</th>
                         <th>Nama Mahasiswa</th>
@@ -16,27 +16,11 @@
                 <tbody>
                     <tr>
                         <td>1</td>
-                        <td>John Doe</td>
+                        <td>Kasih Ananda</td>
                         <td>Implementasi Sistem Informasi</td>
                         <td>10:00 - 12:00</td>
                         <td>Ruang 101</td>
                         <td>Dr. Jane Smith</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Jane Doe</td>
-                        <td>Analisis Data Big Data</td>
-                        <td>13:00 - 15:00</td>
-                        <td>Ruang 102</td>
-                        <td>Prof. John Brown</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Michael Johnson</td>
-                        <td>Pengembangan Aplikasi Mobile</td>
-                        <td>15:30 - 17:30</td>
-                        <td>Ruang 103</td>
-                        <td>Dr. Emily White</td>
                     </tr>
                 </tbody>
             </table>

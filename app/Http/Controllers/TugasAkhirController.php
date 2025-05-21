@@ -166,7 +166,7 @@ class TugasAkhirController extends Controller
             ->latest()
             ->get();
 
-        return view('mahasiswa.TugasAkhir.views.dibatalkan', compact('tugasAkhirDibatalkan'));
+        return view('mahasiswa.TugasAkhir.views.cancelTA', compact('tugasAkhirDibatalkan'));
     }
 
 

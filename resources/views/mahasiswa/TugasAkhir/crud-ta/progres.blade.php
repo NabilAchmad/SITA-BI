@@ -1,6 +1,12 @@
+<style>
+  .judul-progress {
+    color: #004085 !important; /* Warna biru tua/navy */
+  }
+</style>
+
 <div class="container">
     <div class="text-center text-primary">
-        <h1 class="fw-bold">Progress Tugas Akhir</h1>
+        <h1 class="fw-bold judul-progress">Progress Tugas Akhir</h1>
         <p class="text-muted">Pantau perkembangan pengajuan dan pelaksanaan tugas akhir secara detail.</p>
     </div>
 

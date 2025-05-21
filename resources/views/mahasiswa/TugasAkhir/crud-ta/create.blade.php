@@ -1,4 +1,11 @@
-<h1 class="text-center text-primary">Ajukan Tugas Akhir</h1>
+<style>
+  .text-primary-donk {
+    color: #004085 !important;
+  }
+</style>
+
+<h1 class="text-center text-primary-donk">Ajukan Tugas Akhir</h1>
+
 <form action="{{ route('tugasAkhir.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="mb-3">

@@ -37,9 +37,7 @@ Route::prefix('mahasiswa')->group(function () {
             return view('mahasiswa.TugasAkhir.views.listTopik');
         });
 
-        Route::get('/cancel', function () {
-            return view('mahasiswa.TugasAkhir.views.cancelTA');
-        });
+        Route::get('/cancel', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.cancelled');
     });
 
 
