@@ -33,7 +33,7 @@
                 <div class="tab-content" id="nilaiSidangTabContent">
                     <!-- Sidang Sempro -->
                     <div class="tab-pane fade show active" id="sempro" role="tabpanel">
-                        <h5 class="fw-bold mb-3 text-primary">Judul Sidang</h5>
+                        <h5 class="fw-bold mb-3 text-secondary">Judul Sidang</h5>
                         <p class="fs-5 text-muted mb-4">Sistem Informasi Akademik</p>
 
                         <div class="row mb-2">
@@ -46,7 +46,8 @@
                         </div>
                         <div class="row mb-2">
                             <div class="col-sm-5 fw-semibold">Dosen Penguji</div>
-                            <div class="col-sm-7">Prof. Sari Dewi, M.T. dan Dr. Agus Salim, M.Kom</div>
+                            <div class="col-sm-7">Prof. Sari Dewi, M.T. dan Dr. Agus Salim, M.Kom,
+                                 Dr. Wawan Setiawan, M.Kom, Dr. Lina Marlina, M.Kom</div>
                         </div>
 
                         <div class="mt-4">
@@ -62,6 +63,26 @@
                                     <strong>20</strong></li>
                             </ul>
                         </div>
+                        
+                        <!-- Nilai Per Dosen Penguji -->
+                        <div class="mt-4">
+                            <h6 class="fw-bold text-secondary mb-2">Nilai dari Masing-masing Dosen Penguji</h6>
+                            <ul class="list-unstyled ms-3 fs-6">
+                                <li><i class="bi bi-person-square me-2 text-primary"></i> Prof. Sari Dewi, M.T.: <strong>94</strong></li>
+                                <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Agus Salim, M.Kom: <strong>96</strong></li>
+                                <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Wawan Setiawan, M.Kom: <strong>93</strong></li>
+                                <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Lina Marlina, M.Kom: <strong>97</strong></li>
+                            </ul>
+                        </div>
+
+                        <!-- Status Sidang -->
+                        <div class="mt-3">
+                            <h6 class="fw-bold text-secondary mb-3">Status Sidang</h6>
+                            <span class="badge bg-success px-4 py-3 rounded-pill d-inline-flex align-items-center">
+                                <i class="bi bi-check-circle me-6"></i> Lulus
+                            </span>
+                        </div>
+
 
                         <div class="text-center mt-4">
                             <h1 class="display-4 fw-bold text-success">95</h1>
@@ -71,7 +92,7 @@
 
                     <!-- Sidang Akhir -->
                     <div class="tab-pane fade" id="akhir" role="tabpanel">
-                        <h5 class="fw-bold mb-3 text-primary">Judul Sidang</h5>
+                        <h5 class="fw-bold mb-3 text-secondary">Judul Sidang</h5>
                         <p class="fs-5 text-muted mb-4">Sistem Informasi Akademik</p>
 
                         <div class="row mb-2">
@@ -84,28 +105,43 @@
                         </div>
                         <div class="row mb-2">
                             <div class="col-sm-5 fw-semibold">Dosen Penguji</div>
-                            <div class="col-sm-7">Prof. Sari Dewi, M.T., Dr. Agus Salim, M.Kom, dan Dr. Wawan Setiawan,
-                                M.Kom</div>
+                            <div class="col-sm-7">Prof. Sari Dewi, M.T., Dr. Agus Salim, M.Kom,
+                                 Dr. Wawan Setiawan, M.Kom,  Dr. Lina Marlina, M.Kom </div>
                         </div>
 
                         <div class="mt-4">
-                            <h6 class="fw-bold text-secondary mb-2">Rincian Nilai</h6>
-                            <ul class="list-unstyled ms-3 fs-6">
-                                <li>Kelengkapan Dokumen:
-                                    <strong>25</strong></li>
-                                <li>Pemahaman Materi:
-                                    <strong>30</strong></li>
-                                <li>Penyajian Sidang: <strong>30</strong>
-                                </li>
-                                <li>Tanya Jawab:
-                                    <strong>25</strong></li>
-                            </ul>
-                        </div>
+                        <h6 class="fw-bold text-secondary mb-2">Rincian Nilai</h6>
+                        <ul class="list-unstyled ms-3 fs-6">
+                            <li><i class="bi bi-file-earmark-text me-2 text-primary"></i> Kelengkapan Dokumen: <strong>24</strong></li>
+                            <li><i class="bi bi-journal-text me-2 text-primary"></i> Pemahaman Materi: <strong>28</strong></li>
+                            <li><i class="bi bi-easel me-2 text-primary"></i> Penyajian Sidang: <strong>26</strong></li>
+                            <li><i class="bi bi-chat-left-dots me-2 text-primary"></i> Tanya Jawab: <strong>25</strong></li>
+                        </ul>
+                    </div>  
 
-                        <div class="text-center mt-4">
-                            <h1 class="display-4 fw-bold text-success">99</h1>
-                            <p class="text-muted">Nilai Akhir Sidang Tugas Akhir</p>
-                        </div>
+                    <!-- Nilai Per Dosen Penguji -->
+                    <div class="mt-4">
+                        <h6 class="fw-bold text-secondary mb-2">Nilai dari Masing-masing Dosen Penguji</h6>
+                        <ul class="list-unstyled ms-3 fs-6">
+                            <li><i class="bi bi-person-square me-2 text-primary"></i> Prof. Sari Dewi, M.T.: <strong>91</strong></li>
+                            <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Agus Salim, M.Kom: <strong>90</strong></li>
+                            <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Wawan Setiawan, M.Kom: <strong>60</strong></li>
+                            <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Lina Marlina, M.Kom: <strong>55</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6 class="fw-bold text-secondary mb-3">Status Sidang</h6>
+                        <span class="badge bg-warning text-dark px-4 py-3 rounded-pill d-inline-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle me-6"></i> Lulus dengan Revisi
+                        </span>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <h1 class="display-4 fw-bold text-success">74</h1>
+                        <p class="text-muted">Nilai Akhir Sidang Tugas Akhir</p>
+                    </div>
+                    </div>
                     </div>
                 </div> <!-- end tab-content -->
             </div>

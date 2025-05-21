@@ -20,7 +20,12 @@
                         <td>Implementasi Sistem Informasi</td>
                         <td>10:00 - 12:00</td>
                         <td>Ruang 101</td>
-                        <td>Dr. Jane Smith</td>
+                         <td class="text-start">
+                            1. Dr. Jane Smith<br>
+                            2. Prof. Sari Dewi, M.T.<br>
+                            3. Dr. Agus Salim, M.Kom<br>
+                            4. Dr. Wawan Setiawan, M.Kom
+                        </td>
                     </tr>
                 </tbody>
             </table>

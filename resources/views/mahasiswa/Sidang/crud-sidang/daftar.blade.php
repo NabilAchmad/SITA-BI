@@ -16,8 +16,16 @@
             <input type="text" class="form-control" id="judul_ta" name="judul_ta" required>
         </div>
         <div class="mb-3">
-            <label for="dosen_pembimbing" class="form-label">Dosen Pembimbing</label>
+            <label for="dosen_pembimbing" class="form-label">Dosen Pembimbing 1</label>
             <input type="text" class="form-control" id="dosen_pembimbing" name="dosen_pembimbing" required>
+        </div>
+        <div class="mb-3">
+            <label for="dosen_pembimbing" class="form-label">Dosen Pembimbing 2</label>
+            <input type="text" class="form-control" id="dosen_pembimbing" name="dosen_pembimbing" required>
+        </div>
+        <div class="mb-3">
+            <label for="jumlah_bimbingan" class="form-label">Jumlah Bimbingan yang Telah Diikuti</label>
+            <input type="number" class="form-control" id="jumlah_bimbingan" name="jumlah_bimbingan" min="0" required>
         </div>
         <div class="mb-3">
             <label for="file_ta" class="form-label">Upload File Tugas Akhir</label>

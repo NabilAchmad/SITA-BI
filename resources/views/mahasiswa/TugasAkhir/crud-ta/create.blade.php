@@ -16,9 +16,5 @@
         <label for="abstrak" class="form-label">Abstrak</label>
         <textarea class="form-control" id="abstrak" name="abstrak" rows="3" placeholder="Masukkan abstrak tugas akhir" required></textarea>
     </div>
-    <div class="mb-3">
-        <label for="file_proposal" class="form-label">Upload Proposal</label>
-        <input type="file" class="form-control" id="file_proposal" name="file_proposal" required>
-    </div>
     <button type="submit" class="btn btn-primary">Ajukan</button>
 </form>
