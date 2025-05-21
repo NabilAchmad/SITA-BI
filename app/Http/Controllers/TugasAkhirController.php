@@ -50,16 +50,29 @@ class TugasAkhirController extends Controller
         return redirect()->back()->with('success', 'Tugas Akhir berhasil diajukan!');
     }
 
-    public function progress()
-    {
-        // Hanya menampilkan tugas akhir yang belum dibatalkan
-        $tugasAkhir = TugasAkhir::where('mahasiswa_id', $this->assumedMahasiswaId())
-            ->whereNull('deleted_at') // Filter untuk tidak menampilkan yang sudah dihapus
-            ->latest()
-            ->get();
+public function progress()
+{
+    // Simulasi user yang sedang login (ganti angka sesuai kebutuhan)
+    $simulasiUserId = 5;
 
-        return view('mahasiswa.TugasAkhir.views.progresTA', compact('tugasAkhir'));
+    // Cari mahasiswa_id berdasarkan user_id
+    $mahasiswa = \App\Models\Mahasiswa::where('user_id', $simulasiUserId)->first();
+
+    if (!$mahasiswa) {
+        // Handle jika mahasiswa tidak ditemukan
+        abort(404, 'Data mahasiswa tidak ditemukan.');
     }
+
+    // Ambil satu tugas akhir terbaru yang belum dibatalkan (soft delete)
+    $tugasAkhir = \App\Models\TugasAkhir::where('mahasiswa_id', $mahasiswa->id)
+        ->whereNull('deleted_at')
+        ->latest()
+        ->first();
+
+    return view('mahasiswa.TugasAkhir.views.progresTA', compact('tugasAkhir'));
+}
+
+
 
 
     // Menampilkan form edit

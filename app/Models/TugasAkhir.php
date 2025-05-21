@@ -4,32 +4,56 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TugasAkhir extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'tugas_akhir';
+    protected $table = 'tugas_akhir';  // sesuaikan dengan nama tabel di DB
 
     protected $fillable = [
         'mahasiswa_id',
         'judul',
         'abstrak',
-        'file_path',
         'status',
-        'tanggal_pengajuan',
-        'alasan_pembatalan',  // Tambahkan kolom alasan_pembatalan
+        'tanggal_pengajuan'
     ];
-
-
 
     public function mahasiswa()
     {
-        return $this->belongsTo(User::class, 'mahasiswa_id');
+        return $this->belongsTo(Mahasiswa::class);
     }
 
-    public function file()
+
+    public function peranDosenTa()
     {
-        return $this->hasOne(File::class, 'uploaded_by', 'mahasiswa_id');
+        return $this->hasMany(PeranDosenTa::class, 'tugas_akhir_id');
+    }
+
+    public function bimbingan(): HasMany
+    {
+        return $this->hasMany(BimbinganTa::class);
+    }
+
+    public function dokumen(): HasMany
+    {
+        return $this->hasMany(DokumenTa::class);
+    }
+
+    public function revisi(): HasMany
+    {
+        return $this->hasMany(RevisiTa::class);
+    }
+
+    public function sidang()
+    {
+        return $this->hasOne(Sidang::class);
+    }
+
+    public function notifikasi(): HasMany
+    {
+        return $this->hasMany(NotifikasiTa::class);
     }
 }
