@@ -4,33 +4,29 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Faker\Factory as Faker;
 
 class TugasAkhirSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
-        DB::table('tugas_akhir')->insert([
-            [
-                'judul' => 'Sistem Informasi Akademik Berbasis Web',
-                'mahasiswa_id' => 1,
-                'status' => 'Disetujui',
-                'dosen_pembimbing' => 'Dr. Budi Santoso',
-            ],
-            [
-                'judul' => 'Analisis Data Penjualan Menggunakan Data Mining',
-                'mahasiswa_id' => 2,
-                'status' => 'Dalam Proses',
-                'dosen_pembimbing' => 'Dr. Siti Aminah',
-            ],
-            [
-                'judul' => 'Pengembangan Aplikasi Mobile untuk Monitoring Kesehatan',
-                'mahasiswa_id' => 3,
-                'status' => 'Disetujui',
-                'dosen_pembimbing' => 'Dr. Agus Wijaya',
-            ],
-        ]);
+        $faker = Faker::create('id_ID');
+
+        $mahasiswaList = DB::table('mahasiswa')->get();
+
+        foreach ($mahasiswaList as $mhs) {
+            $judul = 'Analysis of English Language Learning System for Student ' . $mhs->nim;
+            $abstrak = $faker->paragraph(3) . ' This research focuses on improving the English language learning process for students with NIM ' . $mhs->nim . '.';
+
+            DB::table('tugas_akhir')->insert([
+                'mahasiswa_id' => $mhs->id,
+                'judul' => $judul,
+                'abstrak' => $abstrak,
+                'status' => 'diajukan',
+                'tanggal_pengajuan' => now()->subDays(rand(1, 20)),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }
