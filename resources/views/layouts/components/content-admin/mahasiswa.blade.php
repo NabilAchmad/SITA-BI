@@ -10,7 +10,7 @@
                 <div class="col col-stats ms-3 ms-sm-0">
                     <div class="numbers">
                         <p class="card-category">Mahasiswa Aktif</p>
-                        <h4 class="card-title">253</h4>
+                        <h4 class="card-title">{{ $mahasiswaAktif }}</h4>
                     </div>
                 </div>
             </div>

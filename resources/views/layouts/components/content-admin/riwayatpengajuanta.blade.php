@@ -3,8 +3,8 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <div class="card-title mb-0">Riwayat Pengajuan Tugas Akhir</div>
             <div class="dropdown">
-                <button class="btn btn-icon btn-clean me-0" type="button" id="dropdownMenuButton"
-                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn btn-icon btn-clean me-0" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-ellipsis-h"></i>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -21,7 +21,8 @@
                 <span class="input-group-text bg-light text-dark border-end-0">
                     <i class="fa fa-search"></i>
                 </span>
-                <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Cari mahasiswa, NIM, atau judul TA...">
+                <input type="text" id="searchInput" class="form-control border-start-0"
+                    placeholder="Cari mahasiswa, NIM, atau judul TA...">
             </div>
         </div>
 
@@ -38,49 +39,33 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Ahmad Ramadhan</td>
-                            <td class="text-end">1901001</td>
-                            <td class="text-end">Sistem Informasi Tugas Akhir Berbasis Web</td>
-                            <td class="text-end"><span class="badge bg-warning">Menunggu Verifikasi</span></td>
-                        </tr>
-                        <tr>
-                            <td>Siti Nurhaliza</td>
-                            <td class="text-end">1901023</td>
-                            <td class="text-end">Penerapan Machine Learning untuk Prediksi Nilai</td>
-                            <td class="text-end"><span class="badge bg-success">Disetujui</span></td>
-                        </tr>
-                        <tr>
-                            <td>Bagus Wijaya</td>
-                            <td class="text-end">1901035</td>
-                            <td class="text-end">Aplikasi Monitoring TA Mahasiswa</td>
-                            <td class="text-end"><span class="badge bg-danger">Ditolak</span></td>
-                        </tr>
-                        <tr>
-                            <td>Nadia Zahrani</td>
-                            <td class="text-end">1901080</td>
-                            <td class="text-end">Perancangan Sistem Pengajuan TA Online</td>
-                            <td class="text-end"><span class="badge bg-success">Disetujui</span></td>
-                        </tr>
-                        <tr>
-                            <td>Rizky Febrian</td>
-                            <td class="text-end">1901101</td>
-                            <td class="text-end">Digitalisasi Proses Bimbingan TA</td>
-                            <td class="text-end"><span class="badge bg-warning">Menunggu Verifikasi</span></td>
-                        </tr>
-                        <tr>
-                            <td>Rizka Ramadhani</td>
-                            <td class="text-end">1901102</td>
-                            <td class="text-end">Digitalisasi Proses Bimbingan TA</td>
-                            <td class="text-end"><span class="badge bg-warning">Menunggu Verifikasi</span></td>
-                        </tr>
-                        <tr>
-                            <td>Friska Rama</td>
-                            <td class="text-end">1901106</td>
-                            <td class="text-end">Digitalisasi Proses Bimbingan TA</td>
-                            <td class="text-end"><span class="badge bg-warning">Menunggu Verifikasi</span></td>
-                        </tr>
+                        @forelse ($riwayatTA as $ta)
+                            <tr>
+                                <td>{{ $ta->mahasiswa->user->name ?? '-' }}</td>
+                                <td class="text-end">{{ $ta->mahasiswa->nim ?? '-' }}</td>
+                                <td class="text-end">{{ $ta->judul ?? '-' }}</td>
+                                <td class="text-end">
+                                    @php
+                                        $status = strtolower($ta->status);
+                                    @endphp
+                                    @if ($status === 'disetujui')
+                                        <span class="badge bg-success">Disetujui</span>
+                                    @elseif ($status === 'ditolak')
+                                        <span class="badge bg-danger">Ditolak</span>
+                                    @elseif ($status === 'menunggu' || $status === 'menunggu verifikasi')
+                                        <span class="badge bg-warning text-dark">Menunggu Verifikasi</span>
+                                    @else
+                                        <span class="badge bg-secondary">-</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">Belum ada pengajuan tugas akhir.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
+
                 </table>
             </div>
 
@@ -94,12 +79,12 @@
 
 <!-- Script Filter (Search Logic + No Result) -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('searchInput');
         const rows = document.querySelectorAll('tbody tr');
         const noResult = document.getElementById('noResult');
 
-        searchInput.addEventListener('keyup', function () {
+        searchInput.addEventListener('keyup', function() {
             const keyword = this.value.toLowerCase();
             let visibleCount = 0;
 

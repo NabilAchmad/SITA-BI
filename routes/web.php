@@ -6,11 +6,14 @@ use App\Http\Controllers\PenugasanPembimbingController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\JadwalSidangController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\LogController;
+use App\Http\Controllers\AdminController;
 
 Route::prefix('admin')->group(function () {
 
     Route::prefix('dashboard')->group(function () {
-        Route::get('/', [PengumumanController::class, 'tampil'])->name('admin.dashboard');
+        Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
     });
 
     // =========================
@@ -121,11 +124,19 @@ Route::prefix('admin')->group(function () {
         Route::delete('/delete-jadwal/{id}', [JadwalSidangController::class, 'destroy'])->name('jadwal-sidang.destroy');
     });
 
-    // Laporan dan Statistik
-    Route::view('/laporan/lihat', 'admin/laporan/views/lihatLaporanStatistik')->name('laporan.statistik');
+    // Admin: Laporan dan Statistik
+    Route::prefix('/laporan')->name('laporan.')->group(function () {
+        // Lihat laporan dan statistik
+        Route::get('/lihat', [LaporanController::class, 'show'])
+            ->name('statistik');
+    });
 
-    // Logs
-    Route::view('/logs/lihat', 'admin/log/views/lihatLogAktifitas')->name('log.aktifitas');
+    // Admin: Logs
+    Route::prefix('/logs')->name('log.')->group(function () {
+        // Lihat log aktivitas sistem
+        Route::get('/lihat', [LogController::class, 'index'])
+            ->name('aktifitas');
+    });
 
     // Profile
     Route::view('/profile', 'admin/user/views/profile')->name('user.profile');

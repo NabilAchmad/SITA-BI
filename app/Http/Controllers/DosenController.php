@@ -21,6 +21,17 @@ class DosenController extends Controller
         return view('admin.kelola-akun.dosen.views.kelolaAkunDosen', compact('dosenList'));
     }
 
+    public function getTotalAktif()
+    {
+        // Asumsi: Semua dosen yang ada di tabel 'dosen' dianggap aktif
+        // Jika ada kolom 'status' di tabel dosen, bisa filter: where('status', 'aktif')
+        $totalDosen = Dosen::count();
+
+        return response()->json([
+            'total' => $totalDosen
+        ]);
+    }
+
     // Form tambah dosen
     public function create()
     {
