@@ -8,6 +8,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Models\Mahasiswa;
+use App\Models\EmailVerificationToken;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifyEmail;
 
 class AuthController extends Controller
 {
@@ -66,9 +70,44 @@ class AuthController extends Controller
             'angkatan' => date('Y'),    // current year as angkatan
         ]);
 
-        Auth::login($user);
+        // Generate email verification token
+        $token = Str::random(64);
 
-        return redirect('/');
+        EmailVerificationToken::create([
+            'user_id' => $user->id,
+            'token' => $token,
+            'created_at' => now(),
+        ]);
+
+        // Send verification email
+        Mail::to($user->email)->send(new VerifyEmail($user, $token));
+
+        // Do not log in user until email is verified
+        return response()->json(['message' => 'Registration successful. Please check your email to verify your account.']);
+    }
+
+    // Verify email
+    public function verifyEmail($token)
+    {
+        $verification = EmailVerificationToken::where('token', $token)->first();
+
+        if (!$verification) {
+            return response()->json(['message' => 'Invalid or expired verification token.'], 400);
+        }
+
+        $user = $verification->user;
+
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'Email already verified.'], 400);
+        }
+
+        $user->email_verified_at = now();
+        $user->save();
+
+        // Delete the token after verification
+        $verification->delete();
+
+        return response()->json(['message' => 'Email verified successfully.']);
     }
 
     // Handle logout
