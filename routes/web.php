@@ -39,8 +39,8 @@ Route::prefix('ketua-prodi')->group(function () {
     Route::get('/judulTA/AccJudulTA', [KajurController::class, 'showAccJudulTA'])->name('accjudul.page');
 
     // Routes for Kaprodi to approve or reject JudulTA
-    Route::post('/kaprodi/judulTA/approve/{id}', [App\Http\Controllers\KaprodiController::class, 'approveJudul'])->name('kaprodi.judulTA.approve');
-    Route::post('/kaprodi/judulTA/reject/{id}', [App\Http\Controllers\KaprodiController::class, 'rejectJudul'])->name('kaprodi.judulTA.reject');
+    Route::post('/judulTA/approve/{id}', [App\Http\Controllers\KaprodiController::class, 'approveJudul'])->name('kaprodi.judulTA.approve');
+    Route::post('/judulTA/reject/{id}', [App\Http\Controllers\KaprodiController::class, 'rejectJudul'])->name('kaprodi.judulTA.reject');
 
     // Nilai sidang
     Route::get('/sidang/lihat-nilai', [KajurController::class, 'showNilaiSidang'])->name('kaprodi.nilai.page');
