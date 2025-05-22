@@ -3,6 +3,6 @@
 @section('title', 'Daftar Sidang')
 
 @section('content')
-@include('mahasiswa.Sidang.crud-sidang.create')
+@include('mahasiswa.Sidang.crud-sidang.daftar')
 
 @endsection

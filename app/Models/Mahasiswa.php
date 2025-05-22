@@ -31,4 +31,14 @@ class Mahasiswa extends Model
     {
         return $this->hasMany(NotifikasiTa::class);
     }
+
+    public function pembimbing1()
+    {
+        return $this->tugasAkhir()->with('pembimbing1Dosen')->first()->pembimbing1Dosen ?? null;
+    }
+
+    public function pembimbing2()
+    {
+        return $this->tugasAkhir()->with('pembimbing2Dosen')->first()->pembimbing2Dosen ?? null;
+    }
 }
