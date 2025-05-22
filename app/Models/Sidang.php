@@ -26,11 +26,7 @@ class Sidang extends Model
         return $this->hasOne(JadwalSidang::class);
     }
     
-<<<<<<< HEAD
-    public function nilai()
-=======
     public function nilai(): HasMany
->>>>>>> 9b746f97d8fd6b9b94568020d81c60f0e486f87a
     {
         return $this->hasMany(NilaiSidang::class);
     }

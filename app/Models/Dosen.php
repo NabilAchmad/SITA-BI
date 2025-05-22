@@ -19,9 +19,6 @@ class Dosen extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-<<<<<<< HEAD
-    public function topik()
-=======
 
     public function isOnline()
     {
@@ -30,7 +27,6 @@ class Dosen extends Model
 
 
     public function topik(): HasMany
->>>>>>> 9b746f97d8fd6b9b94568020d81c60f0e486f87a
     {
         return $this->hasMany(TawaranTopik::class);
     }

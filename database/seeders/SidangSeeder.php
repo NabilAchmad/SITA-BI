@@ -9,13 +9,8 @@ class SidangSeeder extends Seeder
 {
     public function run()
     {
-<<<<<<< HEAD
-        // Ambil 30 tugas akhir pertama untuk dibuatkan sidang
-        $taList = DB::table('tugas_akhir')->get();
-=======
         // Ambil 30 tugas akhir pertama
         $taList = DB::table('tugas_akhir')->limit(30)->get();
->>>>>>> 9b746f97d8fd6b9b94568020d81c60f0e486f87a
 
         foreach ($taList as $ta) {
             DB::table('sidang')->insert([
@@ -27,8 +22,4 @@ class SidangSeeder extends Seeder
             ]);
         }
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 9b746f97d8fd6b9b94568020d81c60f0e486f87a

@@ -14,18 +14,12 @@ class MahasiswaTanpaPembimbingSeeder extends Seeder
         $faker = Faker::create('id_ID');
 
         for ($i = 1; $i <= 30; $i++) {
-<<<<<<< HEAD
-            $userId = DB::table('users')->insertGetId([
-                'name' => $faker->name,
-                'email' => "mhs_tanpa_pembimbing" . ($i + 100) . "@example.com", // agar unik & aman
-=======
             // Nama tanpa gelar
             $namaMahasiswa = $faker->firstName() . ' ' . $faker->lastName();
 
             $userId = DB::table('users')->insertGetId([
                 'name' => $namaMahasiswa,
                 'email' => "mhs_tanpa_pembimbing" . ($i + 100) . "@example.com",
->>>>>>> 9b746f97d8fd6b9b94568020d81c60f0e486f87a
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -38,11 +32,7 @@ class MahasiswaTanpaPembimbingSeeder extends Seeder
 
             $mhsId = DB::table('mahasiswa')->insertGetId([
                 'user_id' => $userId,
-<<<<<<< HEAD
-                'nim' => '25' . str_pad($i + 100, 7, '0', STR_PAD_LEFT), // mulai dari 251000001
-=======
                 'nim' => '25' . str_pad($i + 100, 7, '0', STR_PAD_LEFT),
->>>>>>> 9b746f97d8fd6b9b94568020d81c60f0e486f87a
                 'prodi' => 'D4 Bahasa Inggris',
                 'angkatan' => '25',
                 'created_at' => now(),
@@ -52,15 +42,9 @@ class MahasiswaTanpaPembimbingSeeder extends Seeder
             DB::table('tugas_akhir')->insert([
                 'mahasiswa_id' => $mhsId,
                 'judul' => 'Analisis Tugas Akhir Tanpa Pembimbing ' . $i,
-<<<<<<< HEAD
-                'abstrak' => $faker->paragraph,
-                'status' => 'diajukan',
-                'tanggal_pengajuan' => now()->subDays(rand(1, 90)),
-=======
                 'abstrak' => $faker->paragraph(),
                 'status' => 'diajukan',
                 'tanggal_pengajuan' => now()->subDays(rand(1, 90))->toDateString(),
->>>>>>> 9b746f97d8fd6b9b94568020d81c60f0e486f87a
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

@@ -27,15 +27,8 @@ class DatabaseSeeder extends Seeder
             MahasiswaSeeder::class,
             MahasiswaTanpaPembimbingSeeder::class,
             TugasAkhirSeeder::class,
-<<<<<<< HEAD
-            PeranDosenTaSeeder::class,
             SidangSeeder::class,
             RuanganSeeder::class,
-            JadwalSidangSeeder::class,
-=======
-            SidangSeeder::class,
-            RuanganSeeder::class,
->>>>>>> 9b746f97d8fd6b9b94568020d81c60f0e486f87a
         ]);
     }
 }
