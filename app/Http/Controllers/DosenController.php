@@ -116,6 +116,10 @@ class DosenController extends Controller
         $dosen->user->delete();
         $dosen->delete();
 
+        if (request()->ajax()) {
+            return response()->json(['message' => 'Akun dosen berhasil dihapus.']);
+        }
+
         return redirect()->route('akun-dosen.kelola')->with('success', 'Akun dosen berhasil dihapus.');
     }
 }

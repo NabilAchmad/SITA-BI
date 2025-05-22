@@ -71,27 +71,12 @@
                 </li>
 
                 <!-- Kelola Akun -->
+                <!-- Sidebar -->
                 <li class="nav-item {{ request()->is('admin/kelola-akun*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#tables"
-                        class="{{ request()->is('admin/kelola-akun*') ? '' : 'collapsed' }}">
+                    <a href="{{ route('akun-dosen.kelola') }}">
                         <i class="fas fa-users-cog"></i>
                         <p>Kelola Akun</p>
-                        <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('admin/kelola-akun*') ? 'show' : '' }}" id="tables">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/kelola-akun/dosen') ? 'active' : '' }}">
-                                <a href="{{ route('akun-dosen.kelola') }}">
-                                    <span class="sub-item">Dosen</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('admin/kelola-akun/mahasiswa') ? 'active' : '' }}">
-                                <a href="{{ route('akun-mahasiswa.kelola') }}">
-                                    <span class="sub-item">Mahasiswa</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
 
                 <!-- Mahasiswa -->

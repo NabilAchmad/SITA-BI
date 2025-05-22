@@ -22,11 +22,33 @@ class MahasiswaController extends Controller
     }
 
     // Tampilkan mahasiswa semua list mahasiswa
-    public function listMahasiswa()
+    public function listMahasiswa(Request $request)
     {
-        $mahasiswa = Mahasiswa::with([
-            'user',
-        ])->get();
+        $query = Mahasiswa::with('user');
+
+        // Filter berdasarkan jenjang (D3 / D4) dari prodi
+        if ($request->filled('jenjang')) {
+            $jenjang = $request->jenjang;
+            $query->where('prodi', 'LIKE', $jenjang . '%');
+        }
+
+        // Pencarian berdasarkan nama atau nim
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($q2) use ($search) {
+                    $q2->where('name', 'like', '%' . $search . '%');
+                })->orWhere('nim', 'like', '%' . $search . '%');
+            });
+        }
+
+        $mahasiswa = $query->paginate(10);
+
+        // Jika AJAX request (realtime pencarian)
+        if ($request->ajax()) {
+            return view('admin.kelola-akun.mahasiswa.crud-mahasiswa.read', compact('mahasiswa'))->render();
+        }
+
         return view('admin.kelola-akun.mahasiswa.views.kelolaMahasiswa', compact('mahasiswa'));
     }
 
@@ -44,7 +66,7 @@ class MahasiswaController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $mahasiswa->user->id,
             'nim' => 'required|string|unique:mahasiswa,nim,' . $mahasiswa->id,
-            'prodi' => 'required|string|max:100', 
+            'prodi' => 'required|string|max:100',
             'password' => 'nullable|confirmed|min:8',
         ]);
 
@@ -59,7 +81,7 @@ class MahasiswaController extends Controller
         // Update mahasiswa data
         $mahasiswa->update([
             'nim' => $request->nim,
-            'prodi' => $request->prodi, 
+            'prodi' => $request->prodi,
         ]);
 
         return redirect()->route('akun-mahasiswa.kelola')->with('success', 'Data mahasiswa berhasil diperbarui.');
@@ -73,5 +95,27 @@ class MahasiswaController extends Controller
         })->with(['user', 'tugasAkhir.sidang'])->get();
 
         return view('admin.sidang.mahasiswa.views.read-mhs-sidang', compact('mahasiswa'));
+    }
+
+    public function search(Request $request)
+    {
+        $query = Mahasiswa::with('user');
+
+        if ($request->filled('jenjang')) {
+            $query->where('jenjang', $request->jenjang);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($q2) use ($search) {
+                    $q2->where('name', 'like', '%' . $search . '%');
+                })->orWhere('nim', 'like', '%' . $search . '%');
+            });
+        }
+
+        $mahasiswa = $query->paginate(10);
+
+        return view('admin.kelola-akun.mahasiswa.views.kelolaMahasiswa', compact('mahasiswa'));
     }
 }
