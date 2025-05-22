@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,12 +12,19 @@ class Dosen extends Model
 {
     use HasFactory;
     protected $fillable = ['user_id', 'nidn'];
-    protected $table = 'dosen'; // ⬅️ Ini wajib untuk hindari pluralisasi salah
+    protected $table = 'dosen'; // Ini wajib untuk hindari pluralisasi salah
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
+
+
+    public function isOnline()
+    {
+        return Cache::has('user-is-online-' . $this->id);
+    }
+
 
     public function topik(): HasMany
     {
@@ -46,5 +54,10 @@ class Dosen extends Model
     public function revisiTa(): HasMany
     {
         return $this->hasMany(RevisiTa::class);
+    }
+
+    public function peranDosen()
+    {
+        return $this->hasMany(PeranDosenTA::class);
     }
 }

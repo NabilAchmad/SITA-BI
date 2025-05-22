@@ -3,6 +3,6 @@
 @section('title', 'Batal')
 
 @section('content')
-@include('mahasiswa.TugasAkhir.batalTA')
+@include('mahasiswa.TugasAkhir.crud-ta.progres')
 
 @endsection
