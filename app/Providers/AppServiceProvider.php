@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Pagination\Paginator; // Tambahkan di bagian atas jika belum ada
 use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Gunakan pagination Bootstrap 5
+        Paginator::useBootstrapFive(); // atau useBootstrapFour() jika pakai Bootstrap 4
+
         view()->composer('*', function ($view) {
             if (Auth::check() && Auth::user()->role === 'dosen') {
                 $expiresAt = now()->addMinutes(5); // dianggap online selama 5 menit
