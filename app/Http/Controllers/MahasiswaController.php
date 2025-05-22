@@ -26,18 +26,6 @@ class MahasiswaController extends Controller
         return view('admin.mahasiswa.views.list-mhs', compact('mahasiswa'));
     }
 
-    /**
-     * API endpoint to get list of mahasiswa in JSON format
-     */
-    public function apiIndex()
-    {
-        $mahasiswa = Mahasiswa::with('user')->get();
-        return response()->json([
-            'status' => 'success',
-            'data' => $mahasiswa
-        ]);
-    }
-
     // Tampilkan mahasiswa semua list mahasiswa
     public function listMahasiswa()
     {
