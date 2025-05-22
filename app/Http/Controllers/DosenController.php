@@ -21,6 +21,26 @@ class DosenController extends Controller
         return view('admin.kelola-akun.dosen.views.kelolaAkunDosen', compact('dosenList'));
     }
 
+    /**
+     * API endpoint to get list of dosen with roles in JSON format
+     */
+    public function apiIndex()
+    {
+        $dosenList = Dosen::with(['user', 'user.roles'])->get();
+
+        // Map roles to simple array of role names
+        $dosenList->transform(function ($dosen) {
+            $dosen->roles = $dosen->user->roles->pluck('nama_role');
+            unset($dosen->user->roles);
+            return $dosen;
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $dosenList
+        ]);
+    }
+
     // Form tambah dosen
     public function create()
     {

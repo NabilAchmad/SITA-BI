@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\JudulTA;
+use App\Models\Jadwal;
+use App\Models\Nilai;
+use App\Models\Pengumuman;
 
 class KaprodiController extends Controller
 {
@@ -61,5 +64,53 @@ class KaprodiController extends Controller
         $judul->save();
 
         return response()->json(['message' => 'Judul telah ditolak']);
+    }
+
+    /**
+     * API endpoint to get jadwal sidang in JSON format
+     */
+    public function apiJadwal()
+    {
+        $jadwals = Jadwal::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => $jadwals
+        ]);
+    }
+
+    /**
+     * API endpoint to get judul TA in JSON format
+     */
+    public function apiJudulTA()
+    {
+        $judulTAs = JudulTA::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => $judulTAs
+        ]);
+    }
+
+    /**
+     * API endpoint to get nilai sidang in JSON format
+     */
+    public function apiNilaiSidang()
+    {
+        $nilais = Nilai::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => $nilais
+        ]);
+    }
+
+    /**
+     * API endpoint to get pengumuman in JSON format
+     */
+    public function apiPengumuman()
+    {
+        $pengumumans = Pengumuman::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => $pengumumans
+        ]);
     }
 }
