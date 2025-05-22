@@ -13,13 +13,12 @@ class NilaiSidang extends Model
         'sidang_id', 'dosen_id', 'aspek', 'komentar', 'skor'
     ];
 
-    public function sidang(): BelongsTo
-    {
+    public function sidang() {
         return $this->belongsTo(Sidang::class);
     }
 
-    public function dosen(): BelongsTo
-    {
+
+    public function dosen(){
         return $this->belongsTo(Dosen::class);
     }
 }

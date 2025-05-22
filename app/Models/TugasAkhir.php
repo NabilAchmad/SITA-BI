@@ -32,27 +32,27 @@ class TugasAkhir extends Model
         return $this->hasMany(PeranDosenTa::class, 'tugas_akhir_id');
     }
 
-    public function bimbingan(): HasMany
+    public function bimbingan()
     {
         return $this->hasMany(BimbinganTa::class);
     }
 
-    public function dokumen(): HasMany
+    public function dokumen()
     {
         return $this->hasMany(DokumenTa::class);
     }
 
-    public function revisi(): HasMany
+    public function revisi()
     {
         return $this->hasMany(RevisiTa::class);
     }
 
-    public function sidang(): HasMany
+    public function sidang()
     {
         return $this->hasMany(Sidang::class);
     }
 
-    public function notifikasi(): HasMany
+    public function notifikasi()
     {
         return $this->hasMany(NotifikasiTa::class);
     }

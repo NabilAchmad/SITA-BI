@@ -17,12 +17,12 @@ class TawaranTopik extends Model
         'dosen_id', 'judul_topik', 'deskripsi', 'kuota'
     ];
 
-    public function dosen(): BelongsTo
+    public function dosen()
     {
         return $this->belongsTo(Dosen::class);
     }
 
-    public function historyTopik(): HasMany
+    public function historyTopik()
     {
         return $this->hasMany(HistoryTopikMahasiswa::class);
     }

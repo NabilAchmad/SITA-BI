@@ -22,12 +22,12 @@ class Mahasiswa extends Model
         return $this->hasOne(TugasAkhir::class); // ✔️ Ini yang benar jika hanya 1 TA per mahasiswa
     }
 
-    public function historyTopik(): HasMany
+    public function historyTopik()
     {
         return $this->hasMany(HistoryTopikMahasiswa::class);
     }
 
-    public function notifikasi(): HasMany
+    public function notifikasi()
     {
         return $this->hasMany(NotifikasiTa::class);
     }

@@ -16,12 +16,12 @@ class JadwalSidang extends Model
         'sidang_id', 'tanggal', 'waktu_mulai', 'waktu_selesai', 'ruangan_id'
     ];
 
-    public function sidang(): BelongsTo
+    public function sidang()
     {
         return $this->belongsTo(Sidang::class);
     }
 
-    public function ruangan(): BelongsTo
+    public function ruangan()
     {
         return $this->belongsTo(Ruangan::class);
     }

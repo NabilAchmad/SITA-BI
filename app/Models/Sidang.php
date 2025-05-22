@@ -25,17 +25,17 @@ class Sidang extends Model
         return $this->hasOne(JadwalSidang::class);
     }
     
-    public function nilai(): HasMany
+    public function nilai()
     {
         return $this->hasMany(NilaiSidang::class);
     }
 
-    public function beritaAcaraPasca(): HasMany
+    public function beritaAcaraPasca()
     {
         return $this->hasMany(BeritaAcaraPascaSidang::class);
     }
 
-    public function beritaAcaraPra(): HasMany
+    public function beritaAcaraPra()
     {
         return $this->hasMany(BeritaAcaraPraSidang::class);
     }

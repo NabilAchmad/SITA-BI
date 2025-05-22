@@ -11,7 +11,7 @@ class Ruangan extends Model
 
     protected $fillable = ['nama_ruangan', 'lokasi', 'kapasitas'];
 
-    public function jadwalSidang(): HasMany
+    public function jadwalSidang()
     {
         return $this->hasMany(JadwalSidang::class);
     }

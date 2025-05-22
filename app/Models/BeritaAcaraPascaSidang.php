@@ -11,7 +11,7 @@ class BeritaAcaraPascaSidang extends Model
 
     protected $fillable = ['sidang_id', 'kesimpulan', 'hasil_sidang', 'catatan'];
 
-    public function sidang(): BelongsTo
+    public function sidang()
     {
         return $this->belongsTo(Sidang::class);
     }

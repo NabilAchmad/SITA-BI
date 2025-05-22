@@ -13,12 +13,12 @@ class PeranDosenTa extends Model
         'dosen_id', 'tugas_akhir_id', 'peran'
     ];
 
-    public function dosen(): BelongsTo
+    public function dosen()
     {
         return $this->belongsTo(Dosen::class);
     }
 
-    public function tugasAkhir(): BelongsTo
+    public function tugasAkhir()
     {
         return $this->belongsTo(TugasAkhir::class);
     }

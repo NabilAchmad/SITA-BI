@@ -13,37 +13,37 @@ class Dosen extends Model
     protected $fillable = ['user_id', 'nidn'];
     protected $table = 'dosen'; // Ini wajib untuk hindari pluralisasi salah
 
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function topik(): HasMany
+    public function topik()
     {
         return $this->hasMany(TawaranTopik::class);
     }
 
-    public function bimbingan(): HasMany
+    public function bimbingan()
     {
         return $this->hasMany(BimbinganTa::class);
     }
 
-    public function peranTa(): HasMany
+    public function peranTa()
     {
         return $this->hasMany(PeranDosenTa::class);
     }
 
-    public function nilaiSidang(): HasMany
+    public function nilaiSidang()
     {
         return $this->hasMany(NilaiSidang::class);
     }
 
-    public function reviewDokumen(): HasMany
+    public function reviewDokumen()
     {
         return $this->hasMany(ReviewDokumenTa::class, 'reviewer_id');
     }
 
-    public function revisiTa(): HasMany
+    public function revisiTa()
     {
         return $this->hasMany(RevisiTa::class);
     }

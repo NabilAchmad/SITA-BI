@@ -11,7 +11,7 @@ class JabatanDosen extends Model
 
     protected $fillable = ['user_id', 'jabatan'];
 
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
