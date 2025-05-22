@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TugasAkhir;
+use App\Models\Mahasiswa;
+use App\Models\BimbinganTA;
+use App\Models\RevisiTa;
+use App\Models\DokumenTa;
+use App\Models\Sidang;
 use App\Models\File;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -50,30 +55,57 @@ class TugasAkhirController extends Controller
         return redirect()->back()->with('success', 'Tugas Akhir berhasil diajukan!');
     }
 
-public function progress()
-{
-    // Simulasi user yang sedang login (ganti angka sesuai kebutuhan)
-    $simulasiUserId = 5;
+    public function progress()
+    {
+        // Gunakan auth()->id() jika login, atau ganti dengan simulasi user
+        $simulasiUserId = 35;
 
-    // Cari mahasiswa_id berdasarkan user_id
-    $mahasiswa = \App\Models\Mahasiswa::where('user_id', $simulasiUserId)->first();
+        // Ambil data mahasiswa berdasarkan user_id
+        $mahasiswa = Mahasiswa::where('user_id', $simulasiUserId)->first();
 
-    if (!$mahasiswa) {
-        // Handle jika mahasiswa tidak ditemukan
-        abort(404, 'Data mahasiswa tidak ditemukan.');
+        if (!$mahasiswa) {
+            abort(404, 'Data mahasiswa tidak ditemukan.');
+        }
+
+        // Ambil data tugas akhir terbaru dari mahasiswa
+        $tugasAkhir = TugasAkhir::where('mahasiswa_id', $mahasiswa->id)
+            ->whereNull('deleted_at')
+            ->latest()
+            ->first();
+
+        if (!$tugasAkhir || !is_object($tugasAkhir)) {
+            abort(404, 'Tugas akhir tidak ditemukan.');
+        }
+
+        // Ambil progres bimbingan berdasarkan tugas akhir
+        $progressBimbingan = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
+            ->orderBy('tanggal_bimbingan', 'desc')
+            ->get();
+
+        // Ambil data revisi
+        $revisi = RevisiTa::where('tugas_akhir_id', $tugasAkhir->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Ambil dokumen (proposal, draft, final)
+        $dokumen = DokumenTa::where('tugas_akhir_id', $tugasAkhir->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Ambil sidang yang terkait
+        $sidang = Sidang::where('tugas_akhir_id', $tugasAkhir->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Kirim ke view
+        return view('mahasiswa.TugasAkhir.views.progresTA', compact(
+            'tugasAkhir',
+            'progressBimbingan',
+            'revisi',
+            'dokumen',
+            'sidang'
+        ));
     }
-
-    // Ambil satu tugas akhir terbaru yang belum dibatalkan (soft delete)
-    $tugasAkhir = \App\Models\TugasAkhir::where('mahasiswa_id', $mahasiswa->id)
-        ->whereNull('deleted_at')
-        ->latest()
-        ->first();
-
-    return view('mahasiswa.TugasAkhir.views.progresTA', compact('tugasAkhir'));
-}
-
-
-
 
     // Menampilkan form edit
     public function edit($id)

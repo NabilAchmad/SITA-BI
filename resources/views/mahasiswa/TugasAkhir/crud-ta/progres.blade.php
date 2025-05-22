@@ -1,7 +1,8 @@
 <style>
-  .judul-progress {
-    color: #004085 !important; /* Warna biru tua/navy */
-  }
+    .judul-progress {
+        color: #004085 !important;
+        /* Warna biru tua/navy */
+    }
 </style>
 
 <div class="container">
@@ -11,8 +12,9 @@
     </div>
 
     <div class="row justify-content-center">
-        @forelse ($tugasAkhir as $ta)
+        @if ($tugasAkhir)
             @php
+                $ta = $tugasAkhir;
                 $statusLabel = match ($ta->status) {
                     'diajukan' => 'Dalam Proses',
                     'disetujui' => 'Disetujui',
@@ -128,10 +130,10 @@
                     </div>
                 </div>
             </div>
-        @empty
+        @else
             <div class="col-12 text-center">
                 <div class="alert alert-info rounded-3">Belum ada pengajuan tugas akhir.</div>
             </div>
-        @endforelse
+        @endif
     </div>
 </div>
