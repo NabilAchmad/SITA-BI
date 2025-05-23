@@ -2,14 +2,14 @@
     <div class="sidebar-logo">
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="dark">
-            <a href="{{ url('/ketua-jurusan') }}"
+            <a href="{{ url('/dosen') }}"
                 class="logo d-flex align-items-center text-decoration-none px-3 py-2 text-white w-100"
                 style="max-width: 100%; overflow: hidden; transition: background-color 0.3s ease;">
 
                 <!-- Icon Gear -->
                 <div class="d-flex align-items-center justify-content-center bg-white bg-opacity-10 rounded-circle flex-shrink-0 me-2"
                     style="width: 36px; height: 36px; transition: background-color 0.3s ease;">
-                    <img src="{{ asset('assets/img/ketua-jurusan/hat.svg') }}" alt="Ketua Jurusan Icon"
+                    <img src="{{ asset('assets/img/dosen/hat.svg') }}" alt="Ketua Jurusan Icon"
                         style="width: 60%; height: 60%; filter: brightness(0) invert(1); transition: transform 0.3s ease;">
                 </div>
 
@@ -39,18 +39,18 @@
         <div class="sidebar-content">
             <ul class="nav nav-secondary">
                 <!-- Dashboard -->
-                <li class="nav-item {{ request()->is('ketua-jurusan') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('dosen') ? 'active' : '' }}">
                     <a data-bs-toggle="collapse" href="#dashboard"
-                        aria-expanded="{{ request()->is('ketua-jurusan') ? 'true' : 'false' }}"
-                        class="{{ request()->is('ketua-jurusan') ? '' : 'collapsed' }}">
+                        aria-expanded="{{ request()->is('dosen') ? 'true' : 'false' }}"
+                        class="{{ request()->is('dosen') ? '' : 'collapsed' }}">
                         <i class="fas fa-home"></i>
                         <p>Dashboard</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('ketua-jurusan') ? 'show' : '' }}" id="dashboard">
+                    <div class="collapse {{ request()->is('dosen') ? 'show' : '' }}" id="dashboard">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('ketua-jurusan') ? 'active' : '' }}">
-                                <a href="{{ url('/ketua-jurusan') }}">
+                            <li class="{{ request()->is('dosen') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.dashboard') }}">
                                     <span class="sub-item">Dashboard 1</span>
                                 </a>
                             </li>
@@ -66,84 +66,117 @@
                     <h4 class="text-section">Akses</h4>
                 </li>
 
-                <!-- Sidang -->
-                <li class="nav-item {{ request()->is('dosen/sidang') || request()->is('dosen/sidang/*') ? 'active' : '' }}">
+                <!-- jadwal -->
+                <li class="nav-item {{ request()->is('dosen/jadwal') || request()->is('dosen/jadwal/*') ? 'active' : '' }}">
                     <a data-bs-toggle="collapse" href="#forms"
-                        class="{{ request()->is('dosen/sidang') || request()->is('dosen/sidang/*') ? '' : 'collapsed' }}">
+                        class="{{ request()->is('dosen/jadwal') || request()->is('dosen/jadwal/*') ? '' : 'collapsed' }}">
                         <i class="fas fa-chalkboard-teacher"></i>
-                        <p>Jadwal</p>
+                        <p>Bimbingan</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('sidang') || request()->is('dosen/sidang/*') ? 'show' : '' }}"
+                    <div class="collapse {{ request()->is('jadwal') || request()->is('dosen/jadwal/*') ? 'show' : '' }}"
                         id="forms">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('dosen/sidang/lihat-jadwal') ? 'active' : '' }}">
+                            <li class="{{ request()->is('dosen/jadwal/lihat-jadwal') ? 'active' : '' }}">
                                 <a href="{{ route('dosen.jadwal.read') }}">
                                     <span class="sub-item">List Bimbingan</span></a>
                             </li>
+                            <li class="{{ request()->is('dosen/jadwal/lihat-jadwal') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.jadwal.membuat') }}">
+                                    <span class="sub-item">Membuat Jadwal Bimbingan</span></a>
+                            </li>
+                            <li class="{{ request()->is('dosen/jadwal/lihat-jadwal') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.jadwal.melihat') }}">
+                                    <span class="sub-item">Melihat Jadwal Bimbingan</span></a>
+                            </li>
+                            <li class="{{ request()->is('dosen/jadwal/lihat-jadwal') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.jadwal.perubahan') }}">
+                                    <span class="sub-item">Mengajukan Perubahan Jadwal Bimbingan</span></a>
+                            </li>
                         </ul>
                     </div>
                 </li>
 
-                <!-- Pengumuman -->
-                <li class="nav-item {{ request()->is('dosen/pengumuman*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#pengumuman"
-                        class="{{ request()->is('dosen/pengumuman*') ? '' : 'collapsed' }}">
+                
+                <!-- TawaranTopik -->
+                <li class="nav-item {{ request()->is('dosen/TawaranTopik*') ? 'active' : '' }}">
+                    <a data-bs-toggle="collapse" href="#TawaranTopik"
+                        class="{{ request()->is('dosen/TawaranTopik*') ? '' : 'collapsed' }}">
                         <i class="fas fa-bullhorn"></i>
-                        <p>Pengumuman</p>
+                        <p>TawaranTopik</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('dosen/pengumuman*') ? 'show' : '' }}" id="pengumuman">
+                    <div class="collapse {{ request()->is('dosen/TawaranTopik*') ? 'show' : '' }}" id="TawaranTopik">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('dosen/pengumuman/lihat-pengumuman') ? 'active' : '' }}">
-                                <a href="{{ url('dosen/pengumuman/lihat-pengumuman') }}">
-                                    <span class="sub-item">Lihat Pengumuman</span>
+                            <li class="{{ request()->is('dosen/TawaranTopik/lihat-TawaranTopik') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.tawaranTopik.melihat') }}">
+                                    <span class="sub-item">Melihat Tawaran Topik</span>
+                                </a>
+                            </li>
+                             <li class="{{ request()->is('dosen/TawaranTopik/lihat-TawaranTopik') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.tawaranTopik.mengajukan') }}">
+                                    <span class="sub-item">Mengajukan Tawaran Topik</span>
+                                </a>
+                            </li>
+                            <li class="{{ request()->is('dosen/TawaranTopik/lihat-TawaranTopik') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.tawaranTopik.mengubah') }}">
+                                    <span class="sub-item">Mengubah Tawaran Topik</span>
+                                </a>
+                            </li>
+                            <li class="{{ request()->is('dosen/TawaranTopik/lihat-TawaranTopik') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.tawaranTopik.menghapus') }}">
+                                    <span class="sub-item">Menghapus Tawaran Topik</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </li>
 
-                <!-- Kelola Akun -->
+                <!-- SIDANG -->
                 <li
-                    class="nav-item {{ request()->is('kelola-akun') || request()->is('kelola-akun/*') ? 'active' : '' }}">
+                    class="nav-item {{ request()->is('sidang') || request()->is('sidang/*') ? 'active' : '' }}">
                     <a data-bs-toggle="collapse" href="#tables"
-                        class="{{ request()->is('kelola-akun') || request()->is('kelola-akun/*') ? '' : 'collapsed' }}">
-                        <i class="fas fa-users-cog"></i>
-                        <p>Kelola Akun</p>
+                        class="{{ request()->is('sidang') || request()->is('sidang/*') ? '' : 'collapsed' }}">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <p>Sidang</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('kelola-akun') || request()->is('kelola-akun/*') ? 'show' : '' }}"
+                    <div class="collapse {{ request()->is('sidang') || request()->is('sidang/*') ? 'show' : '' }}"
                         id="tables">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('kelola-akun/dosen') ? 'active' : '' }}">
-                                <a href="{{ url('/kelola-akun/dosen') }}">
-                                    <span class="sub-item">Dosen</span>
+                            <li class="{{ request()->is('sidang/dosen') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.sidang.melihat') }}">
+                                    <span class="sub-item">Melihat jadwal Sidang</span>
                                 </a>
                             </li>
-                            <li class="{{ request()->is('kelola-akun/mahasiswa') ? 'active' : '' }}">
-                                <a href="{{ url('/kelola-akun/mahasiswa') }}">
-                                    <span class="sub-item">Mahasiswa</span>
+                            <li class="{{ request()->is('sidang/mahasiswa') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.sidang.list') }}">
+                                    <span class="sub-item">List Mahasiswa Sidang</span>
+                                </a>
+                            </li>
+                            <li class="{{ request()->is('sidang/mahasiswa') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.sidang.nilai') }}">
+                                    <span class="sub-item">Memberi Nilai Sidang</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </li>
 
-                <!-- Laporan dan Statistik -->
-                <li class="nav-item {{ request()->is('laporan') || request()->is('laporan/*') ? 'active' : '' }}">
+                <!-- Pengumuman-->
+                <li class="nav-item {{ request()->is('pengumuman') || request()->is('pengumuman/*') ? 'active' : '' }}">
                     <a data-bs-toggle="collapse" href="#maps"
-                        class="{{ request()->is('laporan') || request()->is('laporan/*') ? '' : 'collapsed' }}">
+                        class="{{ request()->is('pengumuman') || request()->is('pengumuman/*') ? '' : 'collapsed' }}">
                         <i class="fas fa-chart-bar"></i>
-                        <p>Laporan dan Statistik</p>
+                        <p>Pengumuman </p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('laporan') || request()->is('laporan/*') ? 'show' : '' }}"
+                    <div class="collapse {{ request()->is('pengumuman') || request()->is('pengumuman/*') ? 'show' : '' }}"
                         id="maps">
                         <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('laporan/lihat') ? 'active' : '' }}">
-                                <a href="{{ url('/laporan/lihat') }}">
-                                    <span class="sub-item">Lihat Laporan dan Statistik</span>
+                            <li class="{{ request()->is('pengumuman/lihat') ? 'active' : '' }}">
+                                <a href="{{ route('dosen.pengumuman.melihat') }}">
+                                    <span class="sub-item">Lihat pengumuman </span>
                                 </a>
                             </li>
                         </ul>

@@ -1,7 +1,7 @@
-<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\dosen\jadwal\crud-jadwal\ReadListBimbingan.blade.php -->
+<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\dosen\sidang\crud-sidang\listMahasiswa.blade.php -->
 
 <div class="mb-4">
-    <h5>Daftar Mahasiswa Bimbingan</h5>
+    <h5>Daftar Mahasiswa yang Akan Sidang</h5>
 </div>
 
 <div class="table-responsive">
@@ -12,7 +12,9 @@
                 <th scope="col">Nama Mahasiswa</th>
                 <th scope="col">NIM</th>
                 <th scope="col">Program Studi</th>
-                <th scope="col">Status Bimbingan</th>
+                <th scope="col">Judul Sidang</th>
+                <th scope="col">Tanggal Sidang</th>
+                <th scope="col">Status</th>
             </tr>
         </thead>
         <tbody>
@@ -21,21 +23,27 @@
                 <td>Ahmad Fauzi</td>
                 <td>123456789</td>
                 <td>Sistem Informasi</td>
-                <td><span class="badge bg-success">Aktif</span></td>
+                <td>Sistem Informasi Akademik</td>
+                <td>2025-06-10</td>
+                <td><span class="badge bg-warning text-dark">Menunggu Persetujuan</span></td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>Siti Aminah</td>
                 <td>987654321</td>
                 <td>Teknik Informatika</td>
-                <td><span class="badge bg-warning text-dark">Menunggu</span></td>
+                <td>Analisis Data Penjualan</td>
+                <td>2025-06-11</td>
+                <td><span class="badge bg-success">Disetujui</span></td>
             </tr>
             <tr>
                 <td>3</td>
                 <td>Rizky Hidayat</td>
                 <td>192837465</td>
                 <td>Sistem Informasi</td>
-                <td><span class="badge bg-danger">Tidak Aktif</span></td>
+                <td>Pengembangan Aplikasi Mobile</td>
+                <td>2025-06-12</td>
+                <td><span class="badge bg-danger">Ditolak</span></td>
             </tr>
         </tbody>
     </table>
