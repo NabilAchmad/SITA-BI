@@ -41,7 +41,7 @@
 </head>
 
 <body>
-    <div class="wrapper">
+    <div class="wrapper sidebar_minimize">
         <!-- Sidebar -->
         @include('layouts.components.border-admin.sidebar')
         <!-- End Sidebar -->

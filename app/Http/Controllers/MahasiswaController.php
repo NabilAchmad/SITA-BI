@@ -9,14 +9,24 @@ use Illuminate\Http\Request;
 class MahasiswaController extends Controller
 {
     // Tampilkan mahasiswa yang sudah memiliki 2 pembimbing
-    public function index()
+    public function index(Request $request)
     {
-        $mahasiswa = Mahasiswa::whereHas('tugasAkhir.peranDosenTa', function ($q) {
-            $q->whereIn('peran', ['pembimbing1', 'pembimbing2']);
-        })->with([
-            'user',
-            'tugasAkhir.peranDosenTa.dosen.user'  // eager loading sampai nama dosen
-        ])->get();
+        $mahasiswa = Mahasiswa::with(['user', 'tugasAkhir.peranDosenTa.dosen.user'])
+            ->whereHas('tugasAkhir') // Mahasiswa yang punya TA
+            ->when($request->filled('prodi'), function ($query) use ($request) {
+                $query->where('prodi', 'like', $request->prodi . '%'); // Awalan D3/D4
+            })
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('nim', 'like', "%$search%")
+                        ->orWhereHas('user', function ($q2) use ($search) {
+                            $q2->where('name', 'like', "%$search%");
+                        });
+                });
+            })
+            ->orderBy('nim')
+            ->paginate(10);
 
         return view('admin.mahasiswa.views.list-mhs', compact('mahasiswa'));
     }
@@ -26,10 +36,10 @@ class MahasiswaController extends Controller
     {
         $query = Mahasiswa::with('user');
 
-        // Filter berdasarkan jenjang (D3 / D4) dari prodi
-        if ($request->filled('jenjang')) {
-            $jenjang = $request->jenjang;
-            $query->where('prodi', 'LIKE', $jenjang . '%');
+        // Filter berdasarkan prodi (D3 / D4) dari prodi
+        if ($request->filled('prodi')) {
+            $prodi = $request->prodi;
+            $query->where('prodi', 'LIKE', $prodi . '%');
         }
 
         // Pencarian berdasarkan nama atau nim
@@ -101,8 +111,8 @@ class MahasiswaController extends Controller
     {
         $query = Mahasiswa::with('user');
 
-        if ($request->filled('jenjang')) {
-            $query->where('jenjang', $request->jenjang);
+        if ($request->filled('prodi')) {
+            $query->where('prodi', $request->prodi);
         }
 
         if ($request->filled('search')) {

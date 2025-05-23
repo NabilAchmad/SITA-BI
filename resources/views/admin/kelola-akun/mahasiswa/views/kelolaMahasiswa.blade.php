@@ -4,13 +4,7 @@
     <div class="card shadow-sm mb-4">
         <div class="card-header">
             {{-- Breadcrumb --}}
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item">Kelola Akun</li>
-                    <li class="breadcrumb-item"><a href="{{ route('akun-dosen.kelola') }}">Dosen</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Mahasiswa</li>
-                </ol>
-            </nav>
+            @include('admin.kelola-akun.breadcrumbs.navlink')
 
             {{-- Judul halaman --}}
             <div class="text-center">

@@ -79,18 +79,10 @@
 
 <div class="card shadow-sm mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-        
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">Kelola Akun</li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('akun-dosen.kelola') }}">Dosen</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('akun-mahasiswa.kelola') }}">Mahasiswa</a>
-                </li>
-            </ol>
-        </nav>
+
+        @include('admin.kelola-akun.breadcrumbs.navlink')
+
+        {{-- Judul halaman --}}
 
         <h4 class="card-title text-primary mb-0">Kelola Akun Dosen</h4>
         <!-- Modal Trigger -->

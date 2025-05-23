@@ -79,28 +79,11 @@
                     </a>
                 </li>
 
-                <!-- Mahasiswa -->
                 <li class="nav-item {{ request()->is('admin/mahasiswa*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#ta"
-                        class="{{ request()->is('admin/mahasiswa*') ? '' : 'collapsed' }}">
+                    <a href="{{ route('penugasan-bimbingan.index') }}">
                         <i class="fas fa-graduation-cap"></i>
-                        <p>Mahasiswa</p>
-                        <span class="caret"></span>
+                        <p>Penugasan Bimbingan</p>
                     </a>
-                    <div class="collapse {{ request()->is('admin/mahasiswa*') ? 'show' : '' }}" id="ta">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/mahasiswa/belum-pembimbing') ? 'active' : '' }}">
-                                <a href="{{ route('penugasan-bimbingan.index') }}">
-                                    <span class="sub-item">Assign Dosen Pembimbing</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('admin/mahasiswa/list-mahasiswa') ? 'active' : '' }}">
-                                <a href="{{ route('list-mahasiswa') }}">
-                                    <span class="sub-item">List Mahasiswa</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
 
                 <!-- Pengumuman -->
