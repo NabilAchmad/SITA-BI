@@ -113,11 +113,4 @@ class PengumumanController extends Controller
 
         return redirect()->back()->with('success', 'Semua pengumuman terhapus telah dihapus permanen.');
     }
-
-    public function tampil()
-    {
-        $pengumumans = Pengumuman::with('pembuat')->orderBy('created_at', 'desc')->get();
-
-        return view('admin.views.dashboard', compact('pengumumans'));
-    }
 }

@@ -1,38 +1,34 @@
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h4 class="mb-3">Log dan Aktivitas Sistem</h4>
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>No</th>
-                            <th>Waktu</th>
-                            <th>Pengguna</th>
-                            <th>Aktivitas</th>
-                            <th>IP Address</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Contoh data, ganti dengan data dinamis -->
-                        <tr>
-                            <td>1</td>
-                            <td>2023-03-01 10:00:00</td>
-                            <td>Admin</td>
-                            <td>Login ke sistem</td>
-                            <td>192.168.1.1</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>2023-03-01 10:05:00</td>
-                            <td>User</td>
-                            <td>Mengubah data profil</td>
-                            <td>192.168.1.2</td>
-                        </tr>
-                        <!-- Tambahkan data lainnya di sini -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="container">
+    <h1 class="mb-4">Log Aktivitas Sistem</h1>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Aksi</th>
+                <th>Objek</th>
+                <th>Deskripsi</th>
+                <th>Waktu</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($logs as $log)
+                <tr>
+                    <td>{{ $log->user->name ?? 'Tidak diketahui' }}</td>
+                    <td>{{ $log->action }}</td>
+                    <td>{{ $log->object_type }} #{{ $log->object_id }}</td>
+                    <td>{{ $log->deskripsi }}</td>
+                    <td>{{ $log->created_at->format('d-m-Y H:i') }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="5">Tidak ada log aktivitas.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <div class="mt-3">
+        {{ $logs->links() }}
     </div>
 </div>

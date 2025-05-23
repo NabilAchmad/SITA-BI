@@ -31,37 +31,37 @@ class TugasAkhir extends Model
     }
 
     // Relasi ke Dosen Pembimbing/Penguji via peran_dosen_ta
-    public function peranDosenTa(): HasMany
+    public function peranDosenTa()
     {
         return $this->hasMany(PeranDosenTa::class, 'tugas_akhir_id');
     }
 
     // Relasi ke Bimbingan TA
-    public function bimbingan(): HasMany
+    public function bimbingan()
     {
         return $this->hasMany(BimbinganTa::class, 'tugas_akhir_id');
     }
 
     // Relasi ke Dokumen TA (proposal, draft, final)
-    public function dokumen(): HasMany
+    public function dokumen()
     {
         return $this->hasMany(DokumenTa::class, 'tugas_akhir_id');
     }
 
     // Relasi ke Revisi TA
-    public function revisi(): HasMany
+    public function revisi()
     {
         return $this->hasMany(RevisiTa::class, 'tugas_akhir_id');
     }
 
+    // public function sidang()
     // Relasi ke Sidang TA (bisa juga hasMany jika ada banyak sidang)
-    public function sidang(): HasOne
+    public function sidang()
     {
         return $this->hasOne(Sidang::class, 'tugas_akhir_id');
     }
-
     // Relasi ke Notifikasi TA
-    public function notifikasi(): HasMany
+    public function notifikasi()
     {
         return $this->hasMany(NotifikasiTa::class, 'tugas_akhir_id');
     }

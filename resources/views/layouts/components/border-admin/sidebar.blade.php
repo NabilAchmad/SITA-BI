@@ -70,76 +70,20 @@
                     <h4 class="text-section">Akses</h4>
                 </li>
 
-                <!-- Berita Acara -->
-                <li class="nav-item {{ request()->is('admin/berita-acara*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#sidebarLayouts"
-                        class="{{ request()->is('admin/berita-acara*') ? '' : 'collapsed' }}">
-                        <i class="fas fa-file-signature"></i>
-                        <p>Berita Acara</p>
-                        <span class="caret"></span>
-                    </a>
-                    <div class="collapse {{ request()->is('admin/berita-acara*') ? 'show' : '' }}" id="sidebarLayouts">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/berita-acara/create') ? 'active' : '' }}">
-                                <a href="{{ route('berita-acara.create') }}">
-                                    <span class="sub-item">Buat Berita Acara</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('admin/berita-acara/read') ? 'active' : '' }}">
-                                <a href="{{ route('berita-acara.read') }}">
-                                    <span class="sub-item">Lihat Berita Acara</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-
                 <!-- Kelola Akun -->
+                <!-- Sidebar -->
                 <li class="nav-item {{ request()->is('admin/kelola-akun*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#tables"
-                        class="{{ request()->is('admin/kelola-akun*') ? '' : 'collapsed' }}">
+                    <a href="{{ route('akun-dosen.kelola') }}">
                         <i class="fas fa-users-cog"></i>
                         <p>Kelola Akun</p>
-                        <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('admin/kelola-akun*') ? 'show' : '' }}" id="tables">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/kelola-akun/dosen') ? 'active' : '' }}">
-                                <a href="{{ route('akun-dosen.kelola') }}">
-                                    <span class="sub-item">Dosen</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('admin/kelola-akun/mahasiswa') ? 'active' : '' }}">
-                                <a href="{{ route('akun-mahasiswa.kelola') }}">
-                                    <span class="sub-item">Mahasiswa</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
 
-                <!-- Mahasiswa -->
                 <li class="nav-item {{ request()->is('admin/mahasiswa*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#ta"
-                        class="{{ request()->is('admin/mahasiswa*') ? '' : 'collapsed' }}">
+                    <a href="{{ route('penugasan-bimbingan.index') }}">
                         <i class="fas fa-graduation-cap"></i>
-                        <p>Mahasiswa</p>
-                        <span class="caret"></span>
+                        <p>Penugasan Bimbingan</p>
                     </a>
-                    <div class="collapse {{ request()->is('admin/mahasiswa*') ? 'show' : '' }}" id="ta">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/mahasiswa/belum-pembimbing') ? 'active' : '' }}">
-                                <a href="{{ route('penugasan-bimbingan.index') }}">
-                                    <span class="sub-item">Assign Dosen Pembimbing</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('admin/mahasiswa/list-mahasiswa') ? 'active' : '' }}">
-                                <a href="{{ route('list-mahasiswa') }}">
-                                    <span class="sub-item">List Mahasiswa</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
 
                 <!-- Pengumuman -->
@@ -184,6 +128,11 @@
                             <li class="{{ request()->is('admin/sidang/lihat-jadwal') ? 'active' : '' }}">
                                 <a href="{{ route('jadwal-sidang.read') }}">
                                     <span class="sub-item">Lihat Jadwal Sidang</span>
+                                </a>
+                            </li>
+                            <li class="{{ request()->is('admin/sidang/pasca-sidang') ? 'active' : '' }}">
+                                <a href="{{ route('jadwal-sidang.pasca-sidang') }}">
+                                    <span class="sub-item">Pasca Sidang</span>
                                 </a>
                             </li>
                         </ul>

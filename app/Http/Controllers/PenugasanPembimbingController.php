@@ -10,16 +10,26 @@ use Illuminate\Http\Request;
 class PenugasanPembimbingController extends Controller
 {
     // Tampilkan mahasiswa yang belum memiliki 2 pembimbing
-    public function index()
+    public function index(Request $request)
     {
-        $mahasiswa = Mahasiswa::whereHas('tugasAkhir')
-            ->whereDoesntHave('tugasAkhir.peranDosenTa', function ($query) {
-                $query->whereIn('peran', ['pembimbing1', 'pembimbing2']);
-            }, '=', 2)
-            ->with('user')
-            ->get();
+        $query = Mahasiswa::with('user');
 
-        return view('admin.mahasiswa.views.assign-dospem', compact('mahasiswa'));
+        if ($request->filled('prodi')) {
+            $query->where('prodi', 'like', $request->prodi . '%');
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', fn($q2) => $q2->where('name', 'like', "%$search%"))
+                    ->orWhere('nim', 'like', "%$search%");
+            });
+        }
+
+        $mahasiswa = $query->paginate(10);
+        $dosen = Dosen::with('user')->get(); // Tambahkan ini!
+
+        return view('admin.mahasiswa.views.assign-dospem', compact('mahasiswa', 'dosen'));
     }
 
     // Tampilkan form pilih pembimbing

@@ -1,6 +1,6 @@
-<h1 class="mb-4 fw-bold text-primary text-center border-bottom pb-3">Pilih Dosen Pembimbing</h1>
+<h1 class="mb-4 fw-bold text-primary text-center border-bottom pb-3">Pilih Dosen Penguji</h1>
 
-<form action="{{ route('penugasan-bimbingan.store', $mahasiswa->id) }}" method="POST">
+<form action="{{ route('jadwal-sidang.simpanPenguji', $sidang->id) }}" method="POST">
     @csrf
 
     <table class="table table-bordered table-hover shadow rounded">
@@ -20,7 +20,7 @@
                     <td>{{ $item->nidn }}</td>
                     <td>
                         <div class="form-check d-flex justify-content-center">
-                            <input class="form-check-input fs-5" type="checkbox" name="pembimbing[]"
+                            <input class="form-check-input fs-5" type="checkbox" name="penguji[]"
                                 value="{{ $item->id }}">
                         </div>
                     </td>
@@ -30,20 +30,20 @@
     </table>
 
     <div class="d-flex justify-content-between align-items-center mt-4 px-1">
-        <p class="text-muted fst-italic mb-0">* Silakan pilih maksimal 2 dosen pembimbing.</p>
+        <p class="text-muted fst-italic mb-0">* Silakan pilih maksimal 4 dosen penguji.</p>
         <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm">Pilih</button>
     </div>
 </form>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const checkboxes = document.querySelectorAll('input[name="pembimbing[]"]');
+        const checkboxes = document.querySelectorAll('input[name="penguji[]"]');
         checkboxes.forEach(function(cb) {
             cb.addEventListener('change', function() {
-                const checked = document.querySelectorAll('input[name="pembimbing[]"]:checked');
-                if (checked.length > 2) {
+                const checked = document.querySelectorAll('input[name="penguji[]"]:checked');
+                if (checked.length > 4) {
                     this.checked = false;
-                    alert('Maksimal hanya bisa memilih 2 dosen pembimbing.');
+                    alert('Maksimal hanya bisa memilih 4 dosen penguji.');
                 }
             });
         });

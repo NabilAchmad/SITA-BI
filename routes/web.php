@@ -6,6 +6,9 @@ use App\Http\Controllers\PenugasanPembimbingController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\JadwalSidangController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\LogController;
+use App\Http\Controllers\AdminController;
 
 // Ketua Program Studi
 use App\Http\Controllers\KajurController;
@@ -61,7 +64,7 @@ Route::prefix('ketua-prodi')->group(function () {
 Route::prefix('admin')->group(function () {
 
     Route::prefix('dashboard')->group(function () {
-        Route::get('/', [PengumumanController::class, 'tampil'])->name('admin.dashboard');
+        Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
     });
 
     // =========================
@@ -109,16 +112,6 @@ Route::prefix('admin')->group(function () {
     });
 
     // =========================
-    // ROUTE BERITA ACARA
-    // =========================
-    Route::prefix('berita-acara')->group(function () {
-        // Berita Acara
-        Route::view('/create', 'admin/berita-acara/views/createBeritaAcara')->name('berita-acara.create');
-        Route::view('/edit', 'admin/berita-acara/views/edit-berita-acara')->name('berita-acara.edit');
-        Route::view('/read', 'admin/berita-acara/views/readBeritaAcara')->name('berita-acara.read');
-    });
-
-    // =========================
     // ROUTE KELOLA AKUN
     // =========================
     Route::prefix('kelola-akun')->group(function () {
@@ -141,6 +134,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [MahasiswaController::class, 'listMahasiswa'])->name('akun-mahasiswa.kelola');
             Route::get('/edit/{id}', [MahasiswaController::class, 'edit'])->name('akun-mahasiswa.edit');
             Route::put('/update/{id}', [MahasiswaController::class, 'update'])->name('akun-mahasiswa.update');
+            Route::get('/search', [MahasiswaController::class, 'search'])->name('akun-mahasiswa.search');
         });
     });
 
@@ -151,19 +145,50 @@ Route::prefix('admin')->group(function () {
         Route::get('/list-mahasiswa', [MahasiswaController::class, 'mahasiswaBelumPunyaJadwal'])
             ->name('mahasiswa-sidang.read');
 
-        // Route::view('/lihat-jadwal', 'admin/sidang/jadwal/views/readJadwalSidang')->name('jadwal-sidang.read');
+        // Form untuk memilih penguji 
+        Route::get('/pilih-penguji/{sidang_id}', [JadwalSidangController::class, 'showFormPenguji'])->name('jadwal-sidang.pilihPenguji');
+
+        // POST: Simpan dosen penguji
+        Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
+
+        // Form jadwal sidang
+        Route::get('/jadwal-sidang/create', [JadwalSidangController::class, 'create'])->name('jadwal-sidang.create');
+
+        // Simpan data jadwal sidang
+        Route::post('/jadwal-sidang', [JadwalSidangController::class, 'store'])->name('jadwal-sidang.store');
+
+        // Lihat Jadwal Sidang
         Route::get('/lihat-jadwal', [JadwalSidangController::class, 'index'])->name('jadwal-sidang.read');
 
-        Route::get('/edit-jadwal/{id}', [JadwalSidangController::class, 'edit'])->name('jadwal-sidang.edit');
+        // Lihat Detail Jadwal Sidang
+        Route::get('/detail-sidang/{sidang_id}', [JadwalSidangController::class, 'show'])->name('jadwal-sidang.show');
+
+        // Tandai sidang selesai
+        Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangController::class, 'tandaiSidang'])
+            ->name('jadwal-sidang.mark-done');
+
+        // Halaman Pasca Sidang
+        Route::get('/pasca-sidang', [JadwalSidangController::class, 'pascaSidang'])
+            ->name('jadwal-sidang.pasca-sidang');
+
+        // Edit dan Hapus Jadwal Sidang
         Route::put('/update-jadwal/{id}', [JadwalSidangController::class, 'update'])->name('jadwal-sidang.update');
         Route::delete('/delete-jadwal/{id}', [JadwalSidangController::class, 'destroy'])->name('jadwal-sidang.destroy');
     });
 
-    // Laporan dan Statistik
-    Route::view('/laporan/lihat', 'admin/laporan/views/lihatLaporanStatistik')->name('laporan.statistik');
+    // Admin: Laporan dan Statistik
+    Route::prefix('/laporan')->name('laporan.')->group(function () {
+        // Lihat laporan dan statistik
+        Route::get('/lihat', [LaporanController::class, 'show'])
+            ->name('statistik');
+    });
 
-    // Logs
-    Route::view('/logs/lihat', 'admin/log/views/lihatLogAktifitas')->name('log.aktifitas');
+    // Admin: Logs
+    Route::prefix('/logs')->name('log.')->group(function () {
+        // Lihat log aktivitas sistem
+        Route::get('/lihat', [LogController::class, 'index'])
+            ->name('aktifitas');
+    });
 
     // Profile
     Route::view('/profile', 'admin/user/views/profile')->name('user.profile');

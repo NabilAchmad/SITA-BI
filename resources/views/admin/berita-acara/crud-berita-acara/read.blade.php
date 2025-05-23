@@ -3,9 +3,9 @@
 
     <!-- Search Bar -->
     <div class="mb-4">
-        <form action="#" method="GET">
+        <form action="{{ route('admin.berita-acara.index') }}" method="GET">
             <div class="input-group">
-                <input type="text" name="search" class="form-control" placeholder="Cari topik...">
+                <input type="text" name="search" class="form-control" placeholder="Cari topik..." value="{{ request('search') }}">
                 <button class="btn btn-primary" type="submit">Cari</button>
             </div>
         </form>
@@ -25,46 +25,30 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Contoh data statis -->
+                @forelse ($topics as $index => $topic)
                 <tr>
-                    <td>1</td>
-                    <td>Pengembangan Aplikasi Mobile</td>
-                    <td>Aplikasi mobile berbasis Flutter untuk sistem monitoring tugas akhir.</td>
-                    <td>Dr. Ahmad Basuki</td>
-                    <td>2</td>
+                    <td>{{ $topics->firstItem() + $index }}</td>
+                    <td>{{ $topic->judul_topik }}</td>
+                    <td>{{ $topic->deskripsi }}</td>
+                    <td>{{ $topic->dosen_penawar }}</td>
+                    <td>{{ $topic->kuota }}</td>
                     <td>
                         <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="btn btn-success btn-sm">Ambil Topik</a>
+                            <a href="{{ route('admin.berita-acara.ambil', $topic->id) }}" class="btn btn-success btn-sm">Ambil Topik</a>
                         </div>
                     </td>
                 </tr>
+                @empty
                 <tr>
-                    <td>2</td>
-                    <td>Sistem Rekomendasi Buku</td>
-                    <td>Penggunaan machine learning untuk rekomendasi buku pada perpustakaan digital.</td>
-                    <td>Ir. Siti Hidayati, M.Kom.</td>
-                    <td>3</td>
-                    <td>
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="#" class="btn btn-success btn-sm">Ambil Topik</a>
-                        </div>
-                    </td>
+                    <td colspan="6" class="text-center">Tidak ada topik yang ditemukan.</td>
                 </tr>
-                <!-- Tambahkan data lainnya jika diperlukan -->
+                @endforelse
             </tbody>
         </table>
     </div>
 
     <!-- Pagination -->
     <div class="d-flex justify-content-center mt-4">
-        <nav>
-            <ul class="pagination">
-                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-            </ul>
-        </nav>
+        {{ $topics->links() }}
     </div>
 </div>

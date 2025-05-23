@@ -13,12 +13,32 @@ use Illuminate\Support\Facades\DB;
 class DosenController extends Controller
 {
     // Menampilkan daftar semua akun dosen
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil semua dosen beserta user-nya (relasi: dosen → user)
-        $dosenList = Dosen::with('user')->get();
+        $query = Dosen::with(['user.roles']);
+
+        // Filter berdasarkan nama dosen (yang disimpan di relasi user.name)
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
+        }
+
+        $dosenList = $query->paginate(10); // Ganti 10 sesuai jumlah per halaman
 
         return view('admin.kelola-akun.dosen.views.kelolaAkunDosen', compact('dosenList'));
+    }
+
+    public function getTotalAktif()
+    {
+        // Asumsi: Semua dosen yang ada di tabel 'dosen' dianggap aktif
+        // Jika ada kolom 'status' di tabel dosen, bisa filter: where('status', 'aktif')
+        $totalDosen = Dosen::count();
+
+        return response()->json([
+            'total' => $totalDosen
+        ]);
     }
 
     // Form tambah dosen
@@ -95,6 +115,10 @@ class DosenController extends Controller
         // Hapus user & dosen
         $dosen->user->delete();
         $dosen->delete();
+
+        if (request()->ajax()) {
+            return response()->json(['message' => 'Akun dosen berhasil dihapus.']);
+        }
 
         return redirect()->route('akun-dosen.kelola')->with('success', 'Akun dosen berhasil dihapus.');
     }

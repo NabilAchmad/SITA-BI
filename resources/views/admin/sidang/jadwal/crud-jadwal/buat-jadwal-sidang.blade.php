@@ -1,39 +1,49 @@
-<div class="container mt-5">
-    <h1 class="mb-4">Form Jadwal Sidang</h1>
-    <form>
-        <div class="mb-3">
-            <label for="namaMahasiswa" class="form-label">Nama Mahasiswa</label>
-            <input type="text" class="form-control" id="namaMahasiswa" placeholder="Masukkan nama mahasiswa">
-        </div>
-        <div class="mb-3">
-            <label for="nimMahasiswa" class="form-label">NIM Mahasiswa</label>
-            <input type="text" class="form-control" id="nimMahasiswa" placeholder="Masukkan NIM mahasiswa">
-        </div>
-        <div class="mb-3">
-            <label for="judulSkripsi" class="form-label">Judul Skripsi</label>
-            <input type="text" class="form-control" id="judulSkripsi" placeholder="Masukkan judul skripsi">
-        </div>
-        <div class="mb-3">
-            <label for="tanggalSidang" class="form-label">Tanggal Sidang</label>
-            <input type="date" class="form-control" id="tanggalSidang">
-        </div>
-        <div class="mb-3">
-            <label for="waktuSidang" class="form-label">Waktu Sidang</label>
-            <input type="time" class="form-control" id="waktuSidang">
-        </div>
-        <div class="mb-3">
-            <label for="ruanganSidang" class="form-label">Ruangan Sidang</label>
-            <input type="text" class="form-control" id="ruanganSidang" placeholder="Masukkan ruangan sidang">
-        </div>
-        <div class="mb-3">
-            <label for="dosenPenguji" class="form-label">Dosen Penguji</label>
-            <select class="form-select" id="dosenPenguji">
-                <option selected>Pilih dosen penguji</option>
-                <option value="1">Dosen 1</option>
-                <option value="2">Dosen 2</option>
-                <option value="3">Dosen 3</option>
-            </select>
-        </div>
+<form action="{{ route('jadwal-sidang.store') }}" method="POST">
+    @csrf
+    <input type="hidden" name="sidang_id" value="{{ $sidang->id }}">
+
+    <div class="mb-3">
+        <label class="form-label">Nama Mahasiswa</label>
+        <input type="text" class="form-control" value="{{ $sidang->tugasAkhir->mahasiswa->user->name }}" readonly>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">NIM</label>
+        <input type="text" class="form-control" value="{{ $sidang->tugasAkhir->mahasiswa->nim }}" readonly>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Judul Skripsi</label>
+        <input type="text" class="form-control" value="{{ $sidang->tugasAkhir->judul }}" readonly>
+    </div>
+
+    <div class="mb-3">
+        <label for="tanggal" class="form-label">Tanggal Sidang</label>
+        <input type="date" name="tanggal" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="waktu_mulai" class="form-label">Waktu Mulai</label>
+        <input type="time" name="waktu_mulai" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="waktu_selesai" class="form-label">Waktu Selesai</label>
+        <input type="time" name="waktu_selesai" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="ruangan_id" class="form-label">Ruangan Sidang</label>
+        <select name="ruangan_id" class="form-select" required>
+            <option value="">-- Pilih Ruangan --</option>
+            @foreach ($ruanganList as $ruang)
+                <option value="{{ $ruang->id }}">{{ $ruang->lokasi }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    <div class="mb-3">
         <button type="submit" class="btn btn-primary">Simpan</button>
-    </form>
-</div>
+        <a href="{{ route('mahasiswa-sidang.read') }}" class="btn btn-secondary">Kembali</a>
+    </div>
+</form>
