@@ -86,28 +86,11 @@
                     </a>
                 </li>
 
-                <!-- Pengumuman -->
                 <li class="nav-item {{ request()->is('admin/pengumuman*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#pengumuman"
-                        class="{{ request()->is('admin/pengumuman*') ? '' : 'collapsed' }}">
+                    <a href="{{ route('pengumuman.read') }}">
                         <i class="fas fa-bullhorn"></i>
                         <p>Pengumuman</p>
-                        <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('admin/pengumuman*') ? 'show' : '' }}" id="pengumuman">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/pengumuman/read') ? 'active' : '' }}">
-                                <a href="{{ route('pengumuman.read') }}">
-                                    <span class="sub-item">Lihat Pengumuman</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('admin/pengumuman/trash') ? 'active' : '' }}">
-                                <a href="{{ route('pengumuman.trashed') }}">
-                                    <span class="sub-item">Pengumuman Dihapus</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
 
                 <!-- Sidang -->

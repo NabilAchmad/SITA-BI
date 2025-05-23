@@ -34,30 +34,7 @@
                             <i class="bi bi-info-circle"></i> Detail
                         </button>
 
-                        <!-- Modal Detail -->
-                        <div class="modal fade" id="detailMahasiswaModal{{ $mhs->id }}" tabindex="-1"
-                            aria-labelledby="detailMahasiswaLabel{{ $mhs->id }}" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="detailMahasiswaLabel{{ $mhs->id }}">Detail
-                                            Mahasiswa</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body text-start">
-                                        <p><strong>Nama:</strong> {{ $mhs->user->name }}</p>
-                                        <p><strong>Email:</strong> {{ $mhs->user->email }}</p>
-                                        <p><strong>NIM:</strong> {{ $mhs->nim }}</p>
-                                        <p><strong>Program Studi:</strong> {{ $mhs->prodi }}</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Tutup</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @include('admin.kelola-akun.mahasiswa.modal.modal-detail', ['mhs' => $mhs])
                     </td>
                 </tr>
             @empty

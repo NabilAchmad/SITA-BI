@@ -31,17 +31,34 @@ class PengumumanController extends Controller
                 'tanggal_dibuat' => now(),   // bisa juga default dari DB
             ]);
 
-            return back()->with('success', true);
+            return back()->with('success', 'Pengumuman berhasil ditambahkan!');
         } catch (\Exception $e) {
-            return back()->with('error', true);
+            return back()->with('error', 'Gagal menyimpan pengumuman.');
         }
     }
 
     public function read(Request $request)
     {
-        $pengumuman = Pengumuman::orderBy('tanggal_dibuat', 'desc')
-            ->paginate(10)
-            ->appends($request->query());
+        $query = Pengumuman::orderBy('tanggal_dibuat', 'desc');
+
+        $audiens = $request->input('audiens');
+
+        $validAudiens = ['registered_users', 'dosen', 'mahasiswa', 'guest', 'all_users'];
+
+        if (in_array($audiens, $validAudiens)) {
+            if ($audiens === 'registered_users') {
+                // Tampilkan yang audiens dosen atau mahasiswa
+                $query->whereIn('audiens', ['dosen', 'mahasiswa']);
+            } elseif ($audiens === 'all_users') {
+                // Tampilkan semua, jadi tidak filter
+            } else {
+                // Filter berdasarkan audiens yang dipilih (dosen, mahasiswa, guest)
+                $query->where('audiens', $audiens);
+            }
+        }
+        // jika audiens tidak valid atau kosong, tampilkan semua (tidak filter)
+
+        $pengumuman = $query->paginate(10)->appends($request->query());
 
         return view('admin.pengumuman.views.readPengumuman', compact('pengumuman'));
     }

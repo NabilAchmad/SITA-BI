@@ -44,7 +44,7 @@
         {{-- Tabel --}}
         <div class="table-responsive">
             <table class="table table-bordered shadow-sm">
-                <thead class="table-dark text-center">
+                <thead class="table-light text-center">
                     <tr>
                         <th>No</th>
                         <th>Nama Mahasiswa</th>
