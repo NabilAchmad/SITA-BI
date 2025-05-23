@@ -96,7 +96,7 @@ class MahasiswaController extends Controller
             $query->where('id', $sidang ? $sidang->id : 0);
         })->get();
 
-        return view('mahasiswa.dashboard', compact('pengumuman', 'jadwal', 'judulTA', 'sidang', 'nilai'));
+        return view('mahasiswa.views.dashboard', compact('pengumuman', 'jadwal', 'judulTA', 'sidang', 'nilai'));
     }
 
     // API methods for mahasiswa

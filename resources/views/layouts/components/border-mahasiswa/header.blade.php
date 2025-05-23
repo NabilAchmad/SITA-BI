@@ -9,7 +9,7 @@
                 <!-- End Notification -->
 
                 <!-- profile -->
-                @include('layouts.components.border-admin.profile')
+                @include('layouts.components.border-mahasiswa.profile')
                 <!-- End Profile -->
             </ul>
 

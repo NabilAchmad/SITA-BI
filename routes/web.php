@@ -223,9 +223,9 @@ Route::prefix('admin')->group(function () {
 
     Route::prefix('sidang')->group(function () {
         // Tambahkan route untuk Sidang di sini jika diperlukan
-        // Route::get('/daftar-sidang', function () {
-        //     return view('mahasiswa.sidang.views.form');
-        // });
+        Route::get('/daftar-sidang', function () {
+            return view('mahasiswa.sidang.views.form');
+        });
 
         Route::get('/lihat-nilai', function () {
             return view('mahasiswa.sidang.views.nilaiSidang');
