@@ -7,11 +7,72 @@ use App\Models\JadwalSidang;
 use App\Models\Ruangan;
 use App\Models\Sidang;
 use App\Models\Dosen;
+use App\Models\Mahasiswa;
 use App\Models\PeranDosenTA;
 use Illuminate\Support\Facades\DB;
+use App\Models\BeritaAcaraPraSidang;
+use App\Models\BeritaAcaraPascaSidang;
 
-class JadwalSidangController extends Controller
+class JadwalSidangAkhirController extends Controller
 {
+
+    public function dashboard()
+    {
+        // Mahasiswa yang menunggu penjadwalan sidang proposal
+        $waitingSemproCount = Sidang::where('jenis_sidang', 'proposal')
+            ->where('status', 'dijadwalkan')->count();
+
+        // Mahasiswa yang menunggu penjadwalan sidang akhir
+        $waitingAkhirCount = Sidang::where('jenis_sidang', 'akhir')
+            ->where('status', 'dijadwalkan')->count();
+
+        // Jumlah jadwal sidang proposal
+        $jadwalSemproCount = JadwalSidang::whereHas('sidang', function ($query) {
+            $query->where('jenis_sidang', 'proposal');
+        })->count();
+
+        // Jumlah jadwal sidang akhir
+        $jadwalAkhirCount = JadwalSidang::whereHas('sidang', function ($query) {
+            $query->where('jenis_sidang', 'akhir');
+        })->count();
+
+        // Jumlah berita acara pra sidang (sempro)
+        $pascaSemproCount = BeritaAcaraPraSidang::count();
+
+        // Jumlah berita acara pasca sidang (akhir)
+        $pascaAkhirCount = BeritaAcaraPascaSidang::count();
+
+        return view('admin.sidang.dashboard.dashboard', compact(
+            'waitingSemproCount',
+            'waitingAkhirCount',
+            'jadwalSemproCount',
+            'jadwalAkhirCount',
+            'pascaSemproCount',
+            'pascaAkhirCount'
+        ));
+    }
+
+    public function MenungguSidangAkhir()
+    {
+        $mahasiswa = Mahasiswa::whereHas('tugasAkhir.sidang', function ($query) {
+            $query->where('status', 'dijadwalkan')
+                ->where('jenis_sidang', 'akhir')
+                ->whereDoesntHave('jadwalSidang');
+        })
+            ->with([
+                'user',
+                'tugasAkhir.sidang' => function ($query) {
+                    $query->where('status', 'dijadwalkan')
+                        ->where('jenis_sidang', 'akhir')
+                        ->whereDoesntHave('jadwalSidang');
+                },
+            ])
+            ->get();
+        // Ambil semua dosen
+        $dosen = Dosen::with('user')->get();
+
+        return view('admin.sidang.akhir.views.mhs-sidang', compact('mahasiswa','dosen'));
+    }
 
     public function index()
     {

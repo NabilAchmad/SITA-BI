@@ -80,24 +80,3 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Batas maksimum checkbox = 2 per form modal
-            document.querySelectorAll('.form-pilih-pembimbing').forEach(function(form) {
-                const checkboxes = form.querySelectorAll('input[name="pembimbing[]"]');
-                checkboxes.forEach(function(cb) {
-                    cb.addEventListener('change', function() {
-                        const checked = form.querySelectorAll(
-                            'input[name="pembimbing[]"]:checked');
-                        if (checked.length > 2) {
-                            this.checked = false;
-                            alert('Maksimal hanya bisa memilih 2 dosen pembimbing.');
-                        }
-                    });
-                });
-            });
-        });
-    </script>
-@endpush

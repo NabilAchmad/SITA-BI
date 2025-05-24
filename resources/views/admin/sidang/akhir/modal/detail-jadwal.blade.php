@@ -98,7 +98,7 @@
                         <i class="bi bi-download me-1"></i> Unduh Berita Acara
                     </a>
 
-                    <a href="{{ route('jadwal-sidang.read') }}" class="btn btn-outline-dark btn-sm">
+                    <a href="{{ route('jadwal.sidang.akhir') }}" class="btn btn-outline-dark btn-sm">
                         <i class="bi bi-arrow-left-circle me-1"></i> Kembali
                     </a>
                 </div>
@@ -206,4 +206,6 @@
     </div>
 </div>
 
-<script src="{{ asset('assets/js/sidang/sidang.js') }}"></script>
+@push('scripts')
+    <script src="{{ asset('assets/js/sidang/sidang.js') }}"></script>
+@endpush

@@ -3,5 +3,6 @@
 @section('title', 'List Mahasiswa Sidang')
 
 @section('content')
-@include('admin.sidang.mahasiswa.crud.tabel-mahasiswa-sidang')
+    @include('admin.sidang.akhir.crud-jadwal.read-sidang')
 @endsection
+

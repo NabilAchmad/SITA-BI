@@ -95,31 +95,10 @@
 
                 <!-- Sidang -->
                 <li class="nav-item {{ request()->is('admin/sidang*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#forms"
-                        class="{{ request()->is('admin/sidang*') ? '' : 'collapsed' }}">
+                    <a href="{{ route('dashboard-sidang') }}" class="nav-link">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <p>Sidang</p>
-                        <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('admin/sidang*') ? 'show' : '' }}" id="forms">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('admin/sidang/list-mahasiswa') ? 'active' : '' }}">
-                                <a href="{{ route('mahasiswa-sidang.read') }}">
-                                    <span class="sub-item">Lihat Mahasiswa Sidang</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('admin/sidang/lihat-jadwal') ? 'active' : '' }}">
-                                <a href="{{ route('jadwal-sidang.read') }}">
-                                    <span class="sub-item">Lihat Jadwal Sidang</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('admin/sidang/pasca-sidang') ? 'active' : '' }}">
-                                <a href="{{ route('jadwal-sidang.pasca-sidang') }}">
-                                    <span class="sub-item">Pasca Sidang</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
             </ul>
         </div>
