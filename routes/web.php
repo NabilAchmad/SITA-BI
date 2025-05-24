@@ -34,9 +34,9 @@ Route::prefix('mahasiswa')->group(function () {
         Route::get('tugasAkhir/dibatalkan', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.dibatalkan');
 
         // Menampilkan form ajukan berdasarkan topik dosen
-        Route::get('/read', function () {
+        Route::get('/list-topik-dosen', function () {
             return view('mahasiswa.TugasAkhir.views.listTopik');
-        });
+        })->name('list-topik');
 
         Route::get('/cancel', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.cancelled');
     });
