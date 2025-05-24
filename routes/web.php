@@ -24,6 +24,11 @@ Route::prefix('mahasiswa')->group(function () {
         // Menampilkan form progress TA
         Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugas-akhir.progress');
 
+        //ta mandiri
+        Route::get('/ajukan-ta-mandiri', function () {
+            return view('mahasiswa.TugasAkhir.views.ajukanTA');
+        })->name('ajukan-ta');
+
         // Tangani form POST ajukan TA
         Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
 
@@ -74,6 +79,12 @@ Route::prefix('mahasiswa')->group(function () {
         Route::get('dashboard', function () {
             return view('mahasiswa.Sidang.dashboard.dashboard');
         })->name('dashboard.sidang');
+
+        //sempro
+       Route::get('/daftar-sempro', function () {
+            return view('mahasiswa.Sidang.views.sempro');
+        })->name('daftar-sempro');
+
 
         Route::get('/lihat-nilai', function () {
             return view('mahasiswa.sidang.views.nilaiSidang');
