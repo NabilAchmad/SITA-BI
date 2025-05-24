@@ -107,7 +107,7 @@ Route::prefix('admin')->group(function () {
             // Daftar mahasiswa yang belum punya jadwal sidang akhir
             Route::get('penjadwalan', [JadwalSidangAkhirController::class, 'MenungguSidangAkhir'])->name('sidang.menunggu.penjadwalan.akhir');
             // Daftar mahasiswa yang sudah punya jadwal sidang akhir
-            Route::get('jadwal', [JadwalSidangAkhirController::class, 'index'])->name('jadwal.sidang.akhir');
+            Route::get('jadwal', [JadwalSidangAkhirController::class, 'listJadwal'])->name('jadwal.sidang.akhir');
             // Daftar mahasiswa yang sudah sidang akhir
             Route::get('pasca', [JadwalSidangAkhirController::class, ''])->name('pasca.sidang.akhir');
             // Form untuk memilih penguji 

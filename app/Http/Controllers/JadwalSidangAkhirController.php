@@ -74,7 +74,7 @@ class JadwalSidangAkhirController extends Controller
         return view('admin.sidang.akhir.views.mhs-sidang', compact('mahasiswa','dosen'));
     }
 
-    public function index()
+    public function listJadwal()
     {
         $jadwalList = JadwalSidang::with([
             'sidang.tugasAkhir.mahasiswa.user',
@@ -86,7 +86,7 @@ class JadwalSidangAkhirController extends Controller
             ->unique(fn($item) => $item->sidang->tugasAkhir->mahasiswa_id);
 
 
-        return view('admin.sidang.jadwal.views.readJadwalSidang', compact('jadwalList'));
+        return view('admin.sidang.akhir.jadwal.jadwal-sidang-akhir', compact('jadwalList'));
     }
 
     public function create(Request $request)
