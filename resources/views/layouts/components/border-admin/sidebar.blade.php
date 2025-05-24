@@ -86,18 +86,18 @@
                     </a>
                 </li>
 
-                <li class="nav-item {{ request()->is('admin/pengumuman*') ? 'active' : '' }}">
-                    <a href="{{ route('pengumuman.read') }}">
-                        <i class="fas fa-bullhorn"></i>
-                        <p>Pengumuman</p>
-                    </a>
-                </li>
-
                 <!-- Sidang -->
                 <li class="nav-item {{ request()->is('admin/sidang*') ? 'active' : '' }}">
                     <a href="{{ route('dashboard-sidang') }}" class="nav-link">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <p>Sidang</p>
+                    </a>
+                </li>
+
+                <li class="nav-item {{ request()->is('admin/pengumuman*') ? 'active' : '' }}">
+                    <a href="{{ route('pengumuman.read') }}">
+                        <i class="fas fa-bullhorn"></i>
+                        <p>Pengumuman</p>
                     </a>
                 </li>
             </ul>

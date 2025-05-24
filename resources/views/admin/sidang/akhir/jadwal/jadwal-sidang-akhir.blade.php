@@ -35,10 +35,8 @@
                         <td>{{ $jadwal->ruangan?->lokasi ?? '-' }}</td>
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-2">
-
                                 <a class="btn btn-warning btn-sm"
                                     href="{{ route('jadwal-sidang.show', ['sidang_id' => $jadwal->sidang_id]) }}">Detail</a>
-
                             </div>
                         </td>
                     </tr>

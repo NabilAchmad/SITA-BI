@@ -223,10 +223,10 @@ class JadwalSidangAkhirController extends Controller
         // Ambil semua ruangan untuk dropdown form edit
         $ruangans = Ruangan::all();
 
-        return view('admin.sidang.jadwal.views.detail', compact('jadwal', 'dosens', 'ruangans'));
+        return view('admin.sidang.akhir.modal.detail-jadwal', compact('jadwal', 'dosens', 'ruangans'));
     }
 
-    public function pascaSidang()
+    public function pascaSidangAkhir()
     {
         $sidangSelesai = JadwalSidang::with([
             'sidang.tugasAkhir.mahasiswa.user', // pastikan relasi ini valid
@@ -237,7 +237,7 @@ class JadwalSidangAkhirController extends Controller
             ->get()
             ->unique(fn($item) => optional($item->sidang->tugasAkhir)->mahasiswa_id);
 
-        return view('admin.sidang.jadwal.views.pasca', compact('sidangSelesai'));
+        return view('admin.sidang.akhir.pasca.pasca-sidang', compact('sidangSelesai'));
     }
 
     public function tandaiSidang($sidang_id)

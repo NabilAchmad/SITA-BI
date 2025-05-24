@@ -109,34 +109,30 @@ Route::prefix('admin')->group(function () {
             // Daftar mahasiswa yang sudah punya jadwal sidang akhir
             Route::get('jadwal', [JadwalSidangAkhirController::class, 'listJadwal'])->name('jadwal.sidang.akhir');
             // Daftar mahasiswa yang sudah sidang akhir
-            Route::get('pasca', [JadwalSidangAkhirController::class, ''])->name('pasca.sidang.akhir');
-            // Form untuk memilih penguji 
+            // Halaman Pasca Sidang
+            Route::get('/pasca-sidang-akhir', [JadwalSidangAkhirController::class, 'pascaSidangAkhir'])
+                ->name('pasca.sidang.akhir');
             Route::get('/pilih-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'modalDosen'])->name('jadwal-sidang.modal.dosen');
             // Form jadwal sidang akhir
             Route::get('/jadwal-sidang/create', [JadwalSidangAkhirController::class, 'modalForm'])->name('jadwal-sidang.modal.form');
+            // POST: Simpan dosen penguji
+            Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
+            // Simpan data jadwal sidang
+            Route::post('/jadwal-sidang', [JadwalSidangAkhirController::class, 'store'])->name('jadwal-sidang.store');
+            // Lihat Detail Jadwal Sidang akhir
+            Route::get('/detail-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'show'])->name('jadwal-sidang.show');
+            // Edit dan Hapus Jadwal Sidang
+            Route::put('/update-jadwal/{id}', [JadwalSidangAkhirController::class, 'update'])->name('jadwal-sidang.update');
+            Route::delete('/delete-jadwal/{id}', [JadwalSidangAkhirController::class, 'destroy'])->name('jadwal-sidang.destroy');
         });
 
-        // POST: Simpan dosen penguji
-        Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
 
 
-        // Simpan data jadwal sidang
-        Route::post('/jadwal-sidang', [JadwalSidangAkhirController::class, 'store'])->name('jadwal-sidang.store');
 
-        // Lihat Detail Jadwal Sidang akhir
-        Route::get('/detail-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'show'])->name('jadwal-sidang.show');
 
         // Tandai akhir sidang selesai 
         Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'tandaiSidang'])
             ->name('jadwal-sidang.mark-done');
-
-        // Edit dan Hapus Jadwal Sidang
-        Route::put('/update-jadwal/{id}', [JadwalSidangAkhirController::class, 'update'])->name('jadwal-sidang.update');
-        Route::delete('/delete-jadwal/{id}', [JadwalSidangAkhirController::class, 'destroy'])->name('jadwal-sidang.destroy');
-
-        // Halaman Pasca Sidang
-        Route::get('/pasca-sidang', [JadwalSidangAkhirController::class, 'pascaSidang'])
-            ->name('jadwal-sidang.pasca-sidang');
     });
 
     // Admin: Laporan dan Statistik
