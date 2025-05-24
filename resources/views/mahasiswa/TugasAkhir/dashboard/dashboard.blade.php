@@ -22,7 +22,7 @@
         <div class="row g-4">
             <!-- Ajukan Topik Mandiri -->
             <div class="col-md-6 col-xl-3">
-                <a href="{{ route('tugasAkhir.store') }}" class="text-decoration-none">
+                <a href="{{ route('tugas-akhir.progress') }}" class="text-decoration-none">
                     <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
@@ -37,7 +37,6 @@
                 </a>
             </div>
 
-            <!-- Ajukan Topik Dosen -->
             <!-- Ajukan Topik Dosen -->
             <div class="col-md-6 col-xl-3">
                 <a href="{{ route('list-topik') }}" class="text-decoration-none">
