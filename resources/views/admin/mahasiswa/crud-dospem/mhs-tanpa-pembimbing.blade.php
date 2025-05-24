@@ -46,6 +46,7 @@
                         <th>Nama Mahasiswa</th>
                         <th>NIM</th>
                         <th>Program Studi</th>
+                        <th>Judul Tugas Akhir</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -56,6 +57,7 @@
                             <td>{{ $mhs->user->name }}</td>
                             <td>{{ $mhs->nim }}</td>
                             <td>{{ $mhs->prodi }}</td>
+                            <td>{{ $mhs->tugasAkhir->judul }}</td>
                             <td>
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                     data-bs-target="#modalPembimbing-{{ $mhs->id }}">

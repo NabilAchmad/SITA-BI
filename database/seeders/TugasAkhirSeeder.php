@@ -8,12 +8,12 @@ use Faker\Factory as Faker;
 
 class TugasAkhirSeeder extends Seeder
 {
-
     public function run()
     {
         $faker = Faker::create('id_ID');
 
         $mahasiswaList = DB::table('mahasiswa')->get();
+        $dosenIds = DB::table('dosen')->pluck('id')->toArray();
         $statusList = ['diajukan', 'draft', 'revisi', 'disetujui', 'lulus_tanpa_revisi', 'lulus_dengan_revisi', 'ditolak'];
 
         $judulTemplates = [
@@ -35,6 +35,12 @@ class TugasAkhirSeeder extends Seeder
         $phenomena = ['Code Switching', 'Language Anxiety', 'Translanguaging', 'Spelling Mistakes', 'Pronunciation Errors'];
         $factors = ['Learning Motivation', 'Self-Efficacy', 'Study Habit', 'Class Participation', 'Internet Access'];
         $schools = ['SMAN 1 Jakarta', 'SMA Harapan Bangsa', 'Universitas XYZ', 'English Language Center'];
+
+        // Acak seluruh mahasiswa dan ambil 60% untuk diberi pembimbing
+        $mahasiswaIds = $mahasiswaList->pluck('id')->toArray();
+        shuffle($mahasiswaIds);
+        $jumlahDenganPembimbing = (int) (count($mahasiswaIds) * 0.6);
+        $mahasiswaDenganPembimbing = array_slice($mahasiswaIds, 0, $jumlahDenganPembimbing);
 
         foreach ($mahasiswaList as $mhs) {
             $status = $faker->randomElement($statusList);
@@ -61,7 +67,7 @@ class TugasAkhirSeeder extends Seeder
                 default => null,
             };
 
-            DB::table('tugas_akhir')->insert([
+            $tugasAkhirId = DB::table('tugas_akhir')->insertGetId([
                 'mahasiswa_id' => $mhs->id,
                 'judul' => $judul,
                 'abstrak' => $faker->paragraph(3),
@@ -73,6 +79,20 @@ class TugasAkhirSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            // Hanya mahasiswa yang dipilih secara acak akan diberi pembimbing
+            if (in_array($mhs->id, $mahasiswaDenganPembimbing)) {
+                shuffle($dosenIds);
+                for ($j = 0; $j < 2; $j++) {
+                    DB::table('peran_dosen_ta')->insert([
+                        'tugas_akhir_id' => $tugasAkhirId,
+                        'dosen_id' => $dosenIds[$j % count($dosenIds)],
+                        'peran' => $j === 0 ? 'pembimbing1' : 'pembimbing2',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
         }
     }
 }

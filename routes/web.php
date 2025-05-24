@@ -50,14 +50,14 @@ Route::prefix('admin')->group(function () {
     // =========================
     Route::prefix('mahasiswa')->group(function () {
         // Daftar mahasiswa belum punya pembimbing
-        Route::get('/belum-pembimbing', [PenugasanPembimbingController::class, 'index'])->name('penugasan-bimbingan.index');
+        Route::get('/belum-pembimbing', [PenugasanPembimbingController::class, 'indexWithOutPembimbing'])->name('penugasan-bimbingan.index');
 
         // Form pilih pembimbing untuk mahasiswa tertentu
         Route::get('/pilih-pembimbing/{id}', [PenugasanPembimbingController::class, 'create'])->name('penugasan-bimbingan.create');
         Route::post('/pilih-pembimbing/{id}', [PenugasanPembimbingController::class, 'store'])->name('penugasan-bimbingan.store');
 
         // Daftar mahasiswa sudah punya pembimbing
-        Route::get('/list-mahasiswa', [MahasiswaController::class, 'index'])->name('list-mahasiswa');
+        Route::get('/list-mahasiswa', [PenugasanPembimbingController::class, 'indexPembimbing'])->name('list-mahasiswa');
     });
 
     // =========================

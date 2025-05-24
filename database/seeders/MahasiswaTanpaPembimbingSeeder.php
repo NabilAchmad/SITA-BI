@@ -13,13 +13,12 @@ class MahasiswaTanpaPembimbingSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-        for ($i = 1; $i <= 30; $i++) {
-            // Nama tanpa gelar
+        for ($i = 101; $i <= 130; $i++) {
             $namaMahasiswa = $faker->firstName() . ' ' . $faker->lastName();
 
             $userId = DB::table('users')->insertGetId([
                 'name' => $namaMahasiswa,
-                'email' => "mhs_tanpa_pembimbing" . ($i + 100) . "@example.com",
+                'email' => "mhs_tanpa_pembimbing$i@example.com",
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -30,21 +29,11 @@ class MahasiswaTanpaPembimbingSeeder extends Seeder
                 'role_id' => 5, // mahasiswa
             ]);
 
-            $mhsId = DB::table('mahasiswa')->insertGetId([
+            DB::table('mahasiswa')->insert([
                 'user_id' => $userId,
-                'nim' => '25' . str_pad($i + 100, 7, '0', STR_PAD_LEFT),
+                'nim' => '25' . str_pad($i, 7, '0', STR_PAD_LEFT),
                 'prodi' => 'D4 Bahasa Inggris',
                 'angkatan' => '25',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-            DB::table('tugas_akhir')->insert([
-                'mahasiswa_id' => $mhsId,
-                'judul' => 'Analisis Tugas Akhir Tanpa Pembimbing ' . $i,
-                'abstrak' => $faker->paragraph(),
-                'status' => 'diajukan',
-                'tanggal_pengajuan' => now()->subDays(rand(1, 90))->toDateString(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
