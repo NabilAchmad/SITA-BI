@@ -15,14 +15,14 @@ Route::prefix('mahasiswa')->group(function () {
         return view('mahasiswa.views.dashboard');
     });
 
-    Route::prefix('TugasAkhir')->group(function () {
+    Route::prefix('tugas-akhir')->group(function () {
         // Tampilkan form ajukan
-        Route::get('/ajukan', function () {
-            return view('mahasiswa.TugasAkhir.views.ajukanTA');
-        });
+        Route::get('/', function () {
+            return view('mahasiswa.TugasAkhir.dashboard.dashboard');
+        })->name('tugas-akhir.dashboard');
 
         // Menampilkan form progress TA
-        Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugasAkhir.progress');
+        Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugas-akhir.progress');
 
         // Tangani form POST ajukan TA
         Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
@@ -44,6 +44,9 @@ Route::prefix('mahasiswa')->group(function () {
 
     Route::prefix('bimbingan')->group(function () {
         // Tambahkan route untuk Bimbingan di sini jika diperlukan
+        Route::get('dashboard', function () {
+            return view('mahasiswa.Bimbingan.dashboard.dashboard');
+        })->name('dashboard.bimbingan');
 
         Route::get('/ajukan-jadwal', function () {
             return view('mahasiswa.Bimbingan.views.ajukanBimbingan');
@@ -68,6 +71,9 @@ Route::prefix('mahasiswa')->group(function () {
         // Route::get('/daftar-sidang', function () {
         //     return view('mahasiswa.sidang.views.form');
         // });
+        Route::get('dashboard', function () {
+            return view('mahasiswa.Sidang.dashboard.dashboard');
+        })->name('dashboard.sidang');
 
         Route::get('/lihat-nilai', function () {
             return view('mahasiswa.sidang.views.nilaiSidang');

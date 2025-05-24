@@ -55,104 +55,31 @@
                 </li>
 
                 <!-- Tugas Akhir -->
-                <li
-                    class="nav-item {{ request()->is('mahasiswa/TugasAkhir') || request()->is('mahasiswa/TugasAkhir/*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#sidebarLayouts"
-                        class="{{ request()->is('mahasiswa/TugasAkhir') || request()->is('mahasiswa/TugasAkhir/*') ? '' : 'collapsed' }}">
+                <li class="nav-item {{ request()->is('tugas-akhir/dashboard*') ? 'active' : '' }}">
+                    <a href="{{ route('tugas-akhir.dashboard') }}">
                         <i class="fas fa-file-signature"></i>
-                        <p>Tugas Akhir</p>
-                        <span class="caret"></span>
+                        <p>Dashboard Tugas Akhir</p>
                     </a>
-                    <div class="collapse {{ request()->is('mahasiswa/TugasAkhir') || request()->is('mahasiswa/TugasAkhir/*') ? 'show' : '' }}"
-                        id="sidebarLayouts">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('mahasiswa/TugasAkhir/ajukan') ? 'active' : '' }}">
-                                <a href="{{ url('mahasiswa/TugasAkhir/ajukan') }}">
-                                    <span class="sub-item">Ajukan Topik Mandiri</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('mahasiswa/TugasAkhir/read') ? 'active' : '' }}">
-                                <a href="{{ url('mahasiswa/TugasAkhir/read') }}">
-                                    <span class="sub-item">Ajukan Berdasarkan Topik Dosen</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('mahasiswa/TugasAkhir/progress') ? 'active' : '' }}">
-                                <a href="{{ url('mahasiswa/TugasAkhir/progress') }}">
-                                    <span class="sub-item">Progress Tugas Akhir</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('mahasiswa/TugasAkhir/cancel') ? 'active' : '' }}">
-                                <a href="{{ url('mahasiswa/TugasAkhir/cancel') }}">
-                                    <span class="sub-item">Tugas akhir yang di batalkan</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
 
+
                 <!-- Sidang -->
-                <li class="nav-item {{ request()->is('mahasiswa/sidang') || request()->is('mahasiswa/sidang/*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#forms"
-                        class="{{ request()->is('mahasiswa/sidang') || request()->is('mahasiswa/sidang/*') ? '' : 'collapsed' }}">
+                <li
+                    class="nav-item {{ request()->is('mahasiswa/sidang') || request()->is('mahasiswa/sidang/*') ? 'active' : '' }}">
+                    <a href="{{ route('dashboard.sidang') }}">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <p>Sidang</p>
-                        <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('mahasiswa/sidang') || request()->is('mahasiswa/sidang/*') ? 'show' : '' }}"
-                        id="forms">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('mahasiswa/sidang/daftar-sidang') ? 'active' : '' }}">
-                                <a href="{{ url('/mahasiswa/sidang/daftar-sidang') }}">
-                                    <span class="sub-item">Daftar Sidang</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('mahasiswa/sidang/lihat-nilai') ? 'active' : '' }}">
-                                <a href="{{ url('/mahasiswa/sidang/lihat-nilai') }}">
-                                    <span class="sub-item">Nilai Sidang</span></a>
-                            </li>
-                            <li class="{{ request()->is('mahasiswa/sidang/lihat-jadwal') ? 'active' : '' }}">
-                                <a href="{{ url('/mahasiswa/sidang/lihat-jadwal') }}">
-                                    <span class="sub-item">Jadwal Sidang</span></a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
 
                 <!-- Bimbingan -->
-                <li
-                    class="nav-item {{ request()->is('mahasiswa/bimbingan') || request()->is('mahasiswa/bimbingan/*') ? 'active' : '' }}">
-                    <a data-bs-toggle="collapse" href="#tables"
-                        class="{{ request()->is('mahasiswa/bimbingan') || request()->is('mahasiswa/bimbingan/*') ? '' : 'collapsed' }}">
-                        <i class="fas fa-users-cog"></i>
+                <li class="nav-item {{ request()->is('mahasiswa/bimbingan') ? 'active' : '' }}">
+                    <a href="{{ route('dashboard.bimbingan') }}" class="nav-link">
+                        <i class="fas fa-users-cog me-2"></i>
                         <p>Bimbingan</p>
-                        <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('mahasiswa/bimbingan') || request()->is('mahasiswa/bimbingan/*') ? 'show' : '' }}"
-                        id="tables">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('mahasiswa/bimbingan/ajukan-jadwal') ? 'active' : '' }}">
-                                <a href="{{ url('/mahasiswa/bimbingan/ajukan-jadwal') }}">
-                                    <span class="sub-item">Ajukan Jadwal Bimbingan</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('mahasiswa/bimbingan/lihat-jadwal') ? 'active' : '' }}">
-                                <a href="{{ url('/mahasiswa/bimbingan/lihat-jadwal') }}">
-                                    <span class="sub-item">Lihat Jadwal Bimbingan</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('mahasiswa/bimbingan/revisi') ? 'active' : '' }}">
-                                <a href="{{ url('/mahasiswa/bimbingan/revisi') }}">
-                                    <span class="sub-item">Revisi</span>
-                                </a>
-                            </li>
-                            <li class="{{ request()->is('mahasiswa/bimbingan/perubahan-jadwal') ? 'active' : '' }}">
-                                <a href="{{ url('/mahasiswa/bimbingan/perubahan-jadwal') }}">
-                                    <span class="sub-item">Ajukan Perubahan Jadwal Bimbingan</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
+
             </ul>
         </div>
     </div>
