@@ -24,6 +24,11 @@ Route::prefix('mahasiswa')->group(function () {
         // Menampilkan form progress TA
         Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugas-akhir.progress');
 
+        //ajukan ta berdasarkan topik dosen
+        Route::get('/read', function () {
+            return view('mahasiswa.TugasAkhir.views.listTopik');
+        })->name('list-topik');
+
         // Tangani form POST ajukan TA
         Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
 
@@ -33,7 +38,7 @@ Route::prefix('mahasiswa')->group(function () {
         Route::post('tugasAkhir/{id}/cancel', [TugasAkhirController::class, 'cancel'])->name('tugasAkhir.cancelTA');
         Route::get('tugasAkhir/dibatalkan', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.dibatalkan');
 
-        // Menampilkan form ajukan berdasarkan topik dosen
+        // Menampilkan form batalkan ta
         Route::get('/read', function () {
             return view('mahasiswa.TugasAkhir.views.listTopik');
         });

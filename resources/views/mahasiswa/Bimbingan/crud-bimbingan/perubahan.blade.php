@@ -2,7 +2,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header bg-primary text-white text-center">
+                <div class="card-header bg-dark text-white text-center">
                     <h5>Perubahan Jadwal Bimbingan</h5>
                 </div>
                 <div class="card-body">
@@ -16,7 +16,7 @@
                             <input type="time" class="form-control" id="waktu">
                         </div>
                         <div class="mb-3">
-                            <label for="keterangan" class="form-label">Keterangan</label>
+                            <label for="keterangan" class="form-label">Alasan</label>
                             <textarea class="form-control" id="keterangan" rows="3"></textarea>
                         </div>
                         <div class="text-center">

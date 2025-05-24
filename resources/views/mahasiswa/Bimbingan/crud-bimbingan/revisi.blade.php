@@ -1,5 +1,5 @@
 <div class="card shadow-lg border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center">
+    <div class="card-header bg-dark text-white d-flex align-items-center">
       <i class="bi bi-pencil-square me-2 fs-4"></i>
       <h4 class="mb-0">Revisi Tugas Akhir</h4>
     </div>

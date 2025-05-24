@@ -22,7 +22,7 @@
         <div class="row g-4">
             <!-- Ajukan Topik Mandiri -->
             <div class="col-md-6 col-xl-3">
-                <a href="{{ route('tugas-akhir.progress') }}" class="text-decoration-none">
+                <a href="{{ route('tugasAkhir.store') }}" class="text-decoration-none">
                     <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
@@ -38,8 +38,9 @@
             </div>
 
             <!-- Ajukan Topik Dosen -->
+            <!-- Ajukan Topik Dosen -->
             <div class="col-md-6 col-xl-3">
-                <a href="{{ url('mahasiswa/TugasAkhir/read') }}" class="text-decoration-none">
+                <a href="{{ route('list-topik') }}" class="text-decoration-none">
                     <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
@@ -73,7 +74,7 @@
 
             <!-- TA Dibatalkan -->
             <div class="col-md-6 col-xl-3">
-                <a href="{{ url('mahasiswa/TugasAkhir/cancel') }}" class="text-decoration-none">
+                <a href="{{ route('tugasAkhir.cancelled') }}" class="text-decoration-none">
                     <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
