@@ -115,8 +115,10 @@ Route::prefix('admin')->group(function () {
             Route::get('/pilih-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'modalDosen'])->name('jadwal-sidang.modal.dosen');
             // Form jadwal sidang akhir
             Route::get('/jadwal-sidang/create', [JadwalSidangAkhirController::class, 'modalForm'])->name('jadwal-sidang.modal.form');
+            
             // POST: Simpan dosen penguji
             Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
+            
             // Simpan data jadwal sidang
             Route::post('/jadwal-sidang', [JadwalSidangAkhirController::class, 'store'])->name('jadwal-sidang.store');
             // Lihat Detail Jadwal Sidang akhir

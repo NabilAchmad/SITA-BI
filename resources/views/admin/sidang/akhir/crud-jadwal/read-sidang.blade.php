@@ -1,23 +1,3 @@
-@push('styles')
-    <style>
-        /* Fade-in untuk modal SweetAlert */
-        .swal-modal.fade-in-modal {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-    </style>
-@endpush
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
@@ -57,11 +37,16 @@
                                 <td>{{ $mhs->nim }}</td>
                                 <td>{{ $mhs->tugasAkhir->judul ?? '-' }}</td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-success btn-jadwalkan"
-                                        data-sidang-id="{{ $sidang->id }}" data-nama="{{ $mhs->user->name }}"
-                                        data-judul="{{ $mhs->tugasAkhir->judul }}">
-                                        <i class="bi bi-calendar-plus me-1"></i> Jadwalkan
-                                    </button>
+                                    @if ($sidang)
+                                        <button type="button" class="btn btn-sm btn-success btn-jadwalkan"
+                                            data-sidang-id="{{ $sidang->id }}" data-nama="{{ $mhs->user->name }}"
+                                            data-nim="{{ $mhs->nim }}" data-judul="{{ $mhs->tugasAkhir->judul }}"
+                                            data-url="{{ route('jadwal-sidang.simpanPenguji', ['sidang_id' => $sidang->id]) }}">
+                                            <i class="bi bi-calendar-plus me-1"></i> Jadwalkan
+                                        </button>
+                                    @else
+                                        <span class="text-muted fst-italic">Tidak ada sidang</span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -79,129 +64,119 @@
     </div>
 </div>
 
-@include('admin.sidang.akhir.modal.buat-penguji')
-{{-- @include('admin.sidang.akhir.modal.buat-jadwal-sidang') --}}
+<!-- Modal container untuk modal dinamis -->
+<div id="modalContainer"></div>
 
+<!-- Template Modal Penguji -->
+<template id="template-modal-penguji">
+    <form method="POST" id="form-penguji">
+        @csrf
+        <div class="modal fade" tabindex="-1" role="dialog" id="modalPenguji">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-secondary text-white">
+                        <h5 class="modal-title">Pilih Dosen Penguji</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto; min-width: 700px;">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="search-dosen"
+                                placeholder="Cari nama dosen...">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover rounded overflow-hidden">
+                                <thead class="table-dark text-center">
+                                    <tr>
+                                        <th style="width: 50px;">No</th>
+                                        <th>Nama Dosen</th>
+                                        <th style="width: 150px;">NIDN</th>
+                                        <th style="width: 100px;">Pilih</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center" id="tbody-dosen">
+                                    @foreach ($dosen as $index => $item)
+                                        <tr class="dosen-item align-middle">
+                                            <td>{{ $index + 1 }}</td>
+                                            <td class="nama-dosen">{{ $item->user->name }}</td>
+                                            <td>{{ $item->nidn }}</td>
+                                            <td>
+                                                <div class="form-check d-flex justify-content-center">
+                                                    <input class="form-check-input fs-5" type="checkbox"
+                                                        name="penguji[]" value="{{ $item->id }}">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
+                            <span class="text-muted fst-italic">* Maksimal pilih 4 dosen penguji</span>
+                            <div>
+                                <button type="button" class="btn btn-secondary me-2" id="batal-penguji">Batal</button>
+                                <button type="submit" class="btn btn-primary" id="btn-simpan-penguji">Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</template>
 
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.addEventListener('click', function(e) {
-                const btn = e.target.closest('.btn-jadwalkan');
-                if (!btn) return;
-
-                const sidangId = btn.dataset.sidangId;
-                const template = document.getElementById('template-modal-penguji');
-
-                if (!template) {
-                    console.error('Template modal tidak ditemukan');
-                    return;
-                }
-
-                const cloned = template.content.cloneNode(true);
-                const wrapper = document.createElement('div');
-                wrapper.appendChild(cloned);
-                let htmlString = wrapper.innerHTML;
-
-                htmlString = htmlString.replace(/jadwal-sidang\/simpan-penguji\/0/,
-                    `jadwal-sidang/simpan-penguji/${sidangId}`);
-
-                swal({
-                    title: "Pilih Dosen Penguji",
-                    content: {
-                        element: "div",
-                        attributes: {
-                            innerHTML: htmlString
-                        }
-                    },
-                    buttons: false,
-                    closeOnClickOutside: false,
-                    className: 'fade-in-modal'
-                });
-
-                setTimeout(() => {
-                    const form = document.getElementById('form-penguji');
-                    if (!form) return;
-
-                    const checkboxes = form.querySelectorAll('input[name="penguji[]"]');
-                    const searchInput = form.querySelector('#search-dosen');
-                    const btnSimpan = form.querySelector('#btn-simpan-penguji');
-                    const btnBatal = form.querySelector('#batal-penguji');
-
-                    checkboxes.forEach(cb => {
-                        cb.addEventListener('change', () => {
-                            const totalChecked = [...checkboxes].filter(chk => chk
-                                .checked).length;
-                            if (totalChecked > 4) {
-                                cb.checked = false;
-                                swal("Maksimal 4 penguji!",
-                                    "Silakan kurangi pilihan.", "warning");
-                            }
-                        });
-                    });
-
-                    searchInput.addEventListener('input', () => {
-                        const filter = searchInput.value.toLowerCase();
-                        form.querySelectorAll('.dosen-item').forEach(item => {
-                            const name = item.querySelector('.nama-dosen')
-                                ?.textContent.toLowerCase() || '';
-                            item.style.display = name.includes(filter) ? '' :
-                            'none';
-                        });
-                    });
-
-                    btnBatal.addEventListener('click', () => {
-                        swal.close();
-                    });
-
-                    btnSimpan.addEventListener('click', () => {
-                        const formData = new FormData(form);
-                        btnSimpan.disabled = true;
-                        btnSimpan.innerText = 'Menyimpan...';
-
-                        fetch(form.action, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': formData.get('_token'),
-                                    'Accept': 'application/json',
-                                },
-                                body: formData,
-                            })
-                            .then(res => res.json())
-                            .then(res => {
-                                if (res.status === 'success') {
-                                    swal({
-                                        title: "Berhasil!",
-                                        text: res.message,
-                                        icon: "success",
-                                        buttons: false,
-                                        timer: 1500
-                                    });
-
-                                    document.body.dispatchEvent(new CustomEvent(
-                                        'pengujiDipilih', {
-                                            detail: {
-                                                urlForm: res.urlForm
-                                            }
-                                        }));
-                                } else {
-                                    swal("Gagal", res.message ||
-                                        "Terjadi kesalahan saat menyimpan.", "error"
-                                        );
-                                }
-                            })
-                            .catch(() => {
-                                swal("Gagal",
-                                    "Terjadi kesalahan saat menghubungi server.",
-                                    "error");
-                            })
-                            .finally(() => {
-                                btnSimpan.disabled = false;
-                                btnSimpan.innerText = 'Simpan';
-                            });
-                    });
-                }, 100);
-            });
-        });
-    </script>
-@endpush
+<!-- Template Modal Jadwal Sidang -->
+<template id="template-modal-jadwal-sidang">
+    <form action="{{ route('jadwal-sidang.store') }}" method="POST" id="form-jadwal-sidang">
+        @csrf
+        <input type="hidden" name="sidang_id" id="jadwal-sidang_id" value="">
+        <div class="modal fade" tabindex="-1" role="dialog" id="modalJadwalSidang">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Isi Jadwal Sidang</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nama Mahasiswa</label>
+                            <input type="text" class="form-control" id="jadwal-nama" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">NIM</label>
+                            <input type="text" class="form-control" id="jadwal-nim" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Judul Skripsi</label>
+                            <input type="text" class="form-control" id="jadwal-judul" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tanggal" class="form-label">Tanggal Sidang</label>
+                            <input type="date" name="tanggal" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="waktu_mulai" class="form-label">Waktu Mulai</label>
+                            <input type="time" name="waktu_mulai" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="waktu_selesai" class="form-label">Waktu Selesai</label>
+                            <input type="time" name="waktu_selesai" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ruangan_id" class="form-label">Ruangan Sidang</label>
+                            <select name="ruangan_id" class="form-select" required>
+                                <option value="">-- Pilih Ruangan --</option>
+                                @foreach ($ruanganList as $ruang)
+                                    <option value="{{ $ruang->id }}">{{ $ruang->lokasi }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-end gap-2">
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</template>

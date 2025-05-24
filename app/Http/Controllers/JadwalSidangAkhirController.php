@@ -68,10 +68,12 @@ class JadwalSidangAkhirController extends Controller
                 },
             ])
             ->get();
-        // Ambil semua dosen
+
         $dosen = Dosen::with('user')->get();
 
-        return view('admin.sidang.akhir.views.mhs-sidang', compact('mahasiswa','dosen'));
+        $ruanganList = Ruangan::all();
+
+        return view('admin.sidang.akhir.views.mhs-sidang', compact('mahasiswa', 'dosen', 'ruanganList'));
     }
 
     public function listJadwal()
@@ -81,27 +83,17 @@ class JadwalSidangAkhirController extends Controller
             'sidang.tugasAkhir.peranDosenTa.dosen.user',
             'ruangan'
         ])
-            ->whereHas('sidang', fn($q) => $q->where('status', '!=', 'selesai'))
-            ->get()
-            ->unique(fn($item) => $item->sidang->tugasAkhir->mahasiswa_id);
-
+            ->whereHas('sidang', function ($q) {
+                $q->where('status', 'dijadwalkan');
+            })
+            ->get();
 
         return view('admin.sidang.akhir.jadwal.jadwal-sidang-akhir', compact('jadwalList'));
     }
 
-    public function create(Request $request)
-    {
-        $sidangId = $request->sidang_id;
-        $sidang = Sidang::with('tugasAkhir.mahasiswa.user')->findOrFail($sidangId);
-        $ruanganList = Ruangan::all();
-        $dosenList = Dosen::with('user')->get();
-
-        return view('admin.sidang.jadwal.views.createJadwalSidang', compact('sidang', 'ruanganList', 'dosenList'));
-    }
-
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'sidang_id' => 'required|exists:sidang,id',
             'tanggal' => 'required|date',
             'waktu_mulai' => 'required',
@@ -109,15 +101,28 @@ class JadwalSidangAkhirController extends Controller
             'ruangan_id' => 'required|exists:ruangan,id',
         ]);
 
-        JadwalSidang::create([
-            'sidang_id' => $request->sidang_id,
-            'tanggal' => $request->tanggal,
-            'waktu_mulai' => $request->waktu_mulai,
-            'waktu_selesai' => $request->waktu_selesai,
-            'ruangan_id' => $request->ruangan_id,
-        ]);
+        // Simpan data jadwal sidang ke DB (sesuaikan dengan model dan logika kamu)
+        try {
+            // Contoh:
+            $jadwal = new JadwalSidang();
+            $jadwal->sidang_id = $validated['sidang_id'];
+            $jadwal->tanggal = $validated['tanggal'];
+            $jadwal->waktu_mulai = $validated['waktu_mulai'];
+            $jadwal->waktu_selesai = $validated['waktu_selesai'];
+            $jadwal->ruangan_id = $validated['ruangan_id'];
+            $jadwal->save();
 
-        return redirect()->route('jadwal-sidang.read')->with('success', 'Jadwal sidang berhasil dibuat.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Jadwal sidang berhasil disimpan.',
+            ]);
+        } catch (\Exception $e) {
+            // Bisa log error jika perlu
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data.',
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)
@@ -195,7 +200,6 @@ class JadwalSidangAkhirController extends Controller
 
         // Simpan penguji baru sesuai urutan yang dipilih
         foreach ($request->penguji as $index => $dosenId) {
-            // Tentukan peran berdasarkan index: 0->penguji1, 1->penguji2, 2->penguji3
             $peran = 'penguji' . ($index + 1);
 
             PeranDosenTA::create([
@@ -205,8 +209,8 @@ class JadwalSidangAkhirController extends Controller
             ]);
         }
 
-        return redirect()->route('jadwal-sidang.create', ['sidang_id' => $sidang_id])
-            ->with('success', 'Dosen penguji berhasil disimpan.');
+        // Ini penting untuk AJAX:
+        return response()->json(['success' => true]);
     }
 
     public function show($sidang_id)

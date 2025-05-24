@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tugas_akhir_id')->constrained('tugas_akhir')->onDelete('cascade');
             $table->enum('jenis_sidang', ['proposal', 'akhir']);
-            $table->enum('status', ['lulus', 'lulus_revisi', 'tidak_lulus']);
+            $table->enum('status', ['dijadwalkan', 'lulus', 'lulus_revisi', 'tidak_lulus'])->default('dijadwalkan');
             $table->timestamps();
             $table->softDeletes();
         });

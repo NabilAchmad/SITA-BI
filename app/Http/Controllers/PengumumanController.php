@@ -8,12 +8,6 @@ use App\Models\Pengumuman;
 
 class PengumumanController extends Controller
 {
-
-    public function create()
-    {
-        return view('admin.pengumuman.views.createPengumuman');  // Menampilkan form
-    }
-
     public function store(Request $request)
     {
         $request->validate([
