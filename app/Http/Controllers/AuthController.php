@@ -31,15 +31,36 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            // Redirect to mahasiswa dashboard after login
-            return redirect()->intended(route('mahasiswa.dashboard'));
+
+            $user = Auth::user();
+
+            // Check user roles and redirect accordingly
+            if ($user->roles && $user->roles->count() > 0) {
+                if ($user->roles->contains('nama_role', 'admin')) {
+                    return redirect()->intended(route('admin.dashboard'));
+                } elseif ($user->roles->contains('nama_role', 'kajur')) {
+                    return redirect()->intended(route('kajur.dashboard'));
+                } elseif ($user->roles->contains('nama_role', 'kaprodi')) {
+                    return redirect()->intended(route('kaprodi.dashboard'));
+                } elseif ($user->roles->contains('nama_role', 'dosen')) {
+                    // Assuming dosen dashboard route exists
+                    return redirect()->intended(route('dosen.dashboard'));
+                } elseif ($user->roles->contains('nama_role', 'mahasiswa')) {
+                    return redirect()->intended(route('mahasiswa.dashboard'));
+                } else {
+                    // Default fallback
+                    return redirect()->intended(route('mahasiswa.dashboard'));
+                }
+            } else {
+                // If no roles exist, fallback to mahasiswa dashboard
+                return redirect()->intended(route('mahasiswa.dashboard'));
+            }
         }
 
         throw ValidationException::withMessages([
             'email' => __('auth.failed'),
         ]);
     }
-
     // Show register form
     public function showRegister()
     {
@@ -61,6 +82,12 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        // Assign "mahasiswa" role to the new user
+        // $studentRole = \App\Models\Role::where('nama_role', 'mahasiswa')->first();
+        // if ($studentRole) {
+        //     $user->roles()->attach($studentRole->id);
+        // }
 
         // Create Mahasiswa record for the new user with default values for required fields
         Mahasiswa::create([
@@ -119,6 +146,6 @@ class AuthController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect('/');
     }
 }

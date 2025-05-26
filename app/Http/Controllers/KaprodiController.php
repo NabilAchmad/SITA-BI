@@ -20,9 +20,11 @@ class KaprodiController extends Controller
     }
 
     // Acc Judul Tugas Akhir
+    // compact('judulTA'));
     public function showAccJudulTA()
     {
-        return view('kaprodi.judulTA.AccJudulTA');
+        $judulTAs = JudulTA::all(); // Fetch all JudulTA records or adjust query as needed
+        return view('kaprodi.judulTA.AccJudulTA', compact('judulTAs'));
     }
 
     // Nilai Sidang

@@ -1,5 +1,5 @@
 <div class="sidebar" data-background-color="dark">
-    <div class="sidebar-logo">
+    <div class="sidebar-wrapper scrollbar scrollbar-inner">
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="dark">
             <a href="{{ url('/ketua-prodi') }}"
@@ -33,9 +33,7 @@
             </button>
         </div>
         <!-- End Logo Header -->
-    </div>
 
-    <div class="sidebar-wrapper scrollbar scrollbar-inner">
         <div class="sidebar-content">
             <ul class="nav nav-secondary">
                 <!-- Dashboard -->
@@ -68,14 +66,14 @@
 
                 {{-- Tugas Akhir --}}
                 <li
-                    class="nav-item {{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? 'active' : '' }}">
+                    class="nav-item {{ request()->is('kaprodi/judulTA/*') || request()->is('kaprodi/judulTA') ? 'active' : '' }}">
                     <a data-bs-toggle="collapse" href="#tables"
-                        class="{{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? '' : 'collapsed' }}">
+                        class="{{ request()->is('kaprodi/judulTA/*') || request()->is('kaprodi/judulTA') ? '' : 'collapsed' }}">
                         <i class="fas fa-users-cog"></i>
                         <p>Tugas Akhir</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('tugas-akhir') || request()->is('tugas-akhir/*') ? 'show' : '' }}"
+                    <div class="collapse {{ request()->is('kaprodi/judulTA/*') || request()->is('kaprodi/judulTA') ? 'show' : '' }}"
                         id="tables">
                         <ul class="nav nav-collapse">
                             <li class="{{ request()->is('kaprodi/judulTA/ACCJudulTA') ? 'active' : '' }}">
@@ -95,7 +93,7 @@
                         <p>Sidang</p>
                         <span class="caret"></span>
                     </a>
-                    <div class="collapse {{ request()->is('sidang') || request()->is('ketua-prodi/sidang/*') ? 'show' : '' }}"
+                    <div class="collapse {{ request()->is('ketua-prodi/sidang') || request()->is('ketua-prodi/sidang/*') ? 'show' : '' }}"
                         id="forms">
                         <ul class="nav nav-collapse">
                             <li class="{{ request()->is('ketua-prodi/sidang/lihat-jadwal') ? 'active' : '' }}">
@@ -147,12 +145,7 @@
                                     <span class="sub-item">Lihat Nilai</span>
                                 </a>
                             </li>
-                        </ul>
-                    </div>
-                    <div class="collapse {{ request()->is('laporan') || request()->is('laporan/*') ? 'show' : '' }}"
-                        id="maps">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->is('laporan/lihat') ? 'active' : '' }}">
+                            <li class="{{ request()->is('laporan/tambah') ? 'active' : '' }}">
                                 <a href="{{ route('kaprodi.nilai.create') }}">
                                     <span class="sub-item">Tambahkan Nilai</span>
                                 </a>

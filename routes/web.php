@@ -16,73 +16,112 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KaprodiController;
 use App\Http\Controllers\TugasAkhirController;
 use App\Http\Controllers\PendaftaranSidangController;
+use App\Models\Mahasiswa;
 
 Route::get('/', function () {
     return view('home.homepage');
 });
 
-// Authentication routes for Kajur
+// Kajur routes
 Route::prefix('kajur')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('kajur.login');
-    Route::post('/login', [AuthController::class, 'login'])->name('kajur.login.post');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('kajur.logout');
+    // Authentication routes for Kajur
+    // Route::get('/login', [AuthController::class, 'showLogin'])->name('kajur.login');
+    // Route::post('/login', [AuthController::class, 'login'])->name('kajur.login.post');
+    // Route::post('/logout', [AuthController::class, 'logout'])->name('kajur.logout');
+
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/dashboard', [KajurController::class, 'index'])->name('kajur.dashboard');
+        // Add other Kajur routes here as needed
+    });
 });
 
-// Authentication routes for Kaprodi
+// Kaprodi routes
 Route::prefix('kaprodi')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('kaprodi.login');
-    Route::post('/login', [AuthController::class, 'login'])->name('kaprodi.login.post');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('kaprodi.logout');
+    // Authentication routes for Kaprodi
+    // Route::get('/login', [AuthController::class, 'showLogin'])->name('kaprodi.login');
+    // Route::post('/login', [AuthController::class, 'login'])->name('kaprodi.login.post');
+    // Route::post('/logout', [AuthController::class, 'logout'])->name('kaprodi.logout');
+
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/dashboard', [KaprodiController::class, 'index'])->name('kaprodi.dashboard');
+
+        // Jadwal sidang
+        Route::get('/sidang/lihat-jadwal', [KaprodiController::class, 'showJadwal'])->name('kaprodijadwal.page');
+
+        // Tugas Akhir
+        Route::get('/judulTA/AccJudulTA', [KaprodiController::class, 'showAccJudulTA'])->name('accjudul.page');
+
+        // Routes for Kaprodi to approve or reject JudulTA
+        Route::post('/judulTA/approve/{id}', [KaprodiController::class, 'approveJudul'])->name('kaprodi.judulTA.approve');
+        Route::post('/judulTA/reject/{id}', [KaprodiController::class, 'rejectJudul'])->name('kaprodi.judulTA.reject');
+
+        // Nilai sidang
+        Route::get('/sidang/lihat-nilai', [KaprodiController::class, 'showNilaiSidang'])->name('kaprodi.nilai.page');
+
+        Route::get('/sidang/create', [KaprodiController::class, 'createSidang'])->name('kaprodi.nilai.create');
+        Route::post('/sidang/create', [KaprodiController::class, 'storeSidang'])->name('kaprodi.nilai.store');
+
+        // Pengumuman
+        Route::get('/pengumuman', [KaprodiController::class, 'showPengumuman'])->name('kaprodipengumuman.page');
+    });
 });
 
-// Authentication routes for Dosen
-Route::prefix('dosen')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('dosen.login');
-    Route::post('/login', [AuthController::class, 'login'])->name('dosen.login.post');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('dosen.logout');
-});
+ // General user login routes
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 
-Route::prefix('mahasiswa')->group(function () {
+
+
+
+
+
+// // Authentication routes for Dosen
+// Route::get('/dosen/login', [AuthController::class, 'showLogin'])->name('dosen.login');
+// Route::post('/dosen/login', [AuthController::class, 'login'])->name('dosen.login.post');
+// Route::post('/dosen/logout', [AuthController::class, 'logout'])->name('dosen.logout');
 
     // Authentication routes for Mahasiswa
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('mahasiswa.login');
-    Route::post('/login', [AuthController::class, 'login'])->name('mahasiswa.login.post');
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('mahasiswa.register');
-    Route::post('/register', [AuthController::class, 'register'])->name('mahasiswa.register.post');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('mahasiswa.logout');
+    // Route::get('/mahasiswa/login', [AuthController::class, 'showLogin'])->name('mahasiswa.login');
+    // Route::post('/mahasiswa/login', [AuthController::class, 'login'])->name('mahasiswa.login.post');
+    
 
     // Mahasiswa Dashboard route
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
 
         // Dashboard view route
-        Route::get('/', function () {
+        // Changed route from '/' to '/dashboard-view' to avoid conflict with public homepage route
+        Route::get('/dashboard-view', function () {
             return view('mahasiswa.views.dashboard');
         });
+    });
 
-        Route::prefix('ketua-prodi')->group(function () {
-            // Add base /mahasiswa/ketua-prodi route to redirect to dashboard
-            Route::get('/', [KaprodiController::class, 'index'])->name('kaprodi.page');
+    // Move ketua-prodi routes outside auth middleware to allow access without login
+    Route::prefix('ketua-prodi')->group(function () {
+        // Add base /mahasiswa/ketua-prodi route to redirect to dashboard
+        Route::get('/', [KaprodiController::class, 'index'])->name('kaprodi.dashboard');
 
-            // Jadwal sidang
-            Route::get('/sidang/lihat-jadwal', [KaprodiController::class, 'showJadwal'])->name('kaprodijadwal.page');
+        // Jadwal sidang
+        Route::get('/sidang/lihat-jadwal', [KaprodiController::class, 'showJadwal'])->name('kaprodijadwal.page');
 
-            // Tugas Akhir
-            Route::get('/judulTA/AccJudulTA', [KaprodiController::class, 'showAccJudulTA'])->name('accjudul.page');
+        // Tugas Akhir
+        Route::get('/judulTA/AccJudulTA', [KaprodiController::class, 'showAccJudulTA'])->name('accjudul.page');
 
-            // Routes for Kaprodi to approve or reject JudulTA
-            Route::post('/judulTA/approve/{id}', [KaprodiController::class, 'approveJudul'])->name('kaprodi.judulTA.approve');
-            Route::post('/judulTA/reject/{id}', [KaprodiController::class, 'rejectJudul'])->name('kaprodi.judulTA.reject');
+        // Routes for Kaprodi to approve or reject JudulTA
+        Route::post('/judulTA/approve/{id}', [KaprodiController::class, 'approveJudul'])->name('kaprodi.judulTA.approve');
+        Route::post('/judulTA/reject/{id}', [KaprodiController::class, 'rejectJudul'])->name('kaprodi.judulTA.reject');
 
-            // Nilai sidang
-            Route::get('/sidang/lihat-nilai', [KaprodiController::class, 'showNilaiSidang'])->name('kaprodi.nilai.page');
+        // Nilai sidang
+        Route::get('/sidang/lihat-nilai', [KaprodiController::class, 'showNilaiSidang'])->name('kaprodi.nilai.page');
 
-            Route::get('/sidang/create', [KaprodiController::class, 'createSidang'])->name('kaprodi.nilai.create');
-            Route::post('/sidang/create', [KaprodiController::class, 'storeSidang'])->name('kaprodi.nilai.store');
+        Route::get('/sidang/create', [KaprodiController::class, 'createSidang'])->name('kaprodi.nilai.create');
+        Route::post('/sidang/create', [KaprodiController::class, 'storeSidang'])->name('kaprodi.nilai.store');
 
-            // Pengumuman
-            Route::get('/pengumuman', [KaprodiController::class, 'showPengumuman'])->name('kaprodipengumuman.page');
-        });
+        // Pengumuman
+        Route::get('/pengumuman', [KaprodiController::class, 'showPengumuman'])->name('kaprodipengumuman.page');
+    });
 
         Route::prefix('TugasAkhir')->group(function () {
             // Tampilkan form ajukan
@@ -144,8 +183,8 @@ Route::prefix('mahasiswa')->group(function () {
             Route::get('/daftar-sidang', [PendaftaranSidangController::class, 'form'])->name('pendaftaran_sidang.form');
             Route::post('/daftar-sidang', [PendaftaranSidangController::class, 'store'])->name('pendaftaran_sidang.store');
         });
-    });
-});
+    // });
+
 
 Route::prefix('admin')->group(function () {
 
@@ -208,25 +247,33 @@ Route::prefix('admin')->group(function () {
     // =========================
     // ROUTE KELOLA AKUN
     // =========================
-    Route::prefix('kelola-akun')->group(function () {
+        Route::prefix('kelola-akun')->group(function () {
 
-        // Dosen
-        Route::prefix('dosen')->group(function () {
-            // Add base /admin/kelola-akun/dosen route to show dosen index
-            Route::get('/', [DosenController::class, 'index'])->name('akun-dosen.kelola');
+            // Dosen
+            Route::prefix('dosen')->group(function () {
+                // Add base /admin/kelola-akun/dosen route to show dosen index
+                Route::get('/', [DosenController::class, 'index'])->name('akun-dosen.kelola');
 
-            Route::get('/edit/{id}', [DosenController::class, 'edit'])->name('akun-dosen.edit');
-            Route::put('/update/{id}', [DosenController::class, 'update'])->name('akun-dosen.update');
-            Route::delete('/hapus/{id}', [DosenController::class, 'destroy'])->name('akun-dosen.destroy');
+                Route::get('/edit/{id}', [DosenController::class, 'edit'])->name('akun-dosen.edit');
+                Route::put('/update/{id}', [DosenController::class, 'update'])->name('akun-dosen.update');
+                Route::delete('/hapus/{id}', [DosenController::class, 'destroy'])->name('akun-dosen.destroy');
 
-            Route::get('/tambah-akun-dosen', [DosenController::class, 'create'])->name('akun-dosen.create');
-            Route::post('/tambah-akun-dosen', [DosenController::class, 'store'])->name('akun-dosen.store');
+                Route::get('/tambah-akun-dosen', [DosenController::class, 'create'])->name('akun-dosen.create');
+                Route::post('/tambah-akun-dosen', [DosenController::class, 'store'])->name('akun-dosen.store');
+            });
+
+            // Mahasiswa
+            Route::prefix('mahasiswa')->group(function () {
+                Route::get('/', [MahasiswaController::class, 'listmahasiswa'])->name('akun-mahasiswa.kelola');
+                
+                Route::get('/edit/{id}', [MahasiswaController::class, 'edit'])->name('akun-mahasiswa.edit');
+                Route::put('/update/{id}', [MahasiswaController::class, 'update'])->name('akun-mahasiswa.update');
+                Route::delete('/hapus/{id}', [MahasiswaController::class, 'destroy'])->name('akun-mahasiswa.destroy');
+                
+                Route::get('/tambah-akun-mahasiswa', [MahasiswaController::class, 'create'])->name('akun-mahasiswa.create');
+                Route::post('/tambah-akun-mahasiswa', [MahasiswaController::class, 'store'])->name('akun-mahasiswa.store');
+            });
         });
-
-        Route::prefix('mahasiswa')->group(function () {
-            // Additional mahasiswa account management routes can be added here
-        });
-    });
 
     // =========================
     // ROUTE SIDANG
@@ -315,3 +362,6 @@ Route::prefix('admin')->group(function () {
     // Profile
     Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
 });
+
+
+// require __DIR__.'/auth.php'; // Pastikan ini dipanggil
