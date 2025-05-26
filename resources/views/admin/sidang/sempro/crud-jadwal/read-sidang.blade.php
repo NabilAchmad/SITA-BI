@@ -1,8 +1,8 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h1 class="fw-bold text-danger"><i class="bi bi-calendar-x me-2"></i> Kelola Jadwal Sidang Akhir</h1>
-            <p class="text-muted mb-0">Daftar mahasiswa yang telah terdaftar sidang akhir, termasuk yang belum
+            <h1 class="fw-bold text-primary"><i class="bi bi-calendar-x me-2"></i> Kelola Jadwal Sidang Sempro</h1>
+            <p class="text-muted mb-0">Daftar mahasiswa yang telah terdaftar sidang sempro, termasuk yang belum
                 dijadwalkan dan yang mengulang sidang.</p>
         </div>
         <nav aria-label="breadcrumb">
@@ -17,19 +17,19 @@
     <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
             <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
-                href="{{ route('sidang.menunggu.penjadwalan.akhir') }}">All</a>
+                href="{{ route('sidang.menunggu.penjadwalan.sempro') }}">All</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}"
-                href="{{ route('sidang.menunggu.penjadwalan.akhir', ['prodi' => 'D4']) }}">D4</a>
+                href="{{ route('sidang.menunggu.penjadwalan.sempro', ['prodi' => 'D4']) }}">D4</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}"
-                href="{{ route('sidang.menunggu.penjadwalan.akhir', ['prodi' => 'D3']) }}">D3</a>
+                href="{{ route('sidang.menunggu.penjadwalan.sempro', ['prodi' => 'D3']) }}">D3</a>
         </li>
     </ul>
 
-    <form method="GET" action="{{ route('sidang.menunggu.penjadwalan.akhir') }}">
+    <form method="GET" action="{{ route('sidang.menunggu.penjadwalan.sempro') }}">
         <div class="input-group mb-3">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
             <input type="text" name="search" id="searchInput" class="form-control"
@@ -73,7 +73,7 @@
                                 </tr>
                             </thead>
                             <tbody id="menunggu">
-                                @include('admin.sidang.akhir.partials.table-menunggu-jadwal')
+                                @include('admin.sidang.sempro.partials.table-menunggu-jadwal')
                             </tbody>
                         </table>
                     </div>
@@ -94,7 +94,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tidak-lulus">
-                                @include('admin.sidang.akhir.partials.table-ulang-sidang')
+                                @include('admin.sidang.sempro.partials.table-ulang-sidang')
                             </tbody>
                         </table>
                     </div>

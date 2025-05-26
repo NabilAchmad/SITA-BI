@@ -4,8 +4,8 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <h1 class="fw-bold text-primary"><i class="bi bi-calendar-check me-2"></i> Jadwal Sidang Akhir</h1>
-                <p class="text-muted mb-0">Daftar mahasiswa yang telah dijadwalkan sidang akhir.</p>
+                <h1 class="fw-bold text-primary"><i class="bi bi-calendar-check me-2"></i> Jadwal Sidang Sempro</h1>
+                <p class="text-muted mb-0">Daftar mahasiswa yang telah dijadwalkan sidang sempro.</p>
             </div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
@@ -31,7 +31,7 @@
             </li>
         </ul>
 
-        <form action="{{ route('jadwal.sidang.akhir') }}" method="GET" class="mb-3">
+        <form action="{{ route('jadwal.sidang.sempro') }}" method="GET" class="mb-3">
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                 <input type="text" name="search" class="form-control" placeholder="Cari nama atau NIM mahasiswa..."
@@ -81,7 +81,7 @@
                                             <td class="text-center">
                                                 <div class="d-flex justify-content-center gap-2">
                                                     <a class="btn btn-warning btn-sm"
-                                                        href="{{ route('jadwal-sidang.show', ['sidang_id' => $jadwal->sidang_id]) }}">Detail</a>
+                                                        href="{{ route('jadwal-sempro.show', ['sidang_id' => $jadwal->sidang_id]) }}">Detail</a>
                                                 </div>
                                             </td>
                                         </tr>

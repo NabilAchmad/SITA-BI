@@ -25,7 +25,7 @@ class TugasAkhir extends Model
     ];
 
     // Relasi ke Mahasiswa
-    public function mahasiswa(): BelongsTo
+    public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class);
     }
@@ -58,6 +58,7 @@ class TugasAkhir extends Model
     // Relasi ke Sidang TA (bisa juga hasMany jika ada banyak sidang)
     public function sidang()
     {
+        return $this->hasMany(Sidang::class);
         return $this->hasOne(Sidang::class, 'tugas_akhir_id');
     }
     // Relasi ke Notifikasi TA
@@ -87,5 +88,12 @@ class TugasAkhir extends Model
     public function pembimbing2()
     {
         return $this->hasOne(PeranDosenTA::class, 'tugas_akhir_id')->where('peran', 'pembimbing2');
+    }
+
+    public function sidangTerakhir()
+    {
+        return $this->hasOne(Sidang::class)
+            ->whereIn('jenis_sidang', ['akhir', 'proposal'])
+            ->latestOfMany();
     }
 }

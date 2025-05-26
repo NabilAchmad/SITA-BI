@@ -3,7 +3,7 @@
 @section('title', 'List Mahasiswa Sidang')
 
 @section('content')
-    @include('admin.sidang.akhir.crud-jadwal.read-sidang')
+    @include('admin.sidang.sempro.crud-jadwal.read-sidang')
 @endsection
 
 @push('scripts')
@@ -190,7 +190,7 @@
                                         }
                                     }
                                 }).then(() => {
-                                    window.location.href = "{{ route('jadwal.sidang.akhir') }}";
+                                    window.location.href = "{{ route('jadwal.sidang.sempro') }}";
                                 });
                             } else {
                                 alert(data.message || 'Gagal menyimpan jadwal sidang.');
@@ -218,6 +218,7 @@
                         }
                     }
                 });
+                
             @endif
         });
     </script>

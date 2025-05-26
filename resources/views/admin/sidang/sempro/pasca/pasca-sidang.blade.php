@@ -1,11 +1,11 @@
 @extends('layouts.template.main')
-@section('title', 'Jadwal Sidang Akhir')
+@section('title', 'Data Pasca Sidang')
 @section('content')
-    <div class="container-fluid">
+    <div>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                <h1 class="fw-bold text-primary"><i class="bi bi-calendar-check me-2"></i> Jadwal Sidang Akhir</h1>
-                <p class="text-muted mb-0">Daftar mahasiswa yang telah dijadwalkan sidang akhir.</p>
+                <h1 class="fw-bold text-primary"><i class="bi bi-calendar-check me-2"></i> Pasca Sidang Sempro</h1>
+                <p class="text-muted mb-0">Daftar mahasiswa yang telah menyelesaikan sidang sempro.</p>
             </div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
@@ -19,23 +19,26 @@
         <ul class="nav nav-tabs mb-3">
             <li class="nav-item">
                 <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
-                    href="{{ route('jadwal.sidang.akhir') }}">All</a>
+                    href="{{ route('pasca.sidang.akhir') }}">All</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}"
-                    href="{{ route('jadwal.sidang.akhir', ['prodi' => 'D4']) }}">D4</a>
+                    href="{{ route('pasca.sidang.akhir', ['prodi' => 'D4']) }}">D4</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}"
-                    href="{{ route('jadwal.sidang.akhir', ['prodi' => 'D3']) }}">D3</a>
+                    href="{{ route('pasca.sidang.akhir', ['prodi' => 'D3']) }}">D3</a>
             </li>
         </ul>
 
-        <form action="{{ route('jadwal.sidang.akhir') }}" method="GET" class="mb-3">
+        <form action="{{ route('pasca.sidang.akhir') }}" method="GET" class="mb-3">
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" name="search" class="form-control" placeholder="Cari nama atau NIM mahasiswa..."
+                <input type="text" name="search" class="form-control" placeholder="Cari nama atau NIM..."
                     value="{{ request('search') }}">
+                @if (request('prodi'))
+                    <input type="hidden" name="prodi" value="{{ request('prodi') }}">
+                @endif
                 <button type="submit" class="btn btn-primary">Cari</button>
             </div>
         </form>
@@ -43,7 +46,6 @@
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body">
                 <div class="tab-content" id="jadwalTabContent">
-                    {{-- Tab dijadwalkan --}}
                     <div class="tab-pane fade show active" id="dijadwalkan" role="tabpanel"
                         aria-labelledby="dijadwalkan-tab">
                         <div class="table-responsive">
@@ -51,44 +53,40 @@
                                 <thead class="table-dark text-center">
                                     <tr>
                                         <th>No</th>
-                                        <th>Nama</th>
+                                        <th>Nama Mahasiswa</th>
+                                        <th>NIM</th>
                                         <th>Judul Tugas Akhir</th>
-                                        <th>Tanggal</th>
-                                        <th>Waktu</th>
-                                        <th>Ruangan</th>
+                                        <th>Tanggal Sidang</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="dijadwalkan">
-                                    @forelse ($jadwalList as $index => $jadwal)
+                                <tbody id="pascaSidang">
+                                    @forelse ($sidangSelesai as $index => $item)
                                         @php
-                                            $ta = $jadwal->sidang->tugasAkhir;
-                                            $mahasiswa = $ta?->mahasiswa;
+                                            $sidang = $item->sidang;
+                                            $ta = $sidang->tugasAkhir ?? null;
+                                            $mhs = $ta?->mahasiswa;
                                         @endphp
 
                                         <tr>
-                                            <td class="text-center">{{ $loop->iteration + ($jadwalList->firstItem() - 1) }}
-                                            </td>
-                                            </td>
-                                            <td>{{ $mahasiswa?->user?->name ?? '-' }}</td>
-                                            <td>{{ $ta?->judul ?? '-' }}</td>
-                                            <td class="text-center">{{ $jadwal->tanggal }}</td>
                                             <td class="text-center">
-                                                {{ \Carbon\Carbon::parse($jadwal->waktu_mulai)->format('H:i') }} -
-                                                {{ \Carbon\Carbon::parse($jadwal->waktu_selesai)->format('H:i') }}
+                                                {{ ($sidangSelesai->currentPage() - 1) * $sidangSelesai->perPage() + $index + 1 }}
                                             </td>
-                                            <td>{{ $jadwal->ruangan?->lokasi ?? '-' }}</td>
+                                            <td>{{ $mhs?->user?->name ?? '-' }}</td>
+                                            <td>{{ $mhs->nim ?? '-' }}</td>
+                                            <td>{{ $ta->judul ?? '-' }}</td>
                                             <td class="text-center">
-                                                <div class="d-flex justify-content-center gap-2">
-                                                    <a class="btn btn-warning btn-sm"
-                                                        href="{{ route('jadwal-sidang.show', ['sidang_id' => $jadwal->sidang_id]) }}">Detail</a>
-                                                </div>
+                                                {{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}</td>
+                                            <td class="text-center">
+                                                <a href="#" class="btn btn-primary btn-sm">
+                                                    Cetak
+                                                </a>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="10" class="text-center text-muted">Belum ada jadwal sidang yang
-                                                tersedia.</td>
+                                            <td colspan="6" class="text-center text-muted">Belum ada sidang yang selesai.
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -99,9 +97,8 @@
             </div>
         </div>
     </div>
-
     <div class="mt-3">
-        {{ $jadwalList->links() }}
+        {{ $sidangSelesai->links() }}
     </div>
 
 @endsection

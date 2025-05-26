@@ -9,6 +9,7 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\JadwalSidangAkhirController;
+use App\Http\Controllers\JadwalSidangSemproController;
 
 
 use App\Http\Controllers\KajurController;
