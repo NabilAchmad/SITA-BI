@@ -16,10 +16,14 @@ Route::prefix('mahasiswa')->group(function () {
     });
 
     Route::prefix('tugas-akhir')->group(function () {
-        // Tampilkan form ajukan
         Route::get('/', function () {
             return view('mahasiswa.TugasAkhir.dashboard.dashboard');
         })->name('tugas-akhir.dashboard');
+
+        // Menampilkan form ajukan Tugas Akhir
+        Route::get('/ajukan', function () {
+            return view('mahasiswa.TugasAkhir.views.ajukanTA');
+        })->name('tugas-akhir.ajukan');
 
         // Menampilkan form progress TA
         Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugas-akhir.progress');
