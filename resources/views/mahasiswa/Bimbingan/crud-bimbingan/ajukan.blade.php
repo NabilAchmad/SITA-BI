@@ -1,6 +1,6 @@
 
     <div class="card shadow">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-dark text-white">
             <h4 class="mb-0">Ajukan Bimbingan</h4>
         </div>
         <div class="card-body">
@@ -18,7 +18,7 @@
                     <label for="topik" class="form-label">Topik:</label>
                     <textarea id="topik" name="topik" rows="4" class="form-control" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Ajukan</button>
+                <button type="submit" class="btn btn-dark w-100">Ajukan</button>
             </form>
         </div>
     </div>

@@ -7,7 +7,7 @@
         </div>
         <span class="profile-username">
             <span class="op-7">Hi,</span>
-            <span class="fw-bold">Kasih</span>
+            <span class="fw-bold">Mahasiswa</span>
         </span>
     </a>
     <ul class="dropdown-menu dropdown-user animated fadeIn">
@@ -19,8 +19,8 @@
                             class="avatar-img rounded" />
                     </div>
                     <div class="u-text">
-                        <h4>Kasih Ananda</h4>
-                        <p class="text-muted">Kasih</p>
+                        <h4>Mahasiswa</h4>
+                        <p class="text-muted">Mahasiswa</p>
                         <a href="{{ url('/admin/profile') }}"
                             class="btn btn-xs btn-secondary btn-sm">View Profile</a>
                     </div>

@@ -7,7 +7,7 @@
     <ul class="dropdown-menu notif-box animated fadeIn" aria-labelledby="notifDropdown">
         <li>
             <div class="dropdown-title">
-                You have 4 new notification
+                Anda memiliki 4 notifikasi baru
             </div>
         </li>
         <li>
@@ -15,51 +15,49 @@
                 <div class="notif-center">
                     <a href="#">
                         <div class="notif-icon notif-primary">
-                            <i class="fa fa-user-plus"></i>
+                            <i class="fa fa-calendar-check"></i>
                         </div>
                         <div class="notif-content">
-                            <span class="block"> New user registered </span>
-                            <span class="time">5 minutes ago</span>
+                            <span class="block"> Pendaftaran seminar TA Anda berhasil </span>
+                            <span class="time">5 menit lalu</span>
                         </div>
                     </a>
                     <a href="#">
                         <div class="notif-icon notif-success">
-                            <i class="fa fa-comment"></i>
+                            <i class="fa fa-comments"></i>
                         </div>
                         <div class="notif-content">
                             <span class="block">
-                                Rahmad commented on Admin
+                                Dosen memberi komentar pada laporan Anda
                             </span>
-                            <span class="time">12 minutes ago</span>
+                            <span class="time">12 menit lalu</span>
                         </div>
                     </a>
                     <a href="#">
                         <div class="notif-img">
-                            <img src="assets/img/profile2.jpg" alt="Img Profile" />
+                            <img src="assets/img/profile-dosen.jpg" alt="Foto Dosen" />
                         </div>
                         <div class="notif-content">
                             <span class="block">
-                                Reza send messages to you
+                                Pembimbing mengirim pesan kepada Anda
                             </span>
-                            <span class="time">12 minutes ago</span>
+                            <span class="time">12 menit lalu</span>
                         </div>
                     </a>
                     <a href="#">
                         <div class="notif-icon notif-danger">
-                            <i class="fa fa-heart"></i>
+                            <i class="fa fa-check-circle"></i>
                         </div>
                         <div class="notif-content">
-                            <span class="block"> Farrah liked Admin </span>
-                            <span class="time">17 minutes ago</span>
+                            <span class="block"> Judul TA Anda disetujui </span>
+                            <span class="time">17 menit lalu</span>
                         </div>
                     </a>
                 </div>
             </div>
         </li>
         <li>
-            <a class="see-all" href="javascript:void(0);">See all notifications<i
-                    class="fa fa-angle-right"></i>
-            </a>
+            <a class="see-all" href="javascript:void(0);">Lihat semua notifikasi<i class="fa fa-angle-right"></i></a>
         </li>
     </ul>
 </li>
