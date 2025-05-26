@@ -10,10 +10,9 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\AdminController;
 
-// Ketua Program Studi
 use App\Http\Controllers\KajurController;
 use App\Http\Controllers\AuthController;
-// use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\KaprodiController;
 use App\Http\Controllers\TugasAkhirController;
 use App\Http\Controllers\PendaftaranSidangController;
 
@@ -21,47 +20,143 @@ Route::get('/', function () {
     return view('home.homepage');
 });
 
+// Authentication routes for Kajur
+Route::prefix('kajur')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('kajur.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('kajur.login.post');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('kajur.logout');
+});
+
+// Authentication routes for Kaprodi
+Route::prefix('kaprodi')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('kaprodi.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('kaprodi.login.post');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('kaprodi.logout');
+});
+
+// Authentication routes for Dosen
+Route::prefix('dosen')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('dosen.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('dosen.login.post');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('dosen.logout');
+});
+
 Route::prefix('mahasiswa')->group(function () {
 
-// Mahasiswa Dashboard route
-Route::middleware(['auth'])->group(function () {
-    Route::get('/mahasiswa/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
+    // Authentication routes for Mahasiswa
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('mahasiswa.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('mahasiswa.login.post');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('mahasiswa.register');
+    Route::post('/register', [AuthController::class, 'register'])->name('mahasiswa.register.post');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('mahasiswa.logout');
+
+    // Mahasiswa Dashboard route
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
+
+        // Dashboard view route
+        Route::get('/', function () {
+            return view('mahasiswa.views.dashboard');
+        });
+
+        Route::prefix('ketua-prodi')->group(function () {
+            // Add base /mahasiswa/ketua-prodi route to redirect to dashboard
+            Route::get('/', [KaprodiController::class, 'index'])->name('kaprodi.page');
+
+            // Jadwal sidang
+            Route::get('/sidang/lihat-jadwal', [KaprodiController::class, 'showJadwal'])->name('kaprodijadwal.page');
+
+            // Tugas Akhir
+            Route::get('/judulTA/AccJudulTA', [KaprodiController::class, 'showAccJudulTA'])->name('accjudul.page');
+
+            // Routes for Kaprodi to approve or reject JudulTA
+            Route::post('/judulTA/approve/{id}', [KaprodiController::class, 'approveJudul'])->name('kaprodi.judulTA.approve');
+            Route::post('/judulTA/reject/{id}', [KaprodiController::class, 'rejectJudul'])->name('kaprodi.judulTA.reject');
+
+            // Nilai sidang
+            Route::get('/sidang/lihat-nilai', [KaprodiController::class, 'showNilaiSidang'])->name('kaprodi.nilai.page');
+
+            Route::get('/sidang/create', [KaprodiController::class, 'createSidang'])->name('kaprodi.nilai.create');
+            Route::post('/sidang/create', [KaprodiController::class, 'storeSidang'])->name('kaprodi.nilai.store');
+
+            // Pengumuman
+            Route::get('/pengumuman', [KaprodiController::class, 'showPengumuman'])->name('kaprodipengumuman.page');
+        });
+
+        Route::prefix('TugasAkhir')->group(function () {
+            // Tampilkan form ajukan
+            Route::get('/ajukan', function () {
+                return view('mahasiswa.TugasAkhir.views.ajukanTA');
+            });
+
+            // Menampilkan form progress TA
+            Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugasAkhir.progress');
+
+            // Tangani form POST ajukan TA
+            Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
+
+            Route::resource('tugasAkhir', TugasAkhirController::class);
+
+            Route::delete('tugasAkhir/{id}', [TugasAkhirController::class, 'destroy'])->name('tugasAkhir.destroy');
+            Route::post('tugasAkhir/{id}/cancel', [TugasAkhirController::class, 'cancel'])->name('tugasAkhir.cancelTA');
+            Route::get('tugasAkhir/dibatalkan', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.dibatalkan');
+
+            // Menampilkan form ajukan berdasarkan topik dosen
+            Route::get('/read', function () {
+                return view('mahasiswa.TugasAkhir.views.listTopik');
+            });
+
+            Route::get('/cancel', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.cancelled');
+        });
+
+        Route::prefix('bimbingan')->group(function () {
+            // Tambahkan route untuk Bimbingan di sini jika diperlukan
+
+            Route::get('/ajukan-jadwal', function () {
+                return view('mahasiswa.Bimbingan.views.ajukanBimbingan');
+            });
+
+            Route::get('/lihat-jadwal', function () {
+                return view('mahasiswa.Bimbingan.views.lihatJadwal');
+            });
+
+            Route::get('/revisi', function () {
+                return view('mahasiswa.Bimbingan.views.revisiTA');
+            });
+
+            Route::get('/perubahan-jadwal', function () {
+                return view('mahasiswa.Bimbingan.views.perubahanJadwal');
+            });
+        });
+
+        Route::prefix('sidang')->group(function () {
+            // Tambahkan route untuk Sidang di sini jika diperlukan
+            Route::get('/daftar-sidang', [MahasiswaController::class, 'daftarSidang'])->name('mahasiswa.sidang.daftar');
+            Route::get('/lihat-nilai', function () {
+                return view('mahasiswa.sidang.views.nilaiSidang');
+            });
+
+            Route::get('/lihat-jadwal', function () {
+                return view('mahasiswa.sidang.views.jadwal');
+            });
+
+            Route::get('/daftar-sidang', [PendaftaranSidangController::class, 'form'])->name('pendaftaran_sidang.form');
+            Route::post('/daftar-sidang', [PendaftaranSidangController::class, 'store'])->name('pendaftaran_sidang.store');
+        });
+    });
 });
-
-// Authentication routes
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.post');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-
-Route::prefix('ketua-prodi')->group(function () {
-    Route::get('/', [KajurController::class, 'index'])->name('kaprodi.page');
-
-    // Jadwal sidang
-    Route::get('/sidang/lihat-jadwal', [KajurController::class, 'showJadwal'])->name('kaprodijadwal.page');
-
-    // Tugas Akhir
-    Route::get('/judulTA/AccJudulTA', [KajurController::class, 'showAccJudulTA'])->name('accjudul.page');
-
-    // Routes for Kaprodi to approve or reject JudulTA
-    Route::post('/judulTA/approve/{id}', [App\Http\Controllers\KaprodiController::class, 'approveJudul'])->name('kaprodi.judulTA.approve');
-    Route::post('/judulTA/reject/{id}', [App\Http\Controllers\KaprodiController::class, 'rejectJudul'])->name('kaprodi.judulTA.reject');
-
-    // Nilai sidang
-    Route::get('/sidang/lihat-nilai', [KajurController::class, 'showNilaiSidang'])->name('kaprodi.nilai.page');
-
-    Route::get('/sidang/create', [KajurController::class, 'createSidang'])->name('kaprodi.nilai.create');
-    Route::post('/sidang/create', [KajurController::class, 'storeSidang'])->name('kaprodi.nilai.store');
-
-    // Pengumuman
-    Route::get('/pengumuman', [KajurController::class, 'showPengumuman'])->name('kaprodipengumuman.page');
-});
-
-// Admin Dashboard and related routes
 
 Route::prefix('admin')->group(function () {
+
+    // Authentication routes for Admin
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('admin.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('admin.login.post');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('admin.logout');
+
+    // Add base /admin route to redirect to /admin/dashboard
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard');
+    });
 
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -78,7 +173,6 @@ Route::prefix('admin')->group(function () {
         Route::get('/create', [PengumumanController::class, 'create'])->name('pengumuman.form'); // Form tambah
         Route::post('/create', [PengumumanController::class, 'store'])->name('pengumuman.create'); // Simpan data baru
 
-
         // EDIT / UPDATE
         Route::get('/{id}/edit', [PengumumanController::class, 'edit'])->name('pengumuman.edit'); // Form edit
         Route::put('/{id}/update', [PengumumanController::class, 'update'])->name('pengumuman.update'); // Update data
@@ -93,7 +187,6 @@ Route::prefix('admin')->group(function () {
         Route::get('/trash', [PengumumanController::class, 'trashed'])->name('pengumuman.trashed'); // Tampilkan data terhapus
         Route::post('/{id}/restore', [PengumumanController::class, 'restore'])->name('pengumuman.restore'); // Restore data
         Route::delete('/{id}/force-delete', [PengumumanController::class, 'forceDelete'])->name('pengumuman.force-delete'); // Hapus permanen
-
     });
 
     // =========================
@@ -118,23 +211,19 @@ Route::prefix('admin')->group(function () {
 
         // Dosen
         Route::prefix('dosen')->group(function () {
+            // Add base /admin/kelola-akun/dosen route to show dosen index
             Route::get('/', [DosenController::class, 'index'])->name('akun-dosen.kelola');
 
             Route::get('/edit/{id}', [DosenController::class, 'edit'])->name('akun-dosen.edit');
             Route::put('/update/{id}', [DosenController::class, 'update'])->name('akun-dosen.update');
             Route::delete('/hapus/{id}', [DosenController::class, 'destroy'])->name('akun-dosen.destroy');
 
-
             Route::get('/tambah-akun-dosen', [DosenController::class, 'create'])->name('akun-dosen.create');
             Route::post('/tambah-akun-dosen', [DosenController::class, 'store'])->name('akun-dosen.store');
         });
 
         Route::prefix('mahasiswa')->group(function () {
-            // Mahasiswa
-            Route::get('/', [MahasiswaController::class, 'listMahasiswa'])->name('akun-mahasiswa.kelola');
-            Route::get('/edit/{id}', [MahasiswaController::class, 'edit'])->name('akun-mahasiswa.edit');
-            Route::put('/update/{id}', [MahasiswaController::class, 'update'])->name('akun-mahasiswa.update');
-            Route::get('/search', [MahasiswaController::class, 'search'])->name('akun-mahasiswa.search');
+            // Additional mahasiswa account management routes can be added here
         });
     });
 
@@ -145,7 +234,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/list-mahasiswa', [MahasiswaController::class, 'mahasiswaBelumPunyaJadwal'])
             ->name('mahasiswa-sidang.read');
 
-        // Form untuk memilih penguji 
+        // Form untuk memilih penguji
         Route::get('/pilih-penguji/{sidang_id}', [JadwalSidangController::class, 'showFormPenguji'])->name('jadwal-sidang.pilihPenguji');
 
         // POST: Simpan dosen penguji
@@ -192,75 +281,4 @@ Route::prefix('admin')->group(function () {
 
     // Profile
     Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
-});
-    // Dashboard Mahasiswa
-    Route::get('/', function () {
-        return view('mahasiswa.views.dashboard');
-    });
-
-    Route::prefix('TugasAkhir')->group(function () {
-        // Tampilkan form ajukan
-        Route::get('/ajukan', function () {
-            return view('mahasiswa.TugasAkhir.views.ajukanTA');
-        });
-
-        // Menampilkan form progress TA
-        Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugasAkhir.progress');
-
-        // Tangani form POST ajukan TA
-        Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
-
-        Route::resource('tugasAkhir', TugasAkhirController::class);
-
-        Route::delete('tugasAkhir/{id}', [TugasAkhirController::class, 'destroy'])->name('tugasAkhir.destroy');
-        Route::post('tugasAkhir/{id}/cancel', [TugasAkhirController::class, 'cancel'])->name('tugasAkhir.cancelTA');
-        Route::get('tugasAkhir/dibatalkan', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.dibatalkan');
-
-        // Menampilkan form ajukan berdasarkan topik dosen
-        Route::get('/read', function () {
-            return view('mahasiswa.TugasAkhir.views.listTopik');
-        });
-
-        Route::get('/cancel', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.cancelled');
-    });
-
-
-    Route::prefix('bimbingan')->group(function () {
-        // Tambahkan route untuk Bimbingan di sini jika diperlukan
-
-        Route::get('/ajukan-jadwal', function () {
-            return view('mahasiswa.Bimbingan.views.ajukanBimbingan');
-        });
-
-        Route::get('/lihat-jadwal', function () {
-            return view('mahasiswa.Bimbingan.views.lihatJadwal');
-        });
-
-        Route::get('/revisi', function () {
-            return view('mahasiswa.Bimbingan.views.revisiTA');
-        });
-
-        Route::get('/perubahan-jadwal', function () {
-            return view('
-            mahasiswa.Bimbingan.views.perubahanJadwal');
-        });
-    });
-
-    Route::prefix('sidang')->group(function () {
-        // Tambahkan route untuk Sidang di sini jika diperlukan
-        Route::get('/daftar-sidang', function () {
-            return view('mahasiswa.sidang.views.form');
-        });
-
-        Route::get('/lihat-nilai', function () {
-            return view('mahasiswa.sidang.views.nilaiSidang');
-        });
-
-        Route::get('/lihat-jadwal', function () {
-            return view('mahasiswa.sidang.views.jadwal');
-        });
-
-        Route::get('/daftar-sidang', [PendaftaranSidangController::class, 'form'])->name('pendaftaran_sidang.form');
-        Route::post('/daftar-sidang', [PendaftaranSidangController::class, 'store'])->name('pendaftaran_sidang.store');
-    });
 });
