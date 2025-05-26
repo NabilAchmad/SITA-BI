@@ -11,12 +11,9 @@ class Pengumuman extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'pengumuman';
-<<<<<<< HEAD
-=======
     protected $casts = ['audience' => 'array',];
 
     protected $dates = ['deleted_at']; // penting untuk soft delete
->>>>>>> 905ddd514a1f02e7724f6a26e444a4bf3ee356ee
 
     protected $fillable = [
         'judul',
@@ -26,10 +23,6 @@ class Pengumuman extends Model
         'tanggal_dibuat'
     ];
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 905ddd514a1f02e7724f6a26e444a4bf3ee356ee
     public function pembuat()
     {
         return $this->belongsTo(User::class, 'dibuat_oleh');
