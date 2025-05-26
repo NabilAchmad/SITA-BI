@@ -38,14 +38,15 @@
         </form>
 
         {{-- Table data --}}
-        <div id="tableMahasiswa">
+        <div id="tableMahasiswa" class="table-responsive">
             <table class="table table-bordered shadow-sm">
-                <thead class="table-dark text-center">
+                <thead class="table-light text-center">
                     <tr>
                         <th>No</th>
                         <th>Nama Mahasiswa</th>
                         <th>NIM</th>
                         <th>Program Studi</th>
+                        <th>Judul Tugas Akhir</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -56,6 +57,7 @@
                             <td>{{ $mhs->user->name }}</td>
                             <td>{{ $mhs->nim }}</td>
                             <td>{{ $mhs->prodi }}</td>
+                            <td>{{ $mhs->tugasAkhir->judul }}</td>
                             <td>
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                     data-bs-target="#modalPembimbing-{{ $mhs->id }}">
@@ -80,24 +82,3 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Batas maksimum checkbox = 2 per form modal
-            document.querySelectorAll('.form-pilih-pembimbing').forEach(function(form) {
-                const checkboxes = form.querySelectorAll('input[name="pembimbing[]"]');
-                checkboxes.forEach(function(cb) {
-                    cb.addEventListener('change', function() {
-                        const checked = form.querySelectorAll(
-                            'input[name="pembimbing[]"]:checked');
-                        if (checked.length > 2) {
-                            this.checked = false;
-                            alert('Maksimal hanya bisa memilih 2 dosen pembimbing.');
-                        }
-                    });
-                });
-            });
-        });
-    </script>
-@endpush

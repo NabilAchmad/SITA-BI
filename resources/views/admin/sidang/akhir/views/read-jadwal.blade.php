@@ -2,5 +2,5 @@
 @section('title', 'Lihat Jadwal Sidang')
 
 @section('content')
-    @include('admin.sidang.jadwal.crud-jadwal.tabel-jadwal-sidang')
+    @include('admin.sidang.akhir.jadwal.jadwal-sidang-akhir')
 @endsection

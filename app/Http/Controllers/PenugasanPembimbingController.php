@@ -9,10 +9,38 @@ use Illuminate\Http\Request;
 
 class PenugasanPembimbingController extends Controller
 {
-    // Tampilkan mahasiswa yang belum memiliki 2 pembimbing
-    public function index(Request $request)
+    public function indexPembimbing(Request $request)
     {
-        $query = Mahasiswa::with('user');
+        $mahasiswa = Mahasiswa::with(['user', 'tugasAkhir.peranDosenTA.dosen.user'])
+            ->whereHas('tugasAkhir.peranDosenTA', function ($q) {
+                $q->whereIn('peran', ['pembimbing1', 'pembimbing2']);
+            }, '>=', 2)  // Pastikan minimal 2 pembimbing
+            ->when($request->filled('prodi'), function ($query) use ($request) {
+                $query->where('prodi', 'like', $request->prodi . '%');
+            })
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('nim', 'like', "%$search%")
+                        ->orWhereHas('user', function ($q2) use ($search) {
+                            $q2->where('name', 'like', "%$search%");
+                        });
+                });
+            })
+            ->orderBy('nim')
+            ->paginate(10);
+
+        return view('admin.mahasiswa.views.list-mhs', compact('mahasiswa'));
+    }
+
+    // Tampilkan mahasiswa yang belum memiliki 2 pembimbing
+    public function indexWithOutPembimbing(Request $request)
+    {
+        $query = Mahasiswa::with(['user', 'tugasAkhir'])
+            ->withCount(['peranDosenTA as pembimbing_count' => function ($q) {
+                $q->where('peran', 'like', 'pembimbing%');
+            }])
+            ->having('pembimbing_count', '<', 2);
 
         if ($request->filled('prodi')) {
             $query->where('prodi', 'like', $request->prodi . '%');
@@ -27,18 +55,9 @@ class PenugasanPembimbingController extends Controller
         }
 
         $mahasiswa = $query->paginate(10);
-        $dosen = Dosen::with('user')->get(); // Tambahkan ini!
-
-        return view('admin.mahasiswa.views.assign-dospem', compact('mahasiswa', 'dosen'));
-    }
-
-    // Tampilkan form pilih pembimbing
-    public function create($id)
-    {
-        $mahasiswa = Mahasiswa::with('user', 'tugasAkhir')->findOrFail($id);
         $dosen = Dosen::with('user')->get();
 
-        return view('admin.mahasiswa.views.pilih-pembimbing', compact('mahasiswa', 'dosen'));
+        return view('admin.mahasiswa.views.assign-dospem', compact('mahasiswa', 'dosen'));
     }
 
     // Simpan pembimbing mahasiswa

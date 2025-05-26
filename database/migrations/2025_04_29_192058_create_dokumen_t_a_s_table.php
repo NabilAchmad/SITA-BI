@@ -19,6 +19,12 @@ return new class extends Migration
             $table->foreignId('divalidasi_oleh')->nullable()->constrained('users')->onDelete('set null');
             $table->text('catatan_reviewer')->nullable();
             $table->string('file_path');
+
+            // Hapus penggunaan after() karena tidak diperlukan pada create table
+            $table->integer('version')->default(1);
+            $table->timestamp('scan_at')->nullable()->comment('Terakhir dipindai plagiasi');
+            $table->foreignId('scanned_by')->nullable()->constrained('users');
+
             $table->foreignId('uploaded_by')->constrained('users');
             $table->enum('status_review', ['belum_diperiksa', 'diterima', 'ditolak']);
             $table->timestamps();

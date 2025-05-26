@@ -7,40 +7,93 @@ use App\Models\JadwalSidang;
 use App\Models\Ruangan;
 use App\Models\Sidang;
 use App\Models\Dosen;
+use App\Models\Mahasiswa;
 use App\Models\PeranDosenTA;
 use Illuminate\Support\Facades\DB;
+use App\Models\BeritaAcaraPraSidang;
+use App\Models\BeritaAcaraPascaSidang;
 
-class JadwalSidangController extends Controller
+class JadwalSidangAkhirController extends Controller
 {
 
-    public function index()
+    public function dashboard()
+    {
+        // Mahasiswa yang menunggu penjadwalan sidang proposal
+        $waitingSemproCount = Sidang::where('jenis_sidang', 'proposal')
+            ->where('status', 'dijadwalkan')->count();
+
+        // Mahasiswa yang menunggu penjadwalan sidang akhir
+        $waitingAkhirCount = Sidang::where('jenis_sidang', 'akhir')
+            ->where('status', 'dijadwalkan')->count();
+
+        // Jumlah jadwal sidang proposal
+        $jadwalSemproCount = JadwalSidang::whereHas('sidang', function ($query) {
+            $query->where('jenis_sidang', 'proposal');
+        })->count();
+
+        // Jumlah jadwal sidang akhir
+        $jadwalAkhirCount = JadwalSidang::whereHas('sidang', function ($query) {
+            $query->where('jenis_sidang', 'akhir');
+        })->count();
+
+        // Jumlah berita acara pra sidang (sempro)
+        $pascaSemproCount = BeritaAcaraPraSidang::count();
+
+        // Jumlah berita acara pasca sidang (akhir)
+        $pascaAkhirCount = BeritaAcaraPascaSidang::count();
+
+        return view('admin.sidang.dashboard.dashboard', compact(
+            'waitingSemproCount',
+            'waitingAkhirCount',
+            'jadwalSemproCount',
+            'jadwalAkhirCount',
+            'pascaSemproCount',
+            'pascaAkhirCount'
+        ));
+    }
+
+    public function MenungguSidangAkhir()
+    {
+        $mahasiswa = Mahasiswa::whereHas('tugasAkhir.sidang', function ($query) {
+            $query->where('status', 'dijadwalkan')
+                ->where('jenis_sidang', 'akhir')
+                ->whereDoesntHave('jadwalSidang');
+        })
+            ->with([
+                'user',
+                'tugasAkhir.sidang' => function ($query) {
+                    $query->where('status', 'dijadwalkan')
+                        ->where('jenis_sidang', 'akhir')
+                        ->whereDoesntHave('jadwalSidang');
+                },
+            ])
+            ->get();
+
+        $dosen = Dosen::with('user')->get();
+
+        $ruanganList = Ruangan::all();
+
+        return view('admin.sidang.akhir.views.mhs-sidang', compact('mahasiswa', 'dosen', 'ruanganList'));
+    }
+
+    public function listJadwal()
     {
         $jadwalList = JadwalSidang::with([
             'sidang.tugasAkhir.mahasiswa.user',
             'sidang.tugasAkhir.peranDosenTa.dosen.user',
             'ruangan'
         ])
-            ->whereHas('sidang', fn($q) => $q->where('status', '!=', 'selesai'))
-            ->get()
-            ->unique(fn($item) => $item->sidang->tugasAkhir->mahasiswa_id);
+            ->whereHas('sidang', function ($q) {
+                $q->where('status', 'dijadwalkan');
+            })
+            ->get();
 
-
-        return view('admin.sidang.jadwal.views.readJadwalSidang', compact('jadwalList'));
-    }
-
-    public function create(Request $request)
-    {
-        $sidangId = $request->sidang_id;
-        $sidang = Sidang::with('tugasAkhir.mahasiswa.user')->findOrFail($sidangId);
-        $ruanganList = Ruangan::all();
-        $dosenList = Dosen::with('user')->get();
-
-        return view('admin.sidang.jadwal.views.createJadwalSidang', compact('sidang', 'ruanganList', 'dosenList'));
+        return view('admin.sidang.akhir.jadwal.jadwal-sidang-akhir', compact('jadwalList'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'sidang_id' => 'required|exists:sidang,id',
             'tanggal' => 'required|date',
             'waktu_mulai' => 'required',
@@ -48,15 +101,28 @@ class JadwalSidangController extends Controller
             'ruangan_id' => 'required|exists:ruangan,id',
         ]);
 
-        JadwalSidang::create([
-            'sidang_id' => $request->sidang_id,
-            'tanggal' => $request->tanggal,
-            'waktu_mulai' => $request->waktu_mulai,
-            'waktu_selesai' => $request->waktu_selesai,
-            'ruangan_id' => $request->ruangan_id,
-        ]);
+        // Simpan data jadwal sidang ke DB (sesuaikan dengan model dan logika kamu)
+        try {
+            // Contoh:
+            $jadwal = new JadwalSidang();
+            $jadwal->sidang_id = $validated['sidang_id'];
+            $jadwal->tanggal = $validated['tanggal'];
+            $jadwal->waktu_mulai = $validated['waktu_mulai'];
+            $jadwal->waktu_selesai = $validated['waktu_selesai'];
+            $jadwal->ruangan_id = $validated['ruangan_id'];
+            $jadwal->save();
 
-        return redirect()->route('jadwal-sidang.read')->with('success', 'Jadwal sidang berhasil dibuat.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Jadwal sidang berhasil disimpan.',
+            ]);
+        } catch (\Exception $e) {
+            // Bisa log error jika perlu
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data.',
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)
@@ -134,7 +200,6 @@ class JadwalSidangController extends Controller
 
         // Simpan penguji baru sesuai urutan yang dipilih
         foreach ($request->penguji as $index => $dosenId) {
-            // Tentukan peran berdasarkan index: 0->penguji1, 1->penguji2, 2->penguji3
             $peran = 'penguji' . ($index + 1);
 
             PeranDosenTA::create([
@@ -144,8 +209,8 @@ class JadwalSidangController extends Controller
             ]);
         }
 
-        return redirect()->route('jadwal-sidang.create', ['sidang_id' => $sidang_id])
-            ->with('success', 'Dosen penguji berhasil disimpan.');
+        // Ini penting untuk AJAX:
+        return response()->json(['success' => true]);
     }
 
     public function show($sidang_id)
@@ -162,10 +227,10 @@ class JadwalSidangController extends Controller
         // Ambil semua ruangan untuk dropdown form edit
         $ruangans = Ruangan::all();
 
-        return view('admin.sidang.jadwal.views.detail', compact('jadwal', 'dosens', 'ruangans'));
+        return view('admin.sidang.akhir.modal.detail-jadwal', compact('jadwal', 'dosens', 'ruangans'));
     }
 
-    public function pascaSidang()
+    public function pascaSidangAkhir()
     {
         $sidangSelesai = JadwalSidang::with([
             'sidang.tugasAkhir.mahasiswa.user', // pastikan relasi ini valid
@@ -176,7 +241,7 @@ class JadwalSidangController extends Controller
             ->get()
             ->unique(fn($item) => optional($item->sidang->tugasAkhir)->mahasiswa_id);
 
-        return view('admin.sidang.jadwal.views.pasca', compact('sidangSelesai'));
+        return view('admin.sidang.akhir.pasca.pasca-sidang', compact('sidangSelesai'));
     }
 
     public function tandaiSidang($sidang_id)
