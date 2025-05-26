@@ -18,7 +18,7 @@ class AdminController extends Controller
         $totalDosen = Dosen::count();
         $totalMahasiswa = Mahasiswa::count();
         $totalPengumuman = Pengumuman::count();
-        $riwayatTA = TugasAkhir::latest()->take(5)->get();
+        $riwayatTA = TugasAkhir::latest()->get();
         $pengumumans = Pengumuman::with('pembuat')->orderBy('created_at', 'desc')->get();
         $logs = Log::with('user') // Jika ada relasi ke user
             ->latest()

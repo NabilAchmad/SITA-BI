@@ -41,6 +41,9 @@
                                     <ul class="list-unstyled lh-base">
                                         <li class="mb-3"><strong>Judul TA:</strong>
                                             {{ $jadwal->sidang->tugasAkhir->judul ?? '-' }}</li>
+                                        <li class="mb-3"><strong>Jenis Sidang:</strong>
+                                            {{ ($jadwal->sidang->jenis_sidang ?? '-') === 'akhir' ? 'Sidang Akhir' : $jadwal->sidang->jenis_sidang ?? '-' }}
+                                        </li>
                                         <li class="mb-3"><strong>Penguji 1:</strong>
                                             <span
                                                 id="penguji1Display">{{ optional($jadwal->sidang->tugasAkhir->peranDosenTa->firstWhere('peran', 'penguji1'))->dosen->user->name ?? '-' }}</span>
@@ -76,10 +79,13 @@
                     <!-- Tombol Aksi -->
                     <hr class="my-4">
                     <div class="d-flex flex-wrap justify-content-end gap-2">
+
+                        <!-- Tombol Edit -->
                         <button id="btnEdit" type="button" class="btn btn-warning btn-sm">
                             <i class="bi bi-pencil-square"></i> Edit
                         </button>
 
+                        <!-- Tombol Hapus -->
                         <form action="{{ route('jadwal-sidang.destroy', $jadwal->id) }}" method="POST"
                             onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')" class="m-0">
                             @csrf
@@ -89,21 +95,36 @@
                             </button>
                         </form>
 
-                        <form action="{{ route('jadwal-sidang.mark-done', $jadwal->id) }}" method="POST"
-                            onsubmit="return confirm('Tandai mahasiswa ini sudah melaksanakan sidang?')" class="m-0">
-                            @csrf
-                            <button type="submit" class="btn btn-success btn-sm">
-                                <i class="bi bi-check-circle me-1"></i> Tandai Selesai
+                        <!-- Dropdown Status Kelulusan -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <i class="bi bi-check-circle me-1"></i> Tentukan Kelulusan
                             </button>
-                        </form>
+                            <ul class="dropdown-menu">
+                                <li><button class="dropdown-item"
+                                        onclick="submitStatus('{{ $jadwal->sidang->id }}', 'lulus')">Lulus</button></li>
+                                <li><button class="dropdown-item"
+                                        onclick="submitStatus('{{ $jadwal->sidang->id }}', 'lulus_revisi')">Lulus
+                                        Revisi</button>
+                                </li>
+                                <li><button class="dropdown-item text-danger"
+                                        onclick="submitStatus('{{ $jadwal->sidang->id }}', 'tidak_lulus')">Tidak
+                                        Lulus</button>
+                                </li>
+                            </ul>
+                        </div>
 
+                        <!-- Tombol Unduh -->
                         <a href="#" class="btn btn-secondary btn-sm">
                             <i class="bi bi-download me-1"></i> Unduh Berita Acara
                         </a>
 
+                        <!-- Tombol Kembali -->
                         <a href="{{ route('jadwal.sidang.akhir') }}" class="btn btn-outline-dark btn-sm">
                             <i class="bi bi-arrow-left-circle me-1"></i> Kembali
                         </a>
+
                     </div>
                 </div>
             </div>
@@ -211,5 +232,130 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/js/sidang/sidang.js') }}"></script>
+    <script>
+        function submitStatus(id, status) {
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch(`/admin/sidang/akhir/tandai-sidang/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify({
+                        status: status
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let title = 'Berhasil';
+                        let text = 'Status berhasil diperbarui.';
+                        let icon = 'success';
+
+                        if (status === 'lulus') {
+                            title = 'Selamat!';
+                            text = 'Mahasiswa dinyatakan LULUS!';
+                            icon = 'success';
+                        } else if (status === 'lulus_revisi') {
+                            title = 'Perlu Revisi';
+                            text = 'Mahasiswa dinyatakan lulus dengan catatan revisi.';
+                            icon = 'warning';
+                        } else if (status === 'tidak_lulus') {
+                            title = 'Tidak Lulus';
+                            text = 'Mahasiswa dinyatakan belum lulus sidang.';
+                            icon = 'warning';
+                        }
+
+                        swal({
+                            title: title,
+                            text: text,
+                            icon: icon,
+                            buttons: {
+                                confirm: {
+                                    className: "btn btn-success"
+                                }
+                            }
+                        }).then(() => {
+                            if (status === 'tidak_lulus') {
+                                // Redirect ke halaman penjadwalan jika tidak lulus
+                                window.location.href = '/admin/sidang/akhir/penjadwalan';
+                            } else {
+                                // Redirect default untuk status lainnya
+                                window.location.href = '/admin/sidang/akhir/pasca-sidang-akhir';
+                            }
+                        });
+                    } else {
+                        swal("Gagal", data.message || "Terjadi kesalahan.", "error");
+                    }
+                })
+                .catch(() => {
+                    swal("Error", "Terjadi kesalahan saat mengirim permintaan.", "error");
+                });
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cardFlip = document.querySelector('.card-flip');
+            const btnEdit = document.getElementById('btnEdit');
+            const btnCancelEdit = document.getElementById('btnCancelEdit');
+            const btnSave = document.getElementById('btnSave');
+            const editForm = document.getElementById('editJadwalForm');
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            btnEdit.addEventListener('click', () => {
+                cardFlip.style.transform = 'rotateY(180deg)';
+            });
+
+            btnCancelEdit.addEventListener('click', () => {
+                cardFlip.style.transform = 'rotateY(0deg)';
+            });
+
+            btnSave.addEventListener('click', () => {
+                if (editForm.checkValidity()) {
+                    const formData = new FormData(editForm);
+                    fetch(editForm.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                                'Accept': 'application/json'
+                            },
+                            body: formData
+                        })
+                        .then(async res => {
+                            if (!res.ok) {
+                                const errorText = await res.text();
+                                throw new Error(errorText);
+                            }
+                            return res.json();
+                        })
+                        .then(response => {
+                            const jadwal = response.jadwal;
+                            const penguji = response.penguji;
+
+                            cardFlip.style.transform = 'rotateY(0deg)';
+                            document.getElementById('tanggalDisplay').textContent = jadwal.tanggal;
+                            document.getElementById('waktuDisplay').textContent =
+                                jadwal.waktu_mulai.substring(0, 5) + ' - ' +
+                                jadwal.waktu_selesai.substring(0, 5);
+                            document.getElementById('ruanganDisplay').textContent = jadwal.ruangan
+                                ?.lokasi || '-';
+
+                            ['penguji1', 'penguji2', 'penguji3', 'penguji4'].forEach(p => {
+                                const el = document.getElementById(p + 'Display');
+                                if (el) el.textContent = penguji[p] || '-';
+                            });
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            alert('Gagal menyimpan data:\n' + error.message);
+                        });
+                } else {
+                    alert('Form belum valid, tolong lengkapi data.');
+                }
+            });
+        });
+    </script>
 @endpush

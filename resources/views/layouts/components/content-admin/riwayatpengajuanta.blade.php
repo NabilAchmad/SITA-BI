@@ -48,12 +48,20 @@
                                     @php
                                         $status = strtolower($ta->status);
                                     @endphp
-                                    @if ($status === 'disetujui')
+                                    @if ($status === 'diajukan')
+                                        <span class="badge bg-primary">Diajukan</span>
+                                    @elseif ($status === 'draft')
+                                        <span class="badge bg-secondary">Draft</span>
+                                    @elseif ($status === 'revisi')
+                                        <span class="badge bg-warning text-dark">Revisi</span>
+                                    @elseif ($status === 'disetujui')
                                         <span class="badge bg-success">Disetujui</span>
+                                    @elseif ($status === 'lulus_tanpa_revisi')
+                                        <span class="badge bg-success">Lulus Tanpa Revisi</span>
+                                    @elseif ($status === 'lulus_dengan_revisi')
+                                        <span class="badge bg-info text-dark">Lulus Dengan Revisi</span>
                                     @elseif ($status === 'ditolak')
                                         <span class="badge bg-danger">Ditolak</span>
-                                    @elseif ($status === 'menunggu' || $status === 'menunggu verifikasi')
-                                        <span class="badge bg-warning text-dark">Menunggu Verifikasi</span>
                                     @else
                                         <span class="badge bg-secondary">-</span>
                                     @endif

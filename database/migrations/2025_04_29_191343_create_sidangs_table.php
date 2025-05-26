@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('tugas_akhir_id')->constrained('tugas_akhir')->onDelete('cascade');
             $table->enum('jenis_sidang', ['proposal', 'akhir']);
             $table->enum('status', ['menunggu','dijadwalkan', 'lulus', 'lulus_revisi', 'tidak_lulus'])->default('dijadwalkan');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });

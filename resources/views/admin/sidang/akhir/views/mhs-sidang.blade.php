@@ -20,7 +20,17 @@
                         const checkedCount = [...checkboxes].filter(c => c.checked).length;
                         if (checkedCount > 4) {
                             chk.checked = false;
-                            alert('Maksimal 4 dosen penguji.');
+                            swal({
+                                title: "Peringatan!",
+                                text: "Anda hanya dapat memilih maksimal 4 penguji.",
+                                icon: "warning",
+                                buttons: {
+                                    confirm: {
+                                        text: "OK",
+                                        className: "btn btn-primary"
+                                    }
+                                }
+                            });
                         }
                     });
                 });
@@ -39,8 +49,10 @@
             }
 
             // Modal Penguji
-            document.querySelectorAll('.btn-jadwalkan').forEach(btn => {
-                btn.addEventListener('click', function() {
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.btn-jadwalkan')) {
+                    const btn = e.target.closest('.btn-jadwalkan');
+
                     modalContainer.innerHTML = '';
                     const templatePenguji = document.getElementById('template-modal-penguji');
                     const clone = templatePenguji.content.cloneNode(true);
@@ -49,8 +61,8 @@
                     currentPengujiModal = document.getElementById('modalPenguji');
 
                     const formPenguji = document.getElementById('form-penguji');
-                    const sidangId = this.dataset.sidangId;
-                    formPenguji.action = this.dataset.url;
+                    const sidangId = btn.dataset.sidangId;
+                    formPenguji.action = btn.dataset.url;
 
                     const bsModalPenguji = new bootstrap.Modal(currentPengujiModal);
                     bsModalPenguji.show();
@@ -58,10 +70,9 @@
                     limitCheckboxSelection();
                     setupSearchFilter();
 
-                    currentPengujiModal.querySelector('#batal-penguji').addEventListener('click',
-                    () => {
-                            bsModalPenguji.hide();
-                        });
+                    currentPengujiModal.querySelector('#batal-penguji').addEventListener('click', () => {
+                        bsModalPenguji.hide();
+                    });
 
                     formPenguji.addEventListener('submit', function(e) {
                         e.preventDefault();
@@ -80,8 +91,8 @@
                                 if (!response.ok) {
                                     if (response.status === 422) {
                                         const errorData = await response.json();
-                                        const messages = Object.values(errorData
-                                            .errors).flat().join('\n');
+                                        const messages = Object.values(errorData.errors)
+                                            .flat().join('\n');
                                         alert('Validasi gagal:\n' + messages);
                                     } else {
                                         alert('Terjadi kesalahan server.');
@@ -93,7 +104,6 @@
                             .then(data => {
                                 if (data.success) {
                                     bsModalPenguji.hide();
-
                                     openModalJadwalSidang({
                                         sidang_id: sidangId,
                                         nama: btn.dataset.nama,
@@ -105,7 +115,6 @@
                                 }
                             })
                             .catch(err => {
-                                // Kalau error sudah ditangani, ini fallback
                                 if (err.message !== 'Fetch error') {
                                     alert('Terjadi kesalahan saat menyimpan penguji.');
                                 }
@@ -113,7 +122,7 @@
                     }, {
                         once: true
                     });
-                });
+                }
             });
 
             // Modal Jadwal Sidang

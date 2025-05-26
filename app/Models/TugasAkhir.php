@@ -49,11 +49,18 @@ class TugasAkhir extends Model
 
     public function sidang()
     {
-        return $this->hasOne(Sidang::class);
+        return $this->hasMany(Sidang::class);
     }
 
     public function notifikasi(): HasMany
     {
         return $this->hasMany(NotifikasiTa::class);
+    }
+
+    public function sidangTerakhir()
+    {
+        return $this->hasOne(Sidang::class)
+            ->where('jenis_sidang', ['akhir', 'proposal'])
+            ->latestOfMany();
     }
 }
