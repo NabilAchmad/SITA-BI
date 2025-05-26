@@ -60,7 +60,7 @@ class TugasAkhir extends Model
     public function sidangTerakhir()
     {
         return $this->hasOne(Sidang::class)
-            ->where('jenis_sidang', ['akhir', 'proposal'])
+            ->whereIn('jenis_sidang', ['akhir', 'proposal'])
             ->latestOfMany();
     }
 }

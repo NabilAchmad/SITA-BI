@@ -97,26 +97,34 @@ Route::prefix('admin')->group(function () {
 
         Route::prefix('sempro')->group(function () {
             // Daftar mahasiswa yang belum punya jadwal sidang sempro
-            Route::get('penjadwalan', [JadwalSidangSemproController::class, 'MenungguSidangSempro'])->name('sidang.menunggu.penjadwalan.sempro');
+            Route::get('/penjadwalan-sidang-sempro', [JadwalSidangSemproController::class, 'MenungguSidangSempro'])->name('sidang.menunggu.penjadwalan.sempro');
+
             // Daftar mahasiswa yang sudah punya jadwal sidang
-            Route::get('jadwal', [JadwalSidangSemproController::class, ''])->name('jadwal.sidang.sempro');
+            Route::get('/jadwal-sidang-sempro', [JadwalSidangSemproController::class, 'listJadwalSempro'])->name('jadwal.sidang.sempro');
 
             // Simpan penguji
-            Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangSemproController::class, 'simpanPenguji'])->name('jadwal-seminar.simpanPenguji');
+            Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangSemproController::class, 'simpanPenguji'])->name('jadwal-sempro.simpanPenguji');
 
             // Simpan data jadwal sidang
-            Route::post('/jadwal-sidang', [JadwalSidangSemproController::class, 'store'])->name('jadwal-seminar.store');
+            Route::post('/jadwal-sidang', [JadwalSidangSemproController::class, 'store'])->name('jadwal-sempro.store');
+
+            // Lihat Detail Jadwal Sidang akhir
+            Route::get('/detail-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'show'])->name('jadwal-sempro.show');
+
+            // Tandai akhir sidang selesai 
+            Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidang'])
+                ->name('jadwal-sidang-sempro.mark-done');
 
             // Daftar mahasiswa yang sudah sidang
-            Route::get('pasca', [JadwalSidangSemproController::class, ''])->name('pasca.sidang.sempro');
+            Route::get('pasca', [JadwalSidangSemproController::class, 'pascaSidangSempro'])->name('pasca.sidang.sempro');
         });
 
         Route::prefix('akhir')->group(function () {
             // Daftar mahasiswa yang belum punya jadwal sidang akhir
-            Route::get('/penjadwalan-sidang', [JadwalSidangAkhirController::class, 'MenungguSidangAkhir'])->name('sidang.menunggu.penjadwalan.akhir');
+            Route::get('/penjadwalan-sidang-akhir', [JadwalSidangAkhirController::class, 'MenungguSidangAkhir'])->name('sidang.menunggu.penjadwalan.akhir');
 
             // Daftar mahasiswa yang sudah punya jadwal sidang akhir
-            Route::get('/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'listJadwal'])->name('jadwal.sidang.akhir');
+            Route::get('/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'listJadwalAkhir'])->name('jadwal.sidang.akhir');
 
             // Simpan data jadwal sidang
             Route::post('/jadwal-sidang', [JadwalSidangAkhirController::class, 'store'])->name('jadwal-sidang.store');

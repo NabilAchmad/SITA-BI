@@ -1,12 +1,14 @@
+<!-- Template Modal Penguji -->
 <template id="template-modal-penguji">
     <form method="POST" id="form-penguji">
         @csrf
         <div class="modal fade" tabindex="-1" role="dialog" id="modalPenguji">
             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Pilih Dosen Penguji Seminar Proposal</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-header bg-secondary text-white">
+                        <h5 class="modal-title">Pilih Dosen Penguji</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body" style="max-height: 70vh; overflow-y: auto; min-width: 700px;">
                         <div class="mb-3">
@@ -43,8 +45,10 @@
                         <div class="mt-3 d-flex justify-content-between align-items-center">
                             <span class="text-muted fst-italic">* Maksimal pilih 4 dosen penguji</span>
                             <div>
-                                <button type="button" class="btn btn-secondary me-2" id="batal-penguji">Batal</button>
-                                <button type="submit" class="btn btn-primary" id="btn-simpan-penguji">Simpan</button>
+                                <button type="button" class="btn btn-secondary me-2"
+                                    id="batal-penguji">Batal</button>
+                                <button type="submit" class="btn btn-primary"
+                                    id="btn-simpan-penguji">Simpan</button>
                             </div>
                         </div>
                     </div>

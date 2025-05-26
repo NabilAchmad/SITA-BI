@@ -121,7 +121,7 @@
                         </a>
 
                         <!-- Tombol Kembali -->
-                        <a href="{{ route('jadwal.sidang.akhir') }}" class="btn btn-outline-dark btn-sm">
+                        <a href="{{ route('jadwal.sidang.sempro') }}" class="btn btn-outline-dark btn-sm">
                             <i class="bi bi-arrow-left-circle me-1"></i> Kembali
                         </a>
 
@@ -236,7 +236,7 @@
         function submitStatus(id, status) {
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            fetch(`/admin/sidang/akhir/tandai-sidang/${id}`, {
+            fetch(`/admin/sidang/sempro/tandai-sidang/${id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -279,10 +279,10 @@
                         }).then(() => {
                             if (status === 'tidak_lulus') {
                                 // Redirect ke halaman penjadwalan jika tidak lulus
-                                window.location.href = '/admin/sidang/akhir/penjadwalan-sidang';
+                                window.location.href = '/admin/sidang/sempro/penjadwalan-sidang-sempro';
                             } else {
                                 // Redirect default untuk status lainnya
-                                window.location.href = '/admin/sidang/akhir/pasca-sidang-akhir';
+                                window.location.href = '/admin/sidang/sempro/pasca-sidang-sempro';
                             }
                         });
                     } else {

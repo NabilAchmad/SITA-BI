@@ -1,13 +1,15 @@
+<!-- Template Modal Jadwal Sidang -->
 <template id="template-modal-jadwal-sidang">
-    <form action="{{ route('jadwal-seminar.store') }}" method="POST" id="form-jadwal-sidang">
+    <form action="{{ route('jadwal-sidang.store') }}" method="POST" id="form-jadwal-sidang">
         @csrf
         <input type="hidden" name="sidang_id" id="jadwal-sidang_id" value="">
         <div class="modal fade" tabindex="-1" role="dialog" id="modalJadwalSidang">
             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">Isi Jadwal Seminar Proposal</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">Isi Jadwal Sidang</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
@@ -19,11 +21,11 @@
                             <input type="text" class="form-control" id="jadwal-nim" readonly>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Judul Seminar Proposal</label>
+                            <label class="form-label">Judul Skripsi</label>
                             <input type="text" class="form-control" id="jadwal-judul" readonly>
                         </div>
                         <div class="mb-3">
-                            <label for="tanggal" class="form-label">Tanggal Seminar</label>
+                            <label for="tanggal" class="form-label">Tanggal Sidang</label>
                             <input type="date" name="tanggal" class="form-control" required>
                         </div>
                         <div class="mb-3">
@@ -35,7 +37,7 @@
                             <input type="time" name="waktu_selesai" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label for="ruangan_id" class="form-label">Ruangan Seminar</label>
+                            <label for="ruangan_id" class="form-label">Ruangan Sidang</label>
                             <select name="ruangan_id" class="form-select" required>
                                 <option value="">-- Pilih Ruangan --</option>
                                 @foreach ($ruanganList as $ruang)

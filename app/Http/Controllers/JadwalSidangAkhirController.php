@@ -146,7 +146,7 @@ class JadwalSidangAkhirController extends Controller
         ));
     }
 
-    public function listJadwal(Request $request)
+    public function listJadwalAkhir(Request $request)
     {
         $prodi = $request->input('prodi');
         $search = $request->input('search'); // Ambil input pencarian dari search bar
@@ -364,8 +364,6 @@ class JadwalSidangAkhirController extends Controller
 
         return view('admin.sidang.akhir.modal.detail-jadwal', compact('jadwal', 'dosens', 'ruangans'));
     }
-
-    
 
     public function pascaSidangAkhir(Request $request)
     {
