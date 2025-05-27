@@ -13,6 +13,7 @@ use App\Models\File;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class TugasAkhirController extends Controller
 {
@@ -27,19 +28,6 @@ class TugasAkhirController extends Controller
         $request->validate([
             'judul' => 'required|string|max:255',
             'abstrak' => 'required|string',
-            'file_proposal' => 'required|file|mimes:pdf,doc,docx|max:2048',
-        ]);
-
-        // Simpan file proposal
-        $file = $request->file('file_proposal');
-        $fileName = time() . '_' . Str::slug($file->getClientOriginalName(), '_');
-        $path = $file->storeAs('proposal_ta', $fileName, 'public');
-
-        // Simpan ke tabel files
-        $fileModel = File::create([
-            'file_path' => $path,
-            'file_type' => $file->getClientMimeType(),
-            'uploaded_by' => $this->assumedMahasiswaId(),
         ]);
 
         // Simpan ke tabel tugas_akhir
@@ -47,9 +35,8 @@ class TugasAkhirController extends Controller
             'mahasiswa_id' => $this->assumedMahasiswaId(),
             'judul' => $request->judul,
             'abstrak' => $request->abstrak,
-            'file_path' => $path,
             'status' => 'diajukan',
-            'tanggal_pengajuan' => now()->toDateString(),
+            'tanggal_pengajuan' => Carbon::now()->toDateString(),
         ]);
 
         return redirect()->back()->with('success', 'Tugas Akhir berhasil diajukan!');
@@ -58,7 +45,7 @@ class TugasAkhirController extends Controller
     public function progress()
     {
         // Gunakan auth()->id() jika login, atau ganti dengan simulasi user
-        $simulasiUserId = 35;
+        $simulasiUserId = 3;
 
         // Ambil data mahasiswa berdasarkan user_id
         $mahasiswa = Mahasiswa::where('user_id', $simulasiUserId)->first();

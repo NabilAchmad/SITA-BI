@@ -1,162 +1,68 @@
-<style>
-  .text-primary-donk {
-    color: #004085 !important; /* Biru tua/navy */
-  }
-</style>
+@push('styles')
+    <style>
+        .text-primary-donk {
+            color: #004085 !important; /* Biru tua/navy */
+        }
 
-<h1 class="text-center text-primary-donk">List Topik Tugas Akhir</h1>
+        /* Hover button take topic */
+        .btn-take:hover {
+            background-color: #267acc !important;
+            box-shadow: 0 6px 16px #267acccc;
+        }
+    </style>
+@endpush
 
-<table class="table table-bordered mt-4">
-    @csrf
-    <thead class="table-dark">
-        <tr>
-            <th>No</th>
-            <th>Topic</th>
-            <th>Description</th>
-            <th>Quota</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>1</td>
-            <td>Mobile Application Development</td>
-            <td>Research on developing mobile applications for Android or iOS platforms.</td>
-            <td>5</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>Geographic Information System</td>
-            <td>Research on implementing GIS for mapping specific areas.</td>
-            <td>3</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Machine Learning</td>
-            <td>Research on applying machine learning algorithms for data prediction.</td>
-            <td>4</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>4</td>
-            <td>Internet of Things (IoT)</td>
-            <td>Research on developing IoT-based systems for automation.</td>
-            <td>6</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>5</td>
-            <td>Network Security</td>
-            <td>Research on techniques to enhance computer network security.</td>
-            <td>2</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>6</td>
-            <td>Cloud Computing</td>
-            <td>Research on cloud infrastructure and services for scalable applications.</td>
-            <td>4</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>7</td>
-            <td>Blockchain Technology</td>
-            <td>Research on blockchain applications beyond cryptocurrency.</td>
-            <td>3</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>8</td>
-            <td>Artificial Intelligence</td>
-            <td>Research on AI techniques for natural language processing.</td>
-            <td>5</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>9</td>
-            <td>Big Data Analytics</td>
-            <td>Research on analyzing large datasets for business insights.</td>
-            <td>4</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>10</td>
-            <td>Cybersecurity</td>
-            <td>Research on advanced methods to prevent cyber threats.</td>
-            <td>3</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>11</td>
-            <td>Data Mining</td>
-            <td>Research on extracting meaningful patterns from large datasets.</td>
-            <td>5</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>12</td>
-            <td>Robotics</td>
-            <td>Research on designing and programming autonomous robots.</td>
-            <td>2</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>13</td>
-            <td>Virtual Reality</td>
-            <td>Research on developing immersive VR applications.</td>
-            <td>4</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>14</td>
-            <td>Augmented Reality</td>
-            <td>Research on AR applications for education and training.</td>
-            <td>3</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>15</td>
-            <td>Quantum Computing</td>
-            <td>Research on quantum algorithms for complex problem-solving.</td>
-            <td>2</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>16</td>
-            <td>Game Development</td>
-            <td>Research on creating engaging and interactive video games.</td>
-            <td>6</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>17</td>
-            <td>Human-Computer Interaction</td>
-            <td>Research on improving user interfaces for better usability.</td>
-            <td>4</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>18</td>
-            <td>Renewable Energy Systems</td>
-            <td>Research on optimizing renewable energy technologies.</td>
-            <td>3</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>19</td>
-            <td>Digital Forensics</td>
-            <td>Research on techniques for investigating digital crimes.</td>
-            <td>2</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-        <tr>
-            <td>20</td>
-            <td>Autonomous Vehicles</td>
-            <td>Research on self-driving car technologies and safety measures.</td>
-            <td>5</td>
-            <td><button class="btn btn-primary btn-sm">Take Topic</button></td>
-        </tr>
-    </tbody>
-</table>
+<div class="card shadow-sm mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="card-title text-primary-donk mb-0">List Topik Tugas Akhir</h4>
+        <form method="GET" action="{{ route('topik-ta.index') }}" class="d-flex gap-2">
+            <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari topik..."
+                value="{{ request('search') }}">
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-search me-1"></i> Cari
+            </button>
+        </form>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>No</th>
+                        <th>Topik</th>
+                        <th>Deskripsi</th>
+                        <th>Kuota</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($topikList as $index => $topik)
+                        <tr>
+                            <td>{{ ($topikList->currentPage() - 1) * $topikList->perPage() + $index + 1 }}</td>
+                            <td class="text-start">{{ $topik->judul_topik }}</td>
+                            <td class="text-start">{{ $topik->deskripsi }}</td>
+                            <td>{{ $topik->kuota }}</td>
+                            <td>
+                                <form method="POST" action="{{ route('topik-ta.take', $topik->id) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary btn-sm btn-take">
+                                        Ambil Topik
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-muted">Belum ada topik tersedia.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            {{ $topikList->withQueryString()->links() }}
+        </div>
+    </div>
+</div>
