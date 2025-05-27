@@ -8,8 +8,8 @@ Route::prefix('dosen')->group(function(){
         Route::view('/', 'dosen.views.dashboard')->name('dosen.dashboard');
     });
 
-    Route::prefix('jadwal')->group(function(){
-        Route::view('/read', 'dosen.jadwal.views.read')->name('dosen.jadwal.read');
+    Route::prefix('bimbingan')->group(function(){
+        Route::get('/list-bimbingan', 'dosen.jadwal.views.read')->name('list-mhs-bimbingan');
         
     });
 
