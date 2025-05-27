@@ -59,7 +59,7 @@ class TugasAkhir extends Model
     public function sidang()
     {
         return $this->hasMany(Sidang::class);
-        return $this->hasOne(Sidang::class, 'tugas_akhir_id');
+        // return $this->hasOne(Sidang::class, 'tugas_akhir_id');
     }
     // Relasi ke Notifikasi TA
     public function notifikasi()
@@ -79,16 +79,16 @@ class TugasAkhir extends Model
     }
 
     // relasi 1 ke PeranDosenTA yang peran pembimbing1
-    public function pembimbing1()
-    {
-        return $this->hasOne(PeranDosenTA::class, 'tugas_akhir_id')->where('peran', 'pembimbing1');
-    }
+    // public function pembimbing1()
+    // {
+    //     return $this->hasOne(PeranDosenTA::class, 'tugas_akhir_id')->where('peran', 'pembimbing1');
+    // }
 
-    // relasi 1 ke PeranDosenTA yang peran pembimbing2
-    public function pembimbing2()
-    {
-        return $this->hasOne(PeranDosenTA::class, 'tugas_akhir_id')->where('peran', 'pembimbing2');
-    }
+    // // relasi 1 ke PeranDosenTA yang peran pembimbing2
+    // public function pembimbing2()
+    // {
+    //     return $this->hasOne(PeranDosenTA::class, 'tugas_akhir_id')->where('peran', 'pembimbing2');
+    // }
 
     public function sidangTerakhir()
     {
