@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Models\JadwalSidang;
 use Illuminate\Http\Request;
+use App\Models\Pengumuman;
+use App\Models\Sidang;
+use App\Models\Jadwal;
+use App\Models\JadwalSidang;
 use App\Models\JudulTA;
 use App\Models\Mahasiswa;
+use App\Models\Nilai;
 
 class KaprodiController extends Controller
 {
@@ -16,55 +19,25 @@ class KaprodiController extends Controller
         return view('kaprodi.dashboard');
     }
 
-    // Sidang Dashboard
-    public function showSidangDashboard()
-    {
-        $jadwalCount = JadwalSidang::count();
-        return view('kaprodi.sidang.dashboard.dashboard', compact('jadwalCount'));
-    }
-
-    public function showMahasiswaSidang()
-    {
-        $mahasiswaCount = Mahasiswa::count();
-        return view('kaprodi.sidang.dashboard.dashboard', compact('mahasiswaCount'));
-    }
-
     // Jadwal Sidang
     public function showJadwal()
     {
-        $jadwalSidangs = JadwalSidang::with([
-            'sidang.tugasAkhir.mahasiswa',
-            'sidang.peranDosenTa' => function ($query) {
-                $query->whereIn('peran', ['penguji1', 'penguji2']);
-            },
-            'ruangan'
-        ])->get();
-
-        return view('kaprodi.jadwal.readJadwal', compact('jadwalSidangs'));
+        $jadwals = jadwal::all();
+        return view('kaprodi.jadwal.readJadwal', compact('jadwals'));
     }
 
     // Acc Judul Tugas Akhir
-    // compact('judulTA'));
     public function showAccJudulTA()
     {
-        $judulTAs = JudulTA::all(); // Fetch all JudulTA records or adjust query as needed
+        $judulTAs = JudulTA::all();
         return view('kaprodi.judulTA.AccJudulTA', compact('judulTAs'));
     }
 
     // Nilai Sidang
     public function showNilaiSidang()
     {
-        $jadwalSidangs = JadwalSidang::with(['sidang.nilai', 'sidang.tugasAkhir.mahasiswa'])->get();
-
-        return view('kaprodi.sidang.read', compact('jadwalSidangs'));
-    }
-
-    // Show Sidang Results following jadwal sidang from admin
-    public function showSidangResults()
-    {
-        $jadwalSidangs = JadwalSidang::with(['sidang.nilai', 'sidang.tugasAkhir.mahasiswa'])->get();
-
-        return view('kaprodi.sidang.read', compact('jadwalSidangs'));
+        $nilais = Nilai::all();
+        return view('kajur.sidang.readSidang', compact('nilais'));
     }
 
     // Create Sidang
@@ -73,10 +46,26 @@ class KaprodiController extends Controller
         return view('kaprodi.sidang.createSidang');
     }
 
+    // Store Sidang (handle POST)
+    public function storeSidang(Request $request)
+    {
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'tanggal' => 'required|date',
+            'nilai' => 'nullable|numeric',
+            'status' => 'nullable|string|max:50',
+        ]);
+
+        Sidang::create($validated);
+
+        return redirect()->route('kaprodi.nilai.page')->with('success', 'Sidang berhasil dibuat.');
+    }
+
     // Pengumuman
     public function showPengumuman()
     {
-        return view('kaprodi.Pengumuman.pengumuman');
+        $pengumumans = Pengumuman::all();
+        return view('kaprodi.Pengumuman.pengumuman', compact('pengumumans'));
     }
 
     // Approve JudulTA
@@ -97,5 +86,26 @@ class KaprodiController extends Controller
         $judul->save();
 
         return response()->json(['message' => 'Judul telah ditolak']);
+    }
+
+    // Sidang Dashboard
+    public function showSidangDashboard()
+    {
+        $jadwalCount = JadwalSidang::count();
+        return view('kaprodi.sidang.dashboard.dashboard', compact('jadwalCount'));
+    }
+
+    public function showMahasiswaSidang()
+    {
+        $mahasiswaCount = Mahasiswa::count();
+        return view('kaprodi.sidang.dashboard.dashboard', compact('mahasiswaCount'));
+    }
+
+    // Show Sidang Results following jadwal sidang from admin
+    public function showSidangResults()
+    {
+        $jadwalSidangs = JadwalSidang::with(['sidang.nilai', 'sidang.tugasAkhir.mahasiswa'])->get();
+
+        return view('kaprodi.sidang.read', compact('jadwalSidangs'));
     }
 }

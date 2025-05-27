@@ -1,4 +1,4 @@
-<h1 class="mb-4">Jadwal Sidang</h1>
+<h1 class="mb-4">Nilai Sidang Mahasiswa</h1>
 <div class="table-responsive">
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
@@ -7,10 +7,11 @@
                 <th>Nama Mahasiswa</th>
                 <th>Judul Skripsi</th>
                 <th>Penguji 1</th>
+                <th>Nilai Penguji 1</th>
                 <th>Penguji 2</th>
-                <th>Tanggal</th>
-                <th>Waktu</th>
-                <th>Ruangan</th>
+                <th>Nilai Penguji 2</th>
+                <th>Rata-rata</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -19,33 +20,33 @@
                 <td>John Doe</td>
                 <td>Implementasi Sistem Informasi Akademik</td>
                 <td>Dr. Smith</td>
+                <td>85</td>
                 <td>Prof. Johnson</td>
-                <td>2023-12-01</td>
-                <td>10:00 - 12:00</td>
-                <td>Ruang 101</td>
-
+                <td>88</td>
+                <td>86.5</td>
+                <td><span class="badge bg-success">Lulus</span></td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>Jane Doe</td>
                 <td>Analisis Data Menggunakan Machine Learning</td>
                 <td>Dr. Brown</td>
+                <td>78</td>
                 <td>Prof. Taylor</td>
-                <td>2023-12-02</td>
-                <td>13:00 - 15:00</td>
-                <td>Ruang 102</td>
-
+                <td>80</td>
+                <td>79</td>
+                <td><span class="badge bg-success">Lulus</span></td>
             </tr>
             <tr>
                 <td>3</td>
                 <td>Michael Smith</td>
                 <td>Pengembangan Aplikasi Mobile</td>
                 <td>Dr. Wilson</td>
+                <td>65</td>
                 <td>Prof. Davis</td>
-                <td>2023-12-03</td>
-                <td>09:00 - 11:00</td>
-                <td>Ruang 103</td>
-
+                <td>60</td>
+                <td>62.5</td>
+                <td><span class="badge bg-danger">Tidak Lulus</span></td>
             </tr>
         </tbody>
     </table>
