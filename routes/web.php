@@ -4,18 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TugasAkhirController;
 use App\Http\Controllers\PendaftaranSidangController;
 
-Route::get('/', function () {
-    return view('home/homepage');
-});
-
-Route::prefix('mahasiswa')->group(function () {
+Route::prefix('/mahasiswa')->group(function () {
 
     // Dashboard Mahasiswa
     Route::get('/', function () {
         return view('mahasiswa.views.dashboard');
     });
 
-    Route::prefix('tugas-akhir')->group(function () {
+    Route::prefix('/tugas-akhir')->group(function () {
         Route::get('/', [TugasAkhirController::class, 'dashboard'])->name('tugas-akhir.dashboard');
 
         // Menampilkan form ajukan Tugas Akhir
@@ -44,7 +40,7 @@ Route::prefix('mahasiswa')->group(function () {
 
     Route::prefix('bimbingan')->group(function () {
         // Tambahkan route untuk Bimbingan di sini jika diperlukan
-        Route::get('dashboard', function () {
+        Route::get('/', function () {
             return view('mahasiswa.Bimbingan.dashboard.dashboard');
         })->name('dashboard.bimbingan');
 

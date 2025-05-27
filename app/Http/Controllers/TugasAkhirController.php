@@ -10,7 +10,6 @@ use App\Models\RevisiTa;
 use App\Models\DokumenTa;
 use App\Models\Sidang;
 use App\Models\File;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -20,7 +19,7 @@ class TugasAkhirController extends Controller
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return 42;
+        return 1;
     }
 
     // Mengontrol akses mahasiswa ke dashboard tugas akhir
@@ -46,47 +45,46 @@ class TugasAkhirController extends Controller
         $mahasiswa = Mahasiswa::where('user_id', $mahasiswaId)->first();
 
         if (!$mahasiswa) {
-            return redirect()->back()->with('error', 'Akun ini tidak memiliki data mahasiswa.');
+            return redirect()->route('tugas-akhir.dashboard')->with('error', 'Akun ini tidak memiliki data mahasiswa.');
         }
 
         // Cek apakah mahasiswa sudah mengajukan tugas akhir
         $existing = TugasAkhir::where('mahasiswa_id', $mahasiswaId)->exists();
 
         if ($existing) {
-            return redirect()->back()->withErrors(['error' => 'Anda sudah mengajukan tugas akhir.']);
+            return redirect()->route('tugas-akhir.dashboard')->withErrors(['error' => 'Anda sudah mengajukan tugas akhir.']);
         }
 
         return view('mahasiswa.tugas-akhir.crud-ta.create', compact('mahasiswa'));
     }
 
+    // Menyimpan data Tugas Akhir
     public function store(Request $request)
     {
         $mahasiswaId = $this->assumedMahasiswaId();
-
         $mahasiswa = Mahasiswa::where('user_id', $mahasiswaId)->first();
 
         // Cek apakah mahasiswa sudah mengajukan tugas akhir
         $existing = TugasAkhir::where('mahasiswa_id', $mahasiswaId)->exists();
 
         if ($existing) {
-            return redirect()->back()->withErrors(['error' => 'Anda sudah mengajukan tugas akhir.']);
+            return redirect()->route('tugas-akhir.dashboard')->withErrors(['error' => 'Anda sudah mengajukan tugas akhir.']);
         }
 
         $request->validate([
-            'judul' => 'required|string|max:255',
+            'judul' => 'required|string|max:255|unique:tugas_akhir,judul,NULL,id,mahasiswa_id,' . $mahasiswa->id,
             'abstrak' => 'required|string',
         ]);
 
-        // Simpan ke tabel tugas_akhir
         TugasAkhir::create([
-            'mahasiswa_id' =>  $mahasiswa->id,
+            'mahasiswa_id' => $mahasiswa->id,
             'judul' => $request->judul,
             'abstrak' => $request->abstrak,
             'status' => 'diajukan',
             'tanggal_pengajuan' => Carbon::now()->toDateString(),
         ]);
 
-        return redirect()->route('tugas-akhir.ajukan')->with('success', 'Tugas Akhir berhasil diajukan!');
+        return redirect()->route('tugas-akhir.dashboard')->with('success', 'Tugas Akhir berhasil diajukan!');
     }
 
     public function progress()

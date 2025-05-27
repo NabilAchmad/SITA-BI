@@ -119,3 +119,17 @@
         }
     </style>
 @endsection
+
+@push('scripts')
+    <script>
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                html: `{!! session('error') !!}`,
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        @endif
+    </script>
+@endpush

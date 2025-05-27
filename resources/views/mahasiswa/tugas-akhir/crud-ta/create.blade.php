@@ -1,72 +1,44 @@
 @extends('layouts.template.mahasiswa')
 @section('title', 'Ajukan TA')
 @section('content')
-    <style>
-        .text-primary-donk {
-            color: #004085 !important;
-        }
-    </style>
 
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow-lg border-0 rounded-4">
-                    <div class="card-body">
-
-                        <!-- Tombol Kembali -->
-                        <div class="mb-3">
-                            <a href="{{ route('tugas-akhir.dashboard') }}" class="btn btn-outline-secondary rounded-pill">
-                                <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
-                            </a>
-                        </div>
-
-                        <h3 class="text-center mb-4 text-primary-donk">Ajukan Tugas Akhir</h3>
-
-                        @if (session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-
-                        <form action="{{ route('tugasAkhir.store') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-
-                            <div class="mb-3">
-                                <label for="judul" class="form-label">Judul Tugas Akhir</label>
-                                <input type="text" class="form-control" id="judul" name="judul"
-                                    placeholder="Masukkan judul tugas akhir" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="abstrak" class="form-label">Abstrak</label>
-                                <textarea class="form-control" id="abstrak" name="abstrak" rows="4" placeholder="Masukkan abstrak tugas akhir"
-                                    required></textarea>
-                            </div>
-
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg rounded-pill">
-                                    <i class="bi bi-upload"></i> Ajukan
-                                </button>
-                            </div>
-                        </form>
-
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Page Header with Back Button (moved to top-right) -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h2 class="text-primary-donk">Ajukan Tugas Akhir</h2>
+        <a href="{{ route('tugas-akhir.dashboard') }}" class="btn btn-outline-secondary rounded-pill">
+            <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
+        </a>
     </div>
+
+    <!-- Form Container with max-width -->
+    <div class="mx-auto" style="max-width: 800px;">
+        <form action="{{ route('tugasAkhir.store') }}" method="POST" enctype="multipart/form-data"
+            class="p-4 bg-white rounded-4 shadow-sm">
+            @csrf
+
+            <!-- Judul Field -->
+            <div class="mb-4">
+                <label for="judul" class="form-label fw-semibold">Judul Tugas Akhir</label>
+                <input type="text" class="form-control form-control-lg" id="judul" name="judul"
+                    placeholder="Masukkan judul tugas akhir" required>
+            </div>
+
+            <!-- Abstrak Field -->
+            <div class="mb-4">
+                <label for="abstrak" class="form-label fw-semibold">Abstrak</label>
+                <textarea class="form-control" id="abstrak" name="abstrak" rows="6" placeholder="Masukkan abstrak tugas akhir"
+                    required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-end mt-5">
+                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4">
+                    <i class="bi bi-upload me-2"></i> Ajukan
+                </button>
+            </div>
+        </form>
+    </div>
+
 @endsection
 
 @push('scripts')
@@ -91,4 +63,12 @@
             });
         </script>
     @endif
+@endpush
+
+@push('styles')
+    <style>
+        .text-primary-donk {
+            color: #004085 !important;
+        }
+    </style>
 @endpush
