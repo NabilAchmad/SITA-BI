@@ -20,7 +20,7 @@ class TugasAkhirController extends Controller
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return 3;
+        return 1;
     }
 
     public function store(Request $request)
@@ -39,13 +39,13 @@ class TugasAkhirController extends Controller
             'tanggal_pengajuan' => Carbon::now()->toDateString(),
         ]);
 
-        return redirect()->back()->with('success', 'Tugas Akhir berhasil diajukan!');
+        return redirect()->route('tugas-akhir.ajukan')->with('success', 'Tugas Akhir berhasil diajukan!');
     }
 
     public function progress()
     {
         // Gunakan auth()->id() jika login, atau ganti dengan simulasi user
-        $simulasiUserId = 3;
+        $simulasiUserId = 1;
 
         // Ambil data mahasiswa berdasarkan user_id
         $mahasiswa = Mahasiswa::where('user_id', $simulasiUserId)->first();
