@@ -1,69 +1,44 @@
 @extends('layouts.template.mahasiswa')
 @section('title', 'Ajukan TA')
 @section('content')
-
-    <!-- Page Header with Back Button (moved to top-right) -->
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <h2 class="text-primary-donk">Ajukan Tugas Akhir</h2>
-        <a href="{{ route('tugas-akhir.dashboard') }}" class="btn btn-outline-secondary rounded-pill">
-            <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
+    <!-- Page Header with Back Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">Ajukan Tugas Akhir</h2>
+        <a href="{{ route('tugas-akhir.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+            <i class="bi bi-arrow-left me-1"></i> Kembali
         </a>
     </div>
 
-    <!-- Form Container with max-width -->
-    <div class="mx-auto" style="max-width: 800px;">
-        <form action="{{ route('tugasAkhir.store') }}" method="POST" enctype="multipart/form-data"
-            class="p-4 bg-white rounded-4 shadow-sm">
-            @csrf
+    <!-- Form Container -->
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-4">
+            <form action="{{ route('tugasAkhir.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
 
-            <!-- Judul Field -->
-            <div class="mb-4">
-                <label for="judul" class="form-label fw-semibold">Judul Tugas Akhir</label>
-                <input type="text" class="form-control form-control-lg" id="judul" name="judul"
-                    placeholder="Masukkan judul tugas akhir" required>
-            </div>
+                <!-- Judul Field -->
+                <div class="mb-3">
+                    <label for="judul" class="form-label fw-semibold text-secondary">Judul Tugas Akhir</label>
+                    <input type="text" class="form-control" id="judul" name="judul"
+                        placeholder="Masukkan judul tugas akhir" required>
+                </div>
 
-            <!-- Abstrak Field -->
-            <div class="mb-4">
-                <label for="abstrak" class="form-label fw-semibold">Abstrak</label>
-                <textarea class="form-control" id="abstrak" name="abstrak" rows="6" placeholder="Masukkan abstrak tugas akhir"
-                    required></textarea>
-            </div>
+                <!-- Abstrak Field -->
+                <div class="mb-4">
+                    <label for="abstrak" class="form-label fw-semibold text-secondary">Abstrak</label>
+                    <textarea class="form-control" id="abstrak" name="abstrak" rows="5" placeholder="Masukkan abstrak tugas akhir"
+                        required></textarea>
+                </div>
 
-            <!-- Submit Button -->
-            <div class="text-end mt-5">
-                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4">
-                    <i class="bi bi-upload me-2"></i> Ajukan
-                </button>
-            </div>
-        </form>
+                <!-- Submit Button -->
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">
+                        <i class="bi bi-send me-1"></i> Ajukan
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
 @endsection
-
-@push('scripts')
-    @if (session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: '{{ session('success') }}',
-                confirmButtonColor: '#3085d6'
-            });
-        </script>
-    @endif
-
-    @if ($errors->has('error'))
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal!',
-                text: '{{ $errors->first('error') }}',
-                confirmButtonColor: '#d33'
-            });
-        </script>
-    @endif
-@endpush
 
 @push('styles')
     <style>

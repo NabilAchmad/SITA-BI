@@ -88,4 +88,9 @@ class TugasAkhir extends Model
     {
         return $this->hasOne(PeranDosenTA::class, 'tugas_akhir_id')->where('peran', 'pembimbing2');
     }
+
+    public function tawaranTopik()
+    {
+        return $this->belongsTo(TawaranTopik::class, 'tawaran_topik_id');
+    }
 }

@@ -90,7 +90,7 @@ class TugasAkhirController extends Controller
     public function progress()
     {
         // Gunakan auth()->id() jika login, atau ganti dengan simulasi user
-        $simulasiUserId = 42;
+        $simulasiUserId = 1;
 
         // Ambil data mahasiswa berdasarkan user_id
         $mahasiswa = Mahasiswa::where('user_id', $simulasiUserId)->first();

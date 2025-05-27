@@ -2,6 +2,35 @@
 
 @section('title', 'Dashboard Tugas Akhir')
 
+@push('styles')
+    <style>
+        .card-hover:hover {
+            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
+        }
+
+        .transition-scale {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .transition-scale:hover {
+            transform: scale(1.03);
+        }
+
+        .opacity-10 {
+            opacity: 0.1;
+        }
+
+        .icon.icon-shape {
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="container-fluid py-4">
 
@@ -23,7 +52,7 @@
             <!-- Ajukan Topik Mandiri -->
             <div class="col-md-6 col-xl-3">
                 <a href="{{ !$sudahMengajukan ? route('tugas-akhir.ajukan') : '#' }}"
-                    class="text-decoration-none {{ $sudahMengajukan ? 'disabled-link' : '' }}">
+                    class="text-decoration-none {{ $sudahMengajukan ? 'disabled-link' : '' }} ajukan-link">
                     <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
@@ -41,7 +70,7 @@
             <!-- Ajukan Topik Dosen -->
             <div class="col-md-6 col-xl-3">
                 <a href="{{ !$sudahMengajukan ? route('list-topik') : '#' }}"
-                    class="text-decoration-none {{ $sudahMengajukan ? 'disabled-link' : '' }}">
+                    class="text-decoration-none {{ $sudahMengajukan ? 'disabled-link' : '' }} ajukan-topik-dosen-link">
                     <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
@@ -91,45 +120,64 @@
             </div>
         </div>
     </div>
-
-    <style>
-        .card-hover:hover {
-            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
-        }
-
-        .transition-scale {
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .transition-scale:hover {
-            transform: scale(1.03);
-        }
-
-        .opacity-10 {
-            opacity: 0.1;
-        }
-
-        .icon.icon-shape {
-            width: 3rem;
-            height: 3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-    </style>
 @endsection
 
 @push('scripts')
     <script>
-        @if (session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                html: `{!! session('error') !!}`,
-                showConfirmButton: true,
-                confirmButtonText: 'OK'
-            });
-        @endif
+        document.addEventListener("DOMContentLoaded", function() {
+            const sudahMengajukan = @json($sudahMengajukan);
+            if (sudahMengajukan) {
+                // Pilih semua link yang perlu dicegah kliknya jika sudah mengajukan
+                const links = document.querySelectorAll('.ajukan-link, .ajukan-topik-dosen-link');
+                links.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        swal({
+                            title: "Tidak Bisa!",
+                            text: "Tidak dapat mengajukan lagi.",
+                            icon: "error",
+                            buttons: {
+                                confirm: {
+                                    text: "OK",
+                                    className: "btn btn-danger"
+                                }
+                            }
+                        });
+                    });
+                });
+            }
+        });
     </script>
+
+    @if (session('success'))
+        <script>
+            swal({
+                title: "Berhasil!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                buttons: {
+                    confirm: {
+                        text: "OK",
+                        className: "btn btn-primary"
+                    }
+                }
+            });
+        </script>
+    @endif
+
+    @if ($errors->has('error'))
+        <script>
+            swal({
+                title: "Gagal!",
+                text: "{{ $errors->first('error') }}",
+                icon: "error",
+                buttons: {
+                    confirm: {
+                        text: "OK",
+                        className: "btn btn-danger"
+                    }
+                }
+            });
+        </script>
+    @endif
 @endpush

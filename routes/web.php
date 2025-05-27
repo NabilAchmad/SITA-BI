@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TugasAkhirController;
 use App\Http\Controllers\PendaftaranSidangController;
+use App\Http\Controllers\TopikController;
+use App\Models\TawaranTopik;
 
 Route::prefix('/mahasiswa')->group(function () {
 
@@ -20,19 +22,20 @@ Route::prefix('/mahasiswa')->group(function () {
         // Menampilkan form progress TA
         Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugas-akhir.progress');
 
+        // Menangani revisi TA
+        Route::get('/revisi', [TugasAkhirController::class, ''])->name('tugas-akhir.revisi');
+
         // Tangani form POST ajukan TA
         Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
 
-        Route::resource('tugasAkhir', TugasAkhirController::class);
 
         Route::delete('tugasAkhir/{id}', [TugasAkhirController::class, 'destroy'])->name('tugasAkhir.destroy');
         Route::post('tugasAkhir/{id}/cancel', [TugasAkhirController::class, 'cancel'])->name('tugasAkhir.cancelTA');
         Route::get('tugasAkhir/dibatalkan', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.dibatalkan');
 
         // Menampilkan form ajukan berdasarkan topik dosen
-        Route::get('/list-topik-dosen', function () {
-            return view('mahasiswa.tugas-akhir.views.listTopik');
-        })->name('list-topik');
+        Route::get('/list-topik-dosen', [TopikController::class, 'index'])->name('mahasiswa.topik.index');
+        Route::get('/ambil-topik', [TopikController::class, ''])->name('mahasiswa.topik.ambil');
 
         Route::get('/cancel', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.cancelled');
     });

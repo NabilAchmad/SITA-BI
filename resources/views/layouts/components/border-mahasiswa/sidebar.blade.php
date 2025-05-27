@@ -55,18 +55,11 @@
                 </li>
 
                 <!-- Tugas Akhir -->
-                <li class="nav-item {{ request()->is('mahasiswa/tugas-akhir') || request()->is('mahasiswa/tugas-akhir/*') ? 'active' : ''  }}">
+                <li
+                    class="nav-item {{ request()->is('mahasiswa/tugas-akhir') || request()->is('mahasiswa/tugas-akhir/*') ? 'active' : '' }}">
                     <a href="{{ route('tugas-akhir.dashboard') }}">
                         <i class="fas fa-file-signature"></i>
                         <p>Dashboard Tugas Akhir</p>
-                    </a>
-                </li>
-
-                <!-- Sidang -->
-                <li class="nav-item {{ request()->is('mahasiswa/sidang') || request()->is('mahasiswa/sidang/*') ? 'active' : '' }}">
-                    <a href="{{ route('dashboard.sidang') }}">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                        <p>Sidang</p>
                     </a>
                 </li>
 
@@ -78,6 +71,14 @@
                     </a>
                 </li>
 
+                <!-- Sidang -->
+                <li
+                    class="nav-item {{ request()->is('mahasiswa/sidang') || request()->is('mahasiswa/sidang/*') ? 'active' : '' }}">
+                    <a href="{{ route('dashboard.sidang') }}">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <p>Sidang</p>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
