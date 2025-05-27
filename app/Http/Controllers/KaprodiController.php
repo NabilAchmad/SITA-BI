@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Models\JadwalSidang;
 use Illuminate\Http\Request;
 use App\Models\JudulTA;
+use App\Models\Mahasiswa;
 
 class KaprodiController extends Controller
 {
@@ -13,10 +16,31 @@ class KaprodiController extends Controller
         return view('kaprodi.dashboard');
     }
 
+    // Sidang Dashboard
+    public function showSidangDashboard()
+    {
+        $jadwalCount = JadwalSidang::count();
+        return view('kaprodi.sidang.dashboard.dashboard', compact('jadwalCount'));
+    }
+
+    public function showMahasiswaSidang()
+    {
+        $mahasiswaCount = Mahasiswa::count();
+        return view('kaprodi.sidang.dashboard.dashboard', compact('mahasiswaCount'));
+    }
+
     // Jadwal Sidang
     public function showJadwal()
     {
-        return view('kaprodi.jadwal.readJadwal');
+        $jadwalSidangs = JadwalSidang::with([
+            'sidang.tugasAkhir.mahasiswa',
+            'sidang.peranDosenTa' => function ($query) {
+                $query->whereIn('peran', ['penguji1', 'penguji2']);
+            },
+            'ruangan'
+        ])->get();
+
+        return view('kaprodi.jadwal.readJadwal', compact('jadwalSidangs'));
     }
 
     // Acc Judul Tugas Akhir
@@ -30,7 +54,17 @@ class KaprodiController extends Controller
     // Nilai Sidang
     public function showNilaiSidang()
     {
-        return view('kaprodi.sidang.readSidang');
+        $jadwalSidangs = JadwalSidang::with(['sidang.nilai', 'sidang.tugasAkhir.mahasiswa'])->get();
+
+        return view('kaprodi.sidang.read', compact('jadwalSidangs'));
+    }
+
+    // Show Sidang Results following jadwal sidang from admin
+    public function showSidangResults()
+    {
+        $jadwalSidangs = JadwalSidang::with(['sidang.nilai', 'sidang.tugasAkhir.mahasiswa'])->get();
+
+        return view('kaprodi.sidang.read', compact('jadwalSidangs'));
     }
 
     // Create Sidang
