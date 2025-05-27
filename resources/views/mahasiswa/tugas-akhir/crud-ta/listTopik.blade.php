@@ -7,7 +7,13 @@
     }
 </style>
 
-<h1 class="text-center text-primary-donk">List Topik Tugas Akhir</h1>
+        /* Hover button take topic */
+        .btn-take:hover {
+            background-color: #267acc !important;
+            box-shadow: 0 6px 16px #267acccc;
+        }
+    </style>
+@endpush
 
 <table class="table table-bordered mt-4">
     @csrf

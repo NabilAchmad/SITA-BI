@@ -13,6 +13,7 @@ use App\Models\File;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class TugasAkhirController extends Controller
 {
@@ -82,10 +83,10 @@ class TugasAkhirController extends Controller
             'judul' => $request->judul,
             'abstrak' => $request->abstrak,
             'status' => 'diajukan',
-            'tanggal_pengajuan' => now()->toDateString(),
+            'tanggal_pengajuan' => Carbon::now()->toDateString(),
         ]);
 
-        return redirect()->back()->with('success', 'Tugas Akhir berhasil diajukan!');
+        return redirect()->route('tugas-akhir.ajukan')->with('success', 'Tugas Akhir berhasil diajukan!');
     }
 
     public function progress()
