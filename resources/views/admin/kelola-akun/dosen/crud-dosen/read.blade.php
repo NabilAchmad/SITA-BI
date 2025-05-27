@@ -86,7 +86,7 @@
 
         <h4 class="card-title text-primary mb-0">Kelola Akun Dosen</h4>
         <!-- Modal Trigger -->
-        <button type="button" class="btn btn-light btn-sm d-flex align-items-center gap-1 shadow-sm"
+        <button type="button" class="btn btn-success btn-sm  d-flex align-items-center gap-1 shadow-sm"
             data-bs-toggle="modal" data-bs-target="#tambahAkunModal">
             <i class="bi bi-plus-lg fs-5"></i> Tambah Akun
         </button>

@@ -32,8 +32,9 @@ class MahasiswaSeeder extends Seeder
             DB::table('mahasiswa')->insert([
                 'user_id' => $userId,
                 'nim' => '25' . str_pad($i, 7, '0', STR_PAD_LEFT),
-                'prodi' => $i % 2 === 0 ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris',
+                'prodi' => $i % 2 === 0 ? 'd3' : 'd4',
                 'angkatan' => '25',
+                'kelas' => $faker->randomElement(['a', 'b', 'c']),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

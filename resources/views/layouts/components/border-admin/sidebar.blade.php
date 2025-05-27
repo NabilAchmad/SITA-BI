@@ -94,10 +94,19 @@
                     </a>
                 </li>
 
+                <!-- Pengumuman -->
                 <li class="nav-item {{ request()->is('admin/pengumuman*') ? 'active' : '' }}">
                     <a href="{{ route('pengumuman.read') }}">
                         <i class="fas fa-bullhorn"></i>
                         <p>Pengumuman</p>
+                    </a>
+                </li>
+
+                <!-- Arsip TA -->
+                <li class="nav-item {{ request()->is('admin/arsip-ta*') ? 'active' : '' }}">
+                    <a href="{{ route('arsip-ta.index') }}">
+                        <i class="fas fa-archive"></i>
+                        <p>Arsip TA</p>
                     </a>
                 </li>
             </ul>

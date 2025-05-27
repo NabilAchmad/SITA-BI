@@ -112,11 +112,11 @@ Route::prefix('admin')->group(function () {
             Route::get('/detail-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'show'])->name('jadwal-sempro.show');
 
             // Tandai akhir sidang selesai 
-            Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidang'])
+            Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidangSempro'])
                 ->name('jadwal-sidang-sempro.mark-done');
 
             // Daftar mahasiswa yang sudah sidang
-            Route::get('pasca', [JadwalSidangSemproController::class, 'pascaSidangSempro'])->name('pasca.sidang.sempro');
+            Route::get('pasca-sidang-sempro', [JadwalSidangSemproController::class, 'pascaSidangSempro'])->name('pasca.sidang.sempro');
         });
 
         Route::prefix('akhir')->group(function () {
@@ -166,4 +166,6 @@ Route::prefix('admin')->group(function () {
 
     // Profile
     Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
+
+    Route::view('/arsip-ta', 'admin/arsip/dashboard/arsip')->name('arsip-ta.index');
 });
