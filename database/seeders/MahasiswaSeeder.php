@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Faker\Factory as Faker;
 use Illuminate\Support\Str;
+use Faker\Factory as Faker;
 
 class MahasiswaSeeder extends Seeder
 {
@@ -14,21 +14,71 @@ class MahasiswaSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-        // Ambil dulu semua dosen yg sudah ada (id dan nama)
-        $dosenIds = DB::table('dosen')->pluck('id')->toArray();
-        $totalDosen = count($dosenIds);
+        // === ADMIN ===
+        DB::table('users')->insert([
+            'id' => 1,
+            'name' => 'Administrator',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('admin123'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
-        for ($i = 1; $i <= 50; $i++) {
-            // Nama mahasiswa tanpa gelar
-            $name = $faker->firstName() . ' ' . $faker->lastName();
+        DB::table('user_roles')->insert([
+            'user_id' => 1,
+            'role_id' => 1, // Admin
+        ]);
 
-            // Email natural berdasarkan nama
-            $emailUsername = Str::slug($name, '.');
-            $email = $emailUsername . $i . '@example.com';
+        // === DOSEN (30 dosen termasuk kaprodi dan kajur) ===
+        $gelarList = ['S.Pd.', 'M.Pd.', 'M.A.', 'Ph.D.'];
+        $dosenIds = [];
+
+        for ($i = 1; $i <= 30; $i++) {
+            $namaTanpaGelar = $faker->firstName . ' ' . $faker->lastName;
+            $gelar = $faker->randomElement($gelarList);
+            $namaDosen = $namaTanpaGelar . ', ' . $gelar;
+            $email = Str::slug($namaTanpaGelar, '.') . $i . '@example.com';
 
             $userId = DB::table('users')->insertGetId([
-                'name' => $name,
+                'name' => $namaDosen,
                 'email' => $email,
+                'password' => Hash::make('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('user_roles')->insert([
+                ['user_id' => $userId, 'role_id' => 4], // dosen
+            ]);
+
+            if ($i <= 2) {
+                DB::table('user_roles')->insert([
+                    'user_id' => $userId,
+                    'role_id' => 2, // kaprodi
+                ]);
+            } elseif ($i === 3) {
+                DB::table('user_roles')->insert([
+                    'user_id' => $userId,
+                    'role_id' => 3, // kajur
+                ]);
+            }
+
+            $dosenId = DB::table('dosen')->insertGetId([
+                'user_id' => $userId,
+                'nidn' => 'NIDN' . str_pad($i, 6, '0', STR_PAD_LEFT),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $dosenIds[] = $dosenId;
+        }
+
+        // === MAHASISWA DAN TUGAS AKHIR ===
+        $statusOptions = ['diajukan', 'disetujui', 'ditolak'];
+        for ($i = 1; $i <= 10; $i++) {
+            $userId = DB::table('users')->insertGetId([
+                'name' => 'Mahasiswa ' . $i,
+                'email' => 'mahasiswa' . $i . '@example.com',
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -39,34 +89,59 @@ class MahasiswaSeeder extends Seeder
                 'role_id' => 5, // mahasiswa
             ]);
 
+            $prodi = $faker->randomElement(['d3', 'd4']);
+            $kelas = $prodi === 'd3'
+                ? $faker->randomElement(['a', 'b', 'c'])
+                : $faker->randomElement(['a', 'b']);
+
             $mahasiswaId = DB::table('mahasiswa')->insertGetId([
                 'user_id' => $userId,
-                'nim' => '25' . str_pad($i, 7, '0', STR_PAD_LEFT),
-                'prodi' => $i % 2 === 0 ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris',
-                'angkatan' => '25',
+                'nim' => '21' . str_pad($i, 5, '0', STR_PAD_LEFT),
+                'prodi' => $prodi,
+                'angkatan' => '2021',
+                'kelas' => $kelas,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            // Insert tugas akhir untuk mahasiswa ini
+            $status = $statusOptions[array_rand($statusOptions)];
+
             $tugasAkhirId = DB::table('tugas_akhir')->insertGetId([
                 'mahasiswa_id' => $mahasiswaId,
-                'judul' => 'Judul Tugas Akhir Mahasiswa ' . $i,
-                'abstrak' => $faker->paragraph(),
-                'status' => 'diajukan',
-                'tanggal_pengajuan' => now()->subDays(rand(1, 60))->toDateString(),
+                'judul' => 'Judul TA Mahasiswa ' . $i,
+                'abstrak' => 'Abstrak dari tugas akhir mahasiswa ' . $i,
+                'status' => $status,
+                'tanggal_pengajuan' => now()->subDays(rand(1, 60)),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            $jumlahPembimbing = 2;
-            shuffle($dosenIds); // acak dosen
-
-            for ($j = 0; $j < $jumlahPembimbing; $j++) {
+            if ($status === 'disetujui') {
+                shuffle($dosenIds);
                 DB::table('peran_dosen_ta')->insert([
+                    [
+                        'dosen_id' => $dosenIds[0],
+                        'tugas_akhir_id' => $tugasAkhirId,
+                        'peran' => 'pembimbing1',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ],
+                    [
+                        'dosen_id' => $dosenIds[1],
+                        'tugas_akhir_id' => $tugasAkhirId,
+                        'peran' => 'pembimbing2',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]
+                ]);
+            }
+
+            if ($status === 'disetujui' && $i % 2 === 0) {
+                DB::table('sidang')->insert([
                     'tugas_akhir_id' => $tugasAkhirId,
-                    'dosen_id' => $dosenIds[$j],
-                    'peran' => $j === 0 ? 'pembimbing1' : 'pembimbing2',
+                    'jenis_sidang' => 'akhir',
+                    'status' => 'dijadwalkan',
+                    'is_active' => 1,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

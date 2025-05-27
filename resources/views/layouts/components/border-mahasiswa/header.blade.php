@@ -5,11 +5,11 @@
 
             <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
                 <!--Notification -->
-                @include('layouts.components.border-admin.notification')
+                @include('layouts.components.border-mahasiswa.notification')
                 <!-- End Notification -->
 
                 <!-- profile -->
-                @include('layouts.components.border-admin.profile')
+                @include('layouts.components.border-mahasiswa.profile')
                 <!-- End Profile -->
             </ul>
 

@@ -2,7 +2,7 @@
     <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#"
         aria-expanded="false">
         <div class="avatar-sm">
-            <img src="{{ asset('assets/img/team/kasih.jpg') }}" alt="Erland"
+            <img src="{{ asset('assets/img/team/kasih.jpg') }}" alt="kasih"
                 class="avatar-img rounded-circle" />
         </div>
         <span class="profile-username">
@@ -15,7 +15,7 @@
             <li>
                 <div class="user-box">
                     <div class="avatar-lg">
-                        <img src="{{ asset('assets/img/team/erland.jpg') }}" alt="image profile"
+                        <img src="{{ asset('assets/img/team/kasih.jpg') }}" alt="image profile"
                             class="avatar-img rounded" />
                     </div>
                     <div class="u-text">

@@ -15,15 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tugas_akhir_id')->constrained('tugas_akhir');
             $table->enum('tipe_dokumen', ['proposal', 'draft', 'final']);
-<<<<<<< HEAD
-            $table->foreignId('uploaded_by')->constrained('users');
-            $table->enum('status_review', ['belum_diperiksa', 'diterima', 'ditolak']);
-=======
             $table->enum('status_validasi', ['belum_diperiksa', 'disetujui', 'ditolak'])->default('belum_diperiksa');
             $table->foreignId('divalidasi_oleh')->nullable()->constrained('users')->onDelete('set null');
->>>>>>> 905ddd514a1f02e7724f6a26e444a4bf3ee356ee
             $table->text('catatan_reviewer')->nullable();
             $table->string('file_path');
+
+            // Hapus penggunaan after() karena tidak diperlukan pada create table
+            $table->integer('version')->default(1);
+            $table->timestamp('scan_at')->nullable()->comment('Terakhir dipindai plagiasi');
+            $table->foreignId('scanned_by')->nullable()->constrained('users');
+
             $table->timestamps();
             $table->softDeletes();
         });
