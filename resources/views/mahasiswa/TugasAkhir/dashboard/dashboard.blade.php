@@ -22,7 +22,7 @@
         <div class="row g-4">
             <!-- Ajukan Topik Mandiri -->
             <div class="col-md-6 col-xl-3">
-                <a href="{{ route('ajukan-ta') }}" class="text-decoration-none">
+                <a href="{{ route('tugas-akhir.ajukan') }}" class="text-decoration-none">
                     <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
