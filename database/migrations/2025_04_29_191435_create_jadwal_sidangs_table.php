@@ -16,10 +16,6 @@ return new class extends Migration
             $table->time('waktu_selesai');
             $table->foreignId('ruangan_id')->constrained('ruangan')->onDelete('cascade');
             $table->timestamps();
-<<<<<<< HEAD
-            $table->softDeletes();
-=======
->>>>>>> 905ddd514a1f02e7724f6a26e444a4bf3ee356ee
         });
     }
 
