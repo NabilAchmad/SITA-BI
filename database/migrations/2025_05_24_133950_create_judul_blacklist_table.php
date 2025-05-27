@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mahasiswa', function (Blueprint $table) {
+        Schema::create('judul_blacklist', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('nim', 50)->unique();
-            $table->enum('prodi', ['d3', 'd4']);
-            $table->string('angkatan', 10);
-            $table->enum('kelas', ['a', 'b', 'c']); // Ubah menjadi enum
+            $table->string('pattern')->comment('Pola judul/kata kunci yang diblacklist');
+            $table->text('reason');
+            $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mahasiswas');
+        Schema::dropIfExists('judul_blacklist');
     }
 };
