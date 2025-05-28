@@ -73,6 +73,7 @@ class KaprodiController extends Controller
     {
         $judul = JudulTA::findOrFail($id);
         $judul->status = 'Disetujui';
+        $judul->tanggal_acc = now();
         $judul->save();
 
         return response()->json(['message' => 'Judul telah di-ACC']);

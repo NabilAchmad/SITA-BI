@@ -16,7 +16,7 @@ class KajurController extends Controller
     // Dashboard
     public function index()
     {
-        return view('kajur.dashboard');
+        return view('kajur.views.dashboard');
     }
 
     // Jadwal Sidang
@@ -30,7 +30,7 @@ class KajurController extends Controller
     public function showAccJudulTA()
     {
         $judulTAs = JudulTA::all();
-        return view('kajur.judulTA.AccJudulTA', compact('judulTAs'));
+        return view('kajur.judulTA.read', compact('judulTAs'));
     }
 
     // Nilai Sidang
@@ -40,52 +40,11 @@ class KajurController extends Controller
         return view('kajur.sidang.readSidang', compact('nilais'));
     }
 
-    // Create Sidang
-    public function createSidang()
-    {
-        return view('kajur.sidang.createSidang');
-    }
-
-    // Store Sidang (handle POST)
-    public function storeSidang(Request $request)
-    {
-        $validated = $request->validate([
-            'judul' => 'required|string|max:255',
-            'tanggal' => 'required|date',
-            'nilai' => 'nullable|numeric',
-            'status' => 'nullable|string|max:50',
-        ]);
-
-        Sidang::create($validated);
-
-        return redirect()->route('kajur.nilai.page')->with('success', 'Sidang berhasil dibuat.');
-    }
-
     // Pengumuman
     public function showPengumuman()
     {
         $pengumumans = Pengumuman::all();
         return view('kajur.Pengumuman.pengumuman', compact('pengumumans'));
-    }
-
-    // Approve JudulTA
-    public function approveJudul($id)
-    {
-        $judul = JudulTA::findOrFail($id);
-        $judul->status = 'Disetujui';
-        $judul->save();
-
-        return response()->json(['message' => 'Judul telah di-ACC']);
-    }
-
-    // Reject JudulTA
-    public function rejectJudul($id)
-    {
-        $judul = JudulTA::findOrFail($id);
-        $judul->status = 'Ditolak';
-        $judul->save();
-
-        return response()->json(['message' => 'Judul telah ditolak']);
     }
 
     // Sidang Dashboard

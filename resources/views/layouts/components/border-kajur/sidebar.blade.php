@@ -2,21 +2,21 @@
     <div class="sidebar-logo">
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="dark">
-            <a href="{{ url('/kaprodi') }}"
+            <a href="{{ url('/kajur') }}"
                 class="logo d-flex align-items-center text-decoration-none px-3 py-2 text-white w-100"
                 style="max-width: 100%; overflow: hidden; transition: background-color 0.3s ease;">
 
                 <!-- Icon Gear -->
                 <div class="d-flex align-items-center justify-content-center bg-white bg-opacity-10 rounded-circle flex-shrink-0 me-2"
                     style="width: 36px; height: 36px; transition: background-color 0.3s ease;">
-                    <img src="{{ asset('assets/img/kaprodi/hat.svg') }}" alt="Kaprodi Icon"
+                    <img src="{{ asset('assets/img/kajur/hat.svg') }}" alt="Kajur Icon"
                         style="width: 60%; height: 60%; filter: brightness(0) invert(1); transition: transform 0.3s ease;">
                 </div>
 
                 <!-- Teks -->
                 <span class="fw-semibold d-none d-md-inline text-truncate"
                     style="max-width: 100%; white-space: nowrap; transition: color 0.3s ease;">
-                    Ketua Prodi
+                    Ketua Jurusan
                 </span>
             </a>
 
@@ -39,8 +39,8 @@
         <div class="sidebar-content">
             <ul class="nav nav-secondary">
                 <!-- Dashboard -->
-                <li class="nav-item {{ request()->is('kaprodi') ? 'active' : '' }}">
-                    <a href="{{ route('kaprodi.dashboard') }}">
+                <li class="nav-item {{ request()->is('kajur') ? 'active' : '' }}">
+                    <a href="{{ route('kajur.dashboard') }}">
                         <i class="fas fa-home"></i>
                         <p>Dashboard</p>
                     </a>
@@ -55,40 +55,40 @@
                 </li>
 
                 {{-- Tugas Akhir --}}
-                <li class="nav-item {{ request()->is('kaprodi/judulTA/*') || request()->is('kaprodi/judulTA') ? 'active' : '' }}">
-                    <a href="{{ route('accjudul.page') }}">
+                <li class="nav-item {{ request()->is('kajur/judulTA/*') || request()->is('kajur/judulTA') ? 'active' : '' }}">
+                    <a href="{{ route('kajur.judul.page') }}">
                         <i class="fas fa-users-cog"></i>
                         <p>Tugas Akhir</p>
                     </a>
                 </li>
 
                 <!-- Sidang -->
-                <li class="nav-item {{ request()->is('kaprodi/sidang') || request()->is('kaprodi/sidang/*') ? 'active' : '' }}">
-                    <a href="{{ route('sidangDashboard.page') }}">
+                <li class="nav-item {{ request()->is('kajur/sidang') || request()->is('kajur/sidang/*') ? 'active' : '' }}">
+                    <a href="{{ route('sidangDashboard.kajur') }}">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <p>Sidang</p>
                     </a>
                 </li>
 
                 <!-- Pengumuman -->
-                <li class="nav-item {{ request()->is('kaprodi/pengumuman*') ? 'active' : '' }}">
-                    <a href="{{ route('kaprodipengumuman.page') }}">
+                <li class="nav-item {{ request()->is('kajur/pengumuman*') ? 'active' : '' }}">
+                    <a href="{{ route('kajurpengumuman.page') }}">
                         <i class="fas fa-bullhorn"></i>
                         <p>Pengumuman</p>
                     </a>
                 </li>
 
                 <!-- Laporan dan Statistik -->
-                <li class="nav-item {{ request()->is('kaprodi/laporan') || request()->is('kaprodi/laporan/*') ? 'active' : '' }}">
-                    <a href="{{ route('kaprodi.nilai.page') }}">
+                <li class="nav-item {{ request()->is('kajur/laporan') || request()->is('kajur/laporan/*') ? 'active' : '' }}">
+                    <a href="{{ route('kajur.nilai.page') }}">
                         <i class="fas fa-chart-bar"></i>
                         <p>Nilai Sidang</p>
                     </a>
                 </li>
 
                 <!-- Log dan Aktifitas -->
-                <li class="nav-item {{ request()->is('kaprodi/logs') || request()->is('kaprodi/logs/*') ? 'active' : '' }}">
-                    <a href="{{ url('/kaprodi/logs/lihat') }}">
+                <li class="nav-item {{ request()->is('kajur/logs') || request()->is('kajur/logs/*') ? 'active' : '' }}">
+                    <a href="{{ url('/kajur/logs/lihat') }}">
                         <i class="fas fa-terminal"></i>
                         <p>Log dan Aktifitas</p>
                     </a>

@@ -2,5 +2,5 @@
 
 @section('title', 'Pengumuman')
 @section('content')
-    @include('kaprodi.pengumuman.crud-pengumuman.read')
+    @include('kaprodi.Pengumuman.crud-pengumuman.read')
 @endsection

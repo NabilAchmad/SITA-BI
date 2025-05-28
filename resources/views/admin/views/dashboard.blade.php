@@ -43,7 +43,7 @@
     <div class="row">
         <div class="col-md-12">
             <!-- Pengumuman -->
-            @include('layouts.components.content-admin.pengumuman')
+            @include('layouts.components.content-admin.pengumuman', ['pengumumans' => $pengumumans])
             <!-- End Pengumuman -->
         </div>
     </div>
