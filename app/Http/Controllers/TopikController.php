@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\TawaranTopik;
 use App\Models\TugasAkhir;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class TopikController extends Controller

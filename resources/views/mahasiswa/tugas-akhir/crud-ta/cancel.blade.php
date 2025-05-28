@@ -3,8 +3,8 @@
 @section('content')
     <div class="container">
         <div class="text-center text-danger mb-5">
-            <h2 class="fw-bold">Tugas Akhir yang Dibatalkan</h2>
-            <p class="text-muted">Daftar pengajuan yang telah dibatalkan oleh mahasiswa.</p>
+            <h2 class="fw-bold">Tugas Akhir yang Ditolak</h2>
+            <p class="text-muted">Daftar pengajuan tugas akhir yang ditolak dan dibatalkan oleh mahasiswa.</p>
         </div>
 
         <div class="row justify-content-center">

@@ -59,4 +59,9 @@ class TawaranTopik extends Model
     {
         return $query->whereRaw('(SELECT COUNT(*) FROM tugas_akhir WHERE tugas_akhir.tawaran_topik_id = tawaran_topik.id) < tawaran_topik.kuota');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

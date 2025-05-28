@@ -37,6 +37,7 @@
                         <thead class="table-dark text-center">
                             <tr>
                                 <th>No</th>
+                                <th>Dosen</th>
                                 <th>Topik</th>
                                 <th>Deskripsi</th>
                                 <th>Kuota</th>
@@ -46,14 +47,15 @@
                         <tbody>
                             @forelse ($topikList as $topik)
                                 <tr>
-                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td class="text-center">{{ ($topikList->currentPage() - 1) * $topikList->perPage() + $loop->iteration }}</td>
+                                    <td class="text-center">{{ $topik->dosen->name ?? '-'}}</td>
                                     <td class="fw-semibold">{{ $topik->judul_topik }}</td>
                                     <td>{{ Str::limit($topik->deskripsi, 120) }}</td>
                                     <td class="text-center">{{ $topik->kuota }}</td>
                                     <td class="text-center">
                                         <form action="{{ route('mahasiswa.topik.ambil', $topik->id) }}" method="POST">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                            <button type="submit" class="btn btn-sm btn-success px-4">
                                                 <i class="bi bi-check-circle me-1"></i> Ambil Topik
                                             </button>
                                         </form>

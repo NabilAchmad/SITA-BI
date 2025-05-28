@@ -69,8 +69,8 @@
 
             <!-- Ajukan Topik Dosen -->
             <div class="col-md-6 col-xl-3">
-                <a href="{{ !$sudahMengajukan ? route('list-topik') : '#' }}"
-                    class="text-decoration-none {{ $sudahMengajukan ? 'disabled-link' : '' }} ajukan-topik-dosen-link">
+                <a href="{{route('mahasiswa.topik.index')}}"
+                    class="text-decoration-none">
                     <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">

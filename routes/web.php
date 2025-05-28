@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BimbinganController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TugasAkhirController;
 use App\Http\Controllers\PendaftaranSidangController;
@@ -43,25 +44,16 @@ Route::prefix('/mahasiswa')->group(function () {
 
     Route::prefix('bimbingan')->group(function () {
         // Tambahkan route untuk Bimbingan di sini jika diperlukan
-        Route::get('/', function () {
-            return view('mahasiswa.Bimbingan.dashboard.dashboard');
-        })->name('dashboard.bimbingan');
+        Route::get('/', [BimbinganController::class, 'dashboard'])->name('dashboard.bimbingan');
 
-        Route::get('/ajukan-jadwal', function () {
-            return view('mahasiswa.Bimbingan.views.ajukanBimbingan');
-        });
+        Route::get('/ajukan-jadwal', [BimbinganController::class, 'ajukanJadwal'])->name('bimbingan.ajukanJadwal');
 
-        Route::get('/lihat-jadwal', function () {
-            return view('mahasiswa.Bimbingan.views.lihatJadwal');
-        });
+        Route::get('/jadwal-bimbingan', [BimbinganController::class, 'jadwalBimbingan'])->name('jadwal.bimbingan');
+
+        Route::get('/ubah-jadwal', [BimbinganController::class, 'ubahJadwal'])->name('ubah.jadwal');
 
         Route::get('/revisi', function () {
             return view('mahasiswa.Bimbingan.views.revisiTA');
-        });
-
-        Route::get('/perubahan-jadwal', function () {
-            return view('
-            mahasiswa.Bimbingan.views.perubahanJadwal');
         });
     });
 
