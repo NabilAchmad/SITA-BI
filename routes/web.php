@@ -79,8 +79,8 @@ Route::prefix('kajur')->group(function () {
 // Ketua Prodi (Kaprodi) Routes
 Route::prefix('ketua-prodi')->group(function () {
     // Kaprodi Login (if needed)
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('kaprodi.login');
-    Route::post('/login', [AuthController::class, 'login'])->name('kaprodi.login.post');
+    // Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    // Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/', [KaprodiController::class, 'index'])->name('kaprodi.dashboard');
@@ -96,7 +96,7 @@ Route::prefix('ketua-prodi')->group(function () {
         Route::post('/judulTA/reject/{id}', [KaprodiController::class, 'rejectJudul'])->name('kaprodi.judulTA.reject');
 
         // Nilai sidang
-        Route::get('/sidang/lihat-nilai', [KaprodiController::class, 'showNilaiSidang'])->name('kaprodi.nilai.page');
+        Route::get('/sidang/akhir', [KaprodiController::class, 'SidangAkhir'])->name('kaprodi.akhir.page');
         Route::get('/sidang/create', [KaprodiController::class, 'createSidang'])->name('kaprodi.nilai.create');
         Route::post('/sidang/create', [KaprodiController::class, 'storeSidang'])->name('kaprodi.nilai.store');
 

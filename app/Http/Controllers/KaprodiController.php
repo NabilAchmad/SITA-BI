@@ -34,17 +34,17 @@ class KaprodiController extends Controller
     }
 
     // Nilai Sidang
-    public function showNilaiSidang()
+    public function SidangAkhir()
     {
         $nilais = Nilai::all();
-        return view('kajur.sidang.readSidang', compact('nilais'));
+        return view('kaprodi.sidang.akhir.crud-jadwal.read', compact('nilais'));
     }
 
     // Create Sidang
-    public function createSidang()
-    {
-        return view('kaprodi.sidang.createSidang');
-    }
+    // public function createSidang()
+    // {
+    //     return view('kaprodi.sidang.createSidang');
+    // }
 
     // Store Sidang (handle POST)
     public function storeSidang(Request $request)

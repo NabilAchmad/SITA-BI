@@ -122,4 +122,10 @@ class DosenController extends Controller
 
         return redirect()->route('akun-dosen.kelola')->with('success', 'Akun dosen berhasil dihapus.');
     }
+
+    // Add dashboard method to fix the error
+    public function dashboard()
+    {
+        return view('kaprodi.dashboard'); // Adjust the view path as needed
+    }
 }

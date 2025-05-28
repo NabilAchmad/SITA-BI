@@ -80,7 +80,7 @@
 
                 <!-- Laporan dan Statistik -->
                 <li class="nav-item {{ request()->is('kaprodi/laporan') || request()->is('kaprodi/laporan/*') ? 'active' : '' }}">
-                    <a href="{{ route('kaprodi.nilai.page') }}">
+                    <a href="{{ route('kaprodi.akhir.page') }}">
                         <i class="fas fa-chart-bar"></i>
                         <p>Nilai Sidang</p>
                     </a>

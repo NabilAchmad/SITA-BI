@@ -1,4 +1,4 @@
-@extends('layouts.template.main')
+@extends('layouts.template.kaprodi')
 
 @section('title', 'Dashboard Sidang')
 
