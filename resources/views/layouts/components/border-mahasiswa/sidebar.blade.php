@@ -64,7 +64,7 @@
                 </li>
 
                 <!-- Bimbingan -->
-                <li class="nav-item {{ request()->is('mahasiswa/bimbingan') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('mahasiswa/bimbingan') || request()->is('mahasiswa/bimbingan/*') ? 'active' : '' }}">
                     <a href="{{ route('dashboard.bimbingan') }}" class="nav-link">
                         <i class="fas fa-users-cog me-2"></i>
                         <p>Bimbingan</p>
