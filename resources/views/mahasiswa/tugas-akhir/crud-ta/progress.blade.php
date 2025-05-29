@@ -23,14 +23,17 @@
 
 @section('content')
     <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb bg-white px-3 py-2 rounded-3 shadow-sm">
-            <li class="breadcrumb-item"><a href="{{ route('tugas-akhir.dashboard') }}">Dashboard Tugas Akhir</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Progres</li>
-        </ol>
-    </nav>
+    <div class="page-header">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-white px-3 py-2 rounded-3 shadow-sm justify-content-end d-flex">
+                <li class="breadcrumb-item nav-home"><a href="{{ route('tugas-akhir.dashboard') }}"><i class="icon-home"></i>
+                        Tugas Akhir</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Progres</li>
+            </ol>
+        </nav>
+    </div>
     <!-- Konten Progres -->
-    <div class="container py-3">
+    <div class="container py-0">
         <div class="row justify-content-center">
             @if ($tugasAkhir)
                 @php
@@ -71,7 +74,20 @@
                     <!-- Status -->
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label fw-semibold text-secondary">Status</label>
-                        <div class="col-sm-9 text-capitalize align-self-center">{{ $statusLabel }}</div>
+                        <div class="col-sm-9 text-capitalize align-self-center">
+                            @php
+                                $statusMap = [
+                                    'diajukan' => 'Dalam Proses',
+                                    'draft' => 'Draft',
+                                    'revisi' => 'Revisi',
+                                    'disetujui' => 'Disetujui',
+                                    'lulus_tanpa_revisi' => 'Lulus Tanpa Revisi',
+                                    'lulus_dengan_revisi' => 'Lulus Dengan Revisi',
+                                    'ditolak' => 'Ditolak',
+                                ];
+                            @endphp
+                            {{ $statusMap[$ta->status] ?? 'Tidak Diketahui' }}
+                        </div>
                     </div>
 
                     <!-- Tanggal Pengajuan -->
@@ -118,24 +134,28 @@
 
                     <!-- Action Buttons -->
                     <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
-                        <a href="{{ asset('storage/' . $ta->file_path) }}" target="_blank"
-                            class="btn btn-outline-primary btn-sm rounded-pill px-4 py-2 d-flex align-items-center gap-2 shadow-sm transition-hover">
-                            <i class="bi bi-file-earmark-text"></i> Lihat Proposal
-                        </a>
 
-                        <button type="button"
-                            class="btn btn-sm rounded-pill px-4 py-2 shadow-sm transition-hover {{ $ta->status === 'diajukan' ? 'btn-warning' : 'btn-outline-secondary' }}"
-                            {{ $ta->status !== 'diajukan' ? 'disabled' : '' }} data-bs-toggle="modal"
-                            data-bs-target="#revisiModal{{ $ta->id }}">
-                            <i class="bi bi-pencil-square"></i> Revisi
-                        </button>
+                        @if (!$isMengajukanTA && $ta->status === 'diajukan')
+                            <a href="{{ asset('storage/' . $ta->file_path) }}" target="_blank"
+                                class="btn btn-outline-primary btn-sm rounded-pill px-4 py-2 d-flex align-items-center gap-2 shadow-sm transition-hover">
+                                <i class="bi bi-file-earmark-text"></i> Lihat Proposal
+                            </a>
 
-                        <button type="button"
-                            class="btn btn-danger btn-sm rounded-pill px-4 py-2 shadow-sm transition-hover"
-                            data-bs-toggle="collapse" data-bs-target="#cancelForm{{ $ta->id }}"
-                            {{ $ta->status !== 'diajukan' ? 'disabled' : '' }}>
-                            <i class="bi bi-x-circle"></i> Batalkan
-                        </button>
+                            <button type="button"
+                                class="btn btn-sm rounded-pill px-4 py-2 shadow-sm transition-hover {{ $ta->status === 'diajukan' ? 'btn-warning' : 'btn-outline-secondary' }}"
+                                {{ $ta->status !== 'diajukan' ? 'disabled' : '' }} data-bs-toggle="modal"
+                                data-bs-target="#revisiModal{{ $ta->id }}">
+                                <i class="bi bi-pencil-square"></i> Revisi
+                            </button>
+
+                            <button type="button"
+                                class="btn btn-danger btn-sm rounded-pill px-4 py-2 shadow-sm transition-hover"
+                                data-bs-toggle="collapse" data-bs-target="#cancelForm{{ $ta->id }}"
+                                {{ $ta->status !== 'diajukan' ? 'disabled' : '' }}>
+                                <i class="bi bi-x-circle"></i> Batalkan
+                            </button>
+                        @endif
+
                     </div>
 
                     <!-- Form Pembatalan -->

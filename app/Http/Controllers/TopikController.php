@@ -11,28 +11,40 @@ use Illuminate\Support\Facades\Auth;
 
 class TopikController extends Controller
 {
+    private function assumedMahasiswaId()
+    {
+        // Ganti ini sesuai ID mahasiswa yang ada di tabel users
+        return 1;
+    }
+
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $mahasiswaId = $this->assumedMahasiswaId();
+
+        // Cek apakah mahasiswa sudah punya TA dengan status tertentu
+        $mahasiswaSudahPunyaTA = TugasAkhir::where('mahasiswa_id', $mahasiswaId)
+            ->whereIn('status', ['diajukan', 'revisi', 'disetujui', 'lulus_tanpa_revisi'])
+            ->exists();
 
         $topikList = TawaranTopik::with('dosen')
             ->when($search, function ($query, $search) {
                 return $query->where('judul_topik', 'like', "%{$search}%")
                     ->orWhere('deskripsi', 'like', "%{$search}%");
             })
-            ->whereDoesntHave('tugasAkhir', function ($query) {
-                $query->where('mahasiswa_id', Auth::id());
+            ->whereDoesntHave('tugasAkhir', function ($query) use ($mahasiswaId) {
+                $query->where('mahasiswa_id', $mahasiswaId);
             })
-            ->available() // Hanya tampilkan yang kuotanya masih ada
+            ->available()
             ->paginate(10)
-            ->withQueryString(); // Tambahkan ini
+            ->withQueryString();
 
-        return view('mahasiswa.tugas-akhir.crud-ta.listTopik', compact('topikList'));
+        return view('mahasiswa.tugas-akhir.crud-ta.listTopik', compact('topikList', 'mahasiswaSudahPunyaTA'));
     }
 
     public function ambil($id)
     {
-        $mahasiswaId = Auth::id();
+        $mahasiswaId = $this->assumedMahasiswaId();
 
         // Cek apakah mahasiswa sudah memiliki TA
         if (TugasAkhir::where('mahasiswa_id', $mahasiswaId)->exists()) {

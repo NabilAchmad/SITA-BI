@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BimbinganController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TugasAkhirController;
 use App\Http\Controllers\PendaftaranSidangController;
@@ -10,9 +11,7 @@ use App\Models\TawaranTopik;
 Route::prefix('/mahasiswa')->group(function () {
 
     // Dashboard Mahasiswa
-    Route::get('/', function () {
-        return view('mahasiswa.views.dashboard');
-    });
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard.mahasiswa');
 
     Route::prefix('/tugas-akhir')->group(function () {
         Route::get('/', [TugasAkhirController::class, 'dashboard'])->name('tugas-akhir.dashboard');
@@ -28,8 +27,7 @@ Route::prefix('/mahasiswa')->group(function () {
 
         // Tangani form POST ajukan TA
         Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
-
-
+        
         Route::delete('tugasAkhir/{id}', [TugasAkhirController::class, 'destroy'])->name('tugasAkhir.destroy');
         Route::post('tugasAkhir/{id}/cancel', [TugasAkhirController::class, 'cancel'])->name('tugasAkhir.cancelTA');
         Route::get('tugasAkhir/dibatalkan', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.dibatalkan');

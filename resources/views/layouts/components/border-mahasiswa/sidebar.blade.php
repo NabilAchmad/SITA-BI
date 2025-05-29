@@ -1,21 +1,20 @@
-<div class="sidebar" data-background-color="dark">
+<div class="sidebar sidebar-style-2" data-background-color="dark2">
     <div class="sidebar-logo">
         <!-- Logo Header -->
-        <div class="logo-header" data-background-color="dark">
-            <a href="{{ url('/mahasiswa') }}"
+        <div class="logo-header" data-background-color="dark2">
+            <a href="{{ route('dashboard.mahasiswa') }}"
                 class="logo d-flex align-items-center text-decoration-none px-3 py-2 text-white w-100"
                 style="max-width: 100%; overflow: hidden; transition: background-color 0.3s ease;">
 
-                <!-- Icon Gear -->
-                <div class="d-flex align-items-center justify-content-center bg-white bg-opacity-10 rounded-circle flex-shrink-0 me-2"
-                    style="width: 36px; height: 36px; transition: background-color 0.3s ease;">
-                    <img src="{{ asset('assets/img/mahasiswa/gear.svg') }}" alt="mahasiswa Icon"
-                        style="width: 60%; height: 60%; filter: brightness(0) invert(1); transition: transform 0.3s ease;">
+                <!-- Bootstrap Student Icon -->
+                <div class="d-flex align-items-center justify-content-center bg-light bg-opacity-25 rounded-circle flex-shrink-0 me-2 shadow-sm"
+                    style="width: 40px; height: 40px; transition: background-color 0.3s;">
+                    <i class="bi bi-mortarboard-fill fs-4 text-white"></i>
                 </div>
 
                 <!-- Teks -->
-                <span class="fw-semibold d-none d-md-inline text-truncate"
-                    style="max-width: 100%; white-space: nowrap; transition: color 0.3s ease;">
+                <span class="fw-bold d-none d-md-inline text-truncate"
+                    style="max-width: 100%; white-space: nowrap; letter-spacing: 0.5px; font-size: 1.1rem;">
                     Mahasiswa
                 </span>
             </a>
@@ -59,7 +58,7 @@
                     class="nav-item {{ request()->is('mahasiswa/tugas-akhir') || request()->is('mahasiswa/tugas-akhir/*') ? 'active' : '' }}">
                     <a href="{{ route('tugas-akhir.dashboard') }}">
                         <i class="fas fa-file-signature"></i>
-                        <p>Dashboard Tugas Akhir</p>
+                        <p> Tugas Akhir</p>
                     </a>
                 </li>
 

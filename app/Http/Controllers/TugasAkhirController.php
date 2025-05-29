@@ -94,6 +94,11 @@ class TugasAkhirController extends Controller
 
         // Ambil data mahasiswa berdasarkan user_id
         $mahasiswa = Mahasiswa::where('user_id', $simulasiUserId)->first();
+        
+        // Cek apakah mahasiswa sudah punya TA dengan status tertentu
+        $isMengajukanTA = TugasAkhir::where('mahasiswa_id', $simulasiUserId)
+            ->whereIn('status', ['diajukan', 'revisi', 'disetujui', 'lulus_tanpa_revisi'])
+            ->exists();
 
         if (!$mahasiswa) {
             abort(404, 'Data mahasiswa tidak ditemukan.');
@@ -135,7 +140,8 @@ class TugasAkhirController extends Controller
             'progressBimbingan',
             'revisi',
             'dokumen',
-            'sidang'
+            'sidang',
+            'isMengajukanTA'
         ));
     }
 
