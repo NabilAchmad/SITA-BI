@@ -16,7 +16,8 @@ class KajurController extends Controller
     // Dashboard
     public function index()
     {
-        return view('kajur.views.dashboard');
+        $mahasiswaCount = Mahasiswa::count();
+        return view('kajur.views.dashboard', compact('mahasiswaCount'));
     }
 
     // Jadwal Sidang
