@@ -56,7 +56,15 @@
                             <td>{{ $mahasiswa->firstItem() + $index }}</td>
                             <td>{{ $mhs->user->name }}</td>
                             <td>{{ $mhs->nim }}</td>
-                            <td>{{ $mhs->prodi }}</td>
+                            <td>
+                                @if ($mhs->prodi === 'd4')
+                                    D4 Bahasa Inggris
+                                @elseif ($mhs->prodi === 'd3')
+                                    D3 Bahasa Inggris
+                                @else
+                                    {{ $mhs->prodi }}
+                                @endif
+                            </td>
                             <td>{{ $mhs->tugasAkhir->judul }}</td>
                             <td>
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
