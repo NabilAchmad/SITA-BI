@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\TawaranTopikController;
 use App\Http\Controllers\PenugasanPembimbingController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\DosenController;
@@ -10,6 +10,7 @@ use App\Http\Controllers\LogController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\JadwalSidangAkhirController;
 use App\Http\Controllers\JadwalSidangSemproController;
+use App\Http\Controllers\BimbinganController;
 
 Route::prefix('admin')->group(function () {
 
@@ -17,34 +18,50 @@ Route::prefix('admin')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
     });
 
+//bimbingan
+
+  Route::prefix('bimbingan')->group(function () {
+    // Daftar bimbingan
+    Route::get('/', [BimbinganController::class, 'dashboard'])->name('bimbingan.index');
+
+    Route::get('/bimbingan/belumMulai', [BimbinganController::class, 'belumMulai'])->name('bimbingan.crud-bimbingan.belum.mulai');
+
+    Route::get('/bimbingan/sedangBerlangsung', [BimbinganController::class, 'sedangBerlangsung'])->name('bimbingan.crud-bimbingan.sedang.berlangsung');
+
+    Route::get('/bimbingan/menungguReview', [BimbinganController::class, 'menungguReview'])->name('bimbingan.crud-bimbingan.menunggu.review');
+
+    Route::get('/bimbingan/selesai', [BimbinganController::class, 'selesai'])->name('bimbingan.crud-bimbingan.selesai');
+  });
+
     // =========================
-    // ROUTE PENGUMUMAN
-    // =========================
-    Route::prefix('pengumuman')->group(function () {
-        // READ
-        Route::get('/read', [PengumumanController::class, 'read'])->name('pengumuman.read');
-
-        // CREATE
-        Route::get('/create', [PengumumanController::class, 'create'])->name('pengumuman.form'); // Form tambah
-        Route::post('/create', [PengumumanController::class, 'store'])->name('pengumuman.create'); // Simpan data baru
+// ROUTE TawaranTopik TOPIK
+// =========================
 
 
-        // EDIT / UPDATE
-        Route::get('/{id}/edit', [PengumumanController::class, 'edit'])->name('pengumuman.edit'); // Form edit
-        Route::put('/{id}/update', [PengumumanController::class, 'update'])->name('pengumuman.update'); // Update data
+Route::prefix('TawaranTopik')->group(function () {
+    // READ
+    Route::get('/read', [TawaranTopikController::class, 'read'])->name('TawaranTopik.read');
 
-        // DELETE (Soft Delete)
-        Route::delete('/{id}/soft-delete', [PengumumanController::class, 'destroy'])->name('pengumuman.destroy'); // Soft delete
+    // CREATE
+    Route::get('/create', [TawaranTopikController::class, 'create'])->name('TawaranTopik.form'); // Form tambah
+    Route::post('/create', [TawaranTopikController::class, 'store'])->name('TawaranTopik.create'); // Simpan data baru
 
-        // DELETE ALL (Force delete)
-        Route::delete('/force-delete-all', [PengumumanController::class, 'forceDeleteAll'])->name('pengumuman.force-delete-all');
+    // EDIT / UPDATE
+    Route::get('/{id}/edit', [TawaranTopikController::class, 'edit'])->name('TawaranTopik.edit'); // Form edit
+    Route::put('/{id}/update', [TawaranTopikController::class, 'update'])->name('TawaranTopik.update'); // Update data
 
-        // TRASHED (Manajemen soft delete)
-        Route::get('/trash', [PengumumanController::class, 'trashed'])->name('pengumuman.trashed'); // Tampilkan data terhapus
-        Route::post('/{id}/restore', [PengumumanController::class, 'restore'])->name('pengumuman.restore'); // Restore data
-        Route::delete('/{id}/force-delete', [PengumumanController::class, 'forceDelete'])->name('pengumuman.force-delete'); // Hapus permanen
+    // DELETE (Soft Delete)
+    Route::delete('/{id}/soft-delete', [TawaranTopikController::class, 'destroy'])->name('TawaranTopik.destroy'); // Soft delete
 
-    });
+    // DELETE ALL (Force delete)
+    Route::delete('/force-delete-all', [TawaranTopikController::class, 'forceDeleteAll'])->name('TawaranTopik.force-delete-all');
+
+    // TRASHED (Manajemen soft delete)
+    Route::get('/trash', [TawaranTopikController::class, 'trashed'])->name('TawaranTopik.trashed'); // Tampilkan data terhapus
+    Route::post('/{id}/restore', [TawaranTopikController::class, 'restore'])->name('TawaranTopik.restore'); // Restore data
+    Route::delete('/{id}/force-delete', [TawaranTopikController::class, 'forceDelete'])->name('TawaranTopik.force-delete'); // Hapus permanen
+});
+
 
     // =========================
     // ROUTE Mahasiswa
@@ -164,10 +181,14 @@ Route::prefix('admin')->group(function () {
             ->name('aktifitas');
     });
 
+
+  
+
     // Profile
     Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
 
     Route::view('/arsip-ta', 'admin/arsip/dashboard/arsip')->name('arsip-ta.index');
 });
+
 
 

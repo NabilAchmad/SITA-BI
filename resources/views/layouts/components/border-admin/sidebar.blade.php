@@ -96,17 +96,17 @@
 
                 <!-- Pengumuman -->
                 <li class="nav-item {{ request()->is('admin/pengumuman*') ? 'active' : '' }}">
-                    <a href="{{ route('pengumuman.read') }}">
+                    <a href="{{ route('TawaranTopik.read') }}">
                         <i class="fas fa-bullhorn"></i>
-                        <p>Pengumuman</p>
+                        <p>Tawaran Topik</p>
                     </a>
                 </li>
 
-                <!-- Arsip TA -->
+                <!-- Bimbingan -->
                 <li class="nav-item {{ request()->is('admin/arsip-ta*') ? 'active' : '' }}">
-                    <a href="{{ route('arsip-ta.index') }}">
+                    <a href="{{ route('bimbingan.index') }}">
                         <i class="fas fa-archive"></i>
-                        <p>Arsip TA</p>
+                        <p>bimbingan</p>
                     </a>
                 </li>
             </ul>
