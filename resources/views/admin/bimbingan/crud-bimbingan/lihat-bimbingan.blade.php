@@ -1,11 +1,10 @@
-<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\admin\bimbingan\crud-bimbingan\menunggu-review.blade.php -->
-
+<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\admin\bimbingan\crud-bimbingan\lihat-bimbingan.blade.php -->
 @extends('layouts.template.main')
-@section('title', 'Bimbingan Menunggu Review')
+@section('title', 'Lihat Jadwal Bimbingan')
 @section('content')
 
 <div class="mb-4">
-    <h5>Daftar Bimbingan Sidang Menunggu Review</h5>
+    <h5>Daftar Jadwal Bimbingan</h5>
 </div>
 
 <div class="table-responsive">
@@ -38,7 +37,7 @@
                 <td>Teknik Informatika</td>
                 <td>Analisis Data Penjualan</td>
                 <td>Dr. Rina Dewi</td>
-                <td><span class="badge bg-warning text-dark">Menunggu Review</span></td>
+                <td><span class="badge bg-success">Selesai</span></td>
             </tr>
             <tr>
                 <td>3</td>
@@ -47,7 +46,7 @@
                 <td>Sistem Informasi</td>
                 <td>Pengembangan Aplikasi Mobile</td>
                 <td>Dr. Andi Wijaya</td>
-                <td><span class="badge bg-warning text-dark">Menunggu Review</span></td>
+                <td><span class="badge bg-danger">Belum Mulai</span></td>
             </tr>
         </tbody>
     </table>

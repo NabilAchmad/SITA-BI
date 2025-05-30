@@ -15,22 +15,7 @@
         <div class="row g-4">
             @php
                 $cards = [
-                    [
-                        'title' => 'Menunggu Sidang Sempro',
-                        'icon' => 'bi-hourglass-split',
-                        'color' => 'primary',
-                        'count' => $waitingSemproCount ?? 0,
-                        'route' => route('sidang.menunggu.penjadwalan.sempro'),
-                        'btn' => 'Lihat Detail',
-                    ],
-                    [
-                        'title' => 'Menunggu Sidang Akhir',
-                        'icon' => 'bi-clock-history',
-                        'color' => 'success',
-                        'count' => $waitingAkhirCount ?? 0,
-                        'route' => route('sidang.menunggu.penjadwalan.akhir'),
-                        'btn' => 'Lihat Detail',
-                    ],
+                   
                     [
                         'title' => 'Jadwal Sidang Sempro',
                         'icon' => 'bi-calendar-event',
@@ -47,21 +32,14 @@
                         'route' => route('jadwal.sidang.akhir'),
                         'btn' => 'Lihat Jadwal',
                     ],
+
                     [
-                        'title' => 'Pasca Sidang Sempro',
-                        'icon' => 'bi-clipboard-check',
-                        'color' => 'secondary',
-                        'count' => $pascaSemproCount ?? 0,
-                        'route' => route('pasca.sidang.sempro'),
-                        'btn' => 'Lihat Detail',
-                    ],
-                    [
-                        'title' => 'Pasca Sidang Akhir',
-                        'icon' => 'bi-journal-check',
-                        'color' => 'dark',
-                        'count' => $pascaAkhirCount ?? 0,
-                        'route' => route('pasca.sidang.akhir'),
-                        'btn' => 'Lihat Detail',
+                        'title' => 'Penilaian Sidang Akhir',
+                        'icon' => 'bi-pencil-square',
+                        'color' => 'danger',
+                        'count' => $nilaiSidangCount ?? 0,
+                        'route' => route('penilaian.sidang.index'), 
+                        'btn' => 'Beri Nilai',
                     ],
                 ];
             @endphp
@@ -80,13 +58,6 @@
                                         <h6 class="mb-0 text-{{ $card['color'] }} fw-semibold">{{ $card['title'] }}</h6>
                                         <small class="text-muted">
                                             @switch($card['title'])
-                                                @case('Menunggu Sidang Sempro')
-                                                    Mahasiswa yang belum dijadwalkan.
-                                                @break
-
-                                                @case('Menunggu Sidang Akhir')
-                                                    Mahasiswa menunggu sidang akhir.
-                                                @break
 
                                                 @case('Jadwal Sidang Sempro')
                                                     Total jadwal sempro aktif.
@@ -96,12 +67,8 @@
                                                     Total jadwal sidang akhir aktif.
                                                 @break
 
-                                                @case('Pasca Sidang Sempro')
-                                                    Data hasil sidang proposal.
-                                                @break
-
-                                                @case('Pasca Sidang Akhir')
-                                                    Rekap nilai sidang akhir.
+                                                @case('Penilaian Sidang Akhir')
+                                                    Data hasil penilaian sidang.
                                                 @break
                                             @endswitch
                                         </small>

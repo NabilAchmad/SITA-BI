@@ -46,22 +46,7 @@
                     </a>
                 </li>
 
-                <!-- Laporan dan Statistik -->
-                <li class="nav-item {{ request()->is('admin/laporan*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.statistik') }}">
-                        <i class="fas fa-chart-bar"></i>
-                        <p>Laporan dan Statistik</p>
-                    </a>
-                </li>
-
-                <!-- Log dan Aktifitas -->
-                <li class="nav-item {{ request()->is('admin/logs*') ? 'active' : '' }}">
-                    <a href="{{ route('log.aktifitas') }}">
-                        <i class="fas fa-terminal"></i>
-                        <p>Log dan Aktifitas</p>
-                    </a>
-                </li>
-
+                
                 <!-- Akses Section -->
                 <li class="nav-section">
                     <span class="sidebar-mini-icon">
@@ -75,16 +60,10 @@
                 <li class="nav-item {{ request()->is('admin/kelola-akun*') ? 'active' : '' }}">
                     <a href="{{ route('akun-dosen.kelola') }}">
                         <i class="fas fa-users-cog"></i>
-                        <p>Kelola Akun</p>
+                        <p>Kelola Tugas Akhir</p>
                     </a>
                 </li>
 
-                <li class="nav-item {{ request()->is('admin/mahasiswa*') ? 'active' : '' }}">
-                    <a href="{{ route('penugasan-bimbingan.index') }}">
-                        <i class="fas fa-graduation-cap"></i>
-                        <p>Penugasan Bimbingan</p>
-                    </a>
-                </li>
 
                 <!-- Sidang -->
                 <li class="nav-item {{ request()->is('admin/sidang*') ? 'active' : '' }}">

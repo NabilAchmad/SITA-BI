@@ -12,28 +12,23 @@ class BimbinganController extends Controller
         return view('admin.bimbingan.dashboard.dashboard');
 
     }
-    public function belumMulai()
+    public function ajukanJadwal()
 {
     // logic untuk menampilkan mahasiswa yang belum memulai bimbingan
-    return view('admin.bimbingan.crud-bimbingan.belum-mulai');
+    return view('admin.bimbingan.crud-bimbingan.ajukan-jadwal');
 }
 
-public function sedangBerlangsung()
+    public function lihatBimbingan()
 {
     // logic untuk menampilkan mahasiswa yang sedang bimbingan
-    return view('admin.bimbingan.crud-bimbingan.sedang-berlangsung');
+    return view('admin.bimbingan.crud-bimbingan.lihat-bimbingan');
 }
 
-public function menungguReview()
+    public function ajukanPerubahan()
 {
     // logic untuk menampilkan mahasiswa yang menunggu review
-    return view('admin.bimbingan.crud-bimbingan.menunggu-review');
+    return view('admin.bimbingan.crud-bimbingan.ajukan-perubahan');
 }
 
-public function selesai()
-{
-    // logic untuk menampilkan mahasiswa yang sudah selesai bimbingan
-    return view('admin.bimbingan.crud-bimbingan.selesai');
-}
 
 }

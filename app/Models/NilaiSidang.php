@@ -22,4 +22,27 @@ class NilaiSidang extends Model
     {
         return $this->belongsTo(Dosen::class);
     }
+
+    public function nilai()
+    {
+        return $this->hasMany(NilaiSidang::class, 'sidang_id');
+    }
+
+    public function rataRataNilai()
+    {
+        return $this->nilai()->avg('skor');
+    }
+
+    public function statusKelulusan()
+    {
+        $avg = $this->rataRataNilai();
+        if ($avg === null) return 'Belum Dinilai';
+        return $avg >= 60 ? 'Lulus' : 'Tidak Lulus';
+    }
+
+    public function nilaiSidang()
+    {
+        return $this->hasMany(NilaiSidang::class, 'dosen_id');
+    }
+
 }

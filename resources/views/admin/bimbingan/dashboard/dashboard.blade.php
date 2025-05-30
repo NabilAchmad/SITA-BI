@@ -16,37 +16,30 @@
             @php
                 $cards = [
                     [
-                        'title' => 'Belum Memulai Bimbingan',
+                        'title' => 'Ajukan Jadwal Bimbingan',
                         'icon' => 'bi-hourglass',
                         'color' => 'secondary',
                         'count' => $notStartedCount ?? 0,
-                        'route' => route('bimbingan.crud-bimbingan.belum.mulai'),
+                        'route' => route('bimbingan.crud-bimbingan.ajukan.jadwal'),
                         'btn' => 'Lihat Detail',
                     ],
                     [
-                        'title' => 'Sedang Bimbingan',
+                        'title' => 'lihat jadwal Bimbingan',
                         'icon' => 'bi-person-lines-fill',
                         'color' => 'primary',
                         'count' => $ongoingCount ?? 0,
-                        'route' => route('bimbingan.crud-bimbingan.sedang.berlangsung'),
+                        'route' => route('bimbingan.crud-bimbingan.lihat.bimbingan'),
                         'btn' => 'Lihat Mahasiswa',
                     ],
                     [
-                        'title' => 'Menunggu Review Dosen',
+                        'title' => 'Ajukan Perubahan Jadwal',
                         'icon' => 'bi-eye',
                         'color' => 'warning',
                         'count' => $waitingReviewCount ?? 0,
-                        'route' => route('bimbingan.crud-bimbingan.menunggu.review'),
+                        'route' => route('bimbingan.crud-bimbingan.ajukan.perubahan'),
                         'btn' => 'Lihat Detail',
                     ],
-                    [
-                        'title' => 'Selesai Bimbingan',
-                        'icon' => 'bi-check2-circle',
-                        'color' => 'success',
-                        'count' => $completedCount ?? 0,
-                        'route' => route('bimbingan.crud-bimbingan.selesai'),
-                        'btn' => 'Lihat Rekap',
-                    ],
+                    
                 ];
             @endphp
 
