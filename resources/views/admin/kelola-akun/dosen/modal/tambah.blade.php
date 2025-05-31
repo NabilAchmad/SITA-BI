@@ -51,16 +51,6 @@
                             <i class="bi bi-eye"></i>
                         </button>
                     </div>
-                    <div class="form-floating mb-4 position-relative">
-                        <input type="password" class="form-control" id="password_confirmation"
-                            name="password_confirmation" placeholder="Ulangi password" required>
-                        <label for="password_confirmation">Konfirmasi Password</label>
-                        <button type="button"
-                            class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
-                            id="togglePasswordConfirmation" tabindex="-1" style="z-index: 10;">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                    </div>
                     <button type="submit" class="btn w-100">Tambah Akun Dosen</button>
                 </form>
             </div>

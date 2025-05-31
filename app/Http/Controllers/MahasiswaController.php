@@ -39,12 +39,6 @@ class MahasiswaController extends Controller
         return view('admin.kelola-akun.mahasiswa.views.kelolaMahasiswa', compact('mahasiswa'));
     }
 
-    public function edit($id)
-    {
-        $mahasiswa = Mahasiswa::with('user')->findOrFail($id);
-        return view('admin.kelola-akun.mahasiswa.views.editMahasiswa', compact('mahasiswa'));
-    }
-
     public function update(Request $request, $id)
     {
         $mahasiswa = Mahasiswa::with('user')->findOrFail($id);

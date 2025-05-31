@@ -12,12 +12,11 @@ use Illuminate\Support\Facades\DB;
 
 class DosenController extends Controller
 {
-    // Menampilkan daftar semua akun dosen
     public function index(Request $request)
     {
         $query = Dosen::with(['user.roles']);
 
-        // Filter berdasarkan nama dosen (yang disimpan di relasi user.name)
+        // Filter berdasarkan nama dosen
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->whereHas('user', function ($q) use ($search) {
@@ -25,9 +24,12 @@ class DosenController extends Controller
             });
         }
 
+        // Urutkan berdasarkan created_at dan updated_at DESC
+        $query->orderByDesc('updated_at')->orderByDesc('created_at');
+
         $roles = Role::whereIn('nama_role', ['kaprodi', 'kajur'])->get();
 
-        $dosenList = $query->paginate(10); // Ganti 10 sesuai jumlah per halaman
+        $dosenList = $query->paginate(10); // Bisa ubah jumlah per halaman
 
         return view('admin.kelola-akun.dosen.views.kelolaAkunDosen', compact('dosenList', 'roles'));
     }
@@ -50,28 +52,30 @@ class DosenController extends Controller
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'nidn' => 'required|string|unique:dosen,nidn',
-            'password' => ['required', 'confirmed', Password::min(8)],
-            'role_id' => 'nullable|in:2,3', // hanya kaprodi / kajur jika dipilih
+            'password' => ['required', Password::min(8)],
+            'role_id' => 'nullable|in:2,3', // hanya kaprodi/kajur jika dipilih
         ]);
 
         DB::transaction(function () use ($request) {
-            // Buat user
+            // Buat akun user
             $user = User::create([
                 'name' => $request->nama,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
 
-            // Ambil role dosen wajib
+            // Ambil ID role dosen (wajib)
             $roleDosen = Role::where('nama_role', 'dosen')->firstOrFail();
+
+            // Inisialisasi role_ids dengan role dosen
             $roleIds = [$roleDosen->id];
 
-            // Tambahkan role kaprodi/kajur jika dipilih
-            if ($request->filled('role_id')) {
-                $roleIds[] = $request->role_id;
+            // Tambahkan kaprodi/kajur jika dipilih
+            if ($request->filled('role_id') && in_array($request->role_id, [2, 3])) {
+                $roleIds[] = (int) $request->role_id;
             }
 
-            // Simpan ke tabel user_roles
+            // Simpan relasi ke tabel user_roles
             $user->roles()->attach($roleIds);
 
             // Simpan data dosen
@@ -99,34 +103,36 @@ class DosenController extends Controller
         DB::transaction(function () use ($request, $dosen) {
             $user = $dosen->user;
 
-            // Update user
+            // Update data user
             $user->update([
                 'name' => $request->nama,
                 'email' => $request->email,
                 'password' => $request->filled('password') ? Hash::make($request->password) : $user->password,
             ]);
 
-            // Update NIDN dosen
+            // Update data dosen
             $dosen->update([
                 'nidn' => $request->nidn,
             ]);
 
-            // Ambil role dosen wajib
-            $roleDosen = Role::where('nama_role', 'dosen')->firstOrFail();
-            $roleIds = [$roleDosen->id];
+            // Siapkan role yang akan disimpan ulang
+            $roleIds = [];
 
-            // Tambahkan role tambahan jika dipilih (kajur/kaprodi)
+            // Pastikan role dosen selalu ada
+            $roleDosen = Role::where('nama_role', 'dosen')->firstOrFail();
+            $roleIds[] = $roleDosen->id;
+
+            // Tambahkan role kaprodi atau kajur jika dipilih
             if ($request->filled('role_id')) {
-                $roleIds[] = $request->role_id;
+                $roleIds[] = (int) $request->role_id;
             }
 
-            // Sync roles (hapus sebelumnya, ganti dengan yang baru)
+            // Sinkronisasi: hanya simpan role yang kita izinkan
             $user->roles()->sync($roleIds);
         });
 
         return redirect()->route('akun-dosen.kelola')->with('success', 'Akun dosen berhasil diperbarui.');
     }
-
 
     public function destroy($id)
     {

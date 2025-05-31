@@ -50,4 +50,26 @@ class ArsipTAController extends Controller
             'alumniCount'
         ));
     }
+
+    public function lulusSempro(Request $request)
+    {
+        $query = Mahasiswa::with(['user', 'tugasAkhir', 'sidangSempro'])
+            ->whereHas('sidang', function ($q) {
+                $q->where('status', 'lulus'); // asumsi nama field
+            });
+
+        if ($request->filled('prodi')) {
+            $query->where('prodi', $request->prodi);
+        }
+
+        if ($request->filled('search')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%');
+            })->orWhere('nim', 'like', '%' . $request->search . '%');
+        }
+
+        $mahasiswaLulus = $query->paginate(10);
+
+        return view('admin.arsip.sempro.read', compact('mahasiswaLulus'));
+    }
 }

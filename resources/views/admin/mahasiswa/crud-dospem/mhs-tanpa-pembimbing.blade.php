@@ -65,7 +65,7 @@
                                     {{ $mhs->prodi }}
                                 @endif
                             </td>
-                            <td>{{ $mhs->tugasAkhir->judul }}</td>
+                            <td>{{ $tugasAkhir?->judul ?? '-' }}</td>
                             <td>
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                     data-bs-target="#modalPembimbing-{{ $mhs->id }}">

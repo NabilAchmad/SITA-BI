@@ -33,19 +33,28 @@ class PenugasanPembimbingController extends Controller
         return view('admin.mahasiswa.views.list-mhs', compact('mahasiswa'));
     }
 
-    // Tampilkan mahasiswa yang belum memiliki 2 pembimbing
     public function indexWithOutPembimbing(Request $request)
     {
         $query = Mahasiswa::with(['user', 'tugasAkhir'])
-            ->withCount(['peranDosenTA as pembimbing_count' => function ($q) {
-                $q->where('peran', 'like', 'pembimbing%');
-            }])
-            ->having('pembimbing_count', '<', 2);
+            // Hitung pembimbing
+            ->withCount([
+                'peranDosenTA as pembimbing_count' => function ($q) {
+                    $q->where('peran', 'like', 'pembimbing%');
+                }
+            ])
+            // Mahasiswa dengan jumlah pembimbing < 1
+            ->having('pembimbing_count', '<', 1)
+            // Mahasiswa yang memiliki tugas akhir dengan status disetujui
+            ->whereHas('tugasAkhir', function ($q) {
+                $q->where('status', 'disetujui');
+            });
 
+        // Filter berdasarkan prodi
         if ($request->filled('prodi')) {
             $query->where('prodi', 'like', $request->prodi . '%');
         }
 
+        // Filter berdasarkan nama atau NIM
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {

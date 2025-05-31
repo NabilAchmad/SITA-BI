@@ -25,7 +25,7 @@
                     ],
                     [
                         'title' => 'Menunggu Sidang Akhir',
-                        'icon' => 'bi-clock-history',
+                        'icon' => 'bi-hourglass-top',
                         'color' => 'success',
                         'count' => $waitingAkhirCount ?? 0,
                         'route' => route('sidang.menunggu.penjadwalan.akhir'),
