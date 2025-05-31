@@ -58,10 +58,12 @@
                 <!-- Kelola Akun -->
                 <!-- Sidebar -->
                 <li class="nav-item {{ request()->is('admin/kelola-akun*') ? 'active' : '' }}">
-                    <a href="{{ route('akun-dosen.kelola') }}">
+                    <a href="{{ route('ta.index') }}">
                         <i class="fas fa-users-cog"></i>
-                        <p>Kelola Tugas Akhir</p>
+                        <p>Dashboard Tugas Akhir</p>
                     </a>
+
+
                 </li>
 
 

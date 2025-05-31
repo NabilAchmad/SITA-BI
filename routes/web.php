@@ -12,6 +12,7 @@ use App\Http\Controllers\JadwalSidangAkhirController;
 use App\Http\Controllers\JadwalSidangSemproController;
 use App\Http\Controllers\BimbinganController;
 use App\Http\Controllers\PenilaianSidangController;
+use App\Http\Controllers\TugasAkhirController;
 
 Route::prefix('admin')->group(function () {
 
@@ -185,7 +186,16 @@ Route::prefix('TawaranTopik')->group(function () {
     });
 
 
-  
+   //tugas akhir
+    
+    Route::prefix('ta')->name('ta.')->middleware('auth')->group(function () {
+        Route::get('/', [TugasAkhirController::class, 'index'])->name('index'); // <-- INI WAJIB ADA
+        Route::get('/kemajuan', [TugasAkhirController::class, 'lihatKemajuan'])->name('kemajuan');
+        Route::get('/revisi', [TugasAkhirController::class, 'revisi'])->name('revisi');
+        Route::post('/revisi/upload', [TugasAkhirController::class, 'uploadRevisi'])->name('revisi.upload');
+        Route::get('/pembatalan', [TugasAkhirController::class, 'pembatalan'])->name('pembatalan');
+    });
+
 
     // Profile
     Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
