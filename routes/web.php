@@ -11,6 +11,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\JadwalSidangAkhirController;
 use App\Http\Controllers\JadwalSidangSemproController;
 use App\Http\Controllers\BimbinganController;
+use App\Http\Controllers\PenilaianSidangController;
 
 Route::prefix('admin')->group(function () {
 
