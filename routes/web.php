@@ -171,12 +171,8 @@ Route::prefix('admin')->group(function () {
     Route::prefix('arsip-ta')->group(function () {
         // Halaman Arsip Tugas Akhir
         Route::get('/', [ArsipTAController::class, 'dashboard'])->name('arsip-ta.index');
-
-        Route::get('/lulus-sempro', [ArsipTAController::class, 'lulusSempro'])->name('arsip.lulus.sempro');
-        Route::get('/lulus-akhir', [ArsipTAController::class, ''])->name('arsip.lulus.akhir');
-        Route::get('/belum-lulus-sidang-akhir', [ArsipTAController::class, ''])->name('arsip.belum.lulus.akhir');
-        Route::get('/rekap-nilai', [ArsipTAController::class, ''])->name('arsip.rekap.nilai');
-        Route::get('/dokumen-ta', [ArsipTAController::class, ''])->name('arsip.dokumen.ta');
-        Route::get('/alumni', [ArsipTAController::class, ''])->name('arsip.alumni');
+        Route::get('/rekap-nilai', [ArsipTAController::class, 'rekapNilai'])->name('arsip.rekap.nilai');
+        Route::get('/dokumen-ta', [ArsipTAController::class, 'dokumenTa'])->name('arsip.dokumen.ta');
+        Route::get('/alumni', [ArsipTAController::class, 'alumni'])->name('arsip.alumni');
     });
 });

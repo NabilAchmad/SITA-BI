@@ -51,11 +51,15 @@ class ArsipTAController extends Controller
         ));
     }
 
-    public function lulusSempro(Request $request)
+    public function rekapNilai(Request $request) {}
+
+    public function dokumenTa(Request $request) {}
+
+    public function alumni(Request $request)
     {
-        $query = Mahasiswa::with(['user', 'tugasAkhir', 'sidangSempro'])
+        $query = Mahasiswa::with(['user', 'tugasAkhir', 'sidangAkhir'])
             ->whereHas('sidang', function ($q) {
-                $q->where('status', 'lulus'); // asumsi nama field
+                $q->where('status', 'lulus');
             });
 
         if ($request->filled('prodi')) {
@@ -63,13 +67,15 @@ class ArsipTAController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%');
-            })->orWhere('nim', 'like', '%' . $request->search . '%');
+            $query->where(function ($q) use ($request) {
+                $q->whereHas('user', function ($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->search . '%');
+                })->orWhere('nim', 'like', '%' . $request->search . '%');
+            });
         }
 
-        $mahasiswaLulus = $query->paginate(10);
+        $alumni = $query->paginate(10);
 
-        return view('admin.arsip.sempro.read', compact('mahasiswaLulus'));
+        return view('admin.arsip.daftar-alumni.read', compact('alumni'));
     }
 }

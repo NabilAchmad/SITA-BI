@@ -89,11 +89,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             // === CHART DATA ===
             const prodiLabels = {!! json_encode(
-                $mahasiswaPerProdi->pluck('prodi')->map(function($prodi) {
-                    if (strtolower($prodi) === 'd4') return 'D4 Bahasa Inggris';
-                    if (strtolower($prodi) === 'd3') return 'D3 Bahasa Inggris';
+                $mahasiswaPerProdi->pluck('prodi')->map(function ($prodi) {
+                    if (strtolower($prodi) === 'd4') {
+                        return 'D4 Bahasa Inggris';
+                    }
+                    if (strtolower($prodi) === 'd3') {
+                        return 'D3 Bahasa Inggris';
+                    }
                     return $prodi;
-                })
+                }),
             ) !!};
             const prodiData = {!! json_encode($mahasiswaPerProdi->pluck('total')) !!};
 
