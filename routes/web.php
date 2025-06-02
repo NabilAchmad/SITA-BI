@@ -91,7 +91,8 @@ Route::prefix('ketua-prodi')->group(function () {
         Route::get('/sidang/lihat-jadwal', [KaprodiController::class, 'showJadwal'])->name('kaprodi.jadwal');
 
         // Tugas Akhir
-        Route::get('/judulTA/AccJudulTA', [KaprodiController::class, 'showAccJudulTA'])->name('accjudul.page');
+        // Route::get('/judulTA/AccJudulTA', [KaprodiController::class, 'showAccJudulTA'])->name('accjudul.page');
+        Route::get('/judulTA/AccRejectedJudulTA', [KaprodiController::class, 'showJudulAccRejectedPage'])->name('accrejectedjudul.page');
         Route::post('/judulTA/approve/{id}', [KaprodiController::class, 'approveJudul'])->name('kaprodi.judulTA.approve');
         Route::post('/judulTA/reject/{id}', [KaprodiController::class, 'rejectJudul'])->name('kaprodi.judulTA.reject');
 

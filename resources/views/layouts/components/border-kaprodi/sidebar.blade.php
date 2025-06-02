@@ -56,7 +56,7 @@
 
                 {{-- Tugas Akhir --}}
                 <li class="nav-item {{ request()->is('kaprodi/judulTA/*') || request()->is('kaprodi/judulTA') ? 'active' : '' }}">
-                    <a href="{{ route('accjudul.page') }}">
+                    <a href="{{ route('accrejectedjudul.page') }}">
                         <i class="fas fa-users-cog"></i>
                         <p>Tugas Akhir</p>
                     </a>

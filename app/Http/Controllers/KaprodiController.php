@@ -33,18 +33,20 @@ class KaprodiController extends Controller
         return view('kaprodi.judulTA.AccJudulTA', compact('judulTAs'));
     }
 
+    // Show page with two tables: Judul ACC and Judul Ditolak
+    public function showJudulAccRejectedPage()
+    {
+        $approvedJuduls = JudulTA::where('status', 'Disetujui')->get();
+        $rejectedJuduls = JudulTA::where('status', 'Ditolak')->get();
+        return view('kaprodi.judulTA.AccRejectedJudulTA', compact('approvedJuduls', 'rejectedJuduls'));
+    }
+
     // Nilai Sidang
     public function SidangAkhir()
     {
         $nilais = Nilai::all();
         return view('kaprodi.sidang.akhir.crud-jadwal.read', compact('nilais'));
     }
-
-    // Create Sidang
-    // public function createSidang()
-    // {
-    //     return view('kaprodi.sidang.createSidang');
-    // }
 
     // Store Sidang (handle POST)
     public function storeSidang(Request $request)
