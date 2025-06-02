@@ -12,13 +12,13 @@ class PenilaianSidangController extends Controller
     public function index()
     {
         $sidangs = Sidang::with('mahasiswa')->get();
-        return view('penilaian.index', compact('sidangs'));
+        return view('admin.sidang.penilaian.index', compact('sidangs'));
     }
 
     public function form($sidang_id)
     {
         $sidang = Sidang::with('mahasiswa')->findOrFail($sidang_id);
-        return view('penilaian.form', compact('sidang'));
+        return view('admin.sidang.penilaian.index', compact('sidang'));
     }
 
     public function simpan(Request $request, $sidang_id)
@@ -31,12 +31,12 @@ class PenilaianSidangController extends Controller
 
         NilaiSidang::create([
             'sidang_id' => $sidang_id,
-            'dosen_id' => Auth::id(),
+            'dosen_id' => 4,
             'aspek' => $request->aspek,
             'komentar' => $request->komentar,
             'skor' => $request->skor,
         ]);
 
-        return redirect()->route('penilaian.sidang.index')->with('success', 'Nilai berhasil disimpan');
+        return redirect()->route('admin.sidang.penilaian.index')->with('success', 'Nilai berhasil disimpan');
     }
 }

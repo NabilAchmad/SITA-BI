@@ -13,7 +13,7 @@ class TugasAkhirController extends Controller
     public function index()
 {
     // Bisa ambil data apapun yang ingin ditampilkan di halaman utama TA
-    return view('ta.index');
+    return view('admin.ta.dashboard.dashboard');
 }
     // 1. Lihat laporan kemajuan tugas akhir
     public function lihatKemajuan()
@@ -30,7 +30,7 @@ class TugasAkhirController extends Controller
         $userId = Auth::id();
         $revisi = RevisiTA::where('user_id', $userId)->latest()->get();
 
-        return view('ta.revisi.index', compact('revisi'));
+        return view('admin.ta.revisi.index', compact('revisi'));
     }
 
     public function uploadRevisi(Request $request)

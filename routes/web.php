@@ -20,48 +20,47 @@ Route::prefix('admin')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
     });
 
-//bimbingan
+    //bimbingan
 
-  Route::prefix('bimbingan')->group(function () {
-    // Daftar bimbingan
-    Route::get('/', [BimbinganController::class, 'dashboard'])->name('bimbingan.index');
+    Route::prefix('bimbingan')->group(function () {
+        // Daftar bimbingan
+        Route::get('/', [BimbinganController::class, 'dashboard'])->name('bimbingan.index');
 
-    Route::get('/bimbingan/belumMulai', [BimbinganController::class, 'ajukanJadwal'])->name('bimbingan.crud-bimbingan.ajukan.jadwal');
+        Route::get('/bimbingan/belumMulai', [BimbinganController::class, 'ajukanJadwal'])->name('bimbingan.crud-bimbingan.ajukan.jadwal');
 
-    Route::get('/bimbingan/sedangBerlangsung', [BimbinganController::class, 'lihatBimbingan'])->name('bimbingan.crud-bimbingan.lihat.bimbingan');
+        Route::get('/bimbingan/sedangBerlangsung', [BimbinganController::class, 'lihatBimbingan'])->name('bimbingan.crud-bimbingan.lihat.bimbingan');
 
-    Route::get('/bimbingan/menungguReview', [BimbinganController::class, 'ajukanPerubahan'])->name('bimbingan.crud-bimbingan.ajukan.perubahan');
-
-  });
+        Route::get('/bimbingan/menungguReview', [BimbinganController::class, 'ajukanPerubahan'])->name('bimbingan.crud-bimbingan.ajukan.perubahan');
+    });
 
     // =========================
-// ROUTE TawaranTopik TOPIK
-// =========================
+    // ROUTE TawaranTopik TOPIK
+    // =========================
 
 
-Route::prefix('TawaranTopik')->group(function () {
-    // READ
-    Route::get('/read', [TawaranTopikController::class, 'read'])->name('TawaranTopik.read');
+    Route::prefix('TawaranTopik')->group(function () {
+        // READ
+        Route::get('/read', [TawaranTopikController::class, 'read'])->name('TawaranTopik.read');
 
-    // CREATE
-    Route::get('/create', [TawaranTopikController::class, 'create'])->name('TawaranTopik.form'); // Form tambah
-    Route::post('/create', [TawaranTopikController::class, 'store'])->name('TawaranTopik.create'); // Simpan data baru
+        // CREATE
+        Route::get('/create', [TawaranTopikController::class, 'create'])->name('TawaranTopik.form'); // Form tambah
+        Route::post('/create', [TawaranTopikController::class, 'store'])->name('TawaranTopik.create'); // Simpan data baru
 
-    // EDIT / UPDATE
-    Route::get('/{id}/edit', [TawaranTopikController::class, 'edit'])->name('TawaranTopik.edit'); // Form edit
-    Route::put('/{id}/update', [TawaranTopikController::class, 'update'])->name('TawaranTopik.update'); // Update data
+        // EDIT / UPDATE
+        Route::get('/{id}/edit', [TawaranTopikController::class, 'edit'])->name('TawaranTopik.edit'); // Form edit
+        Route::put('/{id}/update', [TawaranTopikController::class, 'update'])->name('TawaranTopik.update'); // Update data
 
-    // DELETE (Soft Delete)
-    Route::delete('/{id}/soft-delete', [TawaranTopikController::class, 'destroy'])->name('TawaranTopik.destroy'); // Soft delete
+        // DELETE (Soft Delete)
+        Route::delete('/{id}/soft-delete', [TawaranTopikController::class, 'destroy'])->name('TawaranTopik.destroy'); // Soft delete
 
-    // DELETE ALL (Force delete)
-    Route::delete('/force-delete-all', [TawaranTopikController::class, 'forceDeleteAll'])->name('TawaranTopik.force-delete-all');
+        // DELETE ALL (Force delete)
+        Route::delete('/force-delete-all', [TawaranTopikController::class, 'forceDeleteAll'])->name('TawaranTopik.force-delete-all');
 
-    // TRASHED (Manajemen soft delete)
-    Route::get('/trash', [TawaranTopikController::class, 'trashed'])->name('TawaranTopik.trashed'); // Tampilkan data terhapus
-    Route::post('/{id}/restore', [TawaranTopikController::class, 'restore'])->name('TawaranTopik.restore'); // Restore data
-    Route::delete('/{id}/force-delete', [TawaranTopikController::class, 'forceDelete'])->name('TawaranTopik.force-delete'); // Hapus permanen
-});
+        // TRASHED (Manajemen soft delete)
+        Route::get('/trash', [TawaranTopikController::class, 'trashed'])->name('TawaranTopik.trashed'); // Tampilkan data terhapus
+        Route::post('/{id}/restore', [TawaranTopikController::class, 'restore'])->name('TawaranTopik.restore'); // Restore data
+        Route::delete('/{id}/force-delete', [TawaranTopikController::class, 'forceDelete'])->name('TawaranTopik.force-delete'); // Hapus permanen
+    });
 
 
     // =========================
@@ -114,7 +113,7 @@ Route::prefix('TawaranTopik')->group(function () {
         Route::get('dashboard-sidang', [JadwalSidangAkhirController::class, 'dashboard'])->name('dashboard-sidang');
 
         Route::prefix('sempro')->group(function () {
-          
+
             // Daftar mahasiswa yang sudah punya jadwal sidang
             Route::get('/jadwal-sidang-sempro', [JadwalSidangSemproController::class, 'listJadwalSempro'])->name('jadwal.sidang.sempro');
 
@@ -130,11 +129,10 @@ Route::prefix('TawaranTopik')->group(function () {
             // Tandai akhir sidang selesai 
             Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidangSempro'])
                 ->name('jadwal-sidang-sempro.mark-done');
+        });
 
-           
 
-            Route::prefix('akhir')->group(function () {
-          
+        Route::prefix('akhir')->group(function () {
 
             // Daftar mahasiswa yang sudah punya jadwal sidang akhir
             Route::get('/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'listJadwalAkhir'])->name('jadwal.sidang.akhir');
@@ -153,7 +151,7 @@ Route::prefix('TawaranTopik')->group(function () {
             // 5. Routes nilai sidang
             // ============================
 
-            Route::prefix('penilaian')->middleware(['auth', 'dosen'])->group(function () {
+            Route::prefix('penilaian')->group(function () {
                 Route::get('/sidang', [PenilaianSidangController::class, 'index'])->name('penilaian.sidang.index');
                 Route::get('/sidang/{id}/form', [PenilaianSidangController::class, 'form'])->name('penilaian.sidang.form');
                 Route::post('/sidang/{id}/simpan', [PenilaianSidangController::class, 'simpan'])->name('penilaian.sidang.simpan');
@@ -164,7 +162,7 @@ Route::prefix('TawaranTopik')->group(function () {
                 ->name('jadwal-sidang.mark-done');
 
             // Daftar mahasiswa yang sudah sidang akhir
-           
+
 
             // POST: Simpan dosen penguji
             Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
@@ -186,14 +184,14 @@ Route::prefix('TawaranTopik')->group(function () {
     });
 
 
-   //tugas akhir
-    
-    Route::prefix('ta')->name('ta.')->middleware('auth')->group(function () {
-        Route::get('/', [TugasAkhirController::class, 'index'])->name('index'); // <-- INI WAJIB ADA
-        Route::get('/kemajuan', [TugasAkhirController::class, 'lihatKemajuan'])->name('kemajuan');
-        Route::get('/revisi', [TugasAkhirController::class, 'revisi'])->name('revisi');
-        Route::post('/revisi/upload', [TugasAkhirController::class, 'uploadRevisi'])->name('revisi.upload');
-        Route::get('/pembatalan', [TugasAkhirController::class, 'pembatalan'])->name('pembatalan');
+    //tugas akhir
+
+    Route::prefix('ta')->group(function () {
+        Route::get('/', [TugasAkhirController::class, 'index'])->name('ta.index'); // <-- INI WAJIB ADA
+        Route::get('/kemajuan', [TugasAkhirController::class, 'lihatKemajuan'])->name('ta.kemajuan.index');
+        Route::get('/revisi', [TugasAkhirController::class, 'revisi'])->name('ta.revisi.index');
+        Route::post('/revisi/upload', [TugasAkhirController::class, 'uploadRevisi'])->name('ta.revisi.upload');
+        Route::get('/pembatalan', [TugasAkhirController::class, 'pembatalan'])->name('ta.pembatalan.index');
     });
 
 
@@ -201,5 +199,4 @@ Route::prefix('TawaranTopik')->group(function () {
     Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
 
     Route::view('/arsip-ta', 'admin/arsip/dashboard/arsip')->name('arsip-ta.index');
-});
 });
