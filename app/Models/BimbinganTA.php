@@ -12,7 +12,7 @@ class BimbinganTA extends Model
     protected $table = 'bimbingan_ta';
 
     public function tugasAkhir()
-    {
+    {   
         return $this->belongsTo(TugasAkhir::class);
     }
 

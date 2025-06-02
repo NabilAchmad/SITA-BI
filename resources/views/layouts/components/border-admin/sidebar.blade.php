@@ -16,7 +16,7 @@
                 <!-- Teks -->
                 <span class="fw-semibold d-none d-md-inline text-truncate"
                     style="max-width: 100%; white-space: nowrap; transition: color 0.3s ease;">
-                    Admin Panel
+                    Dosen
                 </span>
             </a>
 

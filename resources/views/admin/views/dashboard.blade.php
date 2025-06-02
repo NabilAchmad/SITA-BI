@@ -9,21 +9,21 @@
 
     <!-- main -->
     <div class="row">
-        <!-- dosen section -->
+        <!-- admin section -->
         @include('layouts.components.content-admin.dosen')
-        <!-- End dosen section -->
+        <!-- End admin section -->
 
         <!-- Mahasiswa section -->
         @include('layouts.components.content-admin.mahasiswa')
         <!-- End Mahasiswa section -->
 
-        <!-- Dosen Penguji section -->
+        <!-- admin Penguji section -->
         @include('layouts.components.content-admin.dospeng')
-        <!-- End Sales Dosen Penguji -->
+        <!-- End Sales admin Penguji -->
 
-        <!-- Dosen Pembimbing section -->
+        <!-- admin Pembimbing section -->
         @include('layouts.components.content-admin.dospem')
-        <!-- End Dosen Pembimbing -->
+        <!-- End admin Pembimbing -->
     </div>
     <!-- end main -->
 
@@ -33,11 +33,11 @@
         @include('layouts.components.content-admin.logactivity')
         <!-- end Log Activity -->
 
-        <!-- dosen aktif -->
+        <!-- admin aktif -->
         <div class="col-md-4">
             @include('layouts.components.content-admin.dosenaktif')
         </div>
-        <!-- end dosen aktif -->
+        <!-- end admin aktif -->
     </div>
 
     <div class="row">
