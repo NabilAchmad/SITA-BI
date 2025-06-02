@@ -45,20 +45,9 @@ class Mahasiswa extends Model
         return $this->hasMany(NotifikasiTa::class);
     }
 
-<<<<<<< HEAD
-    public function pembimbing1()
-    {
-        return $this->tugasAkhir()->with('pembimbing1Dosen')->first()->pembimbing1Dosen ?? null;
-    }
-
-    public function pembimbing2()
-    {
-        return $this->tugasAkhir()->with('pembimbing2Dosen')->first()->pembimbing2Dosen ?? null;
-=======
-    public function sidang(): HasMany
+    public function sidang()
     {
         // Ganti 'foreign_key' dan 'local_key' sesuai dengan struktur tabel Anda
         return $this->hasMany(Sidang::class, 'tugas_akhir_id', 'id');
->>>>>>> c1ae1710c4dbe30065137516415b34a9e6d7715a
     }
 }
