@@ -29,24 +29,25 @@ class KaprodiController extends Controller
     // Acc Judul Tugas Akhir
     public function showAccJudulTA()
     {
-        $judulTAs = JudulTA::all();
+        $judulTAs = JudulTA::where('status', 'diajukan')
+            ->get();
         return view('kaprodi.judulTA.AccJudulTA', compact('judulTAs'));
     }
 
     // Show page with two tables: Judul ACC and Judul Ditolak
-    public function showJudulAccRejectedPage()
-    {
-        $approvedJuduls = JudulTA::where('status', 'Disetujui')->get();
-        $rejectedJuduls = JudulTA::where('status', 'Ditolak')->get();
-        return view('kaprodi.judulTA.AccRejectedJudulTA', compact('approvedJuduls', 'rejectedJuduls'));
-    }
+    // public function showJudulAccRejectedPage()
+    // {
+    //     $approvedJuduls = JudulTA::where('status', 'Disetujui')->get();
+    //     $rejectedJuduls = JudulTA::where('status', 'Ditolak')->get();
+    //     return view('kaprodi.judulTA.AccRejectedJudulTA', compact('approvedJuduls', 'rejectedJuduls'));
+    // }
 
     // Show rejected Judul Tugas Akhir only
-    public function showRejectedJudulTA()
-    {
-        $rejectedJuduls = JudulTA::where('status', 'Ditolak')->get();
-        return view('kaprodi.judulTA.RejectedJudulTA', compact('rejectedJuduls'));
-    }
+    // public function showRejectedJudulTA()
+    // {
+    //     $rejectedJuduls = JudulTA::where('status', 'Ditolak')->get();
+    //     return view('kaprodi.judulTA.RejectedJudulTA', compact('rejectedJuduls'));
+    // }
 
     // Nilai Sidang
     public function SidangAkhir()
@@ -77,7 +78,7 @@ class KaprodiController extends Controller
         return view('kaprodi.Pengumuman.pengumuman', compact('pengumumans'));
     }
 
-    // Approve JudulTA
+    // ACC Judul
     public function approveJudul($id)
     {
         $judul = JudulTA::findOrFail($id);
@@ -88,7 +89,7 @@ class KaprodiController extends Controller
         return response()->json(['message' => 'Judul telah di-ACC']);
     }
 
-    // Reject JudulTA
+    // Tolak Judul
     public function rejectJudul($id)
     {
         $judul = JudulTA::findOrFail($id);
@@ -97,6 +98,7 @@ class KaprodiController extends Controller
 
         return response()->json(['message' => 'Judul telah ditolak']);
     }
+
 
     // Sidang Dashboard
     public function showSidangDashboard()

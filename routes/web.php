@@ -15,6 +15,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KaprodiController;
 use App\Http\Controllers\TugasAkhirController;
 use App\Http\Controllers\PendaftaranSidangController;
+use App\Models\JudulTA;
+use App\Models\TugasAkhir;
 
 // Homepage
 // Route::get('/', function () {
@@ -93,6 +95,14 @@ Route::prefix('ketua-prodi')->group(function () {
 
         // Tugas Akhir
         Route::get('/judulTA/JudulTA', [KaprodiController::class, 'showAccJudulTA'])->name('kaprodi.judul.page');
+        // Route untuk ACC dan Tolak Judul
+        Route::post('/ketua-prodi/judulTA/approve/{id}', [TugasAkhirController::class, 'approve'])->name('kaprodi.judul.approve');
+        Route::post('/ketua-prodi/judulTA/reject/{id}', [TugasAkhirController::class, 'reject'])->name('kaprodi.judul.reject');
+        // Route untuk melihat daftar judul yang sudah di-ACC
+        Route::get('/judulTA/acc', [KaprodiController::class, 'showAccJudulTA'])->name('kaprodi.judul.acc');
+        // Route untuk melihat daftar judul yang sudah ditolak
+        Route::get('/judulTA/tolak', [KaprodiController::class, 'showTolakJudulTA'])->name('kaprodi.judul.tolak');
+
 
         // Nilai sidang
         Route::get('/sidang/akhir', [KaprodiController::class, 'SidangAkhir'])->name('kaprodi.akhir.page');
@@ -107,9 +117,9 @@ Route::prefix('ketua-prodi')->group(function () {
 // Admin Routes
 Route::prefix('admin')->group(function () {
     // Authentication
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('admin.login');
-    Route::post('/login', [AuthController::class, 'login'])->name('admin.login.post');
-    Route::get('/logout', [AuthController::class, 'logout'])->name('admin.logout');
+    // Route::get('/login', [AuthController::class, 'showLogin'])->name('admin.login');
+    // Route::post('/login', [AuthController::class, 'login'])->name('admin.login.post');
+    // Route::get('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
     Route::middleware(['auth'])->group(function () {
         // Redirect base /admin to dashboard

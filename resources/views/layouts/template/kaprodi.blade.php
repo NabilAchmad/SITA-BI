@@ -7,6 +7,8 @@
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
     <!-- Ganti Icon -->
     <link rel="icon" href="{{ asset('assets/img/admin/favicon.ico') }}" type="image/x-icon" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 
     <!-- Fonts and icons -->
     <script src="{{ asset('assets/js/plugin/webfont/webfont.min.js') }}"></script>
@@ -121,6 +123,7 @@
             fillColor: "rgba(255, 165, 52, .14)",
         });
     </script>
+    @yield('script')
 </body>
 
 </html>
