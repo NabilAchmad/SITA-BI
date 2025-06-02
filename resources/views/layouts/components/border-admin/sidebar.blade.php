@@ -101,14 +101,6 @@
                         <p>Pengumuman</p>
                     </a>
                 </li>
-
-                <!-- Arsip TA -->
-                <li class="nav-item {{ request()->is('admin/arsip-ta*') ? 'active' : '' }}">
-                    <a href="{{ route('arsip-ta.index') }}">
-                        <i class="fas fa-archive"></i>
-                        <p>Arsip TA</p>
-                    </a>
-                </li>
             </ul>
         </div>
     </div>

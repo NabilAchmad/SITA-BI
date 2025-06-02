@@ -13,6 +13,12 @@ use App\Models\Log;
 class AdminController extends Controller
 {
 
+    public function profile()
+    {
+        $dosen = 1;
+        return view('admin.views.profile', compact('admin'));
+    }
+
     public function index()
     {
         $totalDosen = Dosen::count();

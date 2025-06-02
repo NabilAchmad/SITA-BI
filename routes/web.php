@@ -8,7 +8,6 @@ use App\Http\Controllers\DosenController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ArsipTAController;
 use App\Http\Controllers\JadwalSidangAkhirController;
 use App\Http\Controllers\JadwalSidangSemproController;
 
@@ -141,7 +140,6 @@ Route::prefix('admin')->group(function () {
             Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'tandaiSidang'])
                 ->name('jadwal-sidang.mark-done');
 
-            // Daftar mahasiswa yang sudah sidang akhir
             // Halaman Pasca Sidang
             Route::get('/pasca-sidang-akhir', [JadwalSidangAkhirController::class, 'pascaSidangAkhir'])
                 ->name('pasca.sidang.akhir');
@@ -167,12 +165,4 @@ Route::prefix('admin')->group(function () {
 
     // Profile
     Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
-
-    Route::prefix('arsip-ta')->group(function () {
-        // Halaman Arsip Tugas Akhir
-        Route::get('/', [ArsipTAController::class, 'dashboard'])->name('arsip-ta.index');
-        Route::get('/rekap-nilai', [ArsipTAController::class, 'rekapNilai'])->name('arsip.rekap.nilai');
-        Route::get('/dokumen-ta', [ArsipTAController::class, 'dokumenTa'])->name('arsip.dokumen.ta');
-        Route::get('/alumni', [ArsipTAController::class, 'alumni'])->name('arsip.alumni');
-    });
 });
