@@ -20,7 +20,15 @@
                     <td class="text-start">{{ $mhs->user->name }}</td>
                     <td>{{ $mhs->user->email }}</td>
                     <td>{{ $mhs->nim }}</td>
-                    <td>{{ $mhs->prodi }}</td>
+                    <td>
+                        @if ($mhs->prodi === 'd4')
+                            D4 Bahasa Inggris
+                        @elseif ($mhs->prodi === 'd3')
+                            D3 Bahasa Inggris
+                        @else
+                            {{ $mhs->prodi }}
+                        @endif
+                    </td>
                     <td>
                         <button class="btn-edit-mahasiswa btn btn-warning btn-xs me-1" data-id="{{ $mhs->id }}"
                             data-url="{{ url('admin/kelola-akun/mahasiswa/update/' . $mhs->id) }}"

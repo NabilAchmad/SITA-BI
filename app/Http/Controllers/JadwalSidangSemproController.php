@@ -273,7 +273,7 @@ class JadwalSidangSemproController extends Controller
             'ruangan'
         ])
             ->whereHas('sidang', function ($q) use ($prodi, $search) {
-                $q->where('jenis_sidang', 'sempro') // Ubah dari 'akhir' ke 'sempro'
+                $q->where('jenis_sidang', 'proposal') // Ubah dari 'akhir' ke 'sempro'
                     ->whereIn('status', ['lulus', 'lulus_revisi']) // Tetap sama
                     ->whereHas('tugasAkhir.mahasiswa', function ($q2) use ($prodi, $search) {
                         if ($prodi) {
@@ -307,5 +307,38 @@ class JadwalSidangSemproController extends Controller
         );
 
         return view('admin.sidang.sempro.pasca.pasca-sidang', compact('sidangSelesai'));
+    }
+
+    public function tandaiSidangSempro(Request $request, $sidang_id)
+    {
+        $request->validate([
+            'status' => 'required|in:lulus,lulus_revisi,tidak_lulus'
+        ]);
+
+        $sidang = Sidang::where('id', $sidang_id)
+            ->where('jenis_sidang', 'proposal')
+            ->firstOrFail();
+
+        if (in_array($sidang->status, ['lulus', 'lulus_revisi', 'tidak_lulus'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sidang sudah ditandai sebelumnya.'
+            ]);
+        }
+
+        // Update status sidang
+        $sidang->status = $request->status;
+
+        // Jika tidak lulus, tandai sidang ini sebagai tidak aktif
+        if ($request->status === 'tidak_lulus') {
+            $sidang->is_active = false;
+        }
+
+        $sidang->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status sidang berhasil diperbarui.'
+        ]);
     }
 }

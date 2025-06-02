@@ -26,6 +26,21 @@
                             placeholder="Masukkan NIDN" required>
                         <label for="nidn">NIDN</label>
                     </div>
+
+                    {{-- Dropdown Role --}}
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="role_id" name="role_id">
+                            <option value="" selected>Default Dosen</option>
+                            @foreach ($roles as $role)
+                                @if (in_array($role->nama_role, ['kaprodi', 'kajur']))
+                                    <option value="{{ $role->id }}">{{ ucfirst($role->nama_role) }} -
+                                        {{ $role->deskripsi }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                        <label for="role_id">Jabatan (Opsional)</label>
+                    </div>
+
                     <div class="form-floating mb-3 position-relative">
                         <input type="password" class="form-control" id="password" name="password"
                             placeholder="Masukkan password" required>
@@ -33,16 +48,6 @@
                         <button type="button"
                             class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
                             id="togglePassword" tabindex="-1" style="z-index: 10;">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                    </div>
-                    <div class="form-floating mb-4 position-relative">
-                        <input type="password" class="form-control" id="password_confirmation"
-                            name="password_confirmation" placeholder="Ulangi password" required>
-                        <label for="password_confirmation">Konfirmasi Password</label>
-                        <button type="button"
-                            class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
-                            id="togglePasswordConfirmation" tabindex="-1" style="z-index: 10;">
                             <i class="bi bi-eye"></i>
                         </button>
                     </div>

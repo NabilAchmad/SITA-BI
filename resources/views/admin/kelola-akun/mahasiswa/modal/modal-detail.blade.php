@@ -19,7 +19,15 @@
                         <p><strong>Nama:</strong> {{ $mhs->user->name }}</p>
                         <p><strong>Email:</strong> {{ $mhs->user->email }}</p>
                         <p><strong>NIM:</strong> {{ $mhs->nim }}</p>
-                        <p><strong>Program Studi:</strong> {{ $mhs->prodi }}</p>
+                        @php
+                            $prodi = $mhs->prodi;
+                            if (strtolower($prodi) === 'd4') {
+                                $prodi = 'D4 Bahasa Inggris';
+                            } elseif (strtolower($prodi) === 'd3') {
+                                $prodi = 'D3 Bahasa Inggris';
+                            }
+                        @endphp
+                        <p><strong>Program Studi:</strong> {{ $prodi }}</p>
 
                         @if ($mhs->tugasAkhir)
                             <p><strong>Judul Tugas Akhir:</strong> {{ $mhs->tugasAkhir->judul }}</p>

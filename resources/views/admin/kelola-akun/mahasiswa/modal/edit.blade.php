@@ -3,7 +3,7 @@
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <form id="formEditMahasiswa" method="POST">
+            <form method="POST" id="formEditMahasiswa">
                 @csrf
                 @method('PUT')
                 <div class="modal-header">
@@ -33,8 +33,16 @@
 
                     <div class="col-md-6">
                         <label for="edit_prodi_mahasiswa" class="form-label">PRODI</label>
-                        <input type="text" class="form-control" id="edit_prodi_mahasiswa" name="prodi"
-                            placeholder="Masukkan PRODI">
+                        <select class="form-select" id="edit_prodi_mahasiswa" name="prodi">
+                            <option value="d3"
+                                {{ old('prodi', strtolower($mahasiswa->prodi ?? '')) == 'd3' ? 'selected' : '' }}>
+                                D3 Bahasa Inggris
+                            </option>
+                            <option value="d4"
+                                {{ old('prodi', strtolower($mahasiswa->prodi ?? '')) == 'd4' ? 'selected' : '' }}>
+                                D4 Bahasa Inggris
+                            </option>
+                        </select>
                     </div>
 
                     <div class="col-md-6">

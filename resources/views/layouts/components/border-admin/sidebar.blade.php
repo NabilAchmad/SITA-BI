@@ -94,6 +94,7 @@
                     </a>
                 </li>
 
+                <!-- Pengumuman -->
                 <li class="nav-item {{ request()->is('admin/pengumuman*') ? 'active' : '' }}">
                     <a href="{{ route('pengumuman.read') }}">
                         <i class="fas fa-bullhorn"></i>

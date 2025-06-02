@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('nim', 50)->unique();
-            $table->string('prodi', 100);
+            $table->enum('prodi', ['d3', 'd4']);
             $table->string('angkatan', 10);
+            $table->enum('kelas', ['a', 'b', 'c']); // Ubah menjadi enum
             $table->timestamps();
         });
     }

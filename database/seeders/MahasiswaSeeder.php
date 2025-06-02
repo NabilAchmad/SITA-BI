@@ -3,40 +3,44 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\UserRole;
+use App\Models\Mahasiswa;
 use Faker\Factory as Faker;
 
 class MahasiswaSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create('id_ID');
+        // Pastikan role dengan id = 5 adalah mahasiswa
+        $mahasiswaRole = Role::firstOrCreate(
+            ['id' => 5],
+            ['name' => 'mahasiswa']
+        );
 
-        for ($i = 1; $i <= 50; $i++) {
-            $namaMahasiswa = $faker->firstName() . ' ' . $faker->lastName();
+        // Buat akun user mahasiswa
+        $user = User::create([
+            'name' => 'Avriela Ariestiany',
+            'email' => 'avirestiany@gmail.com',
+            'password' => Hash::make('password'), // Ganti jika perlu
+        ]);
 
-            $userId = DB::table('users')->insertGetId([
-                'name' => $namaMahasiswa,
-                'email' => "mhs$i@example.com",
-                'password' => Hash::make('password'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        // Relasi user-role
+        UserRole::create([
+            'user_id' => $user->id,
+            'role_id' => $mahasiswaRole->id,
+        ]);
 
-            DB::table('user_roles')->insert([
-                'user_id' => $userId,
-                'role_id' => 5, // mahasiswa
-            ]);
-
-            DB::table('mahasiswa')->insert([
-                'user_id' => $userId,
-                'nim' => '25' . str_pad($i, 7, '0', STR_PAD_LEFT),
-                'prodi' => $i % 2 === 0 ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris',
-                'angkatan' => '25',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        // Masukkan data ke tabel mahasiswa
+        Mahasiswa::create([
+            'user_id' => $user->id,
+            'nim' => '2311083007', // Harus unik
+            'prodi' => 'd4',     // Sesuai enum
+            'angkatan' => '2021',
+            'kelas' => 'a',      // Sesuai enum
+        ]);
     }
 }

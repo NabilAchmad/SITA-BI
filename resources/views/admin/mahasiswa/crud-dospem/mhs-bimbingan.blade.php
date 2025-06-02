@@ -1,7 +1,7 @@
 <div class="card shadow-sm mb-4">
     <div class="card-header">
         {{-- Breadcrumb --}}
-            @include('admin.mahasiswa.breadcrumbs.navlink')
+        @include('admin.mahasiswa.breadcrumbs.navlink')
 
         {{-- Judul --}}
         <div class="text-center">
@@ -27,8 +27,7 @@
         </ul>
 
         {{-- Search --}}
-        <form method="GET" action="{{ route('list-mahasiswa') }}"
-            class="row g-2 mb-3 justify-content-end">
+        <form method="GET" action="{{ route('list-mahasiswa') }}" class="row g-2 mb-3 justify-content-end">
             <input type="hidden" name="prodi" value="{{ request('prodi') }}">
             <div class="col-auto">
                 <input type="text" name="search" class="form-control form-control-sm"
@@ -61,7 +60,15 @@
                             <td>{{ ($mahasiswa->firstItem() ?? 0) + $index }}</td>
                             <td>{{ $mhs->user->name }}</td>
                             <td>{{ $mhs->nim }}</td>
-                            <td>{{ $mhs->prodi }}</td>
+                            <td>
+                                @if ($mhs->prodi === 'd4')
+                                    D4 Bahasa Inggris
+                                @elseif ($mhs->prodi === 'd3')
+                                    D3 Bahasa Inggris
+                                @else
+                                    {{ $mhs->prodi }}
+                                @endif
+                            </td>
                             <td>{{ $mhs->tugasAkhir->judul ?? '-' }}</td>
                             <td>
                                 @php

@@ -27,6 +27,20 @@
                         <label for="editNidn">NIDN</label>
                     </div>
 
+                    {{-- Dropdown Role --}}
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="role_id" name="role_id">
+                            <option value="" selected>Default Dosen</option>
+                            @foreach ($roles as $role)
+                                @if (in_array($role->nama_role, ['kaprodi', 'kajur']))
+                                    <option value="{{ $role->id }}">{{ ucfirst($role->nama_role) }} -
+                                        {{ $role->deskripsi }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                        <label for="role_id">Jabatan (Opsional)</label>
+                    </div>
+
                     <div class="form-floating mb-3">
                         <input type="password" class="form-control" name="password"
                             placeholder="Kosongkan jika tidak ingin ganti">

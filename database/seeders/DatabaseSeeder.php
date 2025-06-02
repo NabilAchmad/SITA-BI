@@ -26,9 +26,7 @@ class DatabaseSeeder extends Seeder
             KaprodiSeeder::class,
             DosenSeeder::class,
             MahasiswaSeeder::class,
-            MahasiswaTanpaPembimbingSeeder::class,
-            TugasAkhirSeeder::class,
-            SidangSeeder::class,
+            DosenSeeder::class,
             RuanganSeeder::class,
         ]);
     }

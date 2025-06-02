@@ -93,7 +93,7 @@ Route::prefix('ketua-prodi')->group(function () {
 
         // Tugas Akhir
         Route::get('/judulTA/JudulTA', [KaprodiController::class, 'showAccJudulTA'])->name('kaprodi.judul.page');
-        
+
         // Nilai sidang
         Route::get('/sidang/akhir', [KaprodiController::class, 'SidangAkhir'])->name('kaprodi.akhir.page');
         Route::get('/sidang/create', [KaprodiController::class, 'createSidang'])->name('kaprodi.nilai.create');
@@ -169,67 +169,127 @@ Route::prefix('admin')->group(function () {
         Route::prefix('/laporan')->name('laporan.')->group(function () {
             Route::get('/lihat', [LaporanController::class, 'show'])->name('statistik');
         });
+    });
 
-        Route::prefix('/logs')->name('log.')->group(function () {
-            Route::get('/lihat', [LogController::class, 'index'])->name('aktifitas');
+    // =========================
+    // ROUTE SIDANG
+    // =========================
+    Route::prefix('sidang')->group(function () {
+
+        Route::get('dashboard-sidang', [JadwalSidangAkhirController::class, 'dashboard'])->name('dashboard-sidang');
+
+        Route::prefix('sempro')->group(function () {
+            // Daftar mahasiswa yang belum punya jadwal sidang sempro
+            Route::get('/penjadwalan-sidang-sempro', [JadwalSidangSemproController::class, 'MenungguSidangSempro'])->name('sidang.menunggu.penjadwalan.sempro');
+
+            // Daftar mahasiswa yang sudah punya jadwal sidang
+            Route::get('/jadwal-sidang-sempro', [JadwalSidangSemproController::class, 'listJadwalSempro'])->name('jadwal.sidang.sempro');
+
+            // Simpan penguji
+            Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangSemproController::class, 'simpanPenguji'])->name('jadwal-sempro.simpanPenguji');
+
+            // Simpan data jadwal sidang
+            Route::post('/jadwal-sidang', [JadwalSidangSemproController::class, 'store'])->name('jadwal-sempro.store');
+
+            // Lihat Detail Jadwal Sidang akhir
+            Route::get('/detail-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'show'])->name('jadwal-sempro.show');
+
+            // Tandai akhir sidang selesai 
+            Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidangSempro'])
+                ->name('jadwal-sidang-sempro.mark-done');
+
+            // Daftar mahasiswa yang sudah sidang
+            Route::get('pasca-sidang-sempro', [JadwalSidangSemproController::class, 'pascaSidangSempro'])->name('pasca.sidang.sempro');
+
+            Route::prefix('/logs')->name('log.')->group(function () {
+                Route::get('/lihat', [LogController::class, 'index'])->name('aktifitas');
+            });
+
+            // Profile
+            Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
+        });
+    });
+
+    // Dosen Routes
+    Route::prefix('dosen')->group(function () {
+        // Authentication
+        Route::get('/login', [AuthController::class, 'showLogin'])->name('dosen.login');
+        Route::post('/login', [AuthController::class, 'login'])->name('dosen.login.post');
+        Route::post('/logout', [AuthController::class, 'logout'])->name('dosen.logout');
+
+        // Dashboard
+        Route::middleware(['auth'])->group(function () {
+            Route::get('/dashboard', [DosenController::class, 'dashboard'])->name('dosen.dashboard');
+            // Add other dosen routes here as needed
+        });
+    });
+
+    // Mahasiswa Routes
+    Route::prefix('mahasiswa')->group(function () {
+        // Authentication
+        Route::get('/login', [AuthController::class, 'showLogin'])->name('mahasiswa.login');
+        Route::post('/login', [AuthController::class, 'login'])->name('mahasiswa.login.post');
+        Route::post('/logout', [AuthController::class, 'logout'])->name('mahasiswa.logout');
+
+        // Dashboard
+        Route::middleware(['auth'])->group(function () {
+            Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
+
+            // Additional mahasiswa routes like sidang, bimbingan can be nested here
+            Route::prefix('sidang')->group(function () {
+                Route::get('/daftar-sidang', [PendaftaranSidangController::class, 'form'])->name('pendaftaran_sidang.form');
+                Route::post('/daftar-sidang', [PendaftaranSidangController::class, 'store'])->name('pendaftaran_sidang.store');
+                // Add other mahasiswa sidang routes here
+            });
+
+            Route::prefix('akhir')->group(function () {
+                // Daftar mahasiswa yang belum punya jadwal sidang akhir
+                Route::get('/penjadwalan-sidang-akhir', [JadwalSidangAkhirController::class, 'MenungguSidangAkhir'])->name('sidang.menunggu.penjadwalan.akhir');
+
+                // Daftar mahasiswa yang sudah punya jadwal sidang akhir
+                Route::get('/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'listJadwalAkhir'])->name('jadwal.sidang.akhir');
+
+                // Simpan data jadwal sidang
+                Route::post('/jadwal-sidang', [JadwalSidangAkhirController::class, 'store'])->name('jadwal-sidang.store');
+
+                // Lihat Detail Jadwal Sidang akhir
+                Route::get('/detail-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'show'])->name('jadwal-sidang.show');
+
+                // Edit dan Hapus Jadwal Sidang
+                Route::put('/update-jadwal/{id}', [JadwalSidangAkhirController::class, 'update'])->name('jadwal-sidang.update');
+                Route::delete('/delete-jadwal/{id}', [JadwalSidangAkhirController::class, 'destroy'])->name('jadwal-sidang.destroy');
+
+                // Tandai akhir sidang selesai 
+                Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'tandaiSidang'])
+                    ->name('jadwal-sidang.mark-done');
+
+                // Halaman Pasca Sidang
+                Route::get('/pasca-sidang-akhir', [JadwalSidangAkhirController::class, 'pascaSidangAkhir'])
+                    ->name('pasca.sidang.akhir');
+
+                // POST: Simpan dosen penguji
+                Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
+                Route::prefix('bimbingan')->group(function () {
+                    // Add mahasiswa bimbingan related routes here
+                });
+            });
         });
 
-        // Profile
-        Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
-    });
-});
-
-// Dosen Routes
-Route::prefix('dosen')->group(function () {
-    // Authentication
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('dosen.login');
-    Route::post('/login', [AuthController::class, 'login'])->name('dosen.login.post');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('dosen.logout');
-
-    // Dashboard
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/dashboard', [DosenController::class, 'dashboard'])->name('dosen.dashboard');
-        // Add other dosen routes here as needed
-    });
-});
-
-// Mahasiswa Routes
-Route::prefix('mahasiswa')->group(function () {
-    // Authentication
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('mahasiswa.login');
-    Route::post('/login', [AuthController::class, 'login'])->name('mahasiswa.login.post');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('mahasiswa.logout');
-
-    // Dashboard
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('mahasiswa.dashboard');
-
-        // Additional mahasiswa routes like sidang, bimbingan can be nested here
+        // SIDANG Routes (public or shared, not specific to a user prefix)
         Route::prefix('sidang')->group(function () {
-            Route::get('/daftar-sidang', [PendaftaranSidangController::class, 'form'])->name('pendaftaran_sidang.form');
-            Route::post('/daftar-sidang', [PendaftaranSidangController::class, 'store'])->name('pendaftaran_sidang.store');
-            // Add other mahasiswa sidang routes here
+            Route::get('dashboard-sidang', [JadwalSidangAkhirController::class, 'dashboard'])->name('dashboard-sidang');
+
+            Route::prefix('sempro')->group(function () {
+                Route::get('penjadwalan', [JadwalSidangSemproController::class, 'menungguSidangSempro'])->name('sidang.menunggu.penjadwalan.sempro');
+                Route::get('jadwal', [JadwalSidangSemproController::class, 'listJadwalSempro'])->name('jadwal.sidang.sempro');
+                Route::get('pasca', [JadwalSidangSemproController::class, 'pascaSidangSempro'])->name('pasca.sidang.sempro');
+            });
+
+            Route::prefix('akhir')->group(function () {
+                Route::get('penjadwalan', [JadwalSidangAkhirController::class, 'MenungguSidangAkhir'])->name('sidang.menunggu.penjadwalan.akhir');
+                Route::get('jadwal', [JadwalSidangAkhirController::class, 'listJadwal'])->name('jadwal.sidang.akhir');
+                Route::get('/pasca-sidang-akhir', [JadwalSidangAkhirController::class, 'pascaSidangAkhir'])->name('pasca.sidang.akhir');
+            });
         });
-
-        Route::prefix('bimbingan')->group(function () {
-            // Add mahasiswa bimbingan related routes here
-        });
-    });
-});
-
-// SIDANG Routes (public or shared, not specific to a user prefix)
-Route::prefix('sidang')->group(function () {
-    Route::get('dashboard-sidang', [JadwalSidangAkhirController::class, 'dashboard'])->name('dashboard-sidang');
-
-    Route::prefix('sempro')->group(function () {
-        Route::get('penjadwalan', [JadwalSidangSemproController::class, 'menungguSidangSempro'])->name('sidang.menunggu.penjadwalan.sempro');
-        Route::get('jadwal', [JadwalSidangSemproController::class, 'listJadwalSempro'])->name('jadwal.sidang.sempro');
-        Route::get('pasca', [JadwalSidangSemproController::class, 'pascaSidangSempro'])->name('pasca.sidang.sempro');
-    });
-
-    Route::prefix('akhir')->group(function () {
-        Route::get('penjadwalan', [JadwalSidangAkhirController::class, 'MenungguSidangAkhir'])->name('sidang.menunggu.penjadwalan.akhir');
-        Route::get('jadwal', [JadwalSidangAkhirController::class, 'listJadwal'])->name('jadwal.sidang.akhir');
-        Route::get('/pasca-sidang-akhir', [JadwalSidangAkhirController::class, 'pascaSidangAkhir'])->name('pasca.sidang.akhir');
     });
 });
