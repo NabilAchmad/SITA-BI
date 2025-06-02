@@ -9,15 +9,11 @@ use App\Models\TugasAkhir;
 use Illuminate\Http\Request;
 use App\Models\PeranDosenTA;
 use App\Models\Log;
+use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
-
-    public function profile()
-    {
-        $dosen = 1;
-        return view('admin.views.profile', compact('admin'));
-    }
 
     public function index()
     {
@@ -45,9 +41,7 @@ class AdminController extends Controller
             ->count('dosen_id');
 
         // Mahasiswa aktif = yang punya tugas akhir dan belum dibatalkan
-        $mahasiswaAktif = TugasAkhir::whereNull('alasan_pembatalan')
-            ->distinct('mahasiswa_id')
-            ->count('mahasiswa_id');
+        $mahasiswaAktif = Mahasiswa::count();
 
         return view('admin.views.dashboard', compact(
             'totalDosen',
@@ -62,4 +56,41 @@ class AdminController extends Controller
             'logs'
         ));
     }
+
+    public function profile()
+    {
+        $user = \App\Models\User::findOrFail(21);
+        // dd($user);
+        return view('admin.user.views.profile', compact('user'));
+    }
+
+    public function update(Request $request)
+    {
+        $user = User::findOrFail(21);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        if ($request->hasFile('avatar')) {
+            // Hapus foto lama jika ada
+            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
+
+            // Simpan foto baru
+            $user->photo = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user->save();
+
+        return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function logout() {}
 }

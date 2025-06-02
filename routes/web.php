@@ -25,9 +25,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/read', [PengumumanController::class, 'read'])->name('pengumuman.read');
 
         // CREATE
-        Route::get('/create', [PengumumanController::class, 'create'])->name('pengumuman.form'); // Form tambah
         Route::post('/create', [PengumumanController::class, 'store'])->name('pengumuman.create'); // Simpan data baru
-
 
         // EDIT / UPDATE
         Route::get('/{id}/edit', [PengumumanController::class, 'edit'])->name('pengumuman.edit'); // Form edit
@@ -164,5 +162,9 @@ Route::prefix('admin')->group(function () {
     });
 
     // Profile
-    Route::view('/profile', 'admin/user/views/profile')->name('user.profile');
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [AdminController::class, 'profile'])->name('user.profile');
+        Route::put('/update', [AdminController::class, 'update'])->name('user.profile.update');
+        Route::put('/logout', [AdminController::class, ''])->name('logout');
+    });
 });

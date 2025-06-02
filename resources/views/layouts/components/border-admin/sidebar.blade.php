@@ -1,22 +1,14 @@
-<div class="sidebar" data-background-color="dark">
+<div class="sidebar sidebar-style-2" data-background-color="dark2">
     <div class="sidebar-logo">
         <!-- Logo Header -->
-        <div class="logo-header" data-background-color="dark">
+        <div class="logo-header" data-background-color="dark2">
             <a href="{{ route('admin.dashboard') }}"
                 class="logo d-flex align-items-center text-decoration-none px-3 py-2 text-white w-100"
                 style="max-width: 100%; overflow: hidden; transition: background-color 0.3s ease;">
 
-                <!-- Icon Gear -->
-                <div class="d-flex align-items-center justify-content-center bg-white bg-opacity-10 rounded-circle flex-shrink-0 me-2"
-                    style="width: 36px; height: 36px; transition: background-color 0.3s ease;">
-                    <img src="{{ asset('assets/img/admin/gear.svg') }}" alt="Admin Icon"
-                        style="width: 60%; height: 60%; filter: brightness(0) invert(1); transition: transform 0.3s ease;">
-                </div>
-
-                <!-- Teks -->
-                <span class="fw-semibold d-none d-md-inline text-truncate"
-                    style="max-width: 100%; white-space: nowrap; transition: color 0.3s ease;">
-                    Admin Panel
+                <span class="fw-semibold d-none d-md-inline text-truncate text-white d-flex align-items-center"
+                    style="max-width: 100%; white-space: nowrap; font-family: 'Poppins', sans-serif; font-size: 1.25rem; letter-spacing: 0.05em; transition: color 0.3s ease;">
+                    <i class="fas fa-user-cog me-3 fs-4"></i> Admin Panel
                 </span>
             </a>
 

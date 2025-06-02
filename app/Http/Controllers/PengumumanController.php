@@ -21,7 +21,7 @@ class PengumumanController extends Controller
                 'judul' => $request->judul,
                 'isi' => $request->isi,
                 'audiens' => $request->audiens,
-                'dibuat_oleh' => Auth::id() ?? 1, // asumsinya user sedang login
+                'dibuat_oleh' => Auth::id() ?? 21, // asumsinya user sedang login
                 'tanggal_dibuat' => now(),   // bisa juga default dari DB
             ]);
 
@@ -41,16 +41,19 @@ class PengumumanController extends Controller
 
         if (in_array($audiens, $validAudiens)) {
             if ($audiens === 'registered_users') {
-                // Tampilkan yang audiens dosen atau mahasiswa
+                // Tampilkan hanya dosen dan mahasiswa (tanpa all_users)
                 $query->whereIn('audiens', ['dosen', 'mahasiswa']);
             } elseif ($audiens === 'all_users') {
-                // Tampilkan semua, jadi tidak filter
+                // Tampilkan semua tanpa filter
             } else {
-                // Filter berdasarkan audiens yang dipilih (dosen, mahasiswa, guest)
-                $query->where('audiens', $audiens);
+                // Untuk dosen, mahasiswa, guest tampilkan audiens yang dipilih plus all_users
+                $query->where(function ($q) use ($audiens) {
+                    $q->where('audiens', $audiens)
+                        ->orWhere('audiens', 'all_users');
+                });
             }
         }
-        // jika audiens tidak valid atau kosong, tampilkan semua (tidak filter)
+        // Jika audiens tidak valid atau kosong, tampilkan semua data tanpa filter
 
         $pengumuman = $query->paginate(10)->appends($request->query());
 
