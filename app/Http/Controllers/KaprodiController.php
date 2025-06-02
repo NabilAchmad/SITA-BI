@@ -41,6 +41,13 @@ class KaprodiController extends Controller
         return view('kaprodi.judulTA.AccRejectedJudulTA', compact('approvedJuduls', 'rejectedJuduls'));
     }
 
+    // Show rejected Judul Tugas Akhir only
+    public function showRejectedJudulTA()
+    {
+        $rejectedJuduls = JudulTA::where('status', 'Ditolak')->get();
+        return view('kaprodi.judulTA.RejectedJudulTA', compact('rejectedJuduls'));
+    }
+
     // Nilai Sidang
     public function SidangAkhir()
     {

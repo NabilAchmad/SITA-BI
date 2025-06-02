@@ -5,7 +5,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-7">
+        <div class="col-md-12">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover text-center">
                     <thead class="table-dark">
@@ -36,29 +36,6 @@
                                     <button class="btn btn-warning" onclick="tolakJudul({{ $judul->id }})"
                                         @if($judul->status == 'Ditolak') disabled @endif>Tolak Judul</button>
                                 </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-5">
-            <h3>Judul ACC</h3>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover text-center" id="accTable">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Tanggal ACC</th>
-                            <th>Judul Tugas Akhir</th>
-                            <th>Pengaju</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($judulTAs->where('status', 'Disetujui') as $accJudul)
-                            <tr id="acc-row-{{ $accJudul->id }}">
-                                <td>{{ $accJudul->tanggal_acc ? $accJudul->tanggal_acc->format('d-m-Y H:i') : '-' }}</td>
-                                <td>{{ $accJudul->judul }}</td>
-                                <td>{{ $accJudul->mahasiswa->nama ?? 'N/A' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
