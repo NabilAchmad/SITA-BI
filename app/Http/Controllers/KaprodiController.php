@@ -13,83 +13,90 @@ use App\Models\Nilai;
 
 class KaprodiController extends Controller
 {
-    // Dashboard
+    /**
+     * Dashboard utama Kaprodi
+     */
     public function index()
     {
         return view('kaprodi.dashboard');
     }
 
-    // Jadwal Sidang
+    /**
+     * Menampilkan seluruh jadwal sidang
+     */
     public function showJadwal()
     {
-        $jadwals = jadwal::all();
+        $jadwals = Jadwal::all();
         return view('kaprodi.jadwal.readJadwal', compact('jadwals'));
     }
 
-    // Acc Judul Tugas Akhir
+    /**
+     * Menampilkan daftar Judul TA yang masih berstatus "diajukan" (belum di‑ACC)
+     */
     public function showAccJudulTA()
     {
-        $judulTAs = JudulTA::where('status', 'diajukan')
-            ->get();
+        $judulTAs = JudulTA::where('status', 'diajukan')->get();
         return view('kaprodi.judulTA.AccJudulTA', compact('judulTAs'));
     }
 
-    // Show page with two tables: Judul ACC and Judul Ditolak
-    // public function showJudulAccRejectedPage()
-    // {
-    //     $approvedJuduls = JudulTA::where('status', 'Disetujui')->get();
-    //     $rejectedJuduls = JudulTA::where('status', 'Ditolak')->get();
-    //     return view('kaprodi.judulTA.AccRejectedJudulTA', compact('approvedJuduls', 'rejectedJuduls'));
-    // }
-
-    // Show rejected Judul Tugas Akhir only
-    // public function showRejectedJudulTA()
-    // {
-    //     $rejectedJuduls = JudulTA::where('status', 'Ditolak')->get();
-    //     return view('kaprodi.judulTA.RejectedJudulTA', compact('rejectedJuduls'));
-    // }
-
-    // Nilai Sidang
-    public function SidangAkhir()
+    /**
+     * Daftar Nilai Sidang Akhir (read‑only untuk Kaprodi)
+     */
+    public function sidangAkhir()
     {
-        $nilais = Nilai::all();
-        return view('kaprodi.sidang.akhir.crud-jadwal.read', compact('nilais'));
+        $nilais = Nilai::with([
+            'mahasiswa',        // relasi ke tabel mahasiswa
+            'tugasAkhir',       // relasi ke tugas_akhir (jika ada)
+            'dosenPenguji'      // relasi ke dosen penguji (jika ada)
+        ])->get();
+
+        return view('kaprodi.nilai.read', compact('nilais'));
     }
 
-    // Store Sidang (handle POST)
+    /**
+     * Menyimpan data sidang baru (jika Kaprodi membuat sidang manual)
+     */
     public function storeSidang(Request $request)
     {
         $validated = $request->validate([
-            'judul' => 'required|string|max:255',
+            'judul'   => 'required|string|max:255',
             'tanggal' => 'required|date',
-            'nilai' => 'nullable|numeric',
-            'status' => 'nullable|string|max:50',
+            'nilai'   => 'nullable|numeric',
+            'status'  => 'nullable|string|max:50',
         ]);
 
         Sidang::create($validated);
 
-        return redirect()->route('kaprodi.nilai.page')->with('success', 'Sidang berhasil dibuat.');
+        return redirect()
+            ->route('kaprodi.nilai.page')
+            ->with('success', 'Sidang berhasil dibuat.');
     }
 
-    // Pengumuman
+    /**
+     * Menampilkan seluruh pengumuman
+     */
     public function showPengumuman()
     {
         $pengumumans = Pengumuman::all();
         return view('kaprodi.Pengumuman.pengumuman', compact('pengumumans'));
     }
 
-    // ACC Judul
+    /**
+     * ACC Judul TA
+     */
     public function approveJudul($id)
     {
         $judul = JudulTA::findOrFail($id);
-        $judul->status = 'Disetujui';
-        $judul->tanggal_acc = now();
+        $judul->status       = 'Disetujui';
+        $judul->tanggal_acc  = now();
         $judul->save();
 
-        return response()->json(['message' => 'Judul telah di-ACC']);
+        return response()->json(['message' => 'Judul telah disetujui']);
     }
 
-    // Tolak Judul
+    /**
+     * Menolak Judul TA
+     */
     public function rejectJudul($id)
     {
         $judul = JudulTA::findOrFail($id);
@@ -99,24 +106,33 @@ class KaprodiController extends Controller
         return response()->json(['message' => 'Judul telah ditolak']);
     }
 
-
-    // Sidang Dashboard
+    /**
+     * Dashboard ringkasan Sidang
+     */
     public function showSidangDashboard()
     {
         $jadwalCount = JadwalSidang::count();
         return view('kaprodi.sidang.dashboard.dashboard', compact('jadwalCount'));
     }
 
+    /**
+     * Statistik jumlah mahasiswa yang akan sidang
+     */
     public function showMahasiswaSidang()
     {
         $mahasiswaCount = Mahasiswa::count();
         return view('kaprodi.sidang.dashboard.dashboard', compact('mahasiswaCount'));
     }
 
-    // Show Sidang Results following jadwal sidang from admin
+    /**
+     * Menampilkan hasil sidang sesuai jadwal yang dibuat admin
+     */
     public function showSidangResults()
     {
-        $jadwalSidangs = JadwalSidang::with(['sidang.nilai', 'sidang.tugasAkhir.mahasiswa'])->get();
+        $jadwalSidangs = JadwalSidang::with([
+            'sidang.nilai',
+            'sidang.tugasAkhir.mahasiswa'
+        ])->get();
 
         return view('kaprodi.sidang.read', compact('jadwalSidangs'));
     }

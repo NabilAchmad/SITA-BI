@@ -69,12 +69,16 @@ Route::prefix('kajur')->group(function () {
         Route::get('/pengumuman', [KajurController::class, 'showPengumuman'])->name('kajurpengumuman.page');
 
         // Sidang Routes
-        Route::prefix('sidang')->group(function () {
-            Route::get('/lihat-jadwal', [KajurController::class, 'showJadwal'])->name('kajur.jadwal');
-            Route::get('/mahasiswaSidang', [KajurController::class, 'showMahasiswaSidang'])->name('kajur.sidang');
-            Route::get('/dashboard', [KajurController::class, 'showSidangDashboard'])->name('sidangDashboard.kajur');
-            Route::get('/lihat-nilai', [KajurController::class, 'showNilaiSidang'])->name('kajur.nilai.page');
-        });
+        Route::get('/sidang/dashboard', [KajurController::class, 'showSidangDashboard'])->name('sidangDashboard.kajur');
+        Route::get('/sidang/mahasiswaSidang', [KajurController::class, 'showMahasiswaSidang'])->name('kajur.sidang');
+        Route::get('/sidang/lihat-jadwal', [KajurController::class, 'showJadwal'])->name('kajur.jadwal');
+        Route::get('/sidang/lihat-nilai', [KajurController::class, 'showNilaiSidang'])->name('kajur.nilai.page');
+        // Route::prefix('sidang')->group(function () {
+        //     Route::get('/lihat-jadwal', [KajurController::class, 'showJadwal'])->name('kajur.jadwal');
+        //     Route::get('/mahasiswaSidang', [KajurController::class, 'showMahasiswaSidang'])->name('kajur.sidang');
+        //     Route::get('/dashboard', [KajurController::class, 'showSidangDashboard'])->name('sidangDashboard.kajur');
+        //     Route::get('/lihat-nilai', [KajurController::class, 'showNilaiSidang'])->name('kajur.nilai.page');
+        // });
     });
 });
 
