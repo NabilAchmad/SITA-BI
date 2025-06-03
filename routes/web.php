@@ -5,8 +5,6 @@ use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\PenugasanPembimbingController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\DosenController;
-use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\LogController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\JadwalSidangAkhirController;
 use App\Http\Controllers\JadwalSidangSemproController;
@@ -145,20 +143,6 @@ Route::prefix('admin')->group(function () {
             // POST: Simpan dosen penguji
             Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
         });
-    });
-
-    // Admin: Laporan dan Statistik
-    Route::prefix('/laporan')->name('laporan.')->group(function () {
-        // Lihat laporan dan statistik
-        Route::get('/lihat', [LaporanController::class, 'show'])
-            ->name('statistik');
-    });
-
-    // Admin: Logs
-    Route::prefix('/logs')->name('log.')->group(function () {
-        // Lihat log aktivitas sistem
-        Route::get('/lihat', [LogController::class, 'index'])
-            ->name('aktifitas');
     });
 
     // Profile

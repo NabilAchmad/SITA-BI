@@ -7,8 +7,9 @@
                 style="max-width: 100%; overflow: hidden; transition: background-color 0.3s ease;">
 
                 <span class="fw-semibold d-none d-md-inline text-truncate text-white d-flex align-items-center"
-                    style="max-width: 100%; white-space: nowrap; font-family: 'Poppins', sans-serif; font-size: 1.25rem; letter-spacing: 0.05em; transition: color 0.3s ease;">
-                    <i class="fas fa-user-cog me-3 fs-4"></i> Admin Panel
+                    style="max-width: 100%; white-space: nowrap; font-family: 'Poppins', sans-serif; font-size: 1.5rem; letter-spacing: 0.05em; transition: color 0.3s ease;">
+                    <i class="bi bi-mortarboard me-3 fs-4"></i>
+                    Dosen
                 </span>
             </a>
 
@@ -38,22 +39,6 @@
                     </a>
                 </li>
 
-                <!-- Laporan dan Statistik -->
-                <li class="nav-item {{ request()->is('admin/laporan*') ? 'active' : '' }}">
-                    <a href="{{ route('laporan.statistik') }}">
-                        <i class="fas fa-chart-bar"></i>
-                        <p>Laporan dan Statistik</p>
-                    </a>
-                </li>
-
-                <!-- Log dan Aktifitas -->
-                <li class="nav-item {{ request()->is('admin/logs*') ? 'active' : '' }}">
-                    <a href="{{ route('log.aktifitas') }}">
-                        <i class="fas fa-terminal"></i>
-                        <p>Log dan Aktifitas</p>
-                    </a>
-                </li>
-
                 <!-- Akses Section -->
                 <li class="nav-section">
                     <span class="sidebar-mini-icon">
@@ -63,7 +48,6 @@
                 </li>
 
                 <!-- Kelola Akun -->
-                <!-- Sidebar -->
                 <li class="nav-item {{ request()->is('admin/kelola-akun*') ? 'active' : '' }}">
                     <a href="{{ route('akun-dosen.kelola') }}">
                         <i class="fas fa-users-cog"></i>
