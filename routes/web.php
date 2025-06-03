@@ -27,7 +27,7 @@ Route::prefix('/mahasiswa')->group(function () {
 
         // Tangani form POST ajukan TA
         Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
-        
+
         Route::delete('tugasAkhir/{id}', [TugasAkhirController::class, 'destroy'])->name('tugasAkhir.destroy');
         Route::post('tugasAkhir/{id}/cancel', [TugasAkhirController::class, 'cancel'])->name('tugasAkhir.cancelTA');
         Route::get('tugasAkhir/dibatalkan', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.dibatalkan');
@@ -56,10 +56,6 @@ Route::prefix('/mahasiswa')->group(function () {
     });
 
     Route::prefix('sidang')->group(function () {
-        // Tambahkan route untuk Sidang di sini jika diperlukan
-        // Route::get('/daftar-sidang', function () {
-        //     return view('mahasiswa.sidang.views.form');
-        // });
         Route::get('dashboard', function () {
             return view('mahasiswa.Sidang.dashboard.dashboard');
         })->name('dashboard.sidang');

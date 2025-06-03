@@ -32,35 +32,53 @@
             </ol>
         </nav>
     </div>
-    <!-- Konten Progres -->
+
+    <!-- Konten -->
     <div class="container py-0">
         <div class="row justify-content-center">
-            @if ($tugasAkhir)
+            @if (!$tugasAkhir)
+                <div class="col-12 text-center">
+                    <div class="card border-0 shadow-sm p-4 rounded-4 bg-light">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <i class="bi bi-file-earmark-exclamation text-info" style="font-size: 4rem;"></i>
+                            </div>
+                            <h4 class="fw-semibold text-secondary mb-2">Belum Ada Data Tugas Akhir</h4>
+                            <p class="text-muted mb-3 fs-6">
+                                Anda belum mengajukan atau belum memiliki data Tugas Akhir saat ini.
+                            </p>
+                            <a href="{{ route('tugas-akhir.ajukan') }}"
+                                class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
+                                <i class="bi bi-plus-circle me-1"></i> Ajukan Tugas Akhir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @else
                 @php
                     $ta = $tugasAkhir;
-                    $statusLabel = match ($ta->status) {
+                    $statusMap = [
                         'diajukan' => 'Dalam Proses',
+                        'draft' => 'Draft',
+                        'revisi' => 'Revisi',
                         'disetujui' => 'Disetujui',
+                        'lulus_tanpa_revisi' => 'Lulus Tanpa Revisi',
+                        'lulus_dengan_revisi' => 'Lulus Dengan Revisi',
                         'ditolak' => 'Ditolak',
-                        'selesai' => 'Selesai',
-                        default => 'Tidak Diketahui',
-                    };
-
+                    ];
                     $progress = match ($ta->status) {
                         'diajukan' => 0,
                         'disetujui' => 50,
-                        'selesai' => 100,
+                        'selesai', 'lulus_tanpa_revisi', 'lulus_dengan_revisi' => 100,
                         default => 0,
                     };
-
                     $progressColor = match ($ta->status) {
                         'diajukan' => 'bg-warning',
                         'disetujui' => 'bg-info',
-                        'selesai' => 'bg-success',
+                        'selesai', 'lulus_tanpa_revisi', 'lulus_dengan_revisi' => 'bg-success',
                         'ditolak' => 'bg-danger',
                         default => 'bg-secondary',
                     };
-
                     $abstrakLimit = 300;
                     $abstrakFull = $ta->abstrak;
                     $abstrakShort =
@@ -71,26 +89,15 @@
                 <div class="col-12 col-lg-10 col-xl-8">
                     <h2 class="text-primary fw-bold mb-4 text-center">{{ $ta->judul }}</h2>
 
-                    <!-- Status -->
+                    {{-- Status --}}
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label fw-semibold text-secondary">Status</label>
-                        <div class="col-sm-9 text-capitalize align-self-center">
-                            @php
-                                $statusMap = [
-                                    'diajukan' => 'Dalam Proses',
-                                    'draft' => 'Draft',
-                                    'revisi' => 'Revisi',
-                                    'disetujui' => 'Disetujui',
-                                    'lulus_tanpa_revisi' => 'Lulus Tanpa Revisi',
-                                    'lulus_dengan_revisi' => 'Lulus Dengan Revisi',
-                                    'ditolak' => 'Ditolak',
-                                ];
-                            @endphp
+                        <div class="col-sm-9 align-self-center text-capitalize">
                             {{ $statusMap[$ta->status] ?? 'Tidak Diketahui' }}
                         </div>
                     </div>
 
-                    <!-- Tanggal Pengajuan -->
+                    {{-- Tanggal Pengajuan --}}
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label fw-semibold text-secondary">Tanggal Pengajuan</label>
                         <div class="col-sm-9 align-self-center">
@@ -98,7 +105,7 @@
                         </div>
                     </div>
 
-                    <!-- Abstrak -->
+                    {{-- Abstrak --}}
                     <div class="mb-4">
                         <label class="fw-semibold text-secondary d-block mb-2">Abstrak</label>
                         <p class="fst-italic text-muted" style="white-space: pre-line;"
@@ -117,7 +124,7 @@
                         @endif
                     </div>
 
-                    <!-- Progress Bar -->
+                    {{-- Progress Bar --}}
                     <div class="mb-4">
                         <label class="fw-semibold text-secondary d-block mb-2">Progress</label>
                         <div class="progress rounded-pill" style="height: 24px;">
@@ -128,13 +135,12 @@
                             </div>
                         </div>
                         <div class="progress-label mt-1">
-                            Status: <strong>{{ $statusLabel }}</strong>
+                            Status: <strong>{{ $statusMap[$ta->status] ?? 'Tidak Diketahui' }}</strong>
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
+                    {{-- Action Buttons --}}
                     <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
-
                         @if (!$isMengajukanTA && $ta->status === 'diajukan')
                             <a href="{{ asset('storage/' . $ta->file_path) }}" target="_blank"
                                 class="btn btn-outline-primary btn-sm rounded-pill px-4 py-2 d-flex align-items-center gap-2 shadow-sm transition-hover">
@@ -155,10 +161,9 @@
                                 <i class="bi bi-x-circle"></i> Batalkan
                             </button>
                         @endif
-
                     </div>
 
-                    <!-- Form Pembatalan -->
+                    {{-- Form Pembatalan --}}
                     <div class="collapse" id="cancelForm{{ $ta->id }}">
                         <form action="{{ route('tugasAkhir.cancelTA', $ta->id) }}" method="POST" class="mb-5">
                             @csrf
@@ -171,7 +176,7 @@
                         </form>
                     </div>
 
-                    <!-- Modal Revisi -->
+                    {{-- Modal Revisi --}}
                     <div class="modal fade" id="revisiModal{{ $ta->id }}" tabindex="-1"
                         aria-labelledby="revisiModalLabel{{ $ta->id }}" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
@@ -207,10 +212,6 @@
                             </form>
                         </div>
                     </div>
-                </div>
-            @else
-                <div class="col-12 text-center">
-                    <div class="alert alert-info rounded-3 fs-5 shadow-sm">Belum ada pengajuan tugas akhir.</div>
                 </div>
             @endif
         </div>

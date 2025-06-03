@@ -94,15 +94,15 @@ class TugasAkhirController extends Controller
 
         // Ambil data mahasiswa berdasarkan user_id
         $mahasiswa = Mahasiswa::where('user_id', $simulasiUserId)->first();
-        
-        // Cek apakah mahasiswa sudah punya TA dengan status tertentu
-        $isMengajukanTA = TugasAkhir::where('mahasiswa_id', $simulasiUserId)
-            ->whereIn('status', ['diajukan', 'revisi', 'disetujui', 'lulus_tanpa_revisi'])
-            ->exists();
 
         if (!$mahasiswa) {
             abort(404, 'Data mahasiswa tidak ditemukan.');
         }
+
+        // Cek apakah mahasiswa sudah punya TA dengan status tertentu
+        $isMengajukanTA = TugasAkhir::where('mahasiswa_id', $mahasiswa->id)
+            ->whereIn('status', ['diajukan', 'revisi', 'disetujui', 'lulus_tanpa_revisi'])
+            ->exists();
 
         // Ambil data tugas akhir terbaru dari mahasiswa
         $tugasAkhir = TugasAkhir::where('mahasiswa_id', $mahasiswa->id)
@@ -110,29 +110,29 @@ class TugasAkhirController extends Controller
             ->latest()
             ->first();
 
-        if (!$tugasAkhir || !is_object($tugasAkhir)) {
-            abort(404, 'Tugas akhir tidak ditemukan.');
+        // Inisialisasi variabel kosong
+        $progressBimbingan = collect();
+        $revisi = collect();
+        $dokumen = collect();
+        $sidang = collect();
+
+        if ($tugasAkhir) {
+            $progressBimbingan = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
+                ->orderBy('tanggal_bimbingan', 'desc')
+                ->get();
+
+            $revisi = RevisiTa::where('tugas_akhir_id', $tugasAkhir->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $dokumen = DokumenTa::where('tugas_akhir_id', $tugasAkhir->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $sidang = Sidang::where('tugas_akhir_id', $tugasAkhir->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
         }
-
-        // Ambil progres bimbingan berdasarkan tugas akhir
-        $progressBimbingan = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
-            ->orderBy('tanggal_bimbingan', 'desc')
-            ->get();
-
-        // Ambil data revisi
-        $revisi = RevisiTa::where('tugas_akhir_id', $tugasAkhir->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Ambil dokumen (proposal, draft, final)
-        $dokumen = DokumenTa::where('tugas_akhir_id', $tugasAkhir->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Ambil sidang yang terkait
-        $sidang = Sidang::where('tugas_akhir_id', $tugasAkhir->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
 
         // Kirim ke view
         return view('mahasiswa.tugas-akhir.crud-ta.progress', compact(
