@@ -187,12 +187,16 @@ Route::prefix('admin')->group(function () {
     //tugas akhir
 
     Route::prefix('ta')->group(function () {
-        Route::get('/', [TugasAkhirController::class, 'index'])->name('ta.index'); // <-- INI WAJIB ADA
-        Route::get('/kemajuan', [TugasAkhirController::class, 'lihatKemajuan'])->name('ta.kemajuan.index');
-        Route::get('/revisi', [TugasAkhirController::class, 'revisi'])->name('ta.revisi.index');
-        Route::post('/revisi/upload', [TugasAkhirController::class, 'uploadRevisi'])->name('ta.revisi.upload');
-        Route::get('/pembatalan', [TugasAkhirController::class, 'pembatalan'])->name('ta.pembatalan.index');
-    });
+    // 1. Halaman dashboard TA
+    Route::get('/dashboard', [TugasAkhirController::class, 'dashboard'])->name('ta.dashboard');
+
+    // 2. Kirim komentar revisi (dari modal revisi)
+    Route::post('/revisi', [TugasAkhirController::class, 'revisiStore'])->name('ta.revisi');
+
+    // 3. Aksi ACC dan Tolak per revisi
+    Route::post('/acc/{id}', [TugasAkhirController::class, 'acc'])->name('ta.acc');
+    Route::post('/tolak/{id}', [TugasAkhirController::class, 'tolak'])->name('ta.tolak');
+});
 
 
     // Profile

@@ -17,6 +17,8 @@
                 <th scope="col">Program Studi</th>
                 <th scope="col">Judul Sidang</th>
                 <th scope="col">Dosen Pembimbing</th>
+                <th scope="col">Tanggal</th>
+                <th scope="col">Waktu</th>
                 <th scope="col">Status Bimbingan</th>
             </tr>
         </thead>
@@ -28,7 +30,12 @@
                 <td>Sistem Informasi</td>
                 <td>Sistem Informasi Akademik</td>
                 <td>Dr. Budi Santoso</td>
-                <td><span class="badge bg-warning text-dark">Menunggu Review</span></td>
+                <td>2025-06-10</td>
+                <td>09:00 - 10:00</td>
+                <td>
+                    <button class="btn btn-success btn-sm">ACC</button>
+                    <button class="btn btn-danger btn-sm">Tolak</button>
+                </td>
             </tr>
             <tr>
                 <td>2</td>
@@ -37,7 +44,12 @@
                 <td>Teknik Informatika</td>
                 <td>Analisis Data Penjualan</td>
                 <td>Dr. Rina Dewi</td>
-                <td><span class="badge bg-success">Selesai</span></td>
+                <td>2025-06-11</td>
+                <td>10:00 - 11:00</td>
+                <td>
+                    <button class="btn btn-success btn-sm">ACC</button>
+                    <button class="btn btn-danger btn-sm">Tolak</button>
+                </td>
             </tr>
             <tr>
                 <td>3</td>
@@ -46,7 +58,12 @@
                 <td>Sistem Informasi</td>
                 <td>Pengembangan Aplikasi Mobile</td>
                 <td>Dr. Andi Wijaya</td>
-                <td><span class="badge bg-danger">Belum Mulai</span></td>
+                <td>2025-06-12</td>
+                <td>13:00 - 14:00</td>
+                <td>
+                    <button class="btn btn-success btn-sm">ACC</button>
+                    <button class="btn btn-danger btn-sm">Tolak</button>
+                </td>
             </tr>
         </tbody>
     </table>

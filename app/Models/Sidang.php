@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Sidang extends Model
@@ -15,28 +16,51 @@ class Sidang extends Model
 
     protected $fillable = ['tugas_akhir_id', 'jenis_sidang', 'status'];
 
-    public function tugasAkhir()
+    /**
+     * Relasi ke Tugas Akhir
+     */
+    public function tugasAkhir(): BelongsTo
     {
         return $this->belongsTo(TugasAkhir::class);
     }
 
-    public function jadwalSidang()
+    /**
+     * Relasi ke Jadwal Sidang
+     */
+    public function jadwalSidang(): HasOne
     {
         return $this->hasOne(JadwalSidang::class);
     }
-    
+
+    /**
+     * Relasi ke Nilai Sidang
+     */
     public function nilai(): HasMany
     {
         return $this->hasMany(NilaiSidang::class);
     }
 
+    /**
+     * Relasi ke Berita Acara Pasca Sidang
+     */
     public function beritaAcaraPasca(): HasMany
     {
         return $this->hasMany(BeritaAcaraPascaSidang::class);
     }
 
+    /**
+     * Relasi ke Berita Acara Pra Sidang
+     */
     public function beritaAcaraPra(): HasMany
     {
         return $this->hasMany(BeritaAcaraPraSidang::class);
+    }
+
+    /**
+     * Relasi tidak langsung ke Mahasiswa melalui Tugas Akhir
+     */
+    public function mahasiswa()
+    {
+        return $this->tugasAkhir ? $this->tugasAkhir->mahasiswa() : null;
     }
 }

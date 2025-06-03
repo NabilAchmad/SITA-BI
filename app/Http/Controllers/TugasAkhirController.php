@@ -3,59 +3,51 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\RevisiTA;
-use App\Models\ProgressTA;
-use App\Models\PembatalanTA;
 
 class TugasAkhirController extends Controller
 {
-    public function index()
-{
-    // Bisa ambil data apapun yang ingin ditampilkan di halaman utama TA
-    return view('admin.ta.dashboard.dashboard');
-}
-    // 1. Lihat laporan kemajuan tugas akhir
-    public function lihatKemajuan()
+    // Menampilkan dashboard
+    public function dashboard()
     {
-        $userId = Auth::id();
-        $kemajuan = ProgressTA::where('user_id', $userId)->latest()->get();
-
-        return view('ta.kemajuan.index', compact('kemajuan'));
+        $kemajuan = RevisiTA::latest()->get(); // atau sesuaikan dengan filter user/dosen
+        return view('admin.ta.dashboard.dashboard', compact('kemajuan'));
     }
 
-    // 2. Lihat dan unggah revisi tugas akhir
-    public function revisi()
-    {
-        $userId = Auth::id();
-        $revisi = RevisiTA::where('user_id', $userId)->latest()->get();
-
-        return view('admin.ta.revisi.index', compact('revisi'));
-    }
-
-    public function uploadRevisi(Request $request)
+    // Menyimpan komentar revisi dari modal
+    public function revisiStore(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:pdf|max:2048',
+            'komentar_revisi' => 'required|string|max:1000',
         ]);
 
-        $path = $request->file('file')->store('revisi_ta');
-
+        // Buat revisi baru
         RevisiTA::create([
-            'user_id' => Auth::id(),
-            'file' => $path,
-            'uploaded_at' => now(),
+            'tanggal' => now(),
+            'deskripsi' => $request->komentar_revisi,
+            'status' => 'Menunggu ACC',
         ]);
 
-        return redirect()->back()->with('success', 'Revisi berhasil diunggah.');
+        return redirect()->route('ta.dashboard')->with('success', 'Komentar revisi berhasil dikirim.');
     }
 
-    // 3. Melihat riwayat pembatalan tugas akhir
-    public function pembatalan()
+    // Menyetujui (ACC) revisi tertentu
+    public function acc($id)
     {
-        $userId = Auth::id();
-        $riwayatPembatalan = PembatalanTA::where('user_id', $userId)->latest()->get();
+        $revisi = RevisiTA::findOrFail($id);
+        $revisi->status = 'ACC';
+        $revisi->save();
 
-        return view('ta.pembatalan.index', compact('riwayatPembatalan'));
+        return redirect()->route('ta.dashboard')->with('success', 'Revisi telah di-ACC.');
+    }
+
+    // Menolak revisi tertentu
+    public function tolak($id)
+    {
+        $revisi = RevisiTA::findOrFail($id);
+        $revisi->status = 'Ditolak';
+        $revisi->save();
+
+        return redirect()->route('ta.dashboard')->with('success', 'Revisi telah ditolak.');
     }
 }
