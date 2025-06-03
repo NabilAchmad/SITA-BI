@@ -134,6 +134,16 @@ class TugasAkhirController extends Controller
                 ->get();
         }
 
+        $jumlahBimbingan = $progressBimbingan->count();
+        $maxBimbingan = 7;
+
+        $progress = match ($tugasAkhir->status) {
+            'diajukan' => min(ceil(($jumlahBimbingan / $maxBimbingan) * 100), 49), // max 49%
+            'disetujui' => 50 + min(ceil(($jumlahBimbingan / $maxBimbingan) * 50), 49), // 50–99%
+            'selesai', 'lulus_tanpa_revisi', 'lulus_dengan_revisi' => 100,
+            default => 0,
+        };
+
         // Kirim ke view
         return view('mahasiswa.tugas-akhir.crud-ta.progress', compact(
             'tugasAkhir',
@@ -141,7 +151,8 @@ class TugasAkhirController extends Controller
             'revisi',
             'dokumen',
             'sidang',
-            'isMengajukanTA'
+            'isMengajukanTA',
+            "progress"
         ));
     }
 

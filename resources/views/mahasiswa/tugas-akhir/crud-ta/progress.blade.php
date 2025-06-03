@@ -141,7 +141,7 @@
 
                     {{-- Action Buttons --}}
                     <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
-                        @if (!$isMengajukanTA && $ta->status === 'diajukan')
+                        @if ($isMengajukanTA && $ta->status === 'disetujui')
                             <a href="{{ asset('storage/' . $ta->file_path) }}" target="_blank"
                                 class="btn btn-outline-primary btn-sm rounded-pill px-4 py-2 d-flex align-items-center gap-2 shadow-sm transition-hover">
                                 <i class="bi bi-file-earmark-text"></i> Lihat Proposal
@@ -149,7 +149,7 @@
 
                             <button type="button"
                                 class="btn btn-sm rounded-pill px-4 py-2 shadow-sm transition-hover {{ $ta->status === 'diajukan' ? 'btn-warning' : 'btn-outline-secondary' }}"
-                                {{ $ta->status !== 'diajukan' ? 'disabled' : '' }} data-bs-toggle="modal"
+                                {{ $ta->status !== 'disetujui' ? 'disabled' : '' }} data-bs-toggle="modal"
                                 data-bs-target="#revisiModal{{ $ta->id }}">
                                 <i class="bi bi-pencil-square"></i> Revisi
                             </button>
@@ -157,7 +157,7 @@
                             <button type="button"
                                 class="btn btn-danger btn-sm rounded-pill px-4 py-2 shadow-sm transition-hover"
                                 data-bs-toggle="collapse" data-bs-target="#cancelForm{{ $ta->id }}"
-                                {{ $ta->status !== 'diajukan' ? 'disabled' : '' }}>
+                                {{ $ta->status !== 'disetujui' ? 'disabled' : '' }}>
                                 <i class="bi bi-x-circle"></i> Batalkan
                             </button>
                         @endif
