@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -13,8 +14,9 @@ class TawaranTopik extends Model
 
     protected $table = 'tawaran_topik';
 
+    // Tambahkan 'user_id' ke fillable agar bisa diisi saat insert/update
     protected $fillable = [
-        'dosen_id', 'judul_topik', 'deskripsi', 'kuota'
+        'user_id', 'dosen_id', 'judul_topik', 'deskripsi', 'kuota'
     ];
 
     public function dosen(): BelongsTo

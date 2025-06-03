@@ -58,9 +58,37 @@ class Sidang extends Model
 
     /**
      * Relasi tidak langsung ke Mahasiswa melalui Tugas Akhir
+     * (Eager loading compatible)
      */
     public function mahasiswa()
     {
-        return $this->tugasAkhir ? $this->tugasAkhir->mahasiswa() : null;
+        return $this->hasOneThrough(
+            Mahasiswa::class,
+            TugasAkhir::class,
+            'id',              // Foreign key on TugasAkhir table...
+            'id',              // Foreign key on Mahasiswa table...
+            'tugas_akhir_id',  // Local key on Sidang table...
+            'mahasiswa_id'     // Local key on TugasAkhir table...
+        );
+    }
+
+    /**
+     * Menghitung rata-rata nilai sidang
+     */
+    public function rataRataNilai()
+    {
+        return $this->nilai()->avg('skor');
+    }
+
+    /**
+     * Menentukan status kelulusan sidang berdasarkan rata-rata nilai
+     */
+    public function statusKelulusan()
+    {
+        $rataRata = $this->rataRataNilai();
+        if ($rataRata === null) {
+            return 'Belum Dinilai';
+        }
+        return $rataRata >= 60 ? 'Lulus' : 'Tidak Lulus';
     }
 }
