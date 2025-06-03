@@ -65,7 +65,42 @@
                                     {{ $mhs->prodi }}
                                 @endif
                             </td>
-                            <td>{{ $tugasAkhir?->judul ?? '-' }}</td>
+                            @php
+                                $judul = $mhs->tugasAkhir->judul ?? '-';
+                                $maxLength = 50;
+                                $terpotong = strlen($judul) > $maxLength;
+                            @endphp
+
+                            <td>
+                                @if ($terpotong)
+                                    <span>{{ Str::limit($judul, $maxLength) }}</span>
+                                    <button type="button" class="btn btn-link btn-sm p-0" data-bs-toggle="modal"
+                                        data-bs-target="#lihatJudulModal-{{ $mhs->id }}">
+                                        Lihat Selengkapnya
+                                    </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="lihatJudulModal-{{ $mhs->id }}" tabindex="-1"
+                                        aria-labelledby="lihatJudulModalLabel-{{ $mhs->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title"
+                                                        id="lihatJudulModalLabel-{{ $mhs->id }}">Judul Lengkap
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Tutup"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    {{ $judul }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    {{ $judul }}
+                                @endif
+                            </td>
                             <td>
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                     data-bs-target="#modalPembimbing-{{ $mhs->id }}">
