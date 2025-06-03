@@ -42,13 +42,11 @@
                 <table class="table table-bordered table-hover text-center align-middle custom-table animate-table">
                     <thead class="table-dark">
                         <tr>
-
-
-
-
                             <th scope="col"><i class="bi bi-person-badge me-2 icon-bounce"></i>Nama Mahasiswa</th>
                             <th scope="col"><i class="bi bi-file-earmark-text me-2 icon-bounce"></i>Nilai Tugas Akhir</th>
                             <th scope="col"><i class="bi bi-info-circle me-2 icon-bounce"></i>Status</th>
+                            <th scope="col"><i class="bi bi-award me-2 icon-bounce"></i>Nilai Akhir</th>
+                            <th scope="col"><i class="bi bi-patch-check-fill me-2 icon-bounce"></i>Status Akhir</th>
                             {{-- <th scope="col"><i class="bi bi-gear me-2 icon-bounce"></i>Aksi</th> --}}
                         </tr>
                     </thead>
@@ -77,6 +75,23 @@
                                     @else
 
                                         <span class="badge bg-warning status-badge"><i class="bi bi-clock-fill me-1"></i>Menunggu</span>
+                                    @endif
+                                </td>
+                                <td class="text-start fw-bold">
+                                    {{ $nilai->nilai_angka ?? '-' }}
+                                </td>
+                                <td>
+                                    @php
+                                        $statusAkhir = $nilai->tugasAkhir->status ?? 'N/A';
+                                    @endphp
+                                    @if ($statusAkhir == 'lulus')
+                                        <span class="badge bg-success status-badge"><i class="bi bi-check-circle-fill me-1"></i>Lulus</span>
+                                    @elseif ($statusAkhir == 'lulus dengan revisi')
+                                        <span class="badge bg-warning status-badge"><i class="bi bi-exclamation-triangle-fill me-1"></i>Lulus dengan Revisi</span>
+                                    @elseif ($statusAkhir == 'tidak lulus')
+                                        <span class="badge bg-danger status-badge"><i class="bi bi-x-circle-fill me-1"></i>Tidak Lulus</span>
+                                    @else
+                                        <span class="badge bg-secondary status-badge">-</span>
                                     @endif
                                 </td>
                                 <td>

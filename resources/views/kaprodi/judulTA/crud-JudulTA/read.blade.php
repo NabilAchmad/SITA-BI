@@ -170,20 +170,20 @@
 
 @section('script')
     <script>
-    $(document).ready(function () {
-        // Setup CSRF Token untuk semua request
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+        $(document).ready(function () {
+            // Setup CSRF Token untuk semua request
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
 
-        // Ketika tombol ACC diklik
-        $('.btn-acc').on('click', function () {
-            
+            // Ketika tombol ACC diklik
+            $('.btn-acc').on('click', function () {
+
+            });
         });
-    });
-    function accJudul(id){
+        function accJudul(id) {
             let uri = "{{route('kaprodi.judul.approve', ['id' => ':id'])}}".replace(':id', id);
             $.ajax({
                 url: uri, // pastikan ini route POST
@@ -201,6 +201,6 @@
                     alert('Terjadi kesalahan: ' + error);
                 }
             });
-    }
-</script>
+        }
+    </script>
 @endsection

@@ -33,10 +33,15 @@ class KaprodiController extends Controller
     /**
      * Menampilkan daftar Judul TA yang masih berstatus "diajukan" (belum di‑ACC)
      */
-    public function showAccJudulTA()
+    public function showJudulTA()
     {
         $judulTAs = JudulTA::where('status', 'diajukan')->get();
         return view('kaprodi.judulTA.AccJudulTA', compact('judulTAs'));
+    }
+
+    public function showAcc(){
+        $judulTAs = JudulTA::where('status', 'disetuujui')->get();
+        return view('kaprodi.judulTA.read', compact('judulTAs'));
     }
 
     /**
