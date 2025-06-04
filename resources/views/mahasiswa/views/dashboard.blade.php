@@ -4,17 +4,21 @@
 
 @section('content')
     <!-- Header Main -->
-    @include('layouts.components.content-mahasiswa.welcome')
+    @include('layouts.components.content-mahasiswa.header')
     <!-- end header main -->
 
-    <!-- card alur tugas akhir -->
-    <div class="row g-4">
-        @include('layouts.components.content-mahasiswa.progress')
+    <!-- main -->
+    <div class="row">
+    </div>
+    <!-- end main -->
+
+    <!-- main -->
+    <div class="row">
+
     </div>
 
     <div class="row">
         <div class="col-md-12">
-
             <!-- Pengumuman -->
             <div class="card card-round">
                 @include('layouts.components.content-mahasiswa.pengumuman')

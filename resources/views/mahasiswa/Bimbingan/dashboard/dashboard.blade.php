@@ -21,7 +21,7 @@
 
         <!-- Ajukan Jadwal -->
         <div class="col-md-6 col-xl-4">
-            <a href="{{ route('bimbingan.ajukanJadwal') }}" class="text-decoration-none">
+            <a href="{{ url('/mahasiswa/bimbingan/ajukan-jadwal') }}" class="text-decoration-none">
                 <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
@@ -38,7 +38,7 @@
 
         <!-- Lihat Jadwal -->
         <div class="col-md-6 col-xl-4">
-            <a href="{{ route('jadwal.bimbingan') }}" class="text-decoration-none">
+            <a href="{{ url('/mahasiswa/bimbingan/lihat-jadwal') }}" class="text-decoration-none">
                 <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
@@ -55,7 +55,7 @@
 
         <!-- Ajukan Perubahan -->
         <div class="col-md-6 col-xl-4">
-            <a href="{{ route('ubah.jadwal') }}" class="text-decoration-none">
+            <a href="{{ url('/mahasiswa/bimbingan/perubahan-jadwal') }}" class="text-decoration-none">
                 <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">

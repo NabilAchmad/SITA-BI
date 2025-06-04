@@ -37,14 +37,14 @@
 </head>
 
 <body>
-    <div class="wrapper sidebar_minimize">
+    <div class="wrapper">
         <!-- Sidebar -->
-        @include('layouts.components.border-mahasiswa.sidebar')
+        @include('layouts.components.border-kajur.sidebar')
         <!-- End Sidebar -->
 
         <!-- Main Panel -->
         <div class="main-panel">
-            @include('layouts.components.border-mahasiswa.header')
+            @include('layouts.components.border-kajur.header')
 
             <div class="container">
                 <div class="page-inner">
@@ -53,7 +53,7 @@
             </div>
 
             <!-- Footer -->
-            @include('layouts.components.border-mahasiswa.footer')
+            @include('layouts.components.border-kajur.footer')
             <!-- End Footer -->
 
         </div>

@@ -12,7 +12,6 @@
                 </button>
             </div>
         </div>
-        <p class="card-category mb-0">By Admin</p>
     </div>
 
     <div class="card-body">
@@ -33,27 +32,14 @@
                         <div class="flex-grow-1" style="font-size: 0.95rem; line-height: 1.7;">
                             <strong>[01/04/2025]</strong> - Pendaftaran ulang mahasiswa dibuka hingga 30 April 2025.
                         </div>
-                        <div class="ms-2">
-                            <button class="btn btn-sm btn-outline-secondary btn-edit me-1" title="Edit">
-                                <i class="fa fa-pen"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger btn-delete" title="Hapus">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
+
                     </li>
                     <li class="mb-4 d-flex align-items-start justify-content-between">
                         <div class="flex-grow-1" style="font-size: 0.95rem; line-height: 1.7;">
-                            <strong>[02/04/2025]</strong> - Pelatihan penggunaan sistem e-learning akan dilaksanakan minggu depan.
+                            <strong>[02/04/2025]</strong> - Pelatihan penggunaan sistem e-learning akan dilaksanakan
+                            minggu depan.
                         </div>
-                        <div class="ms-2">
-                            <button class="btn btn-sm btn-outline-secondary btn-edit me-1" title="Edit">
-                                <i class="fa fa-pen"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger btn-delete" title="Hapus">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
+
                     </li>
                     <!-- Tambahkan pengumuman lainnya dengan struktur serupa -->
                 </ul>
@@ -64,7 +50,7 @@
 
 <!-- Script Fungsi -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const card = document.getElementById('pengumumanCard');
         const toggleBtn = card.querySelector('.btn-toggle .fa');
         const refreshBtn = card.querySelector('.btn-refresh-card');
@@ -74,7 +60,7 @@
         const announcementList = card.querySelector('#announcementList');
 
         // Collapse/Expand
-        card.querySelector('.btn-toggle').addEventListener('click', function () {
+        card.querySelector('.btn-toggle').addEventListener('click', function() {
             const isHidden = cardBody.style.display === 'none';
             cardBody.style.display = isHidden ? 'block' : 'none';
             toggleBtn.classList.toggle('fa-angle-down', isHidden);
@@ -82,7 +68,7 @@
         });
 
         // Refresh
-        refreshBtn.addEventListener('click', function () {
+        refreshBtn.addEventListener('click', function() {
             loader.classList.remove('d-none');
             announcementList.classList.add('d-none');
 
@@ -94,7 +80,7 @@
         });
 
         // Edit / Hapus tombol
-        announcementList.addEventListener('click', function (e) {
+        announcementList.addEventListener('click', function(e) {
             if (e.target.closest('.btn-delete')) {
                 const item = e.target.closest('li');
                 if (confirm('Yakin ingin menghapus pengumuman ini?')) {
