@@ -1,4 +1,4 @@
-<div class="sidebar" data-background-color="dark">
+<div class="sidebar sidebar-style-2" data-background-color="dark2">
     <div class="sidebar-logo">
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="dark">
@@ -39,7 +39,7 @@
         <div class="sidebar-content">
             <ul class="nav nav-secondary">
                 <!-- Dashboard -->
-                <li class="nav-item {{ request()->is('kajur') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-jurusan') ? 'active' : '' }}">
                     <a href="{{ route('kajur.dashboard') }}">
                         <i class="fas fa-home"></i>
                         <p>Dashboard</p>
@@ -55,7 +55,7 @@
                 </li>
 
                 {{-- Tugas Akhir --}}
-                <li class="nav-item {{ request()->is('kajur/judulTA/*') || request()->is('kajur/judulTA') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-jurusan/judulTA/*') || request()->is('kajur/judulTA') ? 'active' : '' }}">
                     <a href="{{ route('kajur.judul.page') }}">
                         <i class="fas fa-users-cog"></i>
                         <p>Tugas Akhir</p>
@@ -63,7 +63,7 @@
                 </li>
 
                 <!-- Sidang -->
-                <li class="nav-item {{ request()->is('kajur/sidang') || request()->is('kajur/sidang/*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-jurusan/sidang/*') || request()->is('kajur/sidang/*') ? 'active' : '' }}">
                     <a href="{{ route('sidangDashboard.kajur') }}">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <p>Sidang</p>
@@ -71,7 +71,7 @@
                 </li>
 
                 <!-- Pengumuman -->
-                <li class="nav-item {{ request()->is('kajur/pengumuman*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-jurusan/pengumuman*') ? 'active' : '' }}">
                     <a href="{{ route('kajurpengumuman.page') }}">
                         <i class="fas fa-bullhorn"></i>
                         <p>Pengumuman</p>
@@ -79,7 +79,7 @@
                 </li>
 
                 <!-- Laporan dan Statistik -->
-                <li class="nav-item {{ request()->is('kajur/laporan') || request()->is('kajur/laporan/*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-jurusan/laporan') || request()->is('kajur/laporan/*') ? 'active' : '' }}">
                     <a href="{{ route('kajur.nilai.page') }}">
                         <i class="fas fa-chart-bar"></i>
                         <p>Nilai Sidang</p>

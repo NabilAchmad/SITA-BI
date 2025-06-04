@@ -1,7 +1,11 @@
+@extends('layouts.template.kaprodi')
+
+@section('content')
 <!-- Section Title -->
 <div class="container section-title" data-aos="fade-up">
-    <h1><i class="bi bi-check-circle-fill text-success me-2"></i>Judul Tugas Akhir yang Disetujui</h1>
+    <h1><i class="bi bi-x-circle-fill text-danger me-2"></i>Judul Tugas Akhir Ditolak</h1>
 </div>
+
 <div class="container mb-3">
     <a href="{{ route('kaprodi.judul.page') }}" class="btn btn-secondary">
         <i class="bi bi-arrow-left"></i> Kembali ke Semua Judul
@@ -11,7 +15,7 @@
 <div class="container">
     <div class="table-responsive">
         <table class="table table-bordered table-hover text-center align-middle custom-table">
-            <thead class="table-success">
+            <thead class="table-danger">
                 <tr>
                     <th scope="col"><i class="bi bi-person-badge me-2"></i>Nama Mahasiswa</th>
                     <th scope="col"><i class="bi bi-file-earmark-text me-2"></i>Judul Tugas Akhir</th>
@@ -19,7 +23,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($judulTAs as $judul)
+                @foreach ($judulTolak as $judul)
                     <tr class="align-middle">
                         <td>
                             <div class="d-flex align-items-center justify-content-center">
@@ -29,7 +33,7 @@
                         </td>
                         <td class="text-start">{{ $judul->judul }}</td>
                         <td>
-                            <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>Disetujui</span>
+                            <span class="badge bg-danger"><i class="bi bi-x-circle-fill me-1"></i>Ditolak</span>
                         </td>
                     </tr>
                 @endforeach
@@ -51,4 +55,4 @@
         letter-spacing: 0.5px;
     }
 </style>
-</create_file>
+@endsection

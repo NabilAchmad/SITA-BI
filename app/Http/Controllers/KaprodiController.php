@@ -40,13 +40,13 @@ class KaprodiController extends Controller
     }
 
     public function showAcc(){
-        $judulTAs = JudulTA::where('status', 'disetuujui')->get();
+        $judulTAs = JudulTA::where('status', 'disetujui')->get();
         return view('kaprodi.judulTA.readAcc', compact('judulTAs'));
     }
 
     public function showTolak(){
-        $judulTAs = JudulTA::where('status', 'ditolak')->get();
-        return view('kaprodi.judulTA.readTolak', compact('judulTAs'));
+        $judulTolak = JudulTA::where('status', 'ditolak')->get();
+        return view('kaprodi.judulTA.crud-JudulTA.readTolak', compact('judulTolak'));
     }
 
     /**

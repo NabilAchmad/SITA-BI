@@ -1,3 +1,6 @@
+@extends('layouts.template.kaprodi')
+
+@section('content')
 <!-- Section Title -->
 <div class="container section-title" data-aos="fade-up">
     <h1><i class="bi bi-check-circle-fill text-success me-2"></i>ACC Judul Tugas Akhir</h1>
@@ -18,10 +21,9 @@
                 </a>
             </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tolak-tab" data-bs-toggle="tab" data-bs-target="#tolak" type="button"
-                role="tab" aria-controls="tolak" aria-selected="false">
+            <a class="nav-link" id="tolak-tab" href="{{ route('kaprodi.judul.tolak') }}" role="tab" aria-controls="tolak" aria-selected="false">
                 <i class="bi bi-x-circle-fill me-2 text-danger"></i>Judul Ditolak
-            </button>
+            </a>
         </li>
     </ul>
 
@@ -81,7 +83,7 @@
         
 
         <!-- Tab Ditolak -->
-        <div class="tab-pane fade" id="tolak" role="tabpanel" aria-labelledby="tolak-tab">
+        {{-- <div class="tab-pane fade" id="tolak" role="tabpanel" aria-labelledby="tolak-tab">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover text-center align-middle custom-table">
                     <thead class="table-danger">
@@ -95,7 +97,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div> --}}
     </div>
 </div>
 
@@ -186,4 +188,5 @@
             });
         }
     </script>
+@endsection
 @endsection
