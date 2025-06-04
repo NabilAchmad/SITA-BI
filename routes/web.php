@@ -22,6 +22,10 @@ use App\Models\TawaranTopik;
 use App\Models\JudulTA;
 use App\Models\TugasAkhir;
 
+Route::get('/', function () {
+    return view('home.homepage');
+})->name('homepage');
+
 Route::prefix('/mahasiswa')->group(function () {
 
     // Dashboard Mahasiswa
