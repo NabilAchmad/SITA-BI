@@ -87,12 +87,12 @@
                 </li>
 
                 <!-- Log dan Aktifitas -->
-                <li class="nav-item {{ request()->is('kaprodi/logs') || request()->is('kaprodi/logs/*') ? 'active' : '' }}">
+                {{-- <li class="nav-item {{ request()->is('kaprodi/logs') || request()->is('kaprodi/logs/*') ? 'active' : '' }}">
                     <a href="{{ url('/kaprodi/logs/lihat') }}">
                         <i class="fas fa-terminal"></i>
                         <p>Log dan Aktifitas</p>
                     </a>
-                </li>
+                </li> --}}
             </ul>
         </div>
     </div>

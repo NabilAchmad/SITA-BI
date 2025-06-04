@@ -41,7 +41,12 @@ class KaprodiController extends Controller
 
     public function showAcc(){
         $judulTAs = JudulTA::where('status', 'disetuujui')->get();
-        return view('kaprodi.judulTA.read', compact('judulTAs'));
+        return view('kaprodi.judulTA.readAcc', compact('judulTAs'));
+    }
+
+    public function showTolak(){
+        $judulTAs = JudulTA::where('status', 'ditolak')->get();
+        return view('kaprodi.judulTA.readTolak', compact('judulTAs'));
     }
 
     /**

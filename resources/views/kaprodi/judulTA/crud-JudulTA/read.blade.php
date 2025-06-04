@@ -12,12 +12,11 @@
                 <span class="badge bg-primary ms-2">{{ count($judulTAs) }}</span>
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="acc-tab" data-bs-toggle="tab" data-bs-target="#acc" type="button" role="tab"
-                aria-controls="acc" aria-selected="false">
-                <i class="bi bi-check-circle-fill me-2 text-success"></i>Judul Disetujui
-            </button>
-        </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="acc-tab" href="{{ route('kaprodi.judul.acc') }}" role="tab" aria-selected="false">
+                    <i class="bi bi-check-circle-fill me-2 text-success"></i>Judul Disetujui
+                </a>
+            </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="tolak-tab" data-bs-toggle="tab" data-bs-target="#tolak" type="button"
                 role="tab" aria-controls="tolak" aria-selected="false">
@@ -79,23 +78,7 @@
             </div>
         </div>
 
-        <!-- Tab ACC -->
-        <div class="tab-pane fade" id="acc" role="tabpanel" aria-labelledby="acc-tab">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover text-center align-middle custom-table">
-                    <thead class="table-success">
-                        <tr>
-                            <th scope="col"><i class="bi bi-calendar-check-fill me-2"></i>Tanggal ACC</th>
-                            <th scope="col"><i class="bi bi-file-earmark-text me-2"></i>Judul</th>
-                            <th scope="col"><i class="bi bi-person-badge me-2"></i>Nama Mahasiswa</th>
-                        </tr>
-                    </thead>
-                    <tbody id="accTable">
-                        <!-- Baris ACC ditambahkan lewat JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        
 
         <!-- Tab Ditolak -->
         <div class="tab-pane fade" id="tolak" role="tabpanel" aria-labelledby="tolak-tab">

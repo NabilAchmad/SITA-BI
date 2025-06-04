@@ -28,7 +28,7 @@ Route::get('/', function () {
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 // Route::get('/email/verify/{token}', [AuthController::class, 'verifyEmail'])->name('email.verify');
@@ -58,6 +58,9 @@ Route::prefix('kajur')->group(function () {
     // General User Login Routes inside kajur prefix (optional, depends on your auth strategy)
     // Route::get('/login', [AuthController::class, 'showLogin'])->name('kajur.login');
     // Route::post('/login', [AuthController::class, 'login'])->name('kajur.login.post');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('kajur.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('kajur.login.post');
+    Route::put('/logout', [AuthController::class, 'logout'])->name('kajur.logout');
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [KajurController::class, 'index'])->name('kajur.dashboard');
@@ -87,6 +90,9 @@ Route::prefix('ketua-prodi')->group(function () {
     // Kaprodi Login (if needed)
     // Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     // Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('kaprodi.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('kaprodi.login.post');
+    Route::put('/logout', [AuthController::class, 'logout'])->name('kaprodi.logout');
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/', [KaprodiController::class, 'index'])->name('kaprodi.dashboard');
@@ -98,14 +104,14 @@ Route::prefix('ketua-prodi')->group(function () {
 
 
         // Tugas Akhir
-        Route::get('/judulTA/JudulTA', [KaprodiController::class, 'showAccJudulTA'])->name('kaprodi.judul.page');
+        Route::get('/judulTA/JudulTA', [KaprodiController::class, 'showJudulTA'])->name('kaprodi.judul.page');
         // Route untuk ACC dan Tolak Judul
         Route::post('/ketua-prodi/judulTA/approve/{id}', [TugasAkhirController::class, 'approve'])->name('kaprodi.judul.approve');
         Route::post('/ketua-prodi/judulTA/reject/{id}', [TugasAkhirController::class, 'reject'])->name('kaprodi.judul.reject');
         // Route untuk melihat daftar judul yang sudah di-ACC
         Route::get('/judulTA/acc', [KaprodiController::class, 'showAcc'])->name('kaprodi.judul.acc');
         // Route untuk melihat daftar judul yang sudah ditolak
-        Route::get('/judulTA/tolak', [KaprodiController::class, 'showTolakJudulTA'])->name('kaprodi.judul.tolak');
+        Route::get('/judulTA/tolak', [KaprodiController::class, 'showTolak'])->name('kaprodi.judul.tolak');
 
 
         // Nilai sidang
@@ -121,9 +127,9 @@ Route::prefix('ketua-prodi')->group(function () {
 // Admin Routes
 Route::prefix('admin')->group(function () {
     // Authentication
-    // Route::get('/login', [AuthController::class, 'showLogin'])->name('admin.login');
-    // Route::post('/login', [AuthController::class, 'login'])->name('admin.login.post');
-    // Route::get('/logout', [AuthController::class, 'logout'])->name('admin.logout');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('admin.login');
+    Route::post('/login', [AuthController::class, 'login'])->name('admin.login.post');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
     Route::middleware(['auth'])->group(function () {
         // Redirect base /admin to dashboard
