@@ -10,6 +10,7 @@ use App\Models\RevisiTa;
 use App\Models\DokumenTa;
 use App\Models\Sidang;
 use App\Models\File;
+use App\Models\JudulTA;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -214,7 +215,25 @@ class TugasAkhirController extends Controller
         return view('mahasiswa.TugasAkhir.views.cancelTA', compact('tugasAkhirDibatalkan'));
     }
 
+    public function approve($id)
+    {
+        $judul = JudulTA::findOrFail($id);
+        $judul->status = 'Disetujui';
+        $judul->approved_by = Auth::id();
+        $judul->tanggal_acc = now();
+        $judul->save();
 
+        return response()->json(['success' => true,'message' => 'Judul disetujui.']);
+    }
+
+    public function reject($id)
+    {
+        $judul = JudulTA::findOrFail($id);
+        $judul->status = 'Ditolak';
+        $judul->rejected_by = Auth::id();
+        $judul->rejected_at = now();
+        $judul->save();
+
+        return response()->json(['message' => 'Judul ditolak.']);
+    }
 }
-
-

@@ -26,7 +26,8 @@ return new class extends Migration
                 'ditolak'         // Ditolak Kaprodi/dosen
             ])->default('diajukan');
             $table->date('tanggal_pengajuan');
-
+            // $table->date('tanggal_acc')->nullable()->comment('Tanggal ACC judul oleh Kaprodi');
+            $table->string('approved_by')->nullable()->comment('Dosen yang menyetujui judul');
             // Kolom baru untuk plagiasi dan tracking
             $table->float('similarity_score')->nullable()->comment('Skor kemiripan judul/abstrak (0-100%)');
             $table->text('alasan_penolakan')->nullable()->comment('Catatan jika status=ditolak');

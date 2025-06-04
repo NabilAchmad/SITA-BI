@@ -5,11 +5,11 @@
 
             <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
                 <!--Notification -->
-                @include('layouts.components.border-kaprodi.notification')
+                @include('layouts.components.border-kajur.notification')
                 <!-- End Notification -->
 
                 <!-- profile -->
-                @include('layouts.components.border-kaprodi.profile')
+                @include('layouts.components.border-kajur.profile')
                 <!-- End Profile -->
             </ul>
 

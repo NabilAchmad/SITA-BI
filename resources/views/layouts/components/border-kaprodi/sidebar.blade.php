@@ -1,7 +1,7 @@
-<div class="sidebar" data-background-color="dark">
+<div class="sidebar sidebar-style-2" data-background-color="dark2">
     <div class="sidebar-logo">
         <!-- Logo Header -->
-        <div class="logo-header" data-background-color="dark">
+        <div class="logo-header" data-background-color="dark2">
             <a href="{{ url('/kaprodi') }}"
                 class="logo d-flex align-items-center text-decoration-none px-3 py-2 text-white w-100"
                 style="max-width: 100%; overflow: hidden; transition: background-color 0.3s ease;">
@@ -39,7 +39,7 @@
         <div class="sidebar-content">
             <ul class="nav nav-secondary">
                 <!-- Dashboard -->
-                <li class="nav-item {{ request()->is('kaprodi') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-prodi') ? 'active' : '' }}">
                     <a href="{{ route('kaprodi.dashboard') }}">
                         <i class="fas fa-home"></i>
                         <p>Dashboard</p>
@@ -55,7 +55,7 @@
                 </li>
 
                 {{-- Tugas Akhir --}}
-                <li class="nav-item {{ request()->is('kaprodi/judulTA/*') || request()->is('kaprodi/judulTA') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-prodi/judulTA/*') || request()->is('kaprodi/judulTA') ? 'active' : '' }}">
                     <a href="{{ route('kaprodi.judul.page') }}">
                         <i class="fas fa-users-cog"></i>
                         <p>Tugas Akhir</p>
@@ -63,7 +63,7 @@
                 </li>
 
                 <!-- Sidang -->
-                <li class="nav-item {{ request()->is('kaprodi/sidang') || request()->is('kaprodi/sidang/*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-prodi/sidang/*') || request()->is('kaprodi/sidang/*') ? 'active' : '' }}">
                     <a href="{{ route('sidangDashboard.page') }}">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <p>Sidang</p>
@@ -71,7 +71,7 @@
                 </li>
 
                 <!-- Pengumuman -->
-                <li class="nav-item {{ request()->is('kaprodi/pengumuman*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-prodi/pengumuman*') ? 'active' : '' }}">
                     <a href="{{ route('kaprodipengumuman.page') }}">
                         <i class="fas fa-bullhorn"></i>
                         <p>Pengumuman</p>
@@ -79,7 +79,7 @@
                 </li>
 
                 <!-- Laporan dan Statistik -->
-                <li class="nav-item {{ request()->is('kaprodi/laporan') || request()->is('kaprodi/laporan/*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('ketua-prodi/nilai/*') || request()->is('kaprodi/nilai/*') ? 'active' : '' }}">
                     <a href="{{ route('kaprodi.akhir.page') }}">
                         <i class="fas fa-chart-bar"></i>
                         <p>Nilai Sidang</p>
@@ -87,12 +87,12 @@
                 </li>
 
                 <!-- Log dan Aktifitas -->
-                <li class="nav-item {{ request()->is('kaprodi/logs') || request()->is('kaprodi/logs/*') ? 'active' : '' }}">
+                {{-- <li class="nav-item {{ request()->is('kaprodi/logs') || request()->is('kaprodi/logs/*') ? 'active' : '' }}">
                     <a href="{{ url('/kaprodi/logs/lihat') }}">
                         <i class="fas fa-terminal"></i>
                         <p>Log dan Aktifitas</p>
                     </a>
-                </li>
+                </li> --}}
             </ul>
         </div>
     </div>

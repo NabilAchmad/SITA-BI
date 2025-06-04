@@ -36,9 +36,8 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        // Inject data user admin (id = 21) ke komponen profil
         View::composer('layouts.components.border-admin.profile', function ($view) {
-            $admin = User::find(21);
+            $admin = User::find(21); // pastikan admin dengan id 21 ada
             $view->with('adminProfile', $admin);
         });
     }
