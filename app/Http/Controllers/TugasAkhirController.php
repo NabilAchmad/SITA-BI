@@ -10,95 +10,59 @@ use App\Models\RevisiTa;
 use App\Models\DokumenTa;
 use App\Models\Sidang;
 use App\Models\File;
+use App\Models\JudulTA;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class TugasAkhirController extends Controller
 {
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return 1;
+        return 3;
     }
 
-    // Mengontrol akses mahasiswa ke dashboard tugas akhir
-    public function dashboard()
-    {
-        $mahasiswaId = $this->assumedMahasiswaId();
-        $mahasiswa = Mahasiswa::where('user_id', $mahasiswaId)->first();
-
-        if (!$mahasiswa) {
-            return redirect()->back()->with('error', 'Akun ini tidak memiliki data mahasiswa.');
-        }
-
-        $tugasAkhir = $mahasiswa->tugasAkhir;
-        $sudahMengajukan = $tugasAkhir !== null;
-
-        return view('mahasiswa.tugas-akhir.dashboard.dashboard', compact('tugasAkhir', 'sudahMengajukan', 'mahasiswa'));
-    }
-
-    // Menampilkan form ajukan Tugas Akhir
-    public function ajukanForm()
-    {
-        $mahasiswaId = $this->assumedMahasiswaId();
-        $mahasiswa = Mahasiswa::where('user_id', $mahasiswaId)->first();
-
-        if (!$mahasiswa) {
-            return redirect()->route('tugas-akhir.dashboard')->with('error', 'Akun ini tidak memiliki data mahasiswa.');
-        }
-
-        // Cek apakah mahasiswa sudah mengajukan tugas akhir
-        $existing = TugasAkhir::where('mahasiswa_id', $mahasiswaId)->exists();
-
-        if ($existing) {
-            return redirect()->route('tugas-akhir.dashboard')->withErrors(['error' => 'Anda sudah mengajukan tugas akhir.']);
-        }
-
-        return view('mahasiswa.tugas-akhir.crud-ta.create', compact('mahasiswa'));
-    }
-
-    // Menyimpan data Tugas Akhir
     public function store(Request $request)
     {
-        $mahasiswaId = $this->assumedMahasiswaId();
-        $mahasiswa = Mahasiswa::where('user_id', $mahasiswaId)->first();
-
-        // Cek apakah mahasiswa sudah mengajukan tugas akhir
-        $existing = TugasAkhir::where('mahasiswa_id', $mahasiswaId)->exists();
-
-        if ($existing) {
-            return redirect()->route('tugas-akhir.dashboard')->withErrors(['error' => 'Anda sudah mengajukan tugas akhir.']);
-        }
-
         $request->validate([
-            'judul' => 'required|string|max:255|unique:tugas_akhir,judul,NULL,id,mahasiswa_id,' . $mahasiswa->id,
+            'judul' => 'required|string|max:255',
             'abstrak' => 'required|string',
+            'file_proposal' => 'required|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
+        // Simpan file proposal
+        $file = $request->file('file_proposal');
+        $fileName = time() . '_' . Str::slug($file->getClientOriginalName(), '_');
+        $path = $file->storeAs('proposal_ta', $fileName, 'public');
+
+        // Simpan ke tabel files
+        $fileModel = File::create([
+            'file_path' => $path,
+            'file_type' => $file->getClientMimeType(),
+            'uploaded_by' => $this->assumedMahasiswaId(),
+        ]);
+
+        // Simpan ke tabel tugas_akhir
         TugasAkhir::create([
-            'mahasiswa_id' => $mahasiswa->id,
+            'mahasiswa_id' => $this->assumedMahasiswaId(),
             'judul' => $request->judul,
             'abstrak' => $request->abstrak,
+            'file_path' => $path,
             'status' => 'diajukan',
-            'tanggal_pengajuan' => Carbon::now()->toDateString(),
+            'tanggal_pengajuan' => now()->toDateString(),
         ]);
 
-        return redirect()->route('tugas-akhir.dashboard')->with('success', 'Tugas Akhir berhasil diajukan!');
+        return redirect()->back()->with('success', 'Tugas Akhir berhasil diajukan!');
     }
 
     public function progress()
     {
         // Gunakan auth()->id() jika login, atau ganti dengan simulasi user
-        $simulasiUserId = 1;
+        $simulasiUserId = 35;
 
         // Ambil data mahasiswa berdasarkan user_id
         $mahasiswa = Mahasiswa::where('user_id', $simulasiUserId)->first();
-        
-        // Cek apakah mahasiswa sudah punya TA dengan status tertentu
-        $isMengajukanTA = TugasAkhir::where('mahasiswa_id', $simulasiUserId)
-            ->whereIn('status', ['diajukan', 'revisi', 'disetujui', 'lulus_tanpa_revisi'])
-            ->exists();
 
         if (!$mahasiswa) {
             abort(404, 'Data mahasiswa tidak ditemukan.');
@@ -135,13 +99,12 @@ class TugasAkhirController extends Controller
             ->get();
 
         // Kirim ke view
-        return view('mahasiswa.tugas-akhir.crud-ta.progress', compact(
+        return view('mahasiswa.TugasAkhir.views.progresTA', compact(
             'tugasAkhir',
             'progressBimbingan',
             'revisi',
             'dokumen',
-            'sidang',
-            'isMengajukanTA'
+            'sidang'
         ));
     }
 
@@ -155,7 +118,7 @@ class TugasAkhirController extends Controller
             return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mengedit tugas akhir ini.');
         }
 
-        return view('mahasiswa.tugas-akhir.edit', compact('tugasAkhir'));
+        return view('mahasiswa.TugasAkhir.edit', compact('tugasAkhir'));
     }
 
     // Menyimpan perubahan tugas akhir
@@ -249,6 +212,28 @@ class TugasAkhirController extends Controller
             ->latest()
             ->get();
 
-        return view('mahasiswa.tugas-akhir.crud-ta.cancel', compact('tugasAkhirDibatalkan'));
+        return view('mahasiswa.TugasAkhir.views.cancelTA', compact('tugasAkhirDibatalkan'));
+    }
+
+    public function approve($id)
+    {
+        $judul = JudulTA::findOrFail($id);
+        $judul->status = 'Disetujui';
+        $judul->approved_by = Auth::id();
+        $judul->tanggal_acc = now();
+        $judul->save();
+
+        return response()->json(['success' => true,'message' => 'Judul disetujui.']);
+    }
+
+    public function reject($id)
+    {
+        $judul = JudulTA::findOrFail($id);
+        $judul->status = 'Ditolak';
+        $judul->rejected_by = Auth::id();
+        $judul->rejected_at = now();
+        $judul->save();
+
+        return response()->json(['message' => 'Judul ditolak.']);
     }
 }

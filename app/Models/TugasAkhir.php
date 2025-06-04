@@ -96,9 +96,4 @@ class TugasAkhir extends Model
             ->whereIn('jenis_sidang', ['akhir', 'proposal'])
             ->latestOfMany();
     }
-
-    public function tawaranTopik()
-    {
-        return $this->belongsTo(TawaranTopik::class, 'tawaran_topik_id');
-    }
 }

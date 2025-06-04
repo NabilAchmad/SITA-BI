@@ -58,21 +58,15 @@ class DosenSeeder extends Seeder
             $email = $this->generateEmail($nama);
             $nidn = $faker->unique()->numerify('##########');
 
-            // 1. Check if user with email already exists
-            $existingUser = DB::table('users')->where('email', $email)->first();
-            if ($existingUser) {
-                $userId = $existingUser->id;
-            } else {
-                // Insert new user
-                $userId = DB::table('users')->insertGetId([
-                    'name' => $nama,
-                    'email' => $email,
-                    'email_verified_at' => now(),
-                    'password' => Hash::make('professor123'),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+            // 1. Insert ke tabel users
+            $userId = DB::table('users')->insertGetId([
+                'name' => $nama,
+                'email' => $email,
+                'email_verified_at' => now(),
+                'password' => Hash::make('professor123'),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             // 2. Insert ke tabel dosen
             DB::table('dosen')->insert([

@@ -9,7 +9,7 @@ class AddTanggalAccToTugasAkhirTable extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('tugas_akhir', function (Blueprint $table) {
             $table->timestamp('tanggal_acc')->nullable()->after('status')->comment('Tanggal ACC Judul');
