@@ -220,10 +220,10 @@ class TugasAkhirController extends Controller
         $judul = JudulTA::findOrFail($id);
         $judul->status = 'Disetujui';
         $judul->approved_by = Auth::id();
-        $judul->tanggal_acc = now();
+        // $judul->tanggal_acc = now(); // Removed because column does not exist
         $judul->save();
 
-        return response()->json(['success' => true,'message' => 'Judul disetujui.']);
+        return response()->json(['success' => true, 'message' => 'Judul disetujui.']);
     }
 
     public function reject($id)
@@ -232,8 +232,11 @@ class TugasAkhirController extends Controller
         $judul->status = 'Ditolak';
         $judul->rejected_by = Auth::id();
         $judul->rejected_at = now();
+
+        // dd($judul->toArray()); // Removed debug point
+
         $judul->save();
 
-        return response()->json(['message' => 'Judul ditolak.']);
+        return response()->json(['success' => true, 'message' => 'Judul ditolak.']);
     }
 }

@@ -146,4 +146,36 @@ class KaprodiController extends Controller
 
         return view('kaprodi.sidang.read', compact('jadwalSidangs'));
     }
+
+    /**
+     * Mendapatkan judul-judul yang mirip berdasarkan id judul
+     */
+    public function getSimilarJudul($id)
+    {
+        $judul = JudulTA::findOrFail($id);
+        $judulText = $judul->judul;
+
+        // Pisahkan kata-kata dari judul, hapus kata-kata pendek (<= 3 huruf)
+        $keywords = array_filter(preg_split('/\s+/', strtolower($judulText)), function ($word) {
+            return strlen($word) > 3;
+        });
+
+        // Cari judul lain yang mengandung salah satu kata kunci
+        $similarJuduls = JudulTA::where('id', '!=', $id)
+            ->where(function ($query) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $query->orWhere('judul', 'LIKE', '%' . $keyword . '%');
+                }
+            })
+            ->get();
+
+        // Siapkan data untuk response
+        $data = [
+            'nama_pengaju' => $judul->mahasiswa->nama ?? 'N/A',
+            'judul_ta' => $judulText,
+            'similar_juduls' => $similarJuduls->pluck('judul'),
+        ];
+
+        return response()->json($data);
+    }
 }
