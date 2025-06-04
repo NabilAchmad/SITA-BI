@@ -11,8 +11,8 @@
         </span>
     </a>
     <ul class="dropdown-menu dropdown-user animated fadeIn">
-        <li>
-            <div class="dropdown-user-scroll scrollbar-outer">
+        <div class="dropdown-user-scroll scrollbar-outer">
+            <li>
                 <div class="user-box">
                     <div class="avatar-lg">
                         <img src="{{ asset('assets/img/team/nabil.jpg') }}" alt="image profile"
@@ -25,9 +25,11 @@
                             class="btn btn-xs btn-secondary btn-sm">View Profile</a>
                     </div>
                 </div>
+            </li>
+            <li>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{{route('kajur.logout')}}">Logout</a>
-            </div>
-        </li>
+                <a class="dropdown-item" href="{{route('logout')}}">Logout</a>
+            </li>
+        </div>
     </ul>
 </li>
