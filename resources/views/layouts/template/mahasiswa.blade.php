@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>@yield('title', 'Dashboard')</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Ganti Icon -->
     <link rel="icon" href="{{ asset('assets/img/admin/favicon.ico') }}" type="image/x-icon" />
 
@@ -30,10 +31,13 @@
         });
     </script>
 
+    @stack('styles')
+
     <!-- CSS Files -->
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/plugins.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/admin.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/bootstrap-icons.min.css') }}">
 </head>
 
 <body>
@@ -92,6 +96,8 @@
     <!-- admin JS -->
     <script src="{{ asset('assets/js/admin.min.js') }}"></script>
 
+    <!-- Tempat script tambahan dari halaman lain -->
+    @stack('scripts')
 
     <script>
         $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {

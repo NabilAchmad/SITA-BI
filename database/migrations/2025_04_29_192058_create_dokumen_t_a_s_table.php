@@ -25,8 +25,6 @@ return new class extends Migration
             $table->timestamp('scan_at')->nullable()->comment('Terakhir dipindai plagiasi');
             $table->foreignId('scanned_by')->nullable()->constrained('users');
 
-            $table->foreignId('uploaded_by')->constrained('users');
-            $table->enum('status_review', ['belum_diperiksa', 'diterima', 'ditolak']);
             $table->timestamps();
             $table->softDeletes();
         });
