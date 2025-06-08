@@ -30,8 +30,6 @@
         });
     </script>
 
-    @stack('styles')
-
     <!-- CSS Files -->
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/plugins.min.css') }}" />
@@ -41,7 +39,7 @@
 </head>
 
 <body>
-    <div class="wrapper sidebar_minimize">
+    <div class="wrapper">
         <!-- Sidebar -->
         @include('layouts.components.border-admin.sidebar')
         <!-- End Sidebar -->
@@ -96,8 +94,6 @@
     <!-- admin JS -->
     <script src="{{ asset('assets/js/admin.min.js') }}"></script>
 
-    <!-- Tempat script tambahan dari halaman lain -->
-    @stack('scripts')
 
     <script>
         $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {

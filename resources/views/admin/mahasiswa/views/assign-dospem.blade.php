@@ -3,5 +3,5 @@
 @section('title', 'mahasiswa')
 
 @section('content')
-@include('admin.mahasiswa.crud-dospem.mhs-tanpa-pembimbing')
+@include('admin.mahasiswa.crud-dospem.read-assign-dospem')
 @endsection

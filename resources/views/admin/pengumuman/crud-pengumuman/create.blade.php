@@ -2,7 +2,7 @@
 
     <h1 class="text-center mb-4 fw-bold text-primary">Buat Pengumuman</h1>
 
-    <form action="{{ route('admin.pengumuman.create') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('pengumuman.create') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <!-- Judul Pengumuman -->
