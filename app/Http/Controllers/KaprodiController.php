@@ -40,13 +40,13 @@ class KaprodiController extends Controller
     }
 
     public function showAcc(){
-        $judulTAs = JudulTA::where('status', 'disetuujui')->get();
+        $judulTAs = JudulTA::where('status', 'disetujui')->get();
         return view('kaprodi.judulTA.readAcc', compact('judulTAs'));
     }
 
     public function showTolak(){
-        $judulTAs = JudulTA::where('status', 'ditolak')->get();
-        return view('kaprodi.judulTA.readTolak', compact('judulTAs'));
+        $judulTolak = JudulTA::where('status', 'ditolak')->get();
+        return view('kaprodi.judulTA.crud-JudulTA.readTolak', compact('judulTolak'));
     }
 
     /**
@@ -145,5 +145,37 @@ class KaprodiController extends Controller
         ])->get();
 
         return view('kaprodi.sidang.read', compact('jadwalSidangs'));
+    }
+
+    /**
+     * Mendapatkan judul-judul yang mirip berdasarkan id judul
+     */
+    public function getSimilarJudul($id)
+    {
+        $judul = JudulTA::findOrFail($id);
+        $judulText = $judul->judul;
+
+        // Pisahkan kata-kata dari judul, hapus kata-kata pendek (<= 3 huruf)
+        $keywords = array_filter(preg_split('/\s+/', strtolower($judulText)), function ($word) {
+            return strlen($word) > 3;
+        });
+
+        // Cari judul lain yang mengandung salah satu kata kunci
+        $similarJuduls = JudulTA::where('id', '!=', $id)
+            ->where(function ($query) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $query->orWhere('judul', 'LIKE', '%' . $keyword . '%');
+                }
+            })
+            ->get();
+
+        // Siapkan data untuk response
+        $data = [
+            'nama_pengaju' => $judul->mahasiswa->nama ?? 'N/A',
+            'judul_ta' => $judulText,
+            'similar_juduls' => $similarJuduls->pluck('judul'),
+        ];
+
+        return response()->json($data);
     }
 }
