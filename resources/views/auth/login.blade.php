@@ -5,13 +5,13 @@
         <div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
             <div class="row w-100 justify-content-center">
                 <div class="col-md-6 col-lg-5">
-                    <div class="card shadow-lg border-0 rounded-4">
-                        <div class="card-header bg-primary text-white text-center rounded-top-4">
-                            <h3 class="mb-0">Login</h3>
+                    <div class="card shadow-lg border-0 rounded-4 animate__animated animate__fadeIn">
+                        <div class="card-header bg-gradient text-white text-center rounded-top-4" style="background: linear-gradient(45deg, #1a237e, #0d47a1);">
+                            <h3 class="mb-0 fw-bold">Welcome Back!</h3>
                         </div>
                         <div class="card-body p-4">
                             @if ($errors->any())
-                                <div class="alert alert-danger">
+                                <div class="alert alert-danger animate__animated animate__shakeX">
                                     <ul class="mb-0">
                                         @foreach ($errors->all() as $error)
                                             <li>- {{ $error }}</li>
@@ -21,33 +21,37 @@
                             @endif
                             <form method="POST" action="{{ route('login') }}">
                                 @csrf
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                                        autofocus class="form-control form-control-lg" placeholder="Enter your email" />
+                                <div class="mb-4">
+                                    <label for="email" class="form-label fw-semibold">Email Address</label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                                        <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                                            autofocus class="form-control" placeholder="Enter your email" />
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <div class="input-group">
+                                <div class="mb-4">
+                                    <label for="password" class="form-label fw-semibold">Password</label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
                                         <input id="password" type="password" name="password" required
-                                            class="form-control form-control-lg" placeholder="Enter your password" />
-                                        <button class="btn btn-outline-secondary" type="button"
+                                            class="form-control" placeholder="Enter your password" />
+                                        <button class="btn btn-light border" type="button"
                                             onclick="togglePassword('password', this)">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
                                 </div>
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary btn-lg">
-                                        Login
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg fw-bold" style="background: linear-gradient(45deg, #1a237e, #0d47a1);">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
                                     </button>
                                 </div>
                             </form>
                         </div>
-                        <div class="card-footer text-center bg-white border-0 rounded-bottom-4">
+                        <div class="card-footer text-center bg-white border-0 rounded-bottom-4 py-4">
                             <p class="mb-0">
-                                Don't have an account?
-                                <a href="{{ route('register') }}" class="text-decoration-none">Register here</a>
+                                New to our platform? 
+                                <a href="{{ route('register') }}" class="text-decoration-none fw-bold">Create an account</a>
                             </p>
                         </div>
                     </div>
@@ -72,5 +76,8 @@
             }
         }
     </script>
+
+    {{-- Add animate.css CDN if not already included --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
 @endsection

@@ -19,12 +19,12 @@ use App\Models\JudulTA;
 use App\Models\TugasAkhir;
 
 // Homepage
-// Route::get('/', function () {
-//     return view('home.homepage');
-// });
 Route::get('/', function () {
     return view('home.homepage');
 });
+// Route::get('/', function () {
+//     return view('home.homepage');
+// });
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -66,7 +66,9 @@ Route::prefix('ketua-jurusan')->group(function () {
         Route::get('/', [KajurController::class, 'index'])->name('kajur.dashboard');
 
         // Tugas Akhir
-        Route::get('/judulTA/JudulTA', [KajurController::class, 'showAccJudulTA'])->name('kajur.judul.page');
+        Route::get('/judulTA/JudulTA', [KajurController::class, 'showJudulTA'])->name('kajur.judul.page');
+        Route::get('/judulTA/acc', [KajurController::class, 'showAcc'])->name('kajur.judul.acc');
+        Route::get('/judulTA/tolak', [KajurController::class, 'showTolak'])->name('kajur.judul.tolak');
 
         // Pengumuman
         Route::get('/pengumuman', [KajurController::class, 'showPengumuman'])->name('kajurpengumuman.page');

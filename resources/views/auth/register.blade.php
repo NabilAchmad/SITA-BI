@@ -5,9 +5,9 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-6 col-lg-5">
-                    <div class="card shadow-lg border-0 rounded-4 transform-hover" style="backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95);">
+                    <div class="card shadow-lg border-0 rounded-4 transform-hover" style="backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.92);">
                         <div class="card-header bg-transparent border-0 text-center py-4">
-                            <h4 class="mb-0 fw-bold text-primary">Register Account</h4>
+                            <h4 class="mb-0 fw-bold text-primary animate-text">Register Account</h4>
                         </div>
                         <div class="card-body p-4">
                             @if ($errors->any())
@@ -24,24 +24,24 @@
                                 <div class="mb-3 floating-label">
                                     <label for="name" class="form-label">Name</label>
                                     <input id="name" type="text" name="name" value="{{ old('name') }}" required
-                                        autofocus class="form-control form-control-lg rounded-3 border-0 shadow-sm" placeholder="Enter your name" />
+                                        autofocus class="form-control form-control-lg rounded-3 border-0 shadow-sm input-hover" placeholder="Enter your name" />
                                 </div>
                                 <div class="mb-3 floating-label">
                                     <label for="email" class="form-label">Email</label>
                                     <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                                        class="form-control form-control-lg rounded-3 border-0 shadow-sm" placeholder="Enter your email" />
+                                        class="form-control form-control-lg rounded-3 border-0 shadow-sm input-hover" placeholder="Enter your email" />
                                 </div>
                                 <div class="mb-3 floating-label">
                                     <label for="nim" class="form-label">NIM</label>
                                     <input id="nim" type="number" name="nim" value="{{ old('nim') }}" required
-                                        class="form-control form-control-lg rounded-3 border-0 shadow-sm" placeholder="Enter your NIM" />
+                                        class="form-control form-control-lg rounded-3 border-0 shadow-sm input-hover" placeholder="Enter your NIM" />
                                 </div>
                                 <div class="mb-3 floating-label">
                                     <label for="password" class="form-label">Password</label>
                                     <div class="input-group shadow-sm">
                                         <input id="password" type="password" name="password" required
-                                            class="form-control form-control-lg rounded-start-3 border-0" placeholder="Create password" />
-                                        <button type="button" class="btn btn-light rounded-end-3 border-0"
+                                            class="form-control form-control-lg rounded-start-3 border-0 input-hover" placeholder="Create password" />
+                                        <button type="button" class="btn btn-light rounded-end-3 border-0 btn-hover"
                                             onclick="togglePassword('password', this)">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -51,15 +51,15 @@
                                     <label for="password_confirmation" class="form-label">Confirm Password</label>
                                     <div class="input-group shadow-sm">
                                         <input id="password_confirmation" type="password" name="password_confirmation"
-                                            required class="form-control form-control-lg rounded-start-3 border-0" placeholder="Confirm password" />
-                                        <button type="button" class="btn btn-light rounded-end-3 border-0"
+                                            required class="form-control form-control-lg rounded-start-3 border-0 input-hover" placeholder="Confirm password" />
+                                        <button type="button" class="btn btn-light rounded-end-3 border-0 btn-hover"
                                             onclick="togglePassword('password_confirmation', this)">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary btn-lg rounded-3 shadow-sm">
+                                    <button type="submit" class="btn btn-primary btn-lg rounded-3 shadow-sm pulse-button">
                                         Register
                                     </button>
                                 </div>
@@ -68,7 +68,7 @@
                         <div class="card-footer text-center bg-transparent border-0 py-3">
                             <p class="mb-0">
                                 Already have an account?
-                                <a href="{{ route('login') }}" class="text-primary text-decoration-none fw-bold">Login</a>
+                                <a href="{{ route('login') }}" class="text-primary text-decoration-none fw-bold link-hover">Login</a>
                             </p>
                         </div>
                     </div>
@@ -78,16 +78,93 @@
     </div>
     <style>
     .transform-hover {
-        transition: transform 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .transform-hover:hover {
         transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
     }
     .floating-label input::placeholder {
         color: #adb5bd;
+        transition: opacity 0.3s ease;
     }
     .floating-label input:focus::placeholder {
         opacity: 0;
+    }
+    .input-hover {
+        transition: all 0.3s ease;
+    }
+    .input-hover:focus {
+        transform: scale(1.02);
+    }
+    .btn-hover {
+        transition: all 0.3s ease;
+    }
+    .btn-hover:hover {
+        transform: scale(1.05);
+        background-color: #f8f9fa;
+    }
+    .link-hover {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    .link-hover:after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 0;
+        background-color: var(--bs-primary);
+        transition: width 0.3s ease;
+    }
+    .link-hover:hover:after {
+        width: 100%;
+    }
+    .animate-text {
+        background: linear-gradient(45deg, var(--bs-primary), var(--bs-info));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient 3s ease infinite;
+        background-size: 200% 200%;
+    }
+    @keyframes gradient {
+        0% {background-position: 0% 50%}
+        50% {background-position: 100% 50%}
+        100% {background-position: 0% 50%}
+    }
+    .pulse-button {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    .pulse-button:hover {
+        transform: scale(1.05);
+    }
+    .pulse-button:after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        border-radius: inherit;
+        animation: pulse 2s infinite;
+        opacity: 0;
+    }
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0.4);
+        }
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 10px rgba(var(--bs-primary-rgb), 0);
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(var(--bs-primary-rgb), 0);
+        }
     }
     </style>
 

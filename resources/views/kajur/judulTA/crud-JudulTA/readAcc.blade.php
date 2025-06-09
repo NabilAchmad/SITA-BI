@@ -3,7 +3,7 @@
     <h1 class="display-5 fw-bold"><i class="bi bi-check-circle-fill text-success me-2"></i>Judul Tugas Akhir yang Disetujui</h1>
 </div>
 <div class="container mb-4">
-    <a href="{{ route('kaprodi.judul.page') }}" class="btn btn-secondary btn-lg shadow-sm hover-scale">
+    <a href="{{ route('kajur.judul.page') }}" class="btn btn-secondary btn-lg shadow-sm hover-scale">
         <i class="bi bi-arrow-left"></i> Kembali ke Semua Judul
     </a>
 </div>
