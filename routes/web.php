@@ -54,16 +54,16 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.po
 
 
 // Kajur Routes
-Route::prefix('kajur')->group(function () {
+Route::prefix('ketua-jurusan')->group(function () {
     // General User Login Routes inside kajur prefix (optional, depends on your auth strategy)
     // Route::get('/login', [AuthController::class, 'showLogin'])->name('kajur.login');
     // Route::post('/login', [AuthController::class, 'login'])->name('kajur.login.post');
     Route::get('/login', [AuthController::class, 'showLogin'])->name('kajur.login');
     Route::post('/login', [AuthController::class, 'login'])->name('kajur.login.post');
-    Route::put('/logout', [AuthController::class, 'logout'])->name('kajur.logout');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('kajur.logout');
 
     Route::middleware(['auth'])->group(function () {
-        Route::get('/dashboard', [KajurController::class, 'index'])->name('kajur.dashboard');
+        Route::get('/', [KajurController::class, 'index'])->name('kajur.dashboard');
 
         // Tugas Akhir
         Route::get('/judulTA/JudulTA', [KajurController::class, 'showAccJudulTA'])->name('kajur.judul.page');
@@ -106,12 +106,15 @@ Route::prefix('ketua-prodi')->group(function () {
         // Tugas Akhir
         Route::get('/judulTA/JudulTA', [KaprodiController::class, 'showJudulTA'])->name('kaprodi.judul.page');
         // Route untuk ACC dan Tolak Judul
-        Route::post('/ketua-prodi/judulTA/approve/{id}', [TugasAkhirController::class, 'approve'])->name('kaprodi.judul.approve');
-        Route::post('/ketua-prodi/judulTA/reject/{id}', [TugasAkhirController::class, 'reject'])->name('kaprodi.judul.reject');
+        Route::post('/judulTA/approve/{id}', [TugasAkhirController::class, 'approve'])->name('kaprodi.judul.approve');
+        Route::post('/judulTA/reject/{id}', [TugasAkhirController::class, 'reject'])->name('kaprodi.judul.reject');
         // Route untuk melihat daftar judul yang sudah di-ACC
         Route::get('/judulTA/acc', [KaprodiController::class, 'showAcc'])->name('kaprodi.judul.acc');
         // Route untuk melihat daftar judul yang sudah ditolak
         Route::get('/judulTA/tolak', [KaprodiController::class, 'showTolak'])->name('kaprodi.judul.tolak');
+
+        // Route untuk mendapatkan judul-judul yang mirip berdasarkan id judul
+        Route::get('/judulTA/similar/{id}', [KaprodiController::class, 'getSimilarJudul'])->name('kaprodi.judul.similar');
 
 
         // Nilai sidang

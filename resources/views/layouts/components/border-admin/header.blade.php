@@ -11,7 +11,6 @@
                 <!-- profile -->
                 @include('layouts.components.border-admin.profile')
                 <!-- End Profile -->
-                
             </ul>
 
         </div>

@@ -1,59 +1,84 @@
-<div class="table-responsive">
-    <table class="table table-bordered table-striped text-center align-middle">
-        <thead class="table-light">
+<h1 class="mb-4">Kelola Akun Mahasiswa</h1>
+
+<div class="d-flex justify-content-between mb-3 flex-wrap gap-2">
+    <!-- Input Pencarian -->
+    <input type="text" id="searchInput" class="form-control w-50" placeholder="Cari Nama atau NIM..."
+        onkeyup="filterTable()">
+
+    <!-- Dropdown Sort Prodi -->
+    <select id="sortProdi" class="form-select w-auto" onchange="sortTableByProdi()">
+        <option value="">Urutkan Prodi</option>
+        <option value="asc">Prodi A-Z</option>
+        <option value="desc">Prodi Z-A</option>
+    </select>
+</div>
+
+<table class="table table-bordered table-hover align-middle text-center shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Email</th>
+            <th>NIM</th>
+            <th>Program Studi</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse ($mahasiswa as $index => $mhs)
             <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>NIM</th>
-                <th>Program Studi</th>
-                <th>Aksi</th>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $mhs->user->name }}</td>
+                <td>{{ $mhs->user->email }}</td>
+                <td>{{ $mhs->nim }}</td>
+                <td>{{ $mhs->prodi }}</td>
+                <td>
+                    <a class="btn btn-warning btn-sm" href="{{ route('akun-mahasiswa.edit', $mhs->id) }}">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @php
-                $no = ($mahasiswa->currentPage() - 1) * $mahasiswa->perPage() + 1;
-            @endphp
-            @forelse ($mahasiswa as $mhs)
-                <tr>
-                    <td>{{ $no++ }}</td>
-                    <td class="text-start">{{ $mhs->user->name }}</td>
-                    <td>{{ $mhs->user->email }}</td>
-                    <td>{{ $mhs->nim }}</td>
-                    <td>
-                        @if ($mhs->prodi === 'd4')
-                            D4 Bahasa Inggris
-                        @elseif ($mhs->prodi === 'd3')
-                            D3 Bahasa Inggris
-                        @else
-                            {{ $mhs->prodi }}
-                        @endif
-                    </td>
-                    <td>
-                        <button class="btn-edit-mahasiswa btn btn-warning btn-xs me-1" data-id="{{ $mhs->id }}"
-                            data-url="{{ url('admin/kelola-akun/mahasiswa/update/' . $mhs->id) }}"
-                            data-nama="{{ $mhs->user->name }}" data-email="{{ $mhs->user->email }}"
-                            data-nim="{{ $mhs->nim }}" data-prodi="{{ $mhs->prodi }}" data-bs-toggle="modal"
-                            data-bs-target="#editAkunMahasiswaModal">
-                            <i class="bi bi-pencil-square"></i> Edit
-                        </button>
-                        <button class="btn btn-info btn-xs" data-bs-toggle="modal"
-                            data-bs-target="#detailMahasiswaModal{{ $mhs->id }}">
-                            <i class="bi bi-info-circle"></i> Detail
-                        </button>
+        @empty
+            <tr>
+                <td colspan="5">Tidak ada data mahasiswa.</td>
+            </tr>
+        @endforelse
+    </tbody>
+</table>
 
-                        @include('admin.kelola-akun.mahasiswa.modal.modal-detail', ['mhs' => $mhs])
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-muted">Data tidak ditemukan.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+<script>
+    function filterTable() {
+        const input = document.getElementById("searchInput").value.toLowerCase();
+        const rows = document.querySelectorAll("table tbody tr");
 
-<div class="mt-3">
-    {{ $mahasiswa->appends(request()->query())->links() }}
-</div>
+        rows.forEach(row => {
+            const name = row.cells[1]?.textContent.toLowerCase() || "";
+            const nim = row.cells[3]?.textContent.toLowerCase() || "";
+
+            if (name.includes(input) || nim.includes(input)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+
+    function sortTableByProdi() {
+        const table = document.querySelector("table tbody");
+        const rows = Array.from(table.rows);
+        const direction = document.getElementById("sortProdi").value;
+
+        if (direction === "") return;
+
+        rows.sort((a, b) => {
+            const prodiA = a.cells[4].textContent.trim().toLowerCase();
+            const prodiB = b.cells[4].textContent.trim().toLowerCase();
+
+            if (prodiA < prodiB) return direction === "asc" ? -1 : 1;
+            if (prodiA > prodiB) return direction === "asc" ? 1 : -1;
+            return 0;
+        });
+
+        rows.forEach(row => table.appendChild(row));
+    }
+</script>
