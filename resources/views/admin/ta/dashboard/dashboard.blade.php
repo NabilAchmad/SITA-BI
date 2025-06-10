@@ -8,18 +8,51 @@
     {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="fw-bold mb-1 text-primary"><i class="bi bi-mortarboard-fill me-2"></i> Dashboard Sidang Mahasiswa</h1>
+            <h1 class="fw-bold mb-1 text-primary"><i class="bi bi-mortarboard-fill me-2"></i> Dashboard Tugas Akhir Mahasiswa</h1>
             <p class="text-muted mb-0">Lihat daftar mahasiswa yang sidang dan detail laporan kemajuan tugas akhirnya.</p>
         </div>
     </div>
 
+    {{-- Tabs Program Studi --}}
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}" href="?{{ http_build_query(['search' => request('search')]) }}">All</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}" href="?prodi=D4&{{ http_build_query(['search' => request('search')]) }}">D4</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}" href="?prodi=D3&{{ http_build_query(['search' => request('search')]) }}">D3</a>
+        </li>
+    </ul>
+
+    {{-- Form Cari Nama Mahasiswa --}}
+    <form method="GET" class="mb-3">
+        <div class="input-group">
+            <input type="hidden" name="prodi" value="{{ request('prodi') }}">
+            <input type="text" name="search" class="form-control" placeholder="Cari nama mahasiswa..." value="{{ request('search') }}">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Cari
+            </button>
+        </div>
+    </form>
+
     {{-- List Mahasiswa Sidang --}}
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
-            <h5 class="mb-0 text-primary">Daftar Mahasiswa Sidang</h5>
+            <h5 class="mb-0 text-primary">Daftar Tugas Akhir Mahasiswa</h5>
         </div>
         <div class="card-body">
-            @if(isset($mahasiswaSidang) && $mahasiswaSidang->isEmpty())
+            @php
+                $search = strtolower(request('search', ''));
+                $prodi = request('prodi');
+                $filtered = $mahasiswaSidang->filter(function($mhs) use ($search, $prodi) {
+                    $matchProdi = !$prodi || $mhs->prodi === $prodi;
+                    $matchSearch = !$search || strpos(strtolower($mhs->nama), $search) !== false;
+                    return $matchProdi && $matchSearch;
+                });
+            @endphp
+            @if($filtered->isEmpty())
                 <div class="alert alert-warning">Belum ada mahasiswa yang sidang.</div>
             @else
                 <div class="table-responsive">
@@ -35,7 +68,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($mahasiswaSidang as $mhs)
+                            @foreach ($filtered as $mhs)
                                 <tr>
                                     <td>{{ $mhs->nama }}</td>
                                     <td>{{ $mhs->nim }}</td>

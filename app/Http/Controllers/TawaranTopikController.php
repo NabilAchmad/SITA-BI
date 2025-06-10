@@ -24,7 +24,8 @@ class TawaranTopikController extends Controller
                 'user_id' => Auth::id() ?? 1,
             ]);
 
-            return redirect()->route('tawaran.read')->with('success', 'Tawaran topik berhasil ditambahkan!');
+            // GUNAKAN route('TawaranTopik.read') AGAR SAMA DENGAN YANG DI ROUTES
+            return redirect()->route('TawaranTopik.read')->with('success', 'Tawaran topik berhasil ditambahkan!');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal menyimpan tawaran topik: ' . $e->getMessage());
         }
@@ -32,9 +33,7 @@ class TawaranTopikController extends Controller
 
     public function read(Request $request)
     {
-        // Ambil semua tawaran topik terbaru (tanpa filter user)
         $tawaranTopik = TawaranTopik::orderBy('created_at', 'desc')->paginate(10);
-
         return view('admin.TawaranTopik.crud-TawaranTopik.read', compact('tawaranTopik'));
     }
 
@@ -54,7 +53,8 @@ class TawaranTopikController extends Controller
             'kuota' => $request->kuota,
         ]);
 
-        return redirect()->route('tawaran.read')->with('success', 'Tawaran topik berhasil diperbarui.');
+        // GUNAKAN route('TawaranTopik.read') AGAR SAMA DENGAN YANG DI ROUTES
+        return redirect()->route('TawaranTopik.read')->with('success', 'Tawaran topik berhasil diperbarui.');
     }
 
     public function edit($id)

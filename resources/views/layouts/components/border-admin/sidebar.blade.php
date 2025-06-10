@@ -39,7 +39,7 @@
         <div class="sidebar-content">
             <ul class="nav nav-secondary">
                 <!-- Dashboard -->
-                <li class="nav-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('dosen/dashboard') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}">
                         <i class="fas fa-home"></i>
                         <p>Dashboard</p>
@@ -57,7 +57,7 @@
 
                 <!-- Kelola Akun -->
                 <!-- Sidebar -->
-                <li class="nav-item {{ request()->is('admin/kelola-akun*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('dosen/kelola-akun*') ? 'active' : '' }}">
                     <a href="{{ route('ta.dashboard') }}">
                         <i class="fas fa-users-cog"></i>
                         <p>Tugas Akhir</p>
@@ -66,7 +66,7 @@
 
 
                 <!-- Sidang -->
-                <li class="nav-item {{ request()->is('admin/sidang*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('dosen/sidang*') ? 'active' : '' }}">
                     <a href="{{ route('dashboard-sidang') }}" class="nav-link">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <p>Sidang</p>
@@ -74,7 +74,7 @@
                 </li>
 
                 <!-- Pengumuman -->
-                <li class="nav-item {{ request()->is('admin/pengumuman*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('dosen/pengumuman*') ? 'active' : '' }}">
                     <a href="{{ route('TawaranTopik.read') }}">
                         <i class="fas fa-bullhorn"></i>
                         <p>Tawaran Topik</p>
@@ -82,7 +82,7 @@
                 </li>
 
                 <!-- Bimbingan -->
-                <li class="nav-item {{ request()->is('admin/arsip-ta*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('dosen/arsip-ta*') ? 'active' : '' }}">
                     <a href="{{ route('bimbingan.index') }}">
                         <i class="fas fa-archive"></i>
                         <p>bimbingan</p>

@@ -37,7 +37,7 @@
     <div class="card-body">
         {{-- Tombol Buat --}}
         <div class="mb-3">
-            <button type="button" class="btn btn-primary mb-3"  data-bs-toggle="modal"
+            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
                 data-bs-target="#tambahTawaranTopikModal">
                 <i class="bi bi-plus-lg me-1"></i> Ajukan Tawaran Topik Baru
             </button>
@@ -139,11 +139,10 @@
                 }).then((willDelete) => {
                     if (willDelete) {
                         $.ajax({
-                            url: "/admin/TawaranTopik/" + id +"/soft-delete",
+                            url: "/admin/TawaranTopik/" + id + "/soft-delete",
                             type: "DELETE",
                             headers: {
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                    "content"),
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                             },
                             success: function(res) {
                                 swal({
