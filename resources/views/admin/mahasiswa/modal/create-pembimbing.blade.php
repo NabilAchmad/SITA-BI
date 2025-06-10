@@ -55,35 +55,61 @@
     </div>
 </div>
 
-{{-- Script pencarian realtime dan checkbox limit --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchDosen-{{ $mhs->id }}');
-        const tbody = document.getElementById('tbodyDosen-{{ $mhs->id }}');
-        const checkboxes = tbody.querySelectorAll('input[name="pembimbing[]"]');
+@push('scripts')
+    {{-- Script pencarian realtime dan checkbox limit --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchDosen-{{ $mhs->id }}');
+            const tbody = document.getElementById('tbodyDosen-{{ $mhs->id }}');
+            const checkboxes = tbody.querySelectorAll('input[name="pembimbing[]"]');
 
-        // Realtime filter dosen berdasarkan nama
-        searchInput.addEventListener('input', function() {
-            const filter = this.value.toLowerCase();
-            tbody.querySelectorAll('tr').forEach(function(row) {
-                const nama = row.querySelector('.nama-dosen').textContent.toLowerCase();
-                if (nama.includes(filter)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+            // Realtime filter dosen berdasarkan nama
+            searchInput.addEventListener('input', function() {
+                const filter = this.value.toLowerCase();
+                tbody.querySelectorAll('tr').forEach(function(row) {
+                    const nama = row.querySelector('.nama-dosen').textContent.toLowerCase();
+                    if (nama.includes(filter)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+
+            // Batasi maksimal 2 checkbox yang dipilih
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const checked = tbody.querySelectorAll('input[name="pembimbing[]"]:checked');
+                    if (checked.length > 2) {
+                        this.checked = false;
+                        swal({
+                            title: "Maksimal Hanya 2 Pembimbing!",
+                            text: "{{ session('error') }}",
+                            icon: "error",
+                            buttons: {
+                                confirm: {
+                                    text: "OK",
+                                    className: "btn btn-primary"
+                                }
+                            }
+                        });
+                    }
+                });
             });
         });
-
-        // Batasi maksimal 2 checkbox yang dipilih
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', function() {
-                const checked = tbody.querySelectorAll('input[name="pembimbing[]"]:checked');
-                if (checked.length > 2) {
-                    this.checked = false;
-                    alert('Maksimal hanya bisa memilih 2 dosen pembimbing.');
+        // Cek session success Laravel, lalu tampilkan alert
+        @if (session('success'))
+            swal({
+                title: "Berhasil!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                buttons: {
+                    confirm: {
+                        text: "OK",
+                        className: "btn btn-primary"
+                    }
                 }
             });
-        });
-    });
-</script>
+        @endif
+    </script>
+@endpush
