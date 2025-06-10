@@ -23,18 +23,18 @@ Route::prefix('admin')->group(function () {
     //bimbingan
 
     Route::prefix('bimbingan')->group(function () {
-        // Daftar bimbingan
-        Route::get('/', [BimbinganController::class, 'dashboard'])->name('bimbingan.index');
+    // Daftar bimbingan
+    Route::get('/', [BimbinganController::class, 'dashboard'])->name('bimbingan.index');
 
-        Route::get('/bimbingan/belumMulai', [BimbinganController::class, 'ajukanJadwal'])->name('bimbingan.crud-bimbingan.ajukan.jadwal');
+    Route::get('/belumMulai', [BimbinganController::class, 'ajukanJadwal'])->name('bimbingan.crud-bimbingan.ajukan.jadwal');
 
-        Route::get('/bimbingan/sedangBerlangsung', [BimbinganController::class, 'lihatBimbingan'])->name('bimbingan.crud-bimbingan.lihat.bimbingan');
+    Route::get('/sedangBerlangsung', [BimbinganController::class, 'lihatBimbingan'])->name('bimbingan.crud-bimbingan.lihat.bimbingan');
 
-         // ROUTE UNTUK AJUKAN PERUBAHAN JADWAL (EDIT JADWAL)
-        Route::get('/bimbingan/menungguReview', function () {
+    // ROUTE UNTUK AJUKAN PERUBAHAN JADWAL (EDIT JADWAL)
+    Route::get('/menungguReview', function () {
         return view('admin.bimbingan.crud-bimbingan.ajukan-perubahan');
-        })->name('bimbingan.crud-bimbingan.ajukan.perubahan');
-    });
+    })->name('bimbingan.crud-bimbingan.ajukan.perubahan');
+});
 
     // =========================
     // ROUTE TawaranTopik TOPIK

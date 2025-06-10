@@ -31,14 +31,7 @@
                         'route' => route('bimbingan.crud-bimbingan.lihat.bimbingan'),
                         'btn' => 'Lihat Mahasiswa',
                     ],
-                    [
-                        'title' => 'Ajukan Perubahan Jadwal',
-                        'icon' => 'bi-eye',
-                        'color' => 'warning',
-                        'count' => $waitingReviewCount ?? 0,
-                        'route' => route('bimbingan.crud-bimbingan.ajukan.perubahan'),
-                        'btn' => 'Lihat Detail',
-                    ],
+
                     
                 ];
             @endphp
