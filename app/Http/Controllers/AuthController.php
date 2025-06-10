@@ -74,6 +74,7 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users'],
             'nim' => ['required', 'string', 'max:255', 'unique:mahasiswa'],
+            'prodi' => ['required', 'string', 'max:255'],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
@@ -89,11 +90,11 @@ class AuthController extends Controller
         //     $user->roles()->attach($studentRole->id);
         // }
 
-        // Create Mahasiswa record for the new user with default values for required fields
+        // Create Mahasiswa record for the new user with provided values
         Mahasiswa::create([
             'user_id' => $user->id,
-            'nim' => 'NIM' . $user->id, // placeholder nim, should be unique
-            'prodi' => 'Unknown',       // placeholder prodi
+            'nim' => $request->nim,
+            'prodi' => $request->prodi,
             'angkatan' => date('Y'),    // current year as angkatan
         ]);
 

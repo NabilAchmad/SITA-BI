@@ -59,7 +59,7 @@ class AdminController extends Controller
 
     public function profile()
     {
-        $user = \App\Models\User::findOrFail(21);
+        $user = User::findOrFail(21);
         // dd($user);
         return view('admin.user.views.profile', compact('user'));
     }

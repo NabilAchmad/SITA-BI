@@ -5,13 +5,13 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-6 col-lg-5">
-                    <div class="card shadow-lg border-0 rounded-4 transform-hover" style="backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.92);">
+                    <div class="card shadow-lg border-0 rounded-4 transform-hover">
                         <div class="card-header bg-transparent border-0 text-center py-4">
-                            <h4 class="mb-0 fw-bold text-primary animate-text">Register Account</h4>
+                            <h4 class="mb-0 fw-bold text-primary">Register Account</h4>
                         </div>
                         <div class="card-body p-4">
                             @if ($errors->any())
-                                <div class="alert alert-danger bg-danger-subtle border-0 rounded-3">
+                                <div class="alert alert-danger">
                                     <ul class="mb-0">
                                         @foreach ($errors->all() as $error)
                                             <li>{{ $error }}</li>
@@ -21,45 +21,59 @@
                             @endif
                             <form method="POST" action="{{ route('register.post') }}">
                                 @csrf
-                                <div class="mb-3 floating-label">
+                                <div class="mb-3">
                                     <label for="name" class="form-label">Name</label>
                                     <input id="name" type="text" name="name" value="{{ old('name') }}" required
-                                        autofocus class="form-control form-control-lg rounded-3 border-0 shadow-sm input-hover" placeholder="Enter your name" />
+                                        autofocus class="form-control rounded-3" placeholder="Enter your name" />
                                 </div>
-                                <div class="mb-3 floating-label">
+                                <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
                                     <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                                        class="form-control form-control-lg rounded-3 border-0 shadow-sm input-hover" placeholder="Enter your email" />
+                                        class="form-control rounded-3" placeholder="Enter your email" />
                                 </div>
-                                <div class="mb-3 floating-label">
+                                <div class="mb-3">
                                     <label for="nim" class="form-label">NIM</label>
-                                    <input id="nim" type="number" name="nim" value="{{ old('nim') }}" required
-                                        class="form-control form-control-lg rounded-3 border-0 shadow-sm input-hover" placeholder="Enter your NIM" />
+                                    <input id="nim" type="text" name="nim" inputmode="numeric" value="{{ old('nim') }}" required
+                                        class="form-control rounded-3" placeholder="Enter your NIM" />
                                 </div>
-                                <div class="mb-3 floating-label">
+                                <div class="mb-3">
+                                    <label for="prodi" class="form-label">Prodi</label>
+                                    <select id="prodi" name="prodi" required
+                                        class="form-select rounded-3 @error('prodi') is-invalid @enderror">
+                                        <option value="" hidden>Select your program study</option>
+                                        <option value="d3" {{ old('prodi') == 'd3' ? 'selected' : '' }}>D3 Bahasa Inggris</option>
+                                        <option value="d4" {{ old('prodi') == 'd4' ? 'selected' : '' }}>D4 Bahasa Inggris</option>
+                                    </select>
+                                    @error('prodi')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
                                     <label for="password" class="form-label">Password</label>
-                                    <div class="input-group shadow-sm">
+                                    <div class="input-group">
                                         <input id="password" type="password" name="password" required
-                                            class="form-control form-control-lg rounded-start-3 border-0 input-hover" placeholder="Create password" />
-                                        <button type="button" class="btn btn-light rounded-end-3 border-0 btn-hover"
+                                            class="form-control rounded-start-3" placeholder="Create password" />
+                                        <button type="button" class="btn btn-outline-secondary rounded-end-3"
                                             onclick="togglePassword('password', this)">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
                                 </div>
-                                <div class="mb-4 floating-label">
+                                <div class="mb-4">
                                     <label for="password_confirmation" class="form-label">Confirm Password</label>
-                                    <div class="input-group shadow-sm">
+                                    <div class="input-group">
                                         <input id="password_confirmation" type="password" name="password_confirmation"
-                                            required class="form-control form-control-lg rounded-start-3 border-0 input-hover" placeholder="Confirm password" />
-                                        <button type="button" class="btn btn-light rounded-end-3 border-0 btn-hover"
+                                            required class="form-control rounded-start-3" placeholder="Confirm password" />
+                                        <button type="button" class="btn btn-outline-secondary rounded-end-3"
                                             onclick="togglePassword('password_confirmation', this)">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary btn-lg rounded-3 shadow-sm pulse-button">
+                                    <button type="submit" class="btn btn-primary rounded-3">
                                         Register
                                     </button>
                                 </div>
@@ -68,14 +82,14 @@
                         <div class="card-footer text-center bg-transparent border-0 py-3">
                             <p class="mb-0">
                                 Already have an account?
-                                <a href="{{ route('login') }}" class="text-primary text-decoration-none fw-bold link-hover">Login</a>
+                                <a href="{{ route('login') }}" class="text-primary text-decoration-none">Login</a>
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </div>    </div>
     <style>
     .transform-hover {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
