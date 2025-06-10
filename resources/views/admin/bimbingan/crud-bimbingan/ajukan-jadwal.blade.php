@@ -22,9 +22,11 @@
                         <th>Tanggal</th>
                         <th>Waktu</th>
                         <th>Status</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {{-- Contoh data statis, ganti dengan @foreach jika dari database --}}
                     <tr>
                         <td>1</td>
                         <td>Ahmad Fauzi</td>
@@ -34,36 +36,14 @@
                         <td>Dr. Budi Santoso</td>
                         <td>2025-06-10</td>
                         <td>09:00 - 10:00</td>
+                        <td>ACC</td>
                         <td>
-                            <button class="btn btn-warning btn-sm">Edit Jadwal</button>
+                            <a href="{{ url('admin/bimbingan/menungguReview?id=1') }}" class="btn btn-warning btn-sm">
+                                Edit Jadwal
+                            </a>
                         </td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Siti Aminah</td>
-                        <td>987654321</td>
-                        <td>Teknik Informatika</td>
-                        <td>Analisis Data Penjualan</td>
-                        <td>Dr. Rina Dewi</td>
-                        <td>2025-06-11</td>
-                        <td>10:00 - 11:00</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm">Edit Jadwal</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Rizky Hidayat</td>
-                        <td>192837465</td>
-                        <td>Sistem Informasi</td>
-                        <td>Pengembangan Aplikasi Mobile</td>
-                        <td>Dr. Andi Wijaya</td>
-                        <td>2025-06-12</td>
-                        <td>13:00 - 14:00</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm">Edit Jadwal</button>
-                        </td>
-                    </tr>
+                    {{-- Tambahkan baris lain sesuai kebutuhan --}}
                 </tbody>
             </table>
         </div>

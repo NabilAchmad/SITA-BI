@@ -30,7 +30,10 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/bimbingan/sedangBerlangsung', [BimbinganController::class, 'lihatBimbingan'])->name('bimbingan.crud-bimbingan.lihat.bimbingan');
 
-        Route::get('/bimbingan/menungguReview', [BimbinganController::class, 'ajukanPerubahan'])->name('bimbingan.crud-bimbingan.ajukan.perubahan');
+         // ROUTE UNTUK AJUKAN PERUBAHAN JADWAL (EDIT JADWAL)
+        Route::get('/bimbingan/menungguReview', function () {
+        return view('admin.bimbingan.crud-bimbingan.ajukan-perubahan');
+        })->name('bimbingan.crud-bimbingan.ajukan.perubahan');
     });
 
     // =========================

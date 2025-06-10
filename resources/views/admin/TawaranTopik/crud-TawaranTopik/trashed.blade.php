@@ -1,4 +1,8 @@
 <!-- filepath: d:\SITA-BI\SITA-BI\resources\views\admin\TawaranTopik\crud-TawaranTopik\trashed.blade.php -->
+@extends('layouts.template.main')
+@section('title', 'Tawaran Topik Terhapus')
+@section('content')
+
 <div class="card shadow-sm mb-4">
     <div class="card-header">
         {{-- Breadcrumbs --}}
@@ -8,7 +12,6 @@
                 <li class="breadcrumb-item active" aria-current="page">Tawaran Topik Terhapus</li>
             </ol>
         </nav>
-
         <div class="text-center mt-2">
             <h4 class="card-title text-danger mb-0">Data Tawaran Topik Terhapus</h4>
         </div>
@@ -18,7 +21,7 @@
         {{-- Tombol Hapus Semua --}}
         <div class="mb-3">
             <button type="button" class="btn btn-danger" id="btnHapusSemua"
-                @if ($pengumuman->isEmpty()) disabled @endif data-bs-toggle="modal"
+                @if ($tawaranTopik->isEmpty()) disabled @endif data-bs-toggle="modal"
                 data-bs-target="#modalForceDeleteAll">
                 <i class="bi bi-trash me-1"></i> Hapus Semua Tawaran Topik
             </button>
@@ -30,27 +33,25 @@
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
-                        <th>Judul</th>
+                        <th>Judul Topik</th>
                         <th>Tanggal Dihapus</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($pengumuman as $index => $item)
+                    @forelse ($tawaranTopik as $index => $item)
                         <tr>
-                            <td>{{ ($pengumuman->firstItem() ?? 0) + $index }}</td>
-                            <td>{{ $item->judul }}</td>
-                            <td>{{ $item->deleted_at->format('d M Y, H:i:s') }}</td>
+                            <td>{{ ($tawaranTopik->firstItem() ?? 0) + $index }}</td>
+                            <td>{{ $item->judul_topik }}</td>
+                            <td>{{ $item->deleted_at ? $item->deleted_at->format('d M Y, H:i:s') : '-' }}</td>
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
-                                    <form action="{{ route('TawaranTopik.restore', $item->id) }}" method="POST"
-                                        class="d-inline">
+                                    <form action="{{ route('TawaranTopik.restore', $item->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="btn btn-success btn-sm">
                                             <i class="bi bi-arrow-clockwise"></i> Pulihkan
                                         </button>
                                     </form>
-
                                     <button type="button" class="btn btn-danger btn-sm btn-force-delete"
                                         data-id="{{ $item->id }}" data-bs-toggle="modal"
                                         data-bs-target="#modalHapusPermanen">
@@ -70,7 +71,7 @@
 
         {{-- Pagination --}}
         <div class="d-flex justify-content-end">
-            {{ $pengumuman->links() }}
+            {{ $tawaranTopik->links() }}
         </div>
     </div>
 </div>
@@ -124,6 +125,7 @@
         </form>
     </div>
 </div>
+
 @push('scripts')
     <script>
         $(document).ready(function() {
@@ -160,3 +162,4 @@
         </script>
     @endif
 @endpush
+@endsection

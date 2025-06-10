@@ -60,7 +60,7 @@
                 <li class="nav-item {{ request()->is('admin/kelola-akun*') ? 'active' : '' }}">
                     <a href="{{ route('ta.dashboard') }}">
                         <i class="fas fa-users-cog"></i>
-                        <p>Dashboard Tugas Akhir</p>
+                        <p>Tugas Akhir</p>
                     </a>
                 </li>
 

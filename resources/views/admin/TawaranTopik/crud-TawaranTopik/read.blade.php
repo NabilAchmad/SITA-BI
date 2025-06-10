@@ -3,7 +3,6 @@
 @section('title', 'Daftar Tawaran Topik')
 @section('content')
 
-<!-- CSS Ringan -->
 <style>
     .table td,
     .table th {
@@ -49,7 +48,7 @@
             <input type="hidden" name="audiens" value="{{ request('audiens') }}">
             <div class="col-auto">
                 <input type="text" name="search" class="form-control form-control-sm"
-                    placeholder="Cari nama/topik/deskripsi..." value="{{ request('search') }}">
+                    placeholder="Cari judul/deskripsi..." value="{{ request('search') }}">
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary btn-sm">
@@ -64,33 +63,29 @@
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
-                        <th>Nama Mahasiswa</th>
-                        <th>Topik</th>
+                        <th>Judul Topik</th>
                         <th>Deskripsi</th>
+                        <th>Kuota</th>
                         <th>Tanggal Diajukan</th>
-                        <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($TawaranTopik as $index => $item)
+                    @forelse ($tawaranTopik as $index => $item)
                         <tr>
-                            <td>{{ ($TawaranTopik->firstItem() ?? 0) + $index }}</td>
-                            <td>{{ $item->judul }}</td>
-                            <td>{{ $item->audiens }}</td>
-                            <td class="truncate" title="{{ strip_tags($item->isi) }}">
-                                {{ \Illuminate\Support\Str::limit(strip_tags($item->isi), 100, '...') }}
+                            <td>{{ ($tawaranTopik->firstItem() ?? 0) + $index }}</td>
+                            <td>{{ $item->judul_topik }}</td>
+                            <td class="truncate" title="{{ strip_tags($item->deskripsi) }}">
+                                {{ \Illuminate\Support\Str::limit(strip_tags($item->deskripsi), 100, '...') }}
                             </td>
+                            <td>{{ $item->kuota }}</td>
                             <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y, H:i:s') }}</td>
-                            <td>
-                                <span class="badge bg-warning text-dark">Menunggu Persetujuan</span>
-                            </td>
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
                                     <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#editTawaranTopikModal" data-id="{{ $item->id }}"
-                                        data-judul="{{ $item->judul }}" data-isi="{{ $item->isi }}"
-                                        data-audiens="{{ $item->audiens }}">
+                                        data-judul="{{ $item->judul_topik }}" data-deskripsi="{{ $item->deskripsi }}"
+                                        data-kuota="{{ $item->kuota }}">
                                         Edit
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm btn-hapus"
@@ -102,7 +97,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center">Belum ada tawaran topik.</td>
+                            <td colspan="6" class="text-center">Belum ada tawaran topik.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -111,7 +106,7 @@
 
         {{-- Pagination --}}
         <div class="d-flex justify-content-end">
-            {{ $TawaranTopik->links() }}
+            {{ $tawaranTopik->links() }}
         </div>
     </div>
 </div>
@@ -186,15 +181,15 @@
                 var button = $(event.relatedTarget);
                 var id = button.data('id');
                 var judul = button.data('judul');
-                var isi = button.data('isi');
-                var audiens = button.data('audiens');
+                var deskripsi = button.data('deskripsi');
+                var kuota = button.data('kuota');
 
                 var modal = $(this);
                 modal.find('form').attr('action', '/admin/TawaranTopik/' + id + '/update');
                 modal.find('#edit_id_TawaranTopik').val(id);
-                modal.find('#edit_judul').val(judul);
-                modal.find('#edit_isi').val(isi);
-                modal.find('#edit_audiens').val(audiens);
+                modal.find('#edit_judul_topik').val(judul);
+                modal.find('#edit_deskripsi').val(deskripsi);
+                modal.find('#edit_kuota').val(kuota);
             });
 
             @if (session('success'))
