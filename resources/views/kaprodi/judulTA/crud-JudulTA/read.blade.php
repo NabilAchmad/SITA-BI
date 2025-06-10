@@ -38,7 +38,7 @@
                                 <th scope="col"><i class="bi bi-person-badge me-2"></i>Nama Mahasiswa</th>
                                 <th scope="col"><i class="bi bi-file-earmark-text me-2"></i>Judul Tugas Akhir</th>
                                 <th scope="col"><i class="bi bi-info-circle me-2"></i>Status</th>
-                                <th scope="col"><i class="bi bi-gear me-2"></i>Aksi</th>
+                                {{-- <th scope="col"><i class="bi bi-gear me-2"></i>Aksi</th> --}}
                             </tr>
                         </thead>
                         <tbody id="judulTable">
@@ -67,7 +67,7 @@
                                             <span class="badge status-badge warning"><i class="bi bi-clock-fill me-1"></i>Menunggu</span>
                                         @endif
                                     </td>
-                                    <td>
+                                    {{-- <td>
                                         <div class="btn-group" role="group">
                                             <button class="btn btn-success btn-modern btn-floating" onclick="accJudul({{ $judul->id }})"
                                                 @if($judul->status == 'Disetujui') disabled @endif>
@@ -78,7 +78,7 @@
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
                                         </div>
-                                    </td>
+                                    </td> --}}
                                 </tr>
                             @endforeach
                             <tr id="detail-row" style="display:none;">
@@ -109,6 +109,9 @@
                                             </button>
                                             <button class="btn btn-success btn-modern" id="detail-acc-btn" onclick="accJudulFromDetail()">
                                                 <i class="bi bi-check-lg me-1"></i>ACC
+                                            </button>
+                                            <button class="btn btn-danger btn-modern" id="detail-tolak-btn" onclick="tolakJudulFromDetail()">
+                                                <i class="bi bi-check-lg me-1">Tolak</i>
                                             </button>
                                         </div>
                                     </div>
@@ -392,6 +395,16 @@
                 id = id.replace('row-', '');
                 accJudul(id);
             }
-        </script>
+            function tolakJudulFromDetail() {
+                // Get the id of the current detail shown
+                let id = $('#detail-row').prev('tr').attr('id'); // This gets the previous tr id like "row-123"
+                if (!id) {
+                    alert('ID Judul tidak ditemukan.');
+                    return;
+                }
+                id = id.replace('row-', '');
+                tolakJudul(id);
+            }
+            </script>
     @endsection
 @endsection
