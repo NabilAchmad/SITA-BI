@@ -16,9 +16,7 @@ return new class extends Migration
             $table->foreignId('tugas_akhir_id')->constrained('tugas_akhir');
             $table->foreignId('dosen_id')->constrained('dosen');
             $table->date('tanggal_bimbingan');
-            $table->text('catatan');
             $table->enum('status_bimbingan', ['diajukan', 'disetujui', 'ditolak']);
-            $table->foreignId('file_id')->constrained('files');
             $table->timestamps();
         });
     }

@@ -19,77 +19,70 @@ class TugasAkhir extends Model
         'judul',
         'abstrak',
         'status',
-        'alasan_pembatalan',
         'tanggal_pengajuan',
         'file_path',
+        'similarity_score',
+        'alasan_pembatalan',
+        'alasan_penolakan',
+        'terakhir_dicek',
     ];
 
-    // Relasi ke Mahasiswa
+    /** Relasi ke Mahasiswa */
     public function mahasiswa(): BelongsTo
     {
         return $this->belongsTo(Mahasiswa::class);
     }
 
-    // Relasi ke Dosen Pembimbing/Penguji via peran_dosen_ta
+    /** Relasi ke semua peran dosen TA (pembimbing/penguji) */
     public function peranDosenTa(): HasMany
     {
         return $this->hasMany(PeranDosenTa::class, 'tugas_akhir_id');
     }
 
-    // Relasi ke Bimbingan TA
+    /** Relasi ke dosen pembimbing 1 */
+    public function pembimbing1(): HasOne
+    {
+        return $this->hasOne(PeranDosenTa::class, 'tugas_akhir_id')->where('peran', 'pembimbing1');
+    }
+
+    /** Relasi ke dosen pembimbing 2 */
+    public function pembimbing2(): HasOne
+    {
+        return $this->hasOne(PeranDosenTa::class, 'tugas_akhir_id')->where('peran', 'pembimbing2');
+    }
+
+    /** Relasi ke bimbingan */
     public function bimbingan(): HasMany
     {
         return $this->hasMany(BimbinganTa::class, 'tugas_akhir_id');
     }
 
-    // Relasi ke Dokumen TA (proposal, draft, final)
+    /** Relasi ke dokumen TA */
     public function dokumen(): HasMany
     {
         return $this->hasMany(DokumenTa::class, 'tugas_akhir_id');
     }
 
-    // Relasi ke Revisi TA
+    /** Relasi ke revisi */
     public function revisi(): HasMany
     {
         return $this->hasMany(RevisiTa::class, 'tugas_akhir_id');
     }
 
-    // Relasi ke Sidang TA (bisa juga hasMany jika ada banyak sidang)
+    /** Relasi ke sidang */
     public function sidang(): HasOne
     {
         return $this->hasOne(Sidang::class, 'tugas_akhir_id');
     }
 
-    // Relasi ke Notifikasi TA
+    /** Relasi ke notifikasi TA */
     public function notifikasi(): HasMany
     {
         return $this->hasMany(NotifikasiTa::class, 'tugas_akhir_id');
     }
 
-    public function dosenPembimbing()
-    {
-        return $this->hasMany(PeranDosenTA::class);
-    }
-
-    // relasi banyak ke PeranDosenTA
-    public function peranDosen()
-    {
-        return $this->hasMany(PeranDosenTA::class, 'tugas_akhir_id');
-    }
-
-    // relasi 1 ke PeranDosenTA yang peran pembimbing1
-    public function pembimbing1()
-    {
-        return $this->hasOne(PeranDosenTA::class, 'tugas_akhir_id')->where('peran', 'pembimbing1');
-    }
-
-    // relasi 1 ke PeranDosenTA yang peran pembimbing2
-    public function pembimbing2()
-    {
-        return $this->hasOne(PeranDosenTA::class, 'tugas_akhir_id')->where('peran', 'pembimbing2');
-    }
-
-    public function tawaranTopik()
+    // Jika kamu menambahkan kolom tawaran_topik_id nanti, bisa aktifkan ini kembali
+    public function tawaranTopik(): BelongsTo
     {
         return $this->belongsTo(TawaranTopik::class, 'tawaran_topik_id');
     }

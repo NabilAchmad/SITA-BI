@@ -9,76 +9,130 @@
                 <thead class="table-light">
                     <tr>
                         <th>No</th>
-                        <th>Nama</th>
-                        <th>Email</th>
-                        <th>Dospem 1</th>
-                        <th>Dospem 2</th>
-                        <th>Role</th>
+                        <th>Nama Dosen</th>
+                        <th>Jabatan</th>
+                        <th>Jumlah Bimbingan</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
+                @php
+                    // Ambil status bimbingan terakhir dosen 1 dan dosen 2 (null jika belum ada)
+                    $statusDospem1 = $statusBimbingan[$dospem1->id] ?? null;
+                    $statusDospem2 = $statusBimbingan[$dospem2->id] ?? null;
+                @endphp
+
                 <tbody>
-                    @php $no = ($dosenList->currentPage() - 1) * $dosenList->perPage() + 1; @endphp
+                    @php $no = 1; @endphp
                     @forelse ($dosenList as $dosen)
+                        @php
+                            // Jumlah bimbingan per dosen
+                            $jumlahBimbingan = $bimbinganCount[$dosen->dosen_id] ?? 0;
+
+                            // Default tombol tidak disable
+                            $disabled = false;
+
+                            if ($dosen->peran === 'pembimbing1') {
+                                // Tombol dospem1 disable jika sudah diajukan tapi belum disetujui
+                                if ($statusDospem1 !== null && $statusDospem1 !== 'disetujui') {
+                                    $disabled = true;
+                                }
+                            } elseif ($dosen->peran === 'pembimbing2') {
+                                // Tombol dospem2 disable kalau:
+                                // - dospem1 belum disetujui (belum bisa lanjut ke dospem2)
+                                // - dospem2 sudah diajukan tapi belum disetujui
+                                if (
+                                    $statusDospem1 !== 'disetujui' ||
+                                    ($statusDospem2 !== null && $statusDospem2 !== 'disetujui')
+                                ) {
+                                    $disabled = true;
+                                }
+                            }
+                        @endphp
+
                         <tr>
                             <td>{{ $no++ }}</td>
-                            <td class="text-start">{{ $dosen->user->name }}</td>
-                            <td>{{ $dosen->user->email }}</td>
+                            <td class="text-start">{{ $dosen->dosen->user->name ?? '-' }}</td>
                             <td>
-                                @php $count1 = $dosen->mahasiswaDospem1->count() ?? 0; @endphp
-                                {!! $count1
-                                    ? '<span class="badge bg-info">' . $count1 . ' Mahasiswa</span>'
-                                    : '<span class="text-muted">-</span>' !!}
+                                @if ($dosen->peran === 'pembimbing1')
+                                    <span class="badge bg-info">Dosen Pembimbing 1</span>
+                                @elseif ($dosen->peran === 'pembimbing2')
+                                    <span class="badge bg-secondary">Dosen Pembimbing 2</span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
                             </td>
+                            <td>{{ $jumlahBimbingan }}</td>
                             <td>
-                                @php $count2 = $dosen->mahasiswaDospem2->count() ?? 0; @endphp
-                                {!! $count2
-                                    ? '<span class="badge bg-secondary">' . $count2 . ' Mahasiswa</span>'
-                                    : '<span class="text-muted">-</span>' !!}
-                            </td>
-                            <td>
-                                @foreach ($dosen->user->roles as $role)
-                                    <span class="badge bg-primary">{{ ucfirst($role->nama_role) }}</span>
-                                @endforeach
-                            </td>
-                            <td>
-                                {{-- Form pengajuan dospem 1 --}}
-                                <form action="{{ route('bimbingan.store') }}" method="POST" class="mb-1">
-                                    @csrf
-                                    <input type="hidden" name="dosen_id" value="{{ $dosen->id }}">
-                                    <input type="hidden" name="tipe_dospem" value="1">
-                                    <button class="btn btn-success btn-sm w-100" type="submit"
-                                        {{ isset($dospem1) ? 'disabled' : '' }}>
-                                        <i class="bi bi-calendar-plus"></i> Ajukan Dospem 1
-                                    </button>
-                                </form>
-
-                                {{-- Form pengajuan dospem 2 --}}
-                                <form action="{{ route('bimbingan.store') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="dosen_id" value="{{ $dosen->id }}">
-                                    <input type="hidden" name="tipe_dospem" value="2">
-                                    <button class="btn btn-secondary btn-sm w-100" type="submit"
-                                        {{ isset($dospem2) ? 'disabled' : '' }}>
-                                        <i class="bi bi-calendar-plus"></i> Ajukan Dospem 2
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-primary btn-sm w-100" data-bs-toggle="modal"
+                                    data-bs-target="#modalAjukanJadwal" data-dosenid="{{ $dosen->dosen_id }}"
+                                    data-peran="{{ $dosen->peran }}" {{ $disabled ? 'disabled' : '' }}>
+                                    <i class="bi bi-calendar-plus"></i> Ajukan Jadwal {{ ucfirst($dosen->peran) }}
+                                </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-muted">Data tidak ditemukan.</td>
+                            <td colspan="5" class="text-muted">Data tidak ditemukan.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-
-        <div class="mt-3">
-            {{ $dosenList->withQueryString()->links() }}
-        </div>
     </div>
 </div>
+
+@include('mahasiswa.bimbingan.modal.ajukan')
+
+@push('scripts')
+    <script>
+        const modalAjukan = document.getElementById('modalAjukanJadwal');
+
+        modalAjukan.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const dosenId = button.getAttribute('data-dosenid');
+            const peran = button.getAttribute('data-peran');
+
+            modalAjukan.querySelector('#modal_dosen_id').value = dosenId;
+            modalAjukan.querySelector('#modal_tipe_dospem').value = peran === 'pembimbing1' ? 1 : 2;
+            modalAjukan.querySelector('#modal_label_peran').textContent = peran.replace('pembimbing',
+                'Dosen Pembimbing ');
+        });
+    </script>
+
+    {{-- Tempatkan di bagian paling bawah atau di section scripts --}}
+    @if (session('success'))
+        <script>
+            swal({
+                title: "Jadwal Berhasil Diajukan!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                buttons: {
+                    confirm: {
+                        text: "OK",
+                        className: "btn btn-primary"
+                    }
+                }
+            });
+        </script>
+    @endif
+
+    @if ($errors->has('error'))
+        <script>
+            swal({
+                title: "Gagal!",
+                text: "{{ $errors->first('error') }}",
+                icon: "error",
+                buttons: {
+                    confirm: {
+                        text: "OK",
+                        className: "btn btn-danger"
+                    }
+                }
+            });
+        </script>
+    @endif
+
+@endpush
 
 {{-- Validasi error --}}
 @if ($errors->any())

@@ -45,7 +45,7 @@ Route::prefix('/mahasiswa')->group(function () {
         Route::get('/', [BimbinganController::class, 'dashboard'])->name('dashboard.bimbingan');
 
         Route::get('/ajukan-jadwal', [BimbinganController::class, 'ajukanJadwal'])->name('bimbingan.ajukanJadwal');
-        Route::get('/store', [BimbinganController::class, 'storeJadwal'])->name('simpan.jadwal');
+        Route::post('/store', [BimbinganController::class, 'store'])->name('simpan.jadwal');
 
         Route::get('/jadwal-bimbingan', [BimbinganController::class, 'jadwalBimbingan'])->name('jadwal.bimbingan');
 

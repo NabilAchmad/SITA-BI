@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Dosen;
+use App\Models\TugasAkhir;
 use App\Models\PeranDosenTa;
+use App\Models\BimbinganTA;
+use App\Models\CatatanBimbingan;
+use Illuminate\Http\Request;
 
 class BimbinganController extends Controller
 {
@@ -22,63 +25,124 @@ class BimbinganController extends Controller
 
     public function ajukanJadwal()
     {
-        $mahasiswa = $this->assumedMahasiswaId()->mahasiswa;
+        // Ambil user yang login, diasumsikan role-nya mahasiswa
+        $user =  $this->assumedMahasiswaId();
+        $mahasiswa = $user->mahasiswa;
 
-        $tugasAkhir = $mahasiswa->tugasAkhir()
-            ->with(['pembimbing1.dosen.user', 'pembimbing2.dosen.user'])
-            ->first();
+        if (!$mahasiswa) {
+            return abort(404, 'Data mahasiswa tidak ditemukan.');
+        }
 
-        $dospem1 = $tugasAkhir?->pembimbing1?->dosen;
-        $dospem2 = $tugasAkhir?->pembimbing2?->dosen;
+        // Ambil Tugas Akhir dengan relasi peran dosen dan user dosen
+        $tugasAkhir = $mahasiswa->tugasAkhir()->with('peranDosenTa.dosen.user')->first();
 
-        $dosenList = PeranDosenTa::with(['user', 'pembimbing1', 'pembimbing2'])
-            ->paginate(10);
+        if (!$tugasAkhir) {
+            return redirect()->back()->with('error', 'Data tugas akhir belum tersedia.');
+        }
 
-        return view('mahasiswa.bimbingan.views.ajukanBimbingan', compact('dospem1', 'dospem2', 'dosenList'));
+        // Ambil dospem 1 dan dospem 2 berdasarkan peran
+        $dospem1 = $tugasAkhir->peranDosenTa->firstWhere('peran', 'pembimbing1')?->dosen;
+        $dospem2 = $tugasAkhir->peranDosenTa->firstWhere('peran', 'pembimbing2')?->dosen;
+
+        // Ambil daftar dosen pembimbing dari peran_dosen_ta
+        $dosenList = $tugasAkhir->peranDosenTa; // sudah include dosen dan user
+
+        // Hitung jumlah bimbingan dengan setiap dosen
+        $bimbinganCount = [];
+
+        foreach ($dosenList as $peran) {
+            if ($peran->dosen_id) {
+                $jumlah = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
+                    ->where('dosen_id', $peran->dosen_id)
+                    ->where('status_bimbingan', 'selesai') // hanya hitung yang sudah terjadwal
+                    ->count();
+
+                $bimbinganCount[$peran->dosen_id] = $jumlah;
+            }
+        }
+
+        $statusBimbingan = [];
+        foreach ($dosenList as $peran) {
+            $lastBimbingan = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
+                ->where('dosen_id', $peran->dosen_id)
+                ->orderByDesc('created_at')
+                ->first();
+
+            $statusBimbingan[$peran->dosen_id] = $lastBimbingan?->status_bimbingan; // bisa null jika belum ada
+        }
+
+        return view('mahasiswa.bimbingan.views.ajukanBimbingan', compact(
+            'tugasAkhir',
+            'dosenList',
+            'dospem1',
+            'dospem2',
+            'bimbinganCount',
+            'statusBimbingan'
+        ));
     }
 
-    public function storeJadwal(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
-            'tanggal' => 'required|date',
-            'waktu' => 'required',
-            'dospem_ke' => 'required|in:1,2',
+            'dosen_id' => 'required|exists:dosen,id',
+            'tipe_dospem' => 'required|in:1,2',
+            'tanggal_jadwal' => 'required|date',
+            'catatan' => 'nullable|string',
         ]);
 
         $user = $this->assumedMahasiswaId();
         $mahasiswa = $user->mahasiswa;
-        $ta = $mahasiswa->tugasAkhir;
+        $tugasAkhir = $mahasiswa->tugasAkhir;
 
-        if (!$ta) {
-            return back()->with('error', 'Tugas Akhir tidak ditemukan.');
+        if (!$tugasAkhir) {
+            return back()->withErrors(['error' => 'Tugas Akhir belum ada.']);
         }
 
-        if ($request->dospem_ke == 2) {
-            // pastikan bimbingan dospem 1 sudah acc
-            $accDospem1 = $ta->bimbingan()
-                ->where('dospem_ke', 1)
-                ->where('status', 'acc')
-                ->exists();
-
-            if (!$accDospem1) {
-                return back()->with('error', 'Anda belum menyelesaikan bimbingan dengan dospem 1.');
-            }
-        }
-
-        $ta->bimbingan()->create([
-            'tanggal' => $request->tanggal,
-            'waktu' => $request->waktu,
-            'dospem_ke' => $request->dospem_ke,
-            'status' => 'menunggu',
+        $bimbingan = BimbinganTa::create([
+            'tugas_akhir_id' => $tugasAkhir->id,
+            'dosen_id' => $request->dosen_id,
+            'tanggal_bimbingan' => $request->tanggal_jadwal,
+            'catatan' => '-', // kolom ini bisa tetap ada kosong / tanda strip
+            'status_bimbingan' => 'diajukan',
         ]);
 
-        return back()->with('success', 'Jadwal bimbingan berhasil diajukan.');
+        if ($request->catatan) {
+            CatatanBimbingan::create([
+                'bimbingan_ta_id' => $bimbingan->id,
+                'author_type' => 'mahasiswa',
+                'author_id' => $mahasiswa->id,
+                'catatan' => $request->catatan,
+            ]);
+        }
+
+        return redirect()->route('bimbingan.ajukanJadwal')->with('success', 'Jadwal bimbingan berhasil diajukan.');
     }
 
     public function jadwalBimbingan()
     {
-        // Logika untuk menampilkan jadwal bimbingan
-        return view('mahasiswa.bimbingan.views.lihatJadwal');
+        // Ambil user yang login (mahasiswa)
+        $user = $this->assumedMahasiswaId();
+        $mahasiswa = $user->mahasiswa;
+
+        if (!$mahasiswa) {
+            return abort(404, 'Data mahasiswa tidak ditemukan.');
+        }
+
+        // Ambil tugas akhir mahasiswa beserta jadwal bimbingan dengan relasi dosen dan user dosen
+        $tugasAkhir = $mahasiswa->tugasAkhir;
+
+        if (!$tugasAkhir) {
+            return view('mahasiswa.bimbingan.views.lihatJadwal', ['jadwals' => []])
+                ->with('info', 'Anda belum memiliki data tugas akhir.');
+        }
+
+        // Ambil jadwal bimbingan beserta data dosen dan user dosen
+        $jadwals = $tugasAkhir->bimbingan()
+            ->with(['dosen.user', 'catatanBimbingan'])
+            ->orderBy('tanggal_bimbingan', 'desc')
+            ->get();
+
+        return view('mahasiswa.bimbingan.views.lihatJadwal', compact('jadwals'));
     }
 
     public function ubahJadwal()

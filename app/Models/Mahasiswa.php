@@ -34,11 +34,11 @@ class Mahasiswa extends Model
 
     public function pembimbing1()
     {
-        return $this->tugasAkhir()->with('pembimbing1Dosen')->first()->pembimbing1Dosen ?? null;
+        return $this->tugasAkhir()->with('pembimbing1')->first()->pembimbing1 ?? null;
     }
 
     public function pembimbing2()
     {
-        return $this->tugasAkhir()->with('pembimbing2Dosen')->first()->pembimbing2Dosen ?? null;
+        return $this->tugasAkhir()->with('pembimbing2')->first()->pembimbing2 ?? null;
     }
 }
