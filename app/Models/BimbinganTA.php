@@ -16,6 +16,7 @@ class BimbinganTA extends Model
         'tugas_akhir_id',
         'dosen_id',
         'tanggal_bimbingan',
+        'jam_bimbingan', // pastikan ini ad
         'catatan',
         'status_bimbingan',
         'file_id',

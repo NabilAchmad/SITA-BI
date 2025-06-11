@@ -49,7 +49,7 @@ Route::prefix('/mahasiswa')->group(function () {
 
         Route::get('/jadwal-bimbingan', [BimbinganController::class, 'jadwalBimbingan'])->name('jadwal.bimbingan');
 
-        Route::get('/ubah-jadwal', [BimbinganController::class, 'ubahJadwal'])->name('ubah.jadwal');
+        Route::put('/bimbingan/jadwal/{id}', [BimbinganController::class, 'ubahJadwal'])->name('bimbingan.updateJadwal');
 
         Route::get('/revisi', function () {
             return view('mahasiswa.Bimbingan.views.revisiTA');

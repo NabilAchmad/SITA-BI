@@ -10,69 +10,56 @@
                     <tr>
                         <th>No</th>
                         <th>Nama Dosen</th>
-                        <th>Jabatan</th>
+                        <th>Peran</th>
                         <th>Jumlah Bimbingan</th>
+                        <th>Status Terakhir</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
-                @php
-                    // Ambil status bimbingan terakhir dosen 1 dan dosen 2 (null jika belum ada)
-                    $statusDospem1 = $statusBimbingan[$dospem1->id] ?? null;
-                    $statusDospem2 = $statusBimbingan[$dospem2->id] ?? null;
-                @endphp
-
                 <tbody>
                     @php $no = 1; @endphp
                     @forelse ($dosenList as $dosen)
                         @php
-                            // Jumlah bimbingan per dosen
-                            $jumlahBimbingan = $bimbinganCount[$dosen->dosen_id] ?? 0;
-
-                            // Default tombol tidak disable
-                            $disabled = false;
-
-                            if ($dosen->peran === 'pembimbing1') {
-                                // Tombol dospem1 disable jika sudah diajukan tapi belum disetujui
-                                if ($statusDospem1 !== null && $statusDospem1 !== 'disetujui') {
-                                    $disabled = true;
-                                }
-                            } elseif ($dosen->peran === 'pembimbing2') {
-                                // Tombol dospem2 disable kalau:
-                                // - dospem1 belum disetujui (belum bisa lanjut ke dospem2)
-                                // - dospem2 sudah diajukan tapi belum disetujui
-                                if (
-                                    $statusDospem1 !== 'disetujui' ||
-                                    ($statusDospem2 !== null && $statusDospem2 !== 'disetujui')
-                                ) {
-                                    $disabled = true;
-                                }
-                            }
+                            $dosenId = $dosen->dosen_id;
+                            $jumlahBimbingan = $bimbinganCount[$dosenId] ?? 0;
+                            $status = $statusBimbingan[$dosenId] ?? '-';
+                            $disabled = $disabledPengajuan[$dosenId] ?? true;
                         @endphp
-
                         <tr>
                             <td>{{ $no++ }}</td>
                             <td class="text-start">{{ $dosen->dosen->user->name ?? '-' }}</td>
                             <td>
                                 @if ($dosen->peran === 'pembimbing1')
-                                    <span class="badge bg-info">Dosen Pembimbing 1</span>
+                                    <span class="badge bg-info">Pembimbing 1</span>
                                 @elseif ($dosen->peran === 'pembimbing2')
-                                    <span class="badge bg-secondary">Dosen Pembimbing 2</span>
+                                    <span class="badge bg-secondary">Pembimbing 2</span>
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
                             </td>
-                            <td>{{ $jumlahBimbingan }}</td>
+                            <td>{{ $jumlahBimbingan }} / 9</td>
+                            <td>
+                                @if ($status === 'selesai')
+                                    <span class="badge bg-success">Selesai</span>
+                                @elseif ($status === 'diajukan')
+                                    <span class="badge bg-warning text-dark">Menunggu</span>
+                                @elseif ($status === 'ditolak')
+                                    <span class="badge bg-danger">Ditolak</span>
+                                @else
+                                    <span class="text-muted">Belum Ada</span>
+                                @endif
+                            </td>
                             <td>
                                 <button type="button" class="btn btn-primary btn-sm w-100" data-bs-toggle="modal"
                                     data-bs-target="#modalAjukanJadwal" data-dosenid="{{ $dosen->dosen_id }}"
                                     data-peran="{{ $dosen->peran }}" {{ $disabled ? 'disabled' : '' }}>
-                                    <i class="bi bi-calendar-plus"></i> Ajukan Jadwal {{ ucfirst($dosen->peran) }}
+                                    <i class="bi bi-calendar-plus"></i> Ajukan Jadwal
                                 </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-muted">Data tidak ditemukan.</td>
+                            <td colspan="6" class="text-muted">Data tidak ditemukan.</td>
                         </tr>
                     @endforelse
                 </tbody>
