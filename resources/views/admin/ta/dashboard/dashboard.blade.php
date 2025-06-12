@@ -16,13 +16,16 @@
     {{-- Tabs Program Studi --}}
     <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
-            <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}" href="?{{ http_build_query(['search' => request('search')]) }}">All</a>
+            <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
+                href="?{{ http_build_query(['search' => request('search')]) }}">All</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}" href="?prodi=D4&{{ http_build_query(['search' => request('search')]) }}">D4</a>
+            <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}"
+                href="?prodi=D4&{{ http_build_query(['search' => request('search')]) }}">D4</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}" href="?prodi=D3&{{ http_build_query(['search' => request('search')]) }}">D3</a>
+            <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}"
+                href="?prodi=D3&{{ http_build_query(['search' => request('search')]) }}">D3</a>
         </li>
     </ul>
 
@@ -116,9 +119,9 @@
                                                                         @endif
                                                                     </td>
                                                                     <td>
-                                                                        <form method="POST" action="{{ route('ta.acc', $item->id) }}" class="d-inline">
+                                                                        <form method="POST" action="{{ route('ta.acc', $item->id) }}" class="d-inline acc-form">
                                                                             @csrf
-                                                                            <button class="btn btn-success btn-sm"
+                                                                            <button type="button" class="btn btn-success btn-sm btn-acc"
                                                                                 @if($item->status_revisi != 'Menunggu ACC') disabled @endif>
                                                                                 ACC
                                                                             </button>
@@ -130,6 +133,11 @@
                                                                             @if($item->status_revisi != 'Menunggu ACC') disabled @endif>
                                                                             Revisi
                                                                         </button>
+                                                                        @if(!empty($item->file_pdf))
+                                                                            <a href="{{ asset('storage/' . $item->file_pdf) }}" target="_blank" class="btn btn-secondary btn-sm ms-1">
+                                                                                <i class="bi bi-download"></i> Unduh File
+                                                                            </a>
+                                                                        @endif
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
@@ -156,7 +164,10 @@
 @endsection
 
 @push('scripts')
+<!-- SweetAlert2 CDN jika belum ada di layout -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    // Modal revisi
     const modal = document.getElementById('revisiTAModal');
     if(modal){
         modal.addEventListener('show.bs.modal', function (event) {
@@ -165,5 +176,66 @@
             modal.querySelector('#ta_id_input').value = id;
         });
     }
+
+    // ACC dengan SweetAlert konfirmasi dan langsung tampil notif ACC tanpa reload
+    $(document).on('click', '.btn-acc', function(e) {
+        e.preventDefault();
+        let form = $(this).closest('form');
+        Swal.fire({
+            title: 'ACC Revisi?',
+            text: "Apakah Anda yakin ingin ACC revisi ini?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, ACC!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // AJAX submit agar tidak reload
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function(res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Revisi telah di-ACC.',
+                            confirmButtonColor: '#198754'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: 'Terjadi kesalahan saat ACC revisi.',
+                            confirmButtonColor: '#d33'
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    // Notifikasi setelah ACC berhasil (jika pakai redirect biasa)
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            confirmButtonColor: '#198754'
+        });
+    @endif
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            confirmButtonColor: '#d33'
+        });
+    @endif
 </script>
 @endpush

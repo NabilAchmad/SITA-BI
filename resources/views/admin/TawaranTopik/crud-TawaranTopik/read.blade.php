@@ -117,6 +117,7 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            // Hapus
             $(document).on("click", ".btn-hapus", function(e) {
                 e.preventDefault();
                 const id = $(this).data("id");
@@ -139,7 +140,8 @@
                 }).then((willDelete) => {
                     if (willDelete) {
                         $.ajax({
-                            url: "/admin/TawaranTopik/" + id + "/soft-delete",
+                            // GANTI PREFIX admin MENJADI dosen
+                            url: "/dosen/TawaranTopik/" + id + "/soft-delete",
                             type: "DELETE",
                             headers: {
                                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -176,6 +178,7 @@
                 });
             });
 
+            // Edit
             $('#editTawaranTopikModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
                 var id = button.data('id');
@@ -184,7 +187,8 @@
                 var kuota = button.data('kuota');
 
                 var modal = $(this);
-                modal.find('form').attr('action', '/admin/TawaranTopik/' + id + '/update');
+                // GANTI PREFIX admin MENJADI dosen
+                modal.find('form').attr('action', '/dosen/TawaranTopik/' + id + '/update');
                 modal.find('#edit_id_TawaranTopik').val(id);
                 modal.find('#edit_judul_topik').val(judul);
                 modal.find('#edit_deskripsi').val(deskripsi);

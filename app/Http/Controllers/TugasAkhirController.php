@@ -32,13 +32,15 @@ class TugasAkhirController extends Controller
                         'id' => 101,
                         'created_at' => now(),
                         'catatan' => 'Bab 1 selesai',
-                        'status_revisi' => 'Menunggu ACC'
+                        'status_revisi' => 'Menunggu ACC',
+                        'file_pdf' => 'tugas_akhir/123456789.pdf'
                     ],
                     (object)[
                         'id' => 102,
                         'created_at' => now()->subDays(7),
                         'catatan' => 'Proposal telah direvisi.',
-                        'status_revisi' => 'ACC'
+                        'status_revisi' => 'ACC',
+                        'file_pdf' => 'tugas_akhir/123456789_proposal.pdf'
                     ]
                 ]
             ],
@@ -73,6 +75,12 @@ class TugasAkhirController extends Controller
         $revisi->status_revisi = 'ACC';
         $revisi->save();
 
+        // Jika request AJAX, balas JSON agar SweetAlert muncul tanpa reload penuh
+        if (request()->ajax()) {
+            return response()->json(['message' => 'Revisi telah di-ACC.']);
+        }
+
+        // Jika bukan AJAX, redirect biasa (untuk fallback)
         return redirect()->route('ta.dashboard')->with('success', 'Revisi telah di-ACC.');
     }
 
@@ -82,6 +90,10 @@ class TugasAkhirController extends Controller
         $revisi = RevisiTA::findOrFail($id);
         $revisi->status_revisi = 'Ditolak';
         $revisi->save();
+
+        if (request()->ajax()) {
+            return response()->json(['message' => 'Revisi telah ditolak.']);
+        }
 
         return redirect()->route('ta.dashboard')->with('success', 'Revisi telah ditolak.');
     }
