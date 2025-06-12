@@ -62,52 +62,36 @@ class BimbinganController extends Controller
         $statusBimbingan = [];
         $disabledPengajuan = [];
 
-        // Ambil data dospem1
-        $dospem1 = $dosenList->firstWhere('peran', 'pembimbing1');
-        $jumlahDospem1 = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
-            ->where('dosen_id', $dospem1->dosen_id)
-            ->where('status_bimbingan', 'selesai')
-            ->count();
-
         foreach ($dosenList as $peran) {
             $dosenId = $peran->dosen_id;
 
+            // Hitung sesi terakhir per dosen (bukan status selesai lagi)
             $jumlah = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
                 ->where('dosen_id', $dosenId)
-                ->where('status_bimbingan', 'selesai')
-                ->count();
+                ->max('sesi_ke') ?? 0;
             $bimbinganCount[$dosenId] = $jumlah;
 
+            // Ambil status terakhir
             $last = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
                 ->where('dosen_id', $dosenId)
                 ->orderByDesc('created_at')
                 ->first();
             $status = $last?->status_bimbingan;
-            $statusBimbingan[$dosenId] = $status;
+            $statusBimbingan[$dosenId] = $status ?? '-';
 
-            $disabled = true;
-
+            // Logika pengajuan
             if ($jumlah >= 9) {
-                $disabled = true;
+                $disabled = true; // Sudah maksimal 9 sesi
             } else {
-                if ($peran->peran === 'pembimbing1') {
-                    if (is_null($status) || $status === 'ditolak' || $status === 'selesai') {
-                        $disabled = false;
-                    } elseif ($status === 'diajukan') {
-                        $disabled = true;
-                    }
-                } elseif ($peran->peran === 'pembimbing2') {
-                    if ($jumlahDospem1 >= 1) {
-                        if (is_null($status) || $status === 'ditolak' || $status === 'selesai') {
-                            $disabled = false;
-                        } elseif ($status === 'diajukan') {
-                            $disabled = true;
-                        }
-                    } else {
-                        $disabled = true;
-                    }
-                }
+                // Cek apakah masih ada pengajuan berjalan (status diajukan)
+                $adaPengajuanBerjalan = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
+                    ->where('dosen_id', $dosenId)
+                    ->where('status_bimbingan', 'diajukan')
+                    ->exists();
+
+                $disabled = $adaPengajuanBerjalan;
             }
+
             $disabledPengajuan[$dosenId] = $disabled;
         }
 
@@ -138,9 +122,31 @@ class BimbinganController extends Controller
             return back()->withErrors(['error' => 'Tugas Akhir belum ada.']);
         }
 
+        // Hitung sesi terakhir dosen ini
+        $lastSesi = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
+            ->where('dosen_id', $request->dosen_id)
+            ->max('sesi_ke') ?? 0;
+
+        if ($lastSesi >= 9) {
+            return back()->withErrors(['error' => 'Bimbingan sudah mencapai batas maksimal 9 sesi.']);
+        }
+
+        // Cek apakah masih ada pengajuan berjalan
+        $adaPengajuanBerjalan = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
+            ->where('dosen_id', $request->dosen_id)
+            ->where('status_bimbingan', 'diajukan')
+            ->exists();
+
+        if ($adaPengajuanBerjalan) {
+            return back()->withErrors(['error' => 'Masih ada pengajuan bimbingan yang sedang diproses.']);
+        }
+
+        // Buat pengajuan baru
         $bimbingan = BimbinganTa::create([
             'tugas_akhir_id' => $tugasAkhir->id,
             'dosen_id' => $request->dosen_id,
+            'peran' => $request->tipe_dospem == 1 ? 'pembimbing1' : 'pembimbing2',
+            'sesi_ke' => $lastSesi + 1,
             'tanggal_bimbingan' => $request->tanggal_jadwal,
             'jam_bimbingan' => $request->waktu_jadwal,
             'status_bimbingan' => 'diajukan',
@@ -155,8 +161,7 @@ class BimbinganController extends Controller
             ]);
         }
 
-        return redirect()->route('bimbingan.ajukanJadwal')
-            ->with('success', 'Jadwal bimbingan berhasil diajukan.');
+        return redirect()->route('bimbingan.ajukanJadwal')->with('success', 'Jadwal bimbingan berhasil diajukan.');
     }
 
     public function ubahJadwal(Request $request, $id)
@@ -170,39 +175,32 @@ class BimbinganController extends Controller
         $user = $this->assumedMahasiswaId();
         $mahasiswa = $user->mahasiswa;
 
-        $jadwal = BimbinganTA::findOrFail($id);
+        $jadwal = BimbinganTa::findOrFail($id);
 
         if ($jadwal->tugasAkhir->mahasiswa_id !== $mahasiswa->id) {
             abort(403, 'Anda tidak memiliki akses untuk mengubah jadwal ini.');
         }
 
+        if ($jadwal->status_bimbingan !== 'diajukan') {
+            return back()->withErrors(['error' => 'Jadwal ini tidak bisa diubah karena sudah diproses dosen.']);
+        }
+
         $jadwal->update([
             'tanggal_bimbingan' => $request->tanggal_bimbingan,
             'jam_bimbingan' => $request->waktu_jadwal,
-            'status_bimbingan' => 'diajukan',
         ]);
 
         if ($request->filled('catatan')) {
-            // Cari catatan bimbingan oleh mahasiswa untuk jadwal ini
-            $catatan = CatatanBimbingan::where('bimbingan_ta_id', $jadwal->id)
-                ->where('author_type', 'mahasiswa')
-                ->where('author_id', $mahasiswa->id)
-                ->first();
-
-            if ($catatan) {
-                // Jika sudah ada → update
-                $catatan->update([
-                    'catatan' => $request->catatan,
-                ]);
-            } else {
-                // Jika belum ada → buat baru
-                CatatanBimbingan::create([
+            $catatan = CatatanBimbingan::firstOrCreate(
+                [
                     'bimbingan_ta_id' => $jadwal->id,
                     'author_type' => 'mahasiswa',
                     'author_id' => $mahasiswa->id,
-                    'catatan' => $request->catatan,
-                ]);
-            }
+                ],
+                ['catatan' => $request->catatan]
+            );
+
+            $catatan->update(['catatan' => $request->catatan]);
         }
 
         return redirect()->back()->with('success', 'Perubahan jadwal telah diajukan ke dosen.');

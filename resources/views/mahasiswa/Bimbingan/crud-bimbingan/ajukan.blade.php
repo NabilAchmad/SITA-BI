@@ -45,8 +45,10 @@
                                     <span class="badge bg-warning text-dark">Menunggu</span>
                                 @elseif ($status === 'ditolak')
                                     <span class="badge bg-danger">Ditolak</span>
-                                @else
+                                @elseif (is_null($status))
                                     <span class="text-muted">Belum Ada</span>
+                                @else
+                                    <span class="text-muted">{{ ucfirst($status) }}</span>
                                 @endif
                             </td>
                             <td>
