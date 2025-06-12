@@ -111,7 +111,7 @@ class AuthController extends Controller
         Mail::to($user->email)->send(new VerifyEmail($user, $token));
 
         // Do not log in user until email is verified
-        return response()->json(['message' => 'Registration successful. Please check your email to verify your account.']);
+        return redirect()->route('login')->with('success', 'Registration successful. Please check your email to verify your account.');
     }
 
     // Verify email
@@ -120,13 +120,13 @@ class AuthController extends Controller
         $verification = EmailVerificationToken::where('token', $token)->first();
 
         if (!$verification) {
-            return response()->json(['message' => 'Invalid or expired verification token.'], 400);
+            return redirect()->route('login')->with('error', 'Invalid or expired verification token.');
         }
 
         $user = $verification->user;
 
         if ($user->email_verified_at) {
-            return response()->json(['message' => 'Email already verified.'], 400);
+            return redirect()->route('login')->with('info', 'Email already verified.');
         }
 
         $user->email_verified_at = now();
@@ -135,7 +135,8 @@ class AuthController extends Controller
         // Delete the token after verification
         $verification->delete();
 
-        return response()->json(['message' => 'Email verified successfully.']);
+        $redirectTo = session()->pull('url.intended', route('login'));
+        return redirect($redirectTo)->with('success', 'Email verified successfully.');
     }
 
     // Handle logout

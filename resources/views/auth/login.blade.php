@@ -10,6 +10,21 @@
                             <h3 class="mb-0 fw-bold">Welcome Back!</h3>
                         </div>
                         <div class="card-body p-4">
+                            @if (session('success'))
+                                <div class="alert alert-success animate__animated animate__fadeInDown" role="alert">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+                            @if (session('error'))
+                                <div class="alert alert-danger animate__animated animate__shakeX" role="alert">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
+                            @if (session('info'))
+                                <div class="alert alert-info animate__animated animate__fadeInDown" role="alert">
+                                    {{ session('info') }}
+                                </div>
+                            @endif
                             @if ($errors->any())
                                 <div class="alert alert-danger animate__animated animate__shakeX">
                                     <ul class="mb-0">
