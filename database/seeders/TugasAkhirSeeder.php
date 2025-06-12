@@ -2,45 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Models\TugasAkhir;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Faker\Factory as Faker;
 
 class TugasAkhirSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run()
     {
-        TugasAkhir::insert([
-            [
-                'mahasiswa_id' => 1,
-                'judul' => 'Analisis Sistem Informasi Akademik Berbasis Web',
-                'abstrak' => 'Penelitian ini membahas pengembangan sistem informasi akademik berbasis web untuk meningkatkan efisiensi pengelolaan data mahasiswa.',
+        $faker = Faker::create('id_ID');
+
+        $mahasiswaList = DB::table('mahasiswa')->get();
+
+        foreach ($mahasiswaList as $mhs) {
+            $judul = 'Analysis of English Language Learning System for Student ' . $mhs->nim;
+            $abstrak = $faker->paragraph(3) . ' This research focuses on improving the English language learning process for students with NIM ' . $mhs->nim . '.';
+
+            DB::table('tugas_akhir')->insert([
+                'mahasiswa_id' => $mhs->id,
+                'judul' => $judul,
+                'abstrak' => $abstrak,
                 'status' => 'diajukan',
-                'alasan_penolakan' => null,
-                'tanggal_pengajuan' => '2025-06-01',
-                'file_path' => 'files/tugas_akhir/ta1.pdf',
-            ],
-            [
-                'mahasiswa_id' => 1,
-                'judul' => 'Implementasi Algoritma Machine Learning untuk Prediksi Kelulusan',
-                'abstrak' => 'Studi ini mengimplementasikan algoritma machine learning untuk memprediksi kelulusan mahasiswa berdasarkan data akademik.',
-                'status' => 'disetujui',
-                'alasan_penolakan' => null,
-                'tanggal_pengajuan' => '2025-05-15',
-                'file_path' => 'files/tugas_akhir/ta2.pdf',
-            ],
-            [
-                'mahasiswa_id' => 1,
-                'judul' => 'Pengembangan Aplikasi Mobile untuk Monitoring Kesehatan',
-                'abstrak' => 'Aplikasi mobile ini dikembangkan untuk memonitor kesehatan pengguna secara real-time menggunakan sensor wearable.',
-                'status' => 'ditolak',
-                'alasan_penolakan' => 'Judul tidak sesuai dengan bidang studi',
-                'tanggal_pengajuan' => '2025-04-20',
-                'file_path' => 'files/tugas_akhir/ta3.pdf',
-            ],
-        ]);
+                'tanggal_pengajuan' => now()->subDays(rand(1, 20)),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }

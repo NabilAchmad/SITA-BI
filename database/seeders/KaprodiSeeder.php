@@ -10,16 +10,6 @@ class KaprodiSeeder extends Seeder
 {
     public function run()
     {
-        // Get role_id for 'dosen'
-        $roleDosen = DB::table('roles')->where('nama_role', 'dosen')->first();
-
-        // Debug output to verify roleDosen
-        var_dump($roleDosen);
-
-        if (!$roleDosen) {
-            throw new \Exception("Role 'dosen' not found in roles table. Please run RoleSeeder first.");
-        }
-
         // Menambahkan Kaprodi untuk D3 Bahasa Inggris
         $userKaprodiD3 = DB::table('users')->insertGetId([
             'name' => 'Maridiati, S.S., M.Bing.',
@@ -31,7 +21,7 @@ class KaprodiSeeder extends Seeder
 
         DB::table('user_roles')->insert([
             'user_id' => $userKaprodiD3,
-            'role_id' => $roleDosen->id,
+            'role_id' => 2, // dosen
         ]);
 
         DB::table('jabatan_dosen')->insert([
@@ -52,7 +42,7 @@ class KaprodiSeeder extends Seeder
 
         DB::table('user_roles')->insert([
             'user_id' => $userKaprodiD4,
-            'role_id' => $roleDosen->id,
+            'role_id' => 2, // dosen
         ]);
 
         DB::table('jabatan_dosen')->insert([

@@ -11,9 +11,8 @@ return new class extends Migration
         Schema::create('sidang', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tugas_akhir_id')->constrained('tugas_akhir')->onDelete('cascade');
-            $table->enum('jenis_sidang', ['proposal', 'akhir']);
-            $table->enum('status', ['menunggu','dijadwalkan', 'lulus', 'lulus_revisi', 'tidak_lulus'])->default('dijadwalkan');
-            $table->boolean('is_active')->default(true);
+            $table->enum('jenis_sidang', ['proposal', 'hasil', 'akhir']);
+            $table->enum('status', ['dijadwalkan', 'selesai', 'ditunda']);
             $table->timestamps();
             $table->softDeletes();
         });
