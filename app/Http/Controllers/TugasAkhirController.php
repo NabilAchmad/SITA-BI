@@ -62,7 +62,7 @@ class TugasAkhirController extends Controller
             // 'tugas_akhir_id' => ... // isi jika perlu relasi
             // 'user_id' => auth()->id(), // isi jika perlu
             'catatan' => $request->komentar_revisi,
-            'status_revisi' => 'Menunggu ACC',
+            'status_revisi' => 'diperlukan',
         ]);
 
         return redirect()->route('ta.dashboard')->with('success', 'Komentar revisi berhasil dikirim.');
