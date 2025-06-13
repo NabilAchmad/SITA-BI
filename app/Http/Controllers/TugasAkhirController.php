@@ -10,15 +10,12 @@ class TugasAkhirController extends Controller
     // Menampilkan dashboard mahasiswa (file TA, revisi, dan list mahasiswa sidang)
     public function dashboard()
     {
-        // Ambil file tugas akhir, contoh dummy (ganti dengan query sesuai kebutuhan)
         $fileTA = (object)[
             'file_path' => 'tugas_akhir/contoh_file.pdf'
         ];
 
-        // Ambil data revisi dari database
         $revisi = RevisiTA::orderByDesc('created_at')->get();
 
-        // Data mahasiswa sidang (dummy, ganti dengan query sesuai kebutuhan)
         $mahasiswaSidang = collect([
             (object)[
                 'id' => 1,
@@ -55,14 +52,14 @@ class TugasAkhirController extends Controller
     {
         $request->validate([
             'komentar_revisi' => 'required|string|max:1000',
+            'tugas_akhir_id' => 'required|exists:tugas_akhir,id',
         ]);
 
-        // Buat revisi baru
+        // Buat revisi baru, pastikan tugas_akhir_id diisi!
         RevisiTA::create([
-            // 'tugas_akhir_id' => ... // isi jika perlu relasi
-            // 'user_id' => auth()->id(), // isi jika perlu
             'catatan' => $request->komentar_revisi,
             'status_revisi' => 'Menunggu ACC',
+            'tugas_akhir_id' => $request->tugas_akhir_id,
         ]);
 
         return redirect()->route('ta.dashboard')->with('success', 'Komentar revisi berhasil dikirim.');
@@ -75,12 +72,10 @@ class TugasAkhirController extends Controller
         $revisi->status_revisi = 'ACC';
         $revisi->save();
 
-        // Jika request AJAX, balas JSON agar SweetAlert muncul tanpa reload penuh
         if (request()->ajax()) {
             return response()->json(['message' => 'Revisi telah di-ACC.']);
         }
 
-        // Jika bukan AJAX, redirect biasa (untuk fallback)
         return redirect()->route('ta.dashboard')->with('success', 'Revisi telah di-ACC.');
     }
 

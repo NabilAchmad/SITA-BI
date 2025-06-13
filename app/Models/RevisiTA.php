@@ -11,6 +11,14 @@ class RevisiTA extends Model
 
     protected $table = 'revisi_ta';
 
+    // Tambahkan fillable agar mass assignment diizinkan
+    protected $fillable = [
+        'catatan',
+        'status_revisi',
+        'tugas_akhir_id', // tambahkan ini agar mass assignment diizinkan
+        // tambahkan field lain jika ada, misal: 'dosen_id', dst.
+    ];
+
     public function tugasAkhir()
     {
         return $this->belongsTo(TugasAkhir::class);

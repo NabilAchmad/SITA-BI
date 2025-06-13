@@ -41,6 +41,14 @@ class Sidang extends Model
     }
 
     /**
+     * Relasi ke Penilaian Sidang (untuk eager loading penilaians)
+     */
+    public function penilaians(): HasMany
+    {
+        return $this->hasMany(NilaiSidang::class, 'sidang_id');
+    }
+
+    /**
      * Relasi ke Berita Acara Pasca Sidang
      */
     public function beritaAcaraPasca(): HasMany

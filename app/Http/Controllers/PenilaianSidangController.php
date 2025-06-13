@@ -12,7 +12,8 @@ class PenilaianSidangController extends Controller
     // Tampilkan daftar semua sidang
     public function index()
     {
-        $sidangs = Sidang::with('mahasiswa')->get();
+        // Pastikan relasi penilaians diambil agar nilai langsung tampil di index
+        $sidangs = Sidang::with(['mahasiswa', 'penilaians'])->get();
         return view('admin.sidang.penilaian.index', compact('sidangs'));
     }
 
@@ -40,6 +41,7 @@ class PenilaianSidangController extends Controller
             'skor' => $request->skor,
         ]);
 
-        return redirect()->route('admin.sidang.penilaian.index')->with('success', 'Nilai berhasil disimpan');
+        // Redirect ke route index yang BENAR
+        return redirect()->route('penilaian.sidang.index')->with('success', 'Nilai berhasil disimpan!');
     }
 }
