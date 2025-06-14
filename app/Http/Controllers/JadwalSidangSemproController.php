@@ -13,61 +13,99 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class JadwalSidangSemproController extends Controller
 {
-    public function menungguSidangSempro(Request $request)
+    public function SidangSempro(Request $request)
     {
         $prodi = $request->input('prodi');
         $search = $request->input('search');
 
-        // Mahasiswa yang menunggu penjadwalan sidang sempro
+        // ========================= 1. Mahasiswa Menunggu Penjadwalan ============================
         $mahasiswaMenungguQuery = Mahasiswa::whereHas('tugasAkhir.sidang', function ($query) {
             $query->where('status', 'menunggu')
-                ->where('jenis_sidang', 'proposal')  // ganti ke 'sempro'
+                ->where('jenis_sidang', 'proposal')
                 ->whereDoesntHave('jadwalSidang');
-        })
-            ->with([
-                'user',
-                'tugasAkhir' => function ($query) {
-                    $query->with([
-                        'sidangTerakhir',
-                        'sidang' => function ($query) {
-                            $query->where('status', 'menunggu')
-                                ->where('jenis_sidang', 'proposal')  // ganti ke 'sempro'
-                                ->whereDoesntHave('jadwalSidang');
-                        }
-                    ]);
-                }
-            ]);
+        })->with([
+            'user',
+            'tugasAkhir' => function ($query) {
+                $query->with([
+                    'sidangTerakhir',
+                    'sidang' => function ($query) {
+                        $query->where('status', 'menunggu')
+                            ->where('jenis_sidang', 'proposal')
+                            ->whereDoesntHave('jadwalSidang');
+                    }
+                ]);
+            }
+        ]);
 
-        // Mahasiswa yang tidak lulus sidang sempro dan belum aktif lagi
+        // ========================= 2. Mahasiswa Tidak Lulus Sempro ============================
         $mahasiswaTidakLulusQuery = Mahasiswa::whereHas('tugasAkhir.sidang', function ($query) {
-            $query->where('jenis_sidang', 'proposal')  // ganti ke 'sempro'
+            $query->where('jenis_sidang', 'proposal')
                 ->where('status', 'tidak_lulus')
                 ->where('is_active', false);
-        })
-            ->whereDoesntHave('tugasAkhir.sidang', function ($query) {
-                $query->where('jenis_sidang', 'proposal')  // ganti ke 'sempro'
-                    ->where('is_active', true);
-            })
-            ->with([
-                'user',
-                'tugasAkhir' => function ($query) {
-                    $query->with([
-                        'sidangTerakhir',
-                        'sidang' => function ($q) {
-                            $q->where('jenis_sidang', 'proposal')  // ganti ke 'sempro'
-                                ->orderBy('created_at', 'desc');
-                        }
-                    ]);
-                }
-            ]);
+        })->whereDoesntHave('tugasAkhir.sidang', function ($query) {
+            $query->where('jenis_sidang', 'proposal')
+                ->where('is_active', true);
+        })->with([
+            'user',
+            'tugasAkhir' => function ($query) {
+                $query->with([
+                    'sidangTerakhir',
+                    'sidang' => function ($query) {
+                        $query->where('jenis_sidang', 'proposal')
+                            ->orderBy('created_at', 'desc');
+                    }
+                ]);
+            }
+        ]);
 
-        // Filter berdasarkan Prodi
+        // ========================= 3. Mahasiswa Lulus Sempro ============================
+        $mahasiswaLulusSemproQuery = Mahasiswa::whereHas('tugasAkhir.sidang', function ($query) {
+            $query->where('jenis_sidang', 'proposal')
+                ->whereIn('status', ['lulus', 'lulus_revisi']);
+        })->with([
+            'user',
+            'tugasAkhir' => function ($query) {
+                $query->with([
+                    'sidangTerakhir',
+                    'sidang' => function ($query) {
+                        $query->where('jenis_sidang', 'proposal')
+                            ->orderBy('created_at', 'desc');
+                    }
+                ]);
+            }
+        ]);
+
+        // ========================= 4. Jadwal Mahasiswa Sidang Sempro (Format Query Builder) ============================
+        $jadwalMahasiswaQuery = JadwalSidang::with([
+            'sidang.tugasAkhir.mahasiswa.user',
+            'sidang.tugasAkhir.peranDosenTa.dosen.user',
+            'ruangan'
+        ])->whereHas('sidang', function ($q) use ($prodi, $search) {
+            $q->where('jenis_sidang', 'proposal')
+                ->where('status', 'dijadwalkan')
+                ->where('is_active', true)
+                ->whereHas('tugasAkhir.mahasiswa', function ($q2) use ($prodi, $search) {
+                    if ($prodi) {
+                        $q2->where('prodi', 'like', $prodi . '%');
+                    }
+                    if ($search) {
+                        $q2->where(function ($q3) use ($search) {
+                            $q3->where('nim', 'like', '%' . $search . '%')
+                                ->orWhereHas('user', function ($q4) use ($search) {
+                                    $q4->where('name', 'like', '%' . $search . '%');
+                                });
+                        });
+                    }
+                });
+        });
+
+        // ========================= Apply filter untuk semua query ============================
         if ($prodi) {
             $mahasiswaMenungguQuery->where('prodi', 'like', $prodi . '%');
             $mahasiswaTidakLulusQuery->where('prodi', 'like', $prodi . '%');
+            $mahasiswaLulusSemproQuery->where('prodi', 'like', $prodi . '%');
         }
 
-        // Filter berdasarkan pencarian nama mahasiswa atau NIM
         if ($search) {
             $mahasiswaMenungguQuery->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($u) use ($search) {
@@ -80,106 +118,36 @@ class JadwalSidangSemproController extends Controller
                     $u->where('name', 'like', '%' . $search . '%');
                 })->orWhere('nim', 'like', '%' . $search . '%');
             });
+
+            $mahasiswaLulusSemproQuery->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($u) use ($search) {
+                    $u->where('name', 'like', '%' . $search . '%');
+                })->orWhere('nim', 'like', '%' . $search . '%');
+            });
         }
 
+        // ========================= Paginate semua query ============================
         $perPage = 10;
 
-        $mahasiswaMenunggu = $mahasiswaMenungguQuery
-            ->paginate($perPage, ['*'], 'menunggu_page')
-            ->appends($request->only('prodi', 'search'));
+        $mahasiswaMenunggu = $mahasiswaMenungguQuery->paginate($perPage, ['*'], 'menunggu_page')->appends($request->query());
+        $mahasiswaTidakLulus = $mahasiswaTidakLulusQuery->paginate($perPage, ['*'], 'tidaklulus_page')->appends($request->query());
+        $mahasiswaLulusSempro = $mahasiswaLulusSemproQuery->paginate($perPage, ['*'], 'lulus_page')->appends($request->query());
+        $jadwalMahasiswa = $jadwalMahasiswaQuery->paginate($perPage, ['*'], 'jadwal_page')->appends($request->query());
 
-        $mahasiswaTidakLulus = $mahasiswaTidakLulusQuery
-            ->paginate($perPage, ['*'], 'tidaklulus_page')
-            ->appends($request->only('prodi', 'search'));
-
+        // ========================= Data tambahan ============================
         $dosen = Dosen::with('user')->get();
         $ruanganList = Ruangan::all();
 
         return view('admin.sidang.sempro.views.mhs-sidang', compact(
             'mahasiswaMenunggu',
             'mahasiswaTidakLulus',
+            'mahasiswaLulusSempro',
+            'jadwalMahasiswa',
             'dosen',
             'ruanganList'
         ));
     }
 
-    // Menampilkan daftar jadwal sidang SEMINAR PROPOSAL
-    public function listJadwalSempro(Request $request)
-    {
-        $prodi = $request->input('prodi');
-        $search = $request->input('search'); // Input pencarian dari search bar
-
-        // Ambil semua jadwal sidang SEMPRO dengan status 'dijadwalkan' dan is_active = true
-        $allJadwal = JadwalSidang::with([
-            'sidang.tugasAkhir.mahasiswa.user',
-            'sidang.tugasAkhir.peranDosenTa.dosen.user',
-            'ruangan'
-        ])
-            ->whereHas('sidang', function ($q) use ($prodi, $search) {
-                $q->where('jenis_sidang', 'proposal') // <- Ganti jadi proposal
-                    ->where('status', 'dijadwalkan')
-                    ->where('is_active', true)
-                    ->whereHas('tugasAkhir.mahasiswa', function ($q2) use ($prodi, $search) {
-                        if ($prodi) {
-                            $q2->where('prodi', 'like', $prodi . '%');
-                        }
-
-                        if ($search) {
-                            $q2->where(function ($s) use ($search) {
-                                $s->where('nim', 'like', '%' . $search . '%')
-                                    ->orWhereHas('user', function ($u) use ($search) {
-                                        $u->where('name', 'like', '%' . $search . '%');
-                                    });
-                            });
-                        }
-                    });
-            })
-            ->get()
-            ->unique('sidang_id')
-            ->values();
-
-        // Pagination manual untuk Collection
-        $perPage = 10;
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentItems = $allJadwal->slice(($currentPage - 1) * $perPage, $perPage);
-        $jadwalList = new LengthAwarePaginator(
-            $currentItems,
-            $allJadwal->count(),
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        // Detail jadwal sidang jika sidang_id diberikan (untuk modal/form edit mungkin)
-        $jadwal = null;
-        $dosens = null;
-        $ruangans = null;
-
-        if ($request->has('sidang_id')) {
-            $jadwal = JadwalSidang::with([
-                'sidang.tugasAkhir.mahasiswa.user',
-                'ruangan',
-                'sidang.tugasAkhir.peranDosenTa.dosen.user'
-            ])
-                ->where('sidang_id', $request->sidang_id)
-                ->whereHas('sidang', function ($q) {
-                    $q->where('jenis_sidang', 'proposal') // <- Ganti jadi proposal
-                        ->where('status', 'dijadwalkan')
-                        ->where('is_active', true);
-                })
-                ->first();
-
-            $dosens = Dosen::with('user')->get();
-            $ruangans = Ruangan::all();
-        }
-
-        return view('admin.sidang.sempro.jadwal.jadwal-sidang-sempro', [
-            'jadwalList' => $jadwalList,
-            'jadwal' => $jadwal,
-            'dosens' => $dosens ?? [],
-            'ruangans' => $ruangans ?? [],
-        ]);
-    }
 
     public function store(Request $request)
     {
@@ -260,53 +228,6 @@ class JadwalSidangSemproController extends Controller
         $ruangans = Ruangan::all();
 
         return view('admin.sidang.sempro.modal.detail-jadwal', compact('jadwal', 'dosens', 'ruangans'));
-    }
-
-    public function pascaSidangSempro(Request $request)
-    {
-        $prodi = $request->input('prodi');
-        $search = $request->input('search');
-
-        $query = JadwalSidang::with([
-            'sidang.tugasAkhir.mahasiswa.user',
-            'sidang.tugasAkhir.peranDosenTa.dosen.user',
-            'ruangan'
-        ])
-            ->whereHas('sidang', function ($q) use ($prodi, $search) {
-                $q->where('jenis_sidang', 'proposal') // Ubah dari 'akhir' ke 'sempro'
-                    ->whereIn('status', ['lulus', 'lulus_revisi']) // Tetap sama
-                    ->whereHas('tugasAkhir.mahasiswa', function ($q2) use ($prodi, $search) {
-                        if ($prodi) {
-                            $q2->where('prodi', 'like', $prodi . '%');
-                        }
-
-                        if ($search) {
-                            $q2->where(function ($q3) use ($search) {
-                                $q3->where('nim', 'like', '%' . $search . '%')
-                                    ->orWhereHas('user', function ($q4) use ($search) {
-                                        $q4->where('name', 'like', '%' . $search . '%');
-                                    });
-                            });
-                        }
-                    });
-            });
-
-        $allData = $query->get()->unique(fn($item) => optional($item->sidang->tugasAkhir)->mahasiswa_id)->values();
-
-        // Manual pagination
-        $perPage = 10;
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentItems = $allData->slice(($currentPage - 1) * $perPage, $perPage)->values();
-
-        $sidangSelesai = new LengthAwarePaginator(
-            $currentItems,
-            $allData->count(),
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        return view('admin.sidang.sempro.pasca.pasca-sidang', compact('sidangSelesai'));
     }
 
     public function tandaiSidangSempro(Request $request, $sidang_id)
