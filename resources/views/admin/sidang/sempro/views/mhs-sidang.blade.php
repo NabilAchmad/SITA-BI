@@ -190,7 +190,7 @@
                                         }
                                     }
                                 }).then(() => {
-                                    window.location.href = "{{ route('jadwal.sidang.sempro') }}";
+                                    window.location.href = "{{ route('sidang.kelola.sempro') }}";
                                 });
                             } else {
                                 alert(data.message || 'Gagal menyimpan jadwal sidang.');

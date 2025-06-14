@@ -121,7 +121,7 @@
                         </a>
 
                         <!-- Tombol Kembali -->
-                        <a href="{{ route('jadwal.sidang.sempro') }}" class="btn btn-outline-dark btn-sm">
+                        <a href="{{ route('sidang.kelola.sempro') }}" class="btn btn-outline-dark btn-sm">
                             <i class="bi bi-arrow-left-circle me-1"></i> Kembali
                         </a>
 

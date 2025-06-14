@@ -1,7 +1,7 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h1 class="fw-bold text-danger"><i class="bi bi-calendar-x me-2"></i> Kelola Jadwal Sidang Akhir</h1>
+            <h1 class="fw-bold text-primary"><i class="bi bi-calendar-x me-2"></i> Kelola Jadwal Sidang Akhir</h1>
             <p class="text-muted mb-0">Daftar mahasiswa yang telah terdaftar sidang akhir, termasuk yang belum
                 dijadwalkan dan yang mengulang sidang.</p>
         </div>
@@ -45,13 +45,25 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="menunggu-tab" data-bs-toggle="tab" data-bs-target="#menunggu"
                         type="button" role="tab" aria-controls="menunggu" aria-selected="true">
-                        Menunggu Jadwal
+                        Menunggu Penjadwalan
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="jadwal-sidang-tab" data-bs-toggle="tab" data-bs-target="#jadwal-sidang"
+                        type="button" role="tab" aria-controls="jadwal-sidang" aria-selected="false">
+                        Jadwal Sidang Akhir
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="tidak-lulus-tab" data-bs-toggle="tab" data-bs-target="#tidak-lulus"
                         type="button" role="tab" aria-controls="tidak-lulus" aria-selected="false">
-                        Mengulang Sidang (Tidak Lulus)
+                        Mengulang Sidang (Tidak Lulus Sidang Akhir)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="lulus-tab" data-bs-toggle="tab" data-bs-target="#lulus" type="button"
+                        role="tab" aria-controls="lulus" aria-selected="false">
+                        Lulus Sidang Akhir
                     </button>
                 </li>
             </ul>
@@ -79,6 +91,28 @@
                     </div>
                 </div>
 
+                {{-- Tab Jadwal Sidang Akhir --}}
+                <div class="tab-pane fade" id="jadwal-sidang" role="tabpanel" aria-labelledby="jadwal-sidang-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>Judul Tugas Akhir</th>
+                                    <th>Tanggal</th>
+                                    <th>Waktu</th>
+                                    <th>Ruangan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jadwal-sidang">
+                                @include('admin.sidang.akhir.partials.table-jadwal-sidang')                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 {{-- Tab Tidak Lulus dan Mengulang Sidang --}}
                 <div class="tab-pane fade" id="tidak-lulus" role="tabpanel" aria-labelledby="tidak-lulus-tab">
                     <div class="table-responsive">
@@ -99,6 +133,31 @@
                         </table>
                     </div>
                 </div>
+
+                {{-- Tab Lulus Sidang Akhir --}}
+                <div class="tab-pane fade" id="lulus" role="tabpanel" aria-labelledby="lulus-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Mahasiswa</th>
+                                    <th>NIM</th>
+                                    <th>Judul TA</th>
+                                    <th>Tanggal Sidang</th>
+                                    <th>Nilai Akhir</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lulus">
+                                @include('admin.sidang.akhir.partials.table-lulus-sidang')
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+
             </div>
         </div>
     </div>

@@ -56,61 +56,99 @@ class JadwalSidangAkhirController extends Controller
         ));
     }
 
-    public function menungguSidangAkhir(Request $request)
+    public function SidangAkhir(Request $request)
     {
         $prodi = $request->input('prodi');
         $search = $request->input('search');
 
-        // Mahasiswa menunggu penjadwalan sidang akhir
+        // ========================= 1. Mahasiswa Menunggu Penjadwalan Sidang Akhir ============================
         $mahasiswaMenungguQuery = Mahasiswa::whereHas('tugasAkhir.sidang', function ($query) {
             $query->where('status', 'menunggu')
                 ->where('jenis_sidang', 'akhir')
                 ->whereDoesntHave('jadwalSidang');
-        })
-            ->with([
-                'user',
-                'tugasAkhir' => function ($query) {
-                    $query->with([
-                        'sidangTerakhir',
-                        'sidang' => function ($query) {
-                            $query->where('status', 'menunggu')
-                                ->where('jenis_sidang', 'akhir')
-                                ->whereDoesntHave('jadwalSidang');
-                        }
-                    ]);
-                }
-            ]);
+        })->with([
+            'user',
+            'tugasAkhir' => function ($query) {
+                $query->with([
+                    'sidangTerakhir',
+                    'sidang' => function ($query) {
+                        $query->where('status', 'menunggu')
+                            ->where('jenis_sidang', 'akhir')
+                            ->whereDoesntHave('jadwalSidang');
+                    }
+                ]);
+            }
+        ]);
 
-        // Mahasiswa yang tidak lulus dan belum aktif lagi
+        // ========================= 2. Mahasiswa Tidak Lulus Sidang Akhir ============================
         $mahasiswaTidakLulusQuery = Mahasiswa::whereHas('tugasAkhir.sidang', function ($query) {
             $query->where('jenis_sidang', 'akhir')
                 ->where('status', 'tidak_lulus')
                 ->where('is_active', false);
-        })
-            ->whereDoesntHave('tugasAkhir.sidang', function ($query) {
-                $query->where('jenis_sidang', 'akhir')
-                    ->where('is_active', true);
-            })
-            ->with([
-                'user',
-                'tugasAkhir' => function ($query) {
-                    $query->with([
-                        'sidangTerakhir',
-                        'sidang' => function ($q) {
-                            $q->where('jenis_sidang', 'akhir')
-                                ->orderBy('created_at', 'desc');
-                        }
-                    ]);
-                }
-            ]);
+        })->whereDoesntHave('tugasAkhir.sidang', function ($query) {
+            $query->where('jenis_sidang', 'akhir')
+                ->where('is_active', true);
+        })->with([
+            'user',
+            'tugasAkhir' => function ($query) {
+                $query->with([
+                    'sidangTerakhir',
+                    'sidang' => function ($query) {
+                        $query->where('jenis_sidang', 'akhir')
+                            ->orderBy('created_at', 'desc');
+                    }
+                ]);
+            }
+        ]);
 
-        // Filter berdasarkan Prodi
+        // ========================= 3. Mahasiswa Lulus Sidang Akhir ============================
+        $mahasiswaLulusQuery = Mahasiswa::whereHas('tugasAkhir.sidang', function ($query) {
+            $query->where('jenis_sidang', 'akhir')
+                ->whereIn('status', ['lulus', 'lulus_revisi']);
+        })->with([
+            'user',
+            'tugasAkhir' => function ($query) {
+                $query->with([
+                    'sidangTerakhir',
+                    'sidang' => function ($query) {
+                        $query->where('jenis_sidang', 'akhir')
+                            ->orderBy('created_at', 'desc');
+                    }
+                ]);
+            }
+        ]);
+
+        // ========================= 4. Jadwal Mahasiswa Sidang Akhir ============================
+        $jadwalMahasiswaQuery = JadwalSidang::with([
+            'sidang.tugasAkhir.mahasiswa.user',
+            'sidang.tugasAkhir.peranDosenTa.dosen.user',
+            'ruangan'
+        ])->whereHas('sidang', function ($q) use ($prodi, $search) {
+            $q->where('jenis_sidang', 'akhir')
+                ->where('status', 'dijadwalkan')
+                ->where('is_active', true)
+                ->whereHas('tugasAkhir.mahasiswa', function ($q2) use ($prodi, $search) {
+                    if ($prodi) {
+                        $q2->where('prodi', 'like', $prodi . '%');
+                    }
+                    if ($search) {
+                        $q2->where(function ($q3) use ($search) {
+                            $q3->where('nim', 'like', '%' . $search . '%')
+                                ->orWhereHas('user', function ($q4) use ($search) {
+                                    $q4->where('name', 'like', '%' . $search . '%');
+                                });
+                        });
+                    }
+                });
+        });
+
+        // ========================= Apply Filter Prodi & Search ke semua query ============================
         if ($prodi) {
             $mahasiswaMenungguQuery->where('prodi', 'like', $prodi . '%');
             $mahasiswaTidakLulusQuery->where('prodi', 'like', $prodi . '%');
+            $mahasiswaLulusQuery->where('prodi', 'like', $prodi . '%');
         }
 
-        // Filter berdasarkan pencarian nama mahasiswa atau NIM
         if ($search) {
             $mahasiswaMenungguQuery->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($u) use ($search) {
@@ -123,104 +161,34 @@ class JadwalSidangAkhirController extends Controller
                     $u->where('name', 'like', '%' . $search . '%');
                 })->orWhere('nim', 'like', '%' . $search . '%');
             });
+
+            $mahasiswaLulusQuery->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($u) use ($search) {
+                    $u->where('name', 'like', '%' . $search . '%');
+                })->orWhere('nim', 'like', '%' . $search . '%');
+            });
         }
 
+        // ========================= Pagination ============================
         $perPage = 10;
 
-        $mahasiswaMenunggu = $mahasiswaMenungguQuery
-            ->paginate($perPage, ['*'], 'menunggu_page')
-            ->appends($request->only('prodi', 'search'));
+        $mahasiswaMenunggu = $mahasiswaMenungguQuery->paginate($perPage, ['*'], 'menunggu_page')->appends($request->query());
+        $mahasiswaTidakLulus = $mahasiswaTidakLulusQuery->paginate($perPage, ['*'], 'tidaklulus_page')->appends($request->query());
+        $mahasiswaLulus = $mahasiswaLulusQuery->paginate($perPage, ['*'], 'lulus_page')->appends($request->query());
+        $jadwalMahasiswa = $jadwalMahasiswaQuery->paginate($perPage, ['*'], 'jadwal_page')->appends($request->query());
 
-        $mahasiswaTidakLulus = $mahasiswaTidakLulusQuery
-            ->paginate($perPage, ['*'], 'tidaklulus_page')
-            ->appends($request->only('prodi', 'search'));
-
+        // ========================= Data Tambahan ============================
         $dosen = Dosen::with('user')->get();
         $ruanganList = Ruangan::all();
 
         return view('admin.sidang.akhir.views.mhs-sidang', compact(
             'mahasiswaMenunggu',
             'mahasiswaTidakLulus',
+            'mahasiswaLulus',
+            'jadwalMahasiswa',
             'dosen',
             'ruanganList'
         ));
-    }
-
-    public function listJadwalAkhir(Request $request)
-    {
-        $prodi = $request->input('prodi');
-        $search = $request->input('search'); // Ambil input pencarian dari search bar
-
-        // Ambil semua jadwal sidang akhir dengan status 'dijadwalkan' dan is_active = true
-        $allJadwal = JadwalSidang::with([
-            'sidang.tugasAkhir.mahasiswa.user',
-            'sidang.tugasAkhir.peranDosenTa.dosen.user',
-            'ruangan'
-        ])
-            ->whereHas('sidang', function ($q) use ($prodi, $search) {
-                $q->where('jenis_sidang', 'akhir')
-                    ->where('status', 'dijadwalkan')
-                    ->where('is_active', true)
-                    ->whereHas('tugasAkhir.mahasiswa', function ($q2) use ($prodi, $search) {
-                        if ($prodi) {
-                            $q2->where('prodi', 'like', $prodi . '%');
-                        }
-
-                        if ($search) {
-                            $q2->where(function ($s) use ($search) {
-                                $s->where('nim', 'like', '%' . $search . '%')
-                                    ->orWhereHas('user', function ($u) use ($search) {
-                                        $u->where('name', 'like', '%' . $search . '%');
-                                    });
-                            });
-                        }
-                    });
-            })
-            ->get()
-            ->unique('sidang_id')
-            ->values(); // hasilnya Collection
-
-        // Pagination manual untuk Collection
-        $perPage = 10;
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentItems = $allJadwal->slice(($currentPage - 1) * $perPage, $perPage);
-        $jadwalList = new LengthAwarePaginator(
-            $currentItems,
-            $allJadwal->count(),
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        // Ambil detail jika ada sidang_id
-        $jadwal = null;
-        $dosens = null;
-        $ruangans = null;
-
-        if ($request->has('sidang_id')) {
-            $jadwal = JadwalSidang::with([
-                'sidang.tugasAkhir.mahasiswa.user',
-                'ruangan',
-                'sidang.tugasAkhir.peranDosenTa.dosen.user'
-            ])
-                ->where('sidang_id', $request->sidang_id)
-                ->whereHas('sidang', function ($q) {
-                    $q->where('jenis_sidang', 'akhir')
-                        ->where('status', 'dijadwalkan')
-                        ->where('is_active', true);
-                })
-                ->first();
-
-            $dosens = Dosen::with('user')->get();
-            $ruangans = Ruangan::all();
-        }
-
-        return view('admin.sidang.akhir.jadwal.jadwal-sidang-akhir', [
-            'jadwalList' => $jadwalList,
-            'jadwal' => $jadwal,
-            'dosens' => $dosens ?? [],
-            'ruangans' => $ruangans ?? [],
-        ]);
     }
 
     public function store(Request $request)
@@ -363,53 +331,6 @@ class JadwalSidangAkhirController extends Controller
         $ruangans = Ruangan::all();
 
         return view('admin.sidang.akhir.modal.detail-jadwal', compact('jadwal', 'dosens', 'ruangans'));
-    }
-
-    public function pascaSidangAkhir(Request $request)
-    {
-        $prodi = $request->input('prodi');
-        $search = $request->input('search');
-
-        $query = JadwalSidang::with([
-            'sidang.tugasAkhir.mahasiswa.user',
-            'sidang.tugasAkhir.peranDosenTa.dosen.user',
-            'ruangan'
-        ])
-            ->whereHas('sidang', function ($q) use ($prodi, $search) {
-                $q->where('jenis_sidang', 'akhir')
-                    ->whereIn('status', ['lulus', 'lulus_revisi'])
-                    ->whereHas('tugasAkhir.mahasiswa', function ($q2) use ($prodi, $search) {
-                        if ($prodi) {
-                            $q2->where('prodi', 'like', $prodi . '%');
-                        }
-
-                        if ($search) {
-                            $q2->where(function ($q3) use ($search) {
-                                $q3->where('nim', 'like', '%' . $search . '%')
-                                    ->orWhereHas('user', function ($q4) use ($search) {
-                                        $q4->where('name', 'like', '%' . $search . '%');
-                                    });
-                            });
-                        }
-                    });
-            });
-
-        $allData = $query->get()->unique(fn($item) => optional($item->sidang->tugasAkhir)->mahasiswa_id)->values();
-
-        // Manual pagination
-        $perPage = 10;
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentItems = $allData->slice(($currentPage - 1) * $perPage, $perPage)->values();
-
-        $sidangSelesai = new LengthAwarePaginator(
-            $currentItems,
-            $allData->count(),
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        return view('admin.sidang.akhir.pasca.pasca-sidang', compact('sidangSelesai'));
     }
 
     public function tandaiSidang(Request $request, $sidang_id)
