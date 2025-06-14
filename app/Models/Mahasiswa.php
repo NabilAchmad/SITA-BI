@@ -35,7 +35,7 @@ class Mahasiswa extends Model
         );
     }
 
-    public function historyTopik(): HasMany
+    public function historyTopik()
     {
         return $this->hasMany(HistoryTopikMahasiswa::class);
     }
@@ -45,9 +45,33 @@ class Mahasiswa extends Model
         return $this->hasMany(NotifikasiTa::class);
     }
 
-    public function sidang(): HasMany
+    public function sidang()
     {
         // Ganti 'foreign_key' dan 'local_key' sesuai dengan struktur tabel Anda
         return $this->hasMany(Sidang::class, 'tugas_akhir_id', 'id');
+    }
+
+    public function jadwalSidangSempro()
+    {
+        return $this->hasManyThrough(
+            JadwalSidang::class,
+            Sidang::class,
+            'tugas_akhir_id', // Foreign key on Sidang table...
+            'sidang_id', // Foreign key on JadwalSidang table...
+            'id', // Local key on Mahasiswa table...
+            'id'  // Local key on Sidang table...
+        )->where('sidang.jenis_sidang', 'proposal');
+    }
+
+    public function jadwalSidangAkhir()
+    {
+        return $this->hasManyThrough(
+            JadwalSidang::class,
+            Sidang::class,
+            'tugas_akhir_id',
+            'sidang_id',
+            'id',
+            'id'
+        )->where('sidang.jenis_sidang', 'akhir');
     }
 }

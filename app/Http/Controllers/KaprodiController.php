@@ -121,8 +121,32 @@ class KaprodiController extends Controller
      */
     public function showSidangDashboard()
     {
-        $jadwalCount = JadwalSidang::count();
-        return view('kaprodi.sidang.dashboard.dashboard', compact('jadwalCount'));
+        // Count mahasiswa waiting for Sidang Sempro scheduling
+        $waitingSemproCount = Mahasiswa::whereDoesntHave('jadwalSidangSempro')->count();
+
+        // Count mahasiswa waiting for Sidang Akhir scheduling
+        $waitingAkhirCount = Mahasiswa::whereDoesntHave('jadwalSidangAkhir')->count();
+
+        // Count scheduled Sidang Sempro
+        $scheduledSemproCount = JadwalSidang::where('jenis_sidang', 'sempro')->count();
+
+        // Count scheduled Sidang Akhir
+        $scheduledAkhirCount = JadwalSidang::where('jenis_sidang', 'akhir')->count();
+
+        // Count Pasca Sidang Sempro
+        $pascaSemproCount = Sidang::where('jenis_sidang', 'sempro')->count();
+
+        // Count Pasca Sidang Akhir
+        $pascaAkhirCount = Sidang::where('jenis_sidang', 'akhir')->count();
+
+        return view('kaprodi.sidang.dashboard.dashboard', compact(
+            'waitingSemproCount',
+            'waitingAkhirCount',
+            'scheduledSemproCount',
+            'scheduledAkhirCount',
+            'pascaSemproCount',
+            'pascaAkhirCount'
+        ));
     }
 
     /**

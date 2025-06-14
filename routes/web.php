@@ -78,12 +78,9 @@ Route::prefix('ketua-jurusan')->group(function () {
         Route::get('/sidang/mahasiswaSidang', [KajurController::class, 'showMahasiswaSidang'])->name('kajur.sidang');
         Route::get('/sidang/lihat-jadwal', [KajurController::class, 'showJadwal'])->name('kajur.jadwal');
         Route::get('/sidang/lihat-nilai', [KajurController::class, 'showNilaiSidang'])->name('kajur.nilai.page');
-        // Route::prefix('sidang')->group(function () {
-        //     Route::get('/lihat-jadwal', [KajurController::class, 'showJadwal'])->name('kajur.jadwal');
-        //     Route::get('/mahasiswaSidang', [KajurController::class, 'showMahasiswaSidang'])->name('kajur.sidang');
-        //     Route::get('/dashboard', [KajurController::class, 'showSidangDashboard'])->name('sidangDashboard.kajur');
-        //     Route::get('/lihat-nilai', [KajurController::class, 'showNilaiSidang'])->name('kajur.nilai.page');
-        // });
+
+        // Add dashboard cards routes for Kajur sidang dashboard
+        Route::get('/sidang/dashboard-cards', [KajurController::class, 'showSidangDashboard'])->name('sidangDashboard.kajur.cards');
     });
 });
 
@@ -366,4 +363,7 @@ Route::prefix('sidang')->group(function () {
         Route::get('jadwal', [JadwalSidangAkhirController::class, 'listJadwal'])->name('jadwal.sidang.akhir');
         Route::get('/pasca-sidang-akhir', [JadwalSidangAkhirController::class, 'pascaSidangAkhir'])->name('pasca.sidang.akhir');
     });
+
+    // Add missing route for mahasiswa-sidang.read
+    Route::get('/mahasiswa-sidang', [KaprodiController::class, 'showMahasiswaSidang'])->name('mahasiswa-sidang.read');
 });

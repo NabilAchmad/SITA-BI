@@ -15,6 +15,7 @@ class JadwalSidang extends Model
         'tanggal',
         'waktu_mulai',
         'waktu_selesai',
+        'jenis_sidang',
         'ruangan_id'
     ];
 

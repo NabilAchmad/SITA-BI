@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up()
     {
-Schema::table('mahasiswa', function (Blueprint $table) {
-    $table->enum('status', ['aktif', 'cuti', 'dropout', 'alumni'])->default('aktif');
-});
+        Schema::table('jadwal_sidang', function (Blueprint $table) {
+            $table->enum('jenis_sidang', ['sempro', 'akhir'])->after('waktu_selesai');
+        });
     }
 
     public function down()
     {
-        Schema::table('mahasiswa', function (Blueprint $table) {
-            $table->dropColumn('status');
+        Schema::table('jadwal_sidang', function (Blueprint $table) {
+            $table->dropColumn('jenis_sidang');
         });
     }
 };
