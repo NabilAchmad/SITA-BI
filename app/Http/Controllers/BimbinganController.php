@@ -143,6 +143,7 @@ class BimbinganController extends Controller
             'dosen_id' => $request->dosen_id,
             'tanggal_bimbingan' => $request->tanggal_jadwal,
             'jam_bimbingan' => $request->waktu_jadwal,
+            'catatan' => $request->catatan,
             'status_bimbingan' => 'diajukan',
         ]);
 
