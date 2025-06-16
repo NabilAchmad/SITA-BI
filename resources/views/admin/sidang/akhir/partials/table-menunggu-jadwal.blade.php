@@ -3,7 +3,13 @@
         <td class="text-center">{{ $mahasiswaMenunggu->firstItem() + $index }}</td>
         <td>{{ $mhs->user->name ?? '-' }}</td>
         <td>{{ $mhs->nim ?? '-' }}</td>
-        <td>{{ $mhs->prodi ?? '-' }}</td>
+        <td>
+            @if ($mhs->prodi === 'd4')
+                D4 Bahasa Inggris
+            @elseif ($mhs->prodi === 'd3')
+                D3 Bahasa Inggris
+            @endif
+        </td>
         <td>{{ $mhs->tugasAkhir->judul ?? '-' }}</td>
         <td class="text-center">
             @php

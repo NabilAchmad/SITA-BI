@@ -17,19 +17,19 @@
     <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
             <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
-                href="{{ route('sidang.menunggu.penjadwalan.akhir') }}">All</a>
+                href="{{ route('sidang.kelola.akhir') }}">All</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}"
-                href="{{ route('sidang.menunggu.penjadwalan.akhir', ['prodi' => 'D4']) }}">D4</a>
+                href="{{ route('sidang.kelola.akhir', ['prodi' => 'D4']) }}">D4</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}"
-                href="{{ route('sidang.menunggu.penjadwalan.akhir', ['prodi' => 'D3']) }}">D3</a>
+                href="{{ route('sidang.kelola.akhir', ['prodi' => 'D3']) }}">D3</a>
         </li>
     </ul>
 
-    <form method="GET" action="{{ route('sidang.menunggu.penjadwalan.akhir') }}">
+    <form method="GET" action="{{ route('sidang.kelola.akhir') }}">
         <div class="input-group mb-3">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
             <input type="text" name="search" id="searchInput" class="form-control"

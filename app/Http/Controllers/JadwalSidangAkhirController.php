@@ -296,23 +296,24 @@ class JadwalSidangAkhirController extends Controller
             'penguji.*' => 'exists:dosen,id',
         ]);
 
-        // Hapus dulu data penguji yang lama untuk sidang ini supaya tidak duplikat
-        PeranDosenTA::where('tugas_akhir_id', $sidang_id)
+        $sidang = Sidang::findOrFail($sidang_id);
+        $tugasAkhirId = $sidang->tugas_akhir_id;
+
+        // Hapus penguji lama
+        PeranDosenTA::where('tugas_akhir_id', $tugasAkhirId)
             ->whereIn('peran', ['penguji1', 'penguji2', 'penguji3', 'penguji4'])
             ->delete();
 
-        // Simpan penguji baru sesuai urutan yang dipilih
         foreach ($request->penguji as $index => $dosenId) {
             $peran = 'penguji' . ($index + 1);
 
             PeranDosenTA::create([
                 'dosen_id' => $dosenId,
-                'tugas_akhir_id' => $sidang_id,
+                'tugas_akhir_id' => $tugasAkhirId,
                 'peran' => $peran,
             ]);
         }
 
-        // Ini penting untuk AJAX:
         return response()->json(['success' => true]);
     }
 
@@ -324,13 +325,20 @@ class JadwalSidangAkhirController extends Controller
             'sidang.tugasAkhir.peranDosenTa.dosen.user'
         ])->where('sidang_id', $sidang_id)->firstOrFail();
 
-        // Ambil semua dosen dengan user-nya untuk dropdown select penguji
+        $tugasAkhir = $jadwal->sidang->tugasAkhir;
+
+        // Ambil dosen-dosen peran_dosen_ta yang sudah terdaftar untuk TA ini
+        $peranDosen = $tugasAkhir->peranDosenTa->mapWithKeys(function ($item) {
+            return [$item->peran => $item->dosen];
+        });
+
+        // Ambil semua dosen untuk dropdown select penguji
         $dosens = Dosen::with('user')->get();
 
         // Ambil semua ruangan untuk dropdown form edit
         $ruangans = Ruangan::all();
 
-        return view('admin.sidang.akhir.modal.detail-jadwal', compact('jadwal', 'dosens', 'ruangans'));
+        return view('admin.sidang.akhir.modal.detail-jadwal', compact('jadwal', 'dosens', 'ruangans', 'peranDosen'));
     }
 
     public function tandaiSidang(Request $request, $sidang_id)

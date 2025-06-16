@@ -30,7 +30,7 @@
                         'title' => 'Kelola Jadwal Sidang Akhir',
                         'icon' => 'bi-hourglass-top',
                         'color' => 'success',
-                        'route' => route('sidang.menunggu.penjadwalan.akhir'),
+                        'route' => route('sidang.kelola.akhir'),
                         'btn' => 'Lihat Detail',
                         'desc' => 'Mahasiswa menunggu sidang akhir',
                     ],

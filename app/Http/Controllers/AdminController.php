@@ -59,14 +59,14 @@ class AdminController extends Controller
 
     public function profile()
     {
-        $user = \App\Models\User::findOrFail(21);
+        $user = \App\Models\User::findOrFail(37);
         // dd($user);
         return view('admin.user.views.profile', compact('user'));
     }
 
     public function update(Request $request)
     {
-        $user = User::findOrFail(21);
+        $user = User::findOrFail(37);
 
         $request->validate([
             'name' => 'required|string|max:255',

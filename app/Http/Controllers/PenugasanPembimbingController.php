@@ -96,4 +96,8 @@ class PenugasanPembimbingController extends Controller
 
         return redirect()->route('penugasan-bimbingan.index')->with('success', 'Pembimbing berhasil ditetapkan.');
     }
+
+    public function update() {
+        
+    }
 }

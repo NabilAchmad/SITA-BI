@@ -116,10 +116,7 @@ Route::prefix('admin')->group(function () {
 
         Route::prefix('akhir')->group(function () {
             // Daftar mahasiswa yang belum punya jadwal sidang akhir
-            Route::get('/penjadwalan-sidang-akhir', [JadwalSidangAkhirController::class, 'SidangAkhir'])->name('sidang.menunggu.penjadwalan.akhir');
-
-            // Daftar mahasiswa yang sudah punya jadwal sidang akhir
-            Route::get('/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'listJadwalAkhir'])->name('jadwal.sidang.akhir');
+            Route::get('/penjadwalan-sidang-akhir', [JadwalSidangAkhirController::class, 'SidangAkhir'])->name('sidang.kelola.akhir');
 
             // Simpan data jadwal sidang
             Route::post('/jadwal-sidang', [JadwalSidangAkhirController::class, 'store'])->name('jadwal-sidang.store');

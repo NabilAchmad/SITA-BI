@@ -190,7 +190,7 @@
                                         }
                                     }
                                 }).then(() => {
-                                    window.location.href = "{{ route('jadwal.sidang.akhir') }}";
+                                    window.location.href = "{{ route('sidang.kelola.akhir') }}";
                                 });
                             } else {
                                 alert(data.message || 'Gagal menyimpan jadwal sidang.');

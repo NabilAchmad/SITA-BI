@@ -7,7 +7,6 @@
     <tr>
         <td class="text-center">{{ $loop->iteration + ($jadwalMahasiswa->firstItem() - 1) }}</td>
         <td>{{ $mahasiswa?->user?->name ?? '-' }}</td>
-        <td>{{ $mahasiswa?->nim ?? '-' }}</td>
         <td>{{ $ta?->judul ?? '-' }}</td>
         <td class="text-center">{{ $jadwal->tanggal }}</td>
         <td class="text-center">
