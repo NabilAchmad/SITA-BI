@@ -17,36 +17,21 @@
                         </tr>
                     </thead>
                     <tbody id="pengumumanTable">
-                        <tr class="align-middle">
-                            <td class="fw-bold text-primary">Pendaftaran Sidang TA</td>
-                            <td>Mahasiswa wajib mendaftar sidang TA sebelum 15 Mei 2025 melalui portal akademik.</td>
-                            <td><span class="badge bg-info">25 April 2025</span></td>
-                        </tr>
-                        <tr class="align-middle">
-                            <td class="fw-bold text-primary">Seminar Proposal</td>
-                            <td>Seminar proposal wajib diikuti oleh seluruh mahasiswa tingkat akhir sebelum UAS.</td>
-                            <td><span class="badge bg-info">26 April 2025</span></td>
-                        </tr>
-                        <tr class="align-middle">
-                            <td class="fw-bold text-primary">Libur Nasional</td>
-                            <td>Kampus akan libur pada tanggal 1 Mei 2025 dalam rangka Hari Buruh Internasional.</td>
-                            <td><span class="badge bg-info">24 April 2025</span></td>
-                        </tr>
-                        <tr class="align-middle">
-                            <td class="fw-bold text-primary">Workshop Penulisan Skripsi</td>
-                            <td>Diadakan workshop penulisan skripsi pada 30 April 2025 di Aula B lantai 2.</td>
-                            <td><span class="badge bg-info">23 April 2025</span></td>
-                        </tr>
-                        <tr class="align-middle">
-                            <td class="fw-bold text-primary">Pendaftaran Wisuda</td>
-                            <td>Mahasiswa yang telah lulus wajib melakukan pendaftaran wisuda paling lambat 10 Juni 2025.</td>
-                            <td><span class="badge bg-info">22 April 2025</span></td>
-                        </tr>
-                        <tr class="align-middle">
-                            <td class="fw-bold text-primary">Pengumpulan Laporan Magang</td>
-                            <td>Seluruh laporan magang harus dikumpulkan ke bagian akademik maksimal tanggal 5 Mei 2025.</td>
-                            <td><span class="badge bg-info">21 April 2025</span></td>
-                        </tr>
+                        @if(isset($pengumuman) && count($pengumuman) > 0)
+                            @foreach($pengumuman as $p)
+                                <tr class="align-middle">
+                                    <td class="fw-bold text-primary">{{ $p->judul }}</td>
+                                    <td>{{ $p->isi }}</td>
+                                    <td><span
+                                            class="badge bg-info">{{ \Carbon\Carbon::parse($p->created_at)->format('d F Y') }}</span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td colspan="3">Tidak ada pengumuman</td>
+                            </tr>
+                        @endif
                     </tbody>
                 </table>
             </div>

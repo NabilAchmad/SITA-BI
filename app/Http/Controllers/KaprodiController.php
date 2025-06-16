@@ -202,4 +202,61 @@ class KaprodiController extends Controller
 
         return response()->json($data);
     }
+
+    /**
+     * Menampilkan mahasiswa menunggu sidang akhir
+     */
+    public function showMahasiswaMenungguAkhir()
+    {
+        $mahasiswaMenunggu = Mahasiswa::whereDoesntHave('jadwalSidangAkhir')->paginate(10);
+        return view('kaprodi.sidang.akhir.views.mhs-menunggu-akhir', compact('mahasiswaMenunggu'));
+    }
+
+    /**
+     * Menampilkan mahasiswa menunggu sidang sempro
+     */
+    public function showMahasiswaSidangSempro()
+    {
+        $mahasiswaMenunggu = Mahasiswa::whereDoesntHave('jadwalSidangSempro')->paginate(10);
+        $mahasiswaTidakLulus = Mahasiswa::whereHas('tugasAkhir', function ($query) {
+            $query->where('status', 'tidak lulus');
+        })->paginate(10);
+        return view('kaprodi.sidang.sempro.views.mhs-sidang', compact('mahasiswaMenunggu', 'mahasiswaTidakLulus'));
+    }
+
+    /**
+     * Menampilkan sidang sempro terjadwal
+     */
+    public function showSidangSemproTerjadwal()
+    {
+        $jadwalSempro = JadwalSidang::where('jenis_sidang', 'sempro')->paginate(10);
+        return view('kaprodi.sidang.sempro.views.jadwal-sempro', compact('jadwalSempro'));
+    }
+
+    /**
+     * Menampilkan sidang akhir terjadwal
+     */
+    public function showSidangAkhirTerjadwal()
+    {
+        $jadwalAkhir = JadwalSidang::where('jenis_sidang', 'akhir')->paginate(10);
+        return view('kaprodi.sidang.akhir.views.jadwal-akhir', compact('jadwalAkhir'));
+    }
+
+    /**
+     * Menampilkan pasca sidang sempro
+     */
+    public function showPascaSidangSempro()
+    {
+        $pascaSempro = Sidang::where('jenis_sidang', 'sempro')->paginate(10);
+        return view('kaprodi.sidang.sempro.views.pasca-sempro', compact('pascaSempro'));
+    }
+
+    /**
+     * Menampilkan pasca sidang akhir
+     */
+    public function showPascaSidangAkhir()
+    {
+        $pascaAkhir = Sidang::where('jenis_sidang', 'akhir')->paginate(10);
+        return view('kaprodi.sidang.akhir.views.pasca-akhir', compact('pascaAkhir'));
+    }
 }

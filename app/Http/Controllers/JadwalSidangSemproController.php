@@ -18,10 +18,13 @@ class JadwalSidangSemproController extends Controller
         $prodi = $request->input('prodi');
         $search = $request->input('search');
 
+        $user = $request->user();
+        $roles = $user->roles->pluck('nama_role')->toArray();
+
         // Mahasiswa yang menunggu penjadwalan sidang sempro
         $mahasiswaMenungguQuery = Mahasiswa::whereHas('tugasAkhir.sidang', function ($query) {
             $query->where('status', 'menunggu')
-                ->where('jenis_sidang', 'proposal')  // ganti ke 'sempro'
+                ->where('jenis_sidang', 'sempro')
                 ->whereDoesntHave('jadwalSidang');
         })
             ->with([
@@ -31,7 +34,7 @@ class JadwalSidangSemproController extends Controller
                         'sidangTerakhir',
                         'sidang' => function ($query) {
                             $query->where('status', 'menunggu')
-                                ->where('jenis_sidang', 'proposal')  // ganti ke 'sempro'
+                                ->where('jenis_sidang', 'sempro')
                                 ->whereDoesntHave('jadwalSidang');
                         }
                     ]);
@@ -95,12 +98,28 @@ class JadwalSidangSemproController extends Controller
         $dosen = Dosen::with('user')->get();
         $ruanganList = Ruangan::all();
 
-        return view('admin.sidang.sempro.views.mhs-sidang', compact(
-            'mahasiswaMenunggu',
-            'mahasiswaTidakLulus',
-            'dosen',
-            'ruanganList'
-        ));
+        if (in_array('kaprodi', $roles)) {
+            return view('kaprodi.sidang.sempro.views.mhs-sidang', compact(
+                'mahasiswaMenunggu',
+                'mahasiswaTidakLulus',
+                'dosen',
+                'ruanganList'
+            ));
+        } elseif (in_array('kajur', $roles)) {
+            return view('kajur.sidang.sempro.views.mhs-sidang', compact(
+                'mahasiswaMenunggu',
+                'mahasiswaTidakLulus',
+                'dosen',
+                'ruanganList'
+            ));
+        } else {
+            return view('admin.sidang.sempro.views.mhs-sidang', compact(
+                'mahasiswaMenunggu',
+                'mahasiswaTidakLulus',
+                'dosen',
+                'ruanganList'
+            ));
+        }
     }
 
     // Menampilkan daftar jadwal sidang SEMINAR PROPOSAL

@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             TugasAkhirSeeder::class,
             SidangSeeder::class,
             RuanganSeeder::class,
+            PengumumanSeeder::class,
         ]);
     }
 }
