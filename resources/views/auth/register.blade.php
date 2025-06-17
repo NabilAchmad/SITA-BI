@@ -137,7 +137,7 @@
         }
 
         .gradient-button {
-            background: linear-gradient(45deg, #0A2472, #02d2ed);
+            background: linear-gradient(45deg, #0A2472, #02d2ed, #6a930b);
             background-size: 200% 200%;
             animation: gradient 8s ease infinite;
             border: none;
