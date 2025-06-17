@@ -149,6 +149,7 @@ class BimbinganController extends Controller
             'sesi_ke' => $lastSesi + 1,
             'tanggal_bimbingan' => $request->tanggal_jadwal,
             'jam_bimbingan' => $request->waktu_jadwal,
+            'catatan' => $request->catatan,
             'status_bimbingan' => 'diajukan',
         ]);
 
