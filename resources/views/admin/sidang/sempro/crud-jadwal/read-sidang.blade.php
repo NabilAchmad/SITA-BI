@@ -98,6 +98,8 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Nama</th>
+                                    <th>NIM</th>
+                                    <th>Prodi</th>
                                     <th>Judul Tugas Akhir</th>
                                     <th>Tanggal</th>
                                     <th>Waktu</th>

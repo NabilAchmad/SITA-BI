@@ -8,7 +8,13 @@
         <td class="text-center">{{ $loop->iteration + ($jadwalMahasiswa->firstItem() - 1) }}</td>
         <td>{{ $mahasiswa?->user?->name ?? '-' }}</td>
         <td>{{ $mahasiswa?->nim ?? '-' }}</td>
-        <td>{{ $mahasiswa?->prodi ?? '-' }}</td>
+        <td>
+            @if ($mahasiswa->prodi === 'd4')
+                D4 Bahasa Inggris
+            @elseif ($mahasiswa->prodi === 'd3')
+                D3 Bahasa Inggris
+            @endif
+        </td>
         <td>{{ $ta?->judul ?? '-' }}</td>
         <td class="text-center">{{ $jadwal->tanggal }}</td>
         <td class="text-center">
