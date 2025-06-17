@@ -57,7 +57,7 @@
                                     </div>
                                 </div>
                                 <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary btn-lg fw-bold" style="background: linear-gradient(45deg, #1a237e, #0d47a1);">
+                                    <button type="submit" class="btn btn-primary btn-lg fw-bold btn-gradient">
                                         <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
                                     </button>
                                 </div>
@@ -74,6 +74,35 @@
             </div>
         </div>
     </div>
+
+    <style>
+        .btn-gradient {
+            background: linear-gradient(45deg, #001f3f, #003366, #004080, #064482, #01509f, #0c539b, #004080, #003366, #001f3f);
+            background-size: 400% 400%;
+            animation: gradientShift 4s ease infinite;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    </style>
 
     {{-- Toggle Password Script --}}
     <script>
