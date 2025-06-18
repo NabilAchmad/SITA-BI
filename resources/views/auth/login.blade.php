@@ -77,7 +77,7 @@
 
     <style>
         .btn-gradient {
-            background: linear-gradient(45deg, #001f3f, #003366, #004080, #064482, #01509f, #0c539b, #004080, #003366, #001f3f);
+            background: linear-gradient(45deg, #001f3f, #003264, #094eb5, #094eb5, #003264, #001f3f);
             background-size: 400% 400%;
             animation: gradientShift 4s ease infinite;
             transition: all 0.3s ease;

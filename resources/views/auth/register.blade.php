@@ -132,14 +132,14 @@
             transition: all 0.3s ease;
         }
 
-        .btn-hover:hover {
+        .btn-hover:hover {  
             transform: scale(1.05);
         }
 
         .gradient-button {
-            background: linear-gradient(45deg, #0A2472, #02d2ed, #6a930b);
+            background: linear-gradient(45deg, #0c41de, #0c41de,#a039fb, #a039fb, #0c41de, #0c41de);
             background-size: 200% 200%;
-            animation: gradient 8s ease infinite;
+            animation: gradient 4s ease infinite;
             border: none;
         }
 

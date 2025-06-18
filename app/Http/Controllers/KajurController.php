@@ -31,19 +31,16 @@ class KajurController extends Controller
     public function showJudulTA()
     {
         $judulTAs = JudulTA::where('status', 'diajukan')->get();
-        dd($judulTAs);
         return view('kajur.judulTA.AccJudulTA', compact('judulTAs'));
     }
 
     public function showAcc(){
         $judulAcc = JudulTA::where('status', 'disetujui')->get();
-        dd($judulAcc);
         return view('kajur.judulTA.readAcc', compact('judulTAs'));
     }
 
     public function showTolak(){
         $judulTolak = JudulTA::where('status', 'ditolak')->get();
-        dd($judulTolak);
         // Assuming you want to return a view with the rejected titles
         return view('kajur.judulTA.readTolak', compact('judulTolak'));
     }

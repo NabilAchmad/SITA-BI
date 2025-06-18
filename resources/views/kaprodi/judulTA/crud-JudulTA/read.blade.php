@@ -2,7 +2,7 @@
 
 @section('content')
     <!-- Section Title -->
-    <div class="container section-title" data-aos="fade-up">
+    <div class="container section-title" id="judulTA" data-aos="fade-up">
         <h1><i class="bi bi-check-circle-fill text-success me-2"></i>ACC Judul Tugas Akhir</h1>
     </div>
 
