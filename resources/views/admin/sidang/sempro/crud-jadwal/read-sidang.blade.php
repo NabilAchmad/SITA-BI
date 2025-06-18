@@ -101,7 +101,7 @@
                                     <th>NIM</th>
                                     <th>Prodi</th>
                                     <th>Judul Tugas Akhir</th>
-                                    <th>Tanggal</th>
+                                    <th>Tanggal Sidang</th>
                                     <th>Waktu</th>
                                     <th>Ruangan</th>
                                     <th>Aksi</th>
@@ -146,7 +146,7 @@
                                     <th>Nama</th>
                                     <th>NIM</th>
                                     <th>Judul TA</th>
-                                    <th>Status</th>
+                                    <th>Tanggal Sidang</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
