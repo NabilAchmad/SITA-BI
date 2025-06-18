@@ -8,6 +8,7 @@ use App\Models\TawaranTopik;
 
 class TawaranTopikController extends Controller
 {
+    // CREATE (store data)
     public function store(Request $request)
     {
         $request->validate([
@@ -24,19 +25,31 @@ class TawaranTopikController extends Controller
                 'user_id' => Auth::id() ?? 1,
             ]);
 
-            // GUNAKAN route('TawaranTopik.read') AGAR SAMA DENGAN YANG DI ROUTES
             return redirect()->route('TawaranTopik.read')->with('success', 'Tawaran topik berhasil ditambahkan!');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal menyimpan tawaran topik: ' . $e->getMessage());
         }
     }
 
+    // READ (menampilkan list dengan fitur search)
     public function read(Request $request)
     {
-        $tawaranTopik = TawaranTopik::orderBy('created_at', 'desc')->paginate(10);
+        $query = TawaranTopik::query();
+
+        // Fitur search berdasarkan judul atau deskripsi
+        if ($request->has('search') && $request->search !== null) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('judul_topik', 'like', '%' . $search . '%')
+                  ->orWhere('deskripsi', 'like', '%' . $search . '%');
+            });
+        }
+
+        $tawaranTopik = $query->orderBy('created_at', 'desc')->paginate(10);
         return view('admin.TawaranTopik.crud-TawaranTopik.read', compact('tawaranTopik'));
     }
 
+    // UPDATE
     public function update(Request $request, $id)
     {
         $tawaranTopik = TawaranTopik::findOrFail($id);
@@ -53,32 +66,33 @@ class TawaranTopikController extends Controller
             'kuota' => $request->kuota,
         ]);
 
-        // GUNAKAN route('TawaranTopik.read') AGAR SAMA DENGAN YANG DI ROUTES
         return redirect()->route('TawaranTopik.read')->with('success', 'Tawaran topik berhasil diperbarui.');
     }
 
+    // EDIT (tampilkan form edit)
     public function edit($id)
     {
         $tawaranTopik = TawaranTopik::findOrFail($id);
         return view('admin.TawaranTopik.crud-TawaranTopik.edit', compact('tawaranTopik'));
     }
 
+    // DELETE (soft delete)
     public function destroy($id)
     {
         $tawaranTopik = TawaranTopik::findOrFail($id);
         $tawaranTopik->delete();
 
-        return response()->json([
-            'message' => 'Tawaran topik berhasil dihapus sementara.'
-        ]);
+        return response()->json(['message' => 'Tawaran topik berhasil dihapus sementara.']);
     }
 
+    // Tampilkan data yang sudah terhapus (trash)
     public function trashed()
     {
         $tawaranTopik = TawaranTopik::onlyTrashed()->paginate(10);
         return view('admin.TawaranTopik.crud-TawaranTopik.trashed', compact('tawaranTopik'));
     }
 
+    // Pulihkan soft-deleted
     public function restore($id)
     {
         $tawaranTopik = TawaranTopik::onlyTrashed()->findOrFail($id);
@@ -87,6 +101,7 @@ class TawaranTopikController extends Controller
         return redirect()->back()->with('success', 'Tawaran topik berhasil dipulihkan.');
     }
 
+    // Hapus permanen satu
     public function forceDelete($id)
     {
         $tawaranTopik = TawaranTopik::onlyTrashed()->findOrFail($id);
@@ -95,6 +110,7 @@ class TawaranTopikController extends Controller
         return redirect()->back()->with('success', 'Tawaran topik dihapus permanen.');
     }
 
+    // Hapus permanen semua
     public function forceDeleteAll()
     {
         TawaranTopik::onlyTrashed()->forceDelete();
