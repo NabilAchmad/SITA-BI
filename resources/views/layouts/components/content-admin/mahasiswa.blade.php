@@ -2,15 +2,18 @@
     <div class="card card-stats card-round">
         <div class="card-body">
             <div class="row align-items-center">
+                <!-- Ikon Topik -->
                 <div class="col-icon">
-                    <div class="icon-big text-center icon-info bubble-shadow-small">
-                        <i class="fas fa-users"></i>
+                    <div class="icon-big text-center icon-success bubble-shadow-small">
+                        <i class="fas fa-book-open"></i>
                     </div>
                 </div>
+
+                <!-- Teks dan Angka -->
                 <div class="col col-stats ms-3 ms-sm-0">
                     <div class="numbers">
-                        <p class="card-category">Mahasiswa Aktif</p>
-                        <h4 class="card-title">{{ $mahasiswaAktif }}</h4>
+                        <p class="card-category">Tawaran Topik Diambil</p>
+                        <h4 class="card-title">5</h4> <!-- Ganti manual jika tidak pakai backend -->
                     </div>
                 </div>
             </div>
