@@ -217,19 +217,27 @@ class TugasAkhirController extends Controller
 
     public function approve($id)
     {
-        $judul = JudulTA::findOrFail($id);
-        $judul->status = 'Disetujui';
-        $judul->approved_by = Auth::id();
-        // $judul->tanggal_acc = now(); // Removed because column does not exist
-        $judul->save();
+        if (!Auth::check()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized.'], 401);
+        }
 
-        return response()->json(['success' => true, 'message' => 'Judul disetujui.']);
+        try {
+            $judul = JudulTA::findOrFail($id);
+            $judul->status = 'disetujui'; // lowercase to match blade view
+            $judul->approved_by = Auth::id();
+            $judul->save();
+
+            return response()->json(['success' => true, 'message' => 'Judul disetujui.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+        }
     }
 
     public function reject($id)
     {
         $judul = JudulTA::findOrFail($id);
         $judul->status = 'Ditolak';
+        // Commented out to avoid error if columns do not exist in DB
         $judul->rejected_by = Auth::id();
         $judul->rejected_at = now();
 

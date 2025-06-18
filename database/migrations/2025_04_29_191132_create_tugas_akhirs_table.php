@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('judul', 255);
             $table->text('abstrak');
             $table->enum('status', ['diajukan', 'disetujui', 'ditolak', 'selesai']);
+            $table->string('approved_by')->nullable();
             $table->date('tanggal_pengajuan');
             $table->timestamps();
             $table->softDeletes();

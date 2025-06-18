@@ -82,7 +82,10 @@ Route::prefix('ketua-prodi')->group(function () {
         Route::get('/sidang/dashboard', [KaprodiController::class, 'showSidangDashboard'])->name('sidangDashboard.page');
         Route::get('/sidang/mahasiswaSidang', [KaprodiController::class, 'showMahasiswaSidang'])->name('kaprodi.mahasiswa.sidang');
         Route::get('/sidang/lihat-jadwal', [KaprodiController::class, 'showJadwal'])->name('kaprodi.jadwal');
-
+        
+        //Kaprodi Lihat Nilai
+        Route::get('/nilai', [KaprodiController::class, 'sidangAkhir'])->name('kaprodi.nilai.page');
+        
         // Tugas Akhir
         Route::get('/judulTA/JudulTA', [KaprodiController::class, 'showJudulTA'])->name('kaprodi.judul.page');
         Route::post('/judulTA/approve/{id}', [TugasAkhirController::class, 'approve'])->name('kaprodi.judul.approve');
@@ -110,6 +113,8 @@ Route::prefix('ketua-prodi')->group(function () {
             Route::get('/nilai/sidang', [KaprodiController::class, 'SidangAkhir'])->name('kaprodi.akhir.page');
             Route::get('/sidang/create', [KaprodiController::class, 'createSidang'])->name('kaprodi.nilai.create');
             Route::post('/sidang/create', [KaprodiController::class, 'storeSidang'])->name('kaprodi.nilai.store');
+
+            // Route for Kaprodi to view Nilai
 
 
             // New routes for detailed views of dashboard cards

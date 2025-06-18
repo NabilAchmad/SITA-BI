@@ -58,7 +58,7 @@ class KaprodiController extends Controller
             'mahasiswa',        // relasi ke tabel mahasiswa
             'tugasAkhir',       // relasi ke tugas_akhir (jika ada)
             'dosenPenguji'      // relasi ke dosen penguji (jika ada)
-        ])->get();
+        ])->paginate(15);
 
         return view('kaprodi.nilai.read', compact('nilais'));
     }

@@ -79,8 +79,8 @@
                 </li>
 
                 <!-- Laporan dan Statistik -->
-                <li class="nav-item {{ request()->is('ketua-prodi/nilai/*') || request()->is('kaprodi/nilai/*') ? 'active' : '' }}">
-                    <a href="{{ route('kaprodi.akhir.page') }}">
+                <li class="nav-item {{ request()->is('ketua-prodi/nilai*') || request()->is('kaprodi/nilai/*') ? 'active' : '' }}">
+                    <a href="{{ route('kaprodi.nilai.page') }}">
                         <i class="fas fa-chart-bar"></i>
                         <p>Nilai Sidang</p>
                     </a>

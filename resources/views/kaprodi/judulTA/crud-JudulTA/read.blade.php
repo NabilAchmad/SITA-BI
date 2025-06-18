@@ -1,7 +1,6 @@
 @extends('layouts.template.kaprodi')
 
 @section('content')
-    <!-- Section Title -->
     <div class="container section-title" id="judulTA" data-aos="fade-up">
         <h1><i class="bi bi-check-circle-fill text-success me-2"></i>ACC Judul Tugas Akhir</h1>
     </div>
@@ -29,7 +28,6 @@
         </ul>
 
         <div class="tab-content pt-4">
-            <!-- Tab Semua -->
             <div class="tab-pane fade show active" id="semua" role="tabpanel" aria-labelledby="semua-tab">
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover text-center align-middle custom-table animate__animated animate__fadeIn">
@@ -297,6 +295,8 @@
     </style>
     @section('script')
         <script>
+            let currentJudulId = null; // Variable to store the ID of the currently displayed detail
+
             $(document).ready(function () {
                 // Setup CSRF Token untuk semua request
                 $.ajaxSetup({
@@ -305,13 +305,13 @@
                     }
                 });
 
-                // Ketika tombol ACC diklik
-                $('.btn-acc').on('click', function () {
-
-                });
+                // Ketika tombol ACC diklik (This block can be removed as you're using accJudulFromDetail now)
+                // $('.btn-acc').on('click', function () {
+                // });
             });
 
             function showDetail(id) {
+                currentJudulId = id; // Store the ID when showing details
                 let uri = "{{ route('kaprodi.judul.similar', ['id' => ':id']) }}".replace(':id', id);
                 $.ajax({
                     url: uri,
@@ -328,6 +328,24 @@
                             $('#detail-similar-list').append('<li>Tidak ada judul mirip ditemukan.</li>');
                         }
                         $('#detail-row').show();
+
+                        // Disable/Enable ACC/Tolak buttons based on current status
+                        const currentStatus = response.status_judul; // Assuming your API returns the status
+                        const accButton = $('#detail-acc-btn');
+                        const tolakButton = $('#detail-tolak-btn');
+
+                        if (currentStatus === 'disetujui') {
+                            accButton.prop('disabled', true);
+                            tolakButton.prop('disabled', false); // Allow tolak if currently approved
+                        } else if (currentStatus === 'Ditolak') {
+                            accButton.prop('disabled', false); // Allow acc if currently rejected
+                            tolakButton.prop('disabled', true);
+                        } else { // Menunggu
+                            accButton.prop('disabled', false);
+                            tolakButton.prop('disabled', false);
+                        }
+
+
                         // Scroll to detail card
                         $('html, body').animate({
                             scrollTop: $('#detail-row').offset().top
@@ -341,6 +359,7 @@
 
             function hideDetail() {
                 $('#detail-row').hide();
+                currentJudulId = null; // Clear the stored ID when hiding details
             }
 
             // Acc Judul
@@ -359,7 +378,8 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        alert('Terjadi kesalahan: ' + error);
+                        console.error("AJAX Error: ", xhr.responseText); // Log the full error response
+                        alert('Terjadi kesalahan: ' + error + '. Detail: ' + xhr.responseText);
                     }
                 });
             }
@@ -380,31 +400,27 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        alert('Terjadi kesalahan: ' + error);
+                        console.error("AJAX Error: ", xhr.responseText); // Log the full error response
+                        alert('Terjadi kesalahan: ' + error + '. Detail: ' + xhr.responseText);
                     }
                 });
-            } 
+            }
 
             function accJudulFromDetail() {
-                // Get the id of the current detail shown
-                let id = $('#detail-row').prev('tr').attr('id'); // This gets the previous tr id like "row-123"
-                if (!id) {
-                    alert('ID Judul tidak ditemukan.');
-                    return;
+                if (currentJudulId) {
+                    accJudul(currentJudulId);
+                } else {
+                    alert('Tidak ada judul yang sedang ditampilkan detailnya.');
                 }
-                id = id.replace('row-', '');
-                accJudul(id);
             }
+
             function tolakJudulFromDetail() {
-                // Get the id of the current detail shown
-                let id = $('#detail-row').prev('tr').attr('id'); // This gets the previous tr id like "row-123"
-                if (!id) {
-                    alert('ID Judul tidak ditemukan.');
-                    return;
+                if (currentJudulId) {
+                    tolakJudul(currentJudulId);
+                } else {
+                    alert('Tidak ada judul yang sedang ditampilkan detailnya.');
                 }
-                id = id.replace('row-', '');
-                tolakJudul(id);
             }
-            </script>
+        </script>
     @endsection
 @endsection
