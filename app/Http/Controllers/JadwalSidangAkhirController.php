@@ -196,39 +196,64 @@ class JadwalSidangAkhirController extends Controller
         $validated = $request->validate([
             'sidang_id' => 'required|exists:sidang,id',
             'tanggal' => 'required|date',
-            'waktu_mulai' => 'required',
-            'waktu_selesai' => 'required|after:waktu_mulai',
+            'waktu_mulai' => 'required|date_format:H:i',
+            'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
             'ruangan_id' => 'required|exists:ruangan,id',
         ]);
 
         try {
             $sidangId = $validated['sidang_id'];
+            $tanggal = $validated['tanggal'];
+            $mulai = $validated['waktu_mulai'];
+            $selesai = $validated['waktu_selesai'];
+            $ruanganId = $validated['ruangan_id'];
 
-            // 1. Nonaktifkan sidang lama yang aktif untuk tugas akhir yang sama
-            $sidang = Sidang::findOrFail($sidangId);
+            // Ambil data sidang
+            $sidang = Sidang::with('tugasAkhir')->findOrFail($sidangId);
 
+            // Cek bentrok jadwal ruangan di tanggal & waktu yang sama
+            $bentrok = JadwalSidang::where('ruangan_id', $ruanganId)
+                ->where('tanggal', $tanggal)
+                ->where(function ($query) use ($mulai, $selesai) {
+                    $query->whereBetween('waktu_mulai', [$mulai, $selesai])
+                        ->orWhereBetween('waktu_selesai', [$mulai, $selesai])
+                        ->orWhere(function ($query) use ($mulai, $selesai) {
+                            $query->where('waktu_mulai', '<', $mulai)
+                                ->where('waktu_selesai', '>', $selesai);
+                        });
+                })
+                ->exists();
+
+            if ($bentrok) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ruangan sudah terpakai pada waktu tersebut.',
+                ]);
+            }
+
+            // Nonaktifkan sidang lain milik tugas akhir ini
             Sidang::where('tugas_akhir_id', $sidang->tugas_akhir_id)
                 ->where('id', '!=', $sidangId)
                 ->where('is_active', true)
                 ->update(['is_active' => false]);
 
-            // 2. Simpan jadwal sidang baru
+            // Simpan jadwal sidang
             $jadwal = new JadwalSidang();
             $jadwal->sidang_id = $sidangId;
-            $jadwal->tanggal = $validated['tanggal'];
-            $jadwal->waktu_mulai = $validated['waktu_mulai'];
-            $jadwal->waktu_selesai = $validated['waktu_selesai'];
-            $jadwal->ruangan_id = $validated['ruangan_id'];
+            $jadwal->tanggal = $tanggal;
+            $jadwal->waktu_mulai = $mulai;
+            $jadwal->waktu_selesai = $selesai;
+            $jadwal->ruangan_id = $ruanganId;
             $jadwal->save();
 
-            // 3. Update status sidang dan aktifkan sidang baru
+            // Update status sidang
             $sidang->status = 'dijadwalkan';
             $sidang->is_active = true;
             $sidang->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Jadwal sidang berhasil disimpan.',
+                'message' => 'Jadwal sidang akhir berhasil disimpan.',
             ]);
         } catch (\Exception $e) {
             return response()->json([

@@ -109,9 +109,6 @@ Route::prefix('admin')->group(function () {
             // Tandai akhir sidang selesai 
             Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidangSempro'])
                 ->name('jadwal-sidang-sempro.mark-done');
-
-            // Daftar mahasiswa yang sudah sidang
-            Route::get('pasca-sidang-sempro', [JadwalSidangSemproController::class, 'pascaSidangSempro'])->name('pasca.sidang.sempro');
         });
 
         Route::prefix('akhir')->group(function () {

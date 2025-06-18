@@ -282,7 +282,7 @@
                                 window.location.href = '/admin/sidang/sempro/penjadwalan-sidang-sempro';
                             } else {
                                 // Redirect default untuk status lainnya
-                                window.location.href = '/admin/sidang/sempro/pasca-sidang-sempro';
+                                window.location.href = '/admin/sidang/sempro/penjadwalan-sidang-sempro';
                             }
                         });
                     } else {

@@ -66,7 +66,7 @@ class JadwalSidangSemproController extends Controller
             'user',
             'tugasAkhir' => function ($query) {
                 $query->with([
-                    'sidangTerakhir',
+                    'sidangTerakhir.jadwalSidang', // tambahkan ini agar tanggal sidang ikut dimuat
                     'sidang' => function ($query) {
                         $query->where('jenis_sidang', 'proposal')
                             ->orderBy('created_at', 'desc');
@@ -165,7 +165,7 @@ class JadwalSidangSemproController extends Controller
             $selesai = $validated['waktu_selesai'];
             $ruanganId = $validated['ruangan_id'];
 
-            // Periksa apakah ruangan sudah dipakai di waktu yang sama
+            // Cek bentrok jadwal
             $jadwalBentrok = JadwalSidang::where('ruangan_id', $ruanganId)
                 ->where('tanggal', $tanggal)
                 ->where(function ($query) use ($mulai, $selesai) {
@@ -184,7 +184,7 @@ class JadwalSidangSemproController extends Controller
                 ]);
             }
 
-            // Nonaktifkan sidang lama yang aktif (jika ada)
+            // Nonaktifkan sidang lama
             $sidang = Sidang::findOrFail($sidangId);
             Sidang::where('tugas_akhir_id', $sidang->tugas_akhir_id)
                 ->where('id', '!=', $sidangId)
@@ -192,23 +192,29 @@ class JadwalSidangSemproController extends Controller
                 ->update(['is_active' => false]);
 
             // Simpan jadwal baru
-            $jadwal = new JadwalSidang();
-            $jadwal->sidang_id = $sidangId;
-            $jadwal->tanggal = $tanggal;
-            $jadwal->waktu_mulai = $mulai;
-            $jadwal->waktu_selesai = $selesai;
-            $jadwal->ruangan_id = $ruanganId;
-            $jadwal->save();
+            JadwalSidang::create([
+                'sidang_id' => $sidangId,
+                'tanggal' => $tanggal,
+                'waktu_mulai' => $mulai,
+                'waktu_selesai' => $selesai,
+                'ruangan_id' => $ruanganId,
+            ]);
 
-            // Update status sidang
-            $sidang->status = 'dijadwalkan';
-            $sidang->is_active = true;
-            $sidang->save();
+            $sidang->update([
+                'status' => 'dijadwalkan',
+                'is_active' => true,
+            ]);
 
-            return redirect()->back()->with('success', 'Jadwal sidang berhasil disimpan.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Jadwal sidang berhasil disimpan.'
+            ]);
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()
-                ->with('error', 'Terjadi kesalahan saat menyimpan jadwal.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan jadwal.',
+                'error' => $e->getMessage(), // opsional untuk debug
+            ], 500);
         }
     }
 

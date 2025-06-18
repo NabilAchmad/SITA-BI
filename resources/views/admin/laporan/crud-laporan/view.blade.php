@@ -1,30 +1,54 @@
 <div class="container-fluid">
-    <h1 class="mb-4 fw-bold"><i class="bi bi-bar-chart-line me-2 text-primary"></i> Laporan dan Statistik</h1>
+    <h1 class="mb-4 fw-bold">
+        <i class="bi bi-bar-chart-line me-2 text-primary"></i> Laporan dan Statistik
+    </h1>
 
-    {{-- CHARTS --}}
+    {{-- CHARTS SECTION --}}
     <div class="row g-4 mb-5">
-        <div class="col-md-6">
+        <!-- Mahasiswa per Prodi -->
+        <div class="col-md-4">
             <div class="card shadow-sm p-3">
                 <h6 class="fw-semibold mb-3">Mahasiswa per Prodi</h6>
                 <canvas id="prodiChart" height="200"></canvas>
             </div>
         </div>
-        <div class="col-md-6">
+
+        <!-- Mahasiswa per Status -->
+        <div class="col-md-4">
             <div class="card shadow-sm p-3">
                 <h6 class="fw-semibold mb-3">Mahasiswa per Status</h6>
                 <canvas id="statusChart" height="200"></canvas>
             </div>
         </div>
-        <div class="col-md-12">
+
+        <!-- Status Sidang per Jenis -->
+        <div class="col-md-4">
             <div class="card shadow-sm p-3">
                 <h6 class="fw-semibold mb-3">Status Sidang per Jenis</h6>
-                <canvas id="sidangChart" height="100"></canvas>
+                <canvas id="sidangChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Similarity Score Distribution -->
+        <div class="col-md-6">
+            <div class="card shadow-sm p-3">
+                <h6 class="fw-semibold mb-3">Distribusi Skor Similarity</h6>
+                <canvas id="similarityChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Status Revisi TA -->
+        <div class="col-md-6">
+            <div class="card shadow-sm p-3">
+                <h6 class="fw-semibold mb-3">Status Revisi Tugas Akhir</h6>
+                <canvas id="revisiChart" height="200"></canvas>
             </div>
         </div>
     </div>
 
-    {{-- TABEL --}}
+    {{-- TABLES SECTION --}}
     <div class="row g-4">
+        <!-- Jumlah Mahasiswa per Angkatan -->
         <div class="col-md-6">
             <div class="card shadow-sm p-3">
                 <h6 class="fw-semibold mb-3">Jumlah Mahasiswa per Angkatan</h6>
@@ -49,14 +73,16 @@
                 </table>
             </div>
         </div>
+
+        <!-- Dokumen TA Statistik -->
         <div class="col-md-6">
             <div class="card shadow-sm p-3">
-                <h6 class="fw-semibold mb-3">Jumlah Dokumen Tugas Akhir</h6>
+                <h6 class="fw-semibold mb-3">Dokumen Tugas Akhir</h6>
                 <table class="table table-sm table-bordered">
                     <thead>
                         <tr>
                             <th>Tipe</th>
-                            <th>Status Validasi</th>
+                            <th>Status</th>
                             <th>Total</th>
                         </tr>
                     </thead>
@@ -77,6 +103,7 @@
         </div>
     </div>
 
+    <!-- Alumni Summary -->
     <div class="mt-4">
         <div class="alert alert-success">
             <h5 class="mb-0">Total Alumni Terdaftar: <strong>{{ $totalAlumni }}</strong> mahasiswa</h5>
@@ -87,42 +114,14 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // === CHART DATA ===
-            const prodiLabels = {!! json_encode(
-                $mahasiswaPerProdi->pluck('prodi')->map(function ($prodi) {
-                    if (strtolower($prodi) === 'd4') {
-                        return 'D4 Bahasa Inggris';
-                    }
-                    if (strtolower($prodi) === 'd3') {
-                        return 'D3 Bahasa Inggris';
-                    }
-                    return $prodi;
-                }),
-            ) !!};
-            const prodiData = {!! json_encode($mahasiswaPerProdi->pluck('total')) !!};
-
-            const statusLabels = {!! json_encode($mahasiswaPerStatus->pluck('status')) !!};
-            const statusData = {!! json_encode($mahasiswaPerStatus->pluck('total')) !!};
-
-            const sidang = {!! json_encode($sidangStatistik->groupBy('jenis_sidang')) !!};
-            const sidangLabels = Object.keys(sidang);
-            const sidangStatus = ['menunggu', 'dijadwalkan', 'lulus', 'lulus_revisi', 'tidak_lulus'];
-            const sidangColors = {
-                menunggu: '#facc15',
-                dijadwalkan: '#60a5fa',
-                lulus: '#4ade80',
-                lulus_revisi: '#38bdf8',
-                tidak_lulus: '#f87171'
-            };
-
-            // === CHART INSTANCES ===
+            // Prodi Chart
             new Chart(document.getElementById('prodiChart'), {
                 type: 'bar',
                 data: {
-                    labels: prodiLabels,
+                    labels: {!! json_encode($mahasiswaPerProdi->pluck('prodi')) !!},
                     datasets: [{
                         label: 'Jumlah',
-                        data: prodiData,
+                        data: {!! json_encode($mahasiswaPerProdi->pluck('total')) !!},
                         backgroundColor: '#6366f1'
                     }]
                 },
@@ -136,51 +135,84 @@
                 }
             });
 
+            // Status Chart
             new Chart(document.getElementById('statusChart'), {
                 type: 'pie',
                 data: {
-                    labels: statusLabels,
+                    labels: {!! json_encode($mahasiswaPerStatus->pluck('status')) !!},
                     datasets: [{
-                        data: statusData,
+                        data: {!! json_encode($mahasiswaPerStatus->pluck('total')) !!},
                         backgroundColor: ['#4ade80', '#60a5fa', '#facc15', '#f87171']
                     }]
                 }
             });
 
-            const sidangDatasets = sidangStatus.map(stat => ({
-                label: stat.replace('_', ' '),
+            // Sidang Chart
+            const sidang = {!! json_encode($sidangStatistik->groupBy('jenis_sidang')) !!};
+            const sidangLabels = Object.keys(sidang);
+            const sidangStatus = ['menunggu', 'dijadwalkan', 'lulus', 'lulus_revisi', 'tidak_lulus'];
+            const sidangColors = {
+                menunggu: '#facc15',
+                dijadwalkan: '#60a5fa',
+                lulus: '#4ade80',
+                lulus_revisi: '#38bdf8',
+                tidak_lulus: '#f87171'
+            };
+            const sidangDatasets = sidangStatus.map(status => ({
+                label: status.replace('_', ' '),
                 data: sidangLabels.map(jenis => {
-                    const entry = sidang[jenis].find(s => s.status === stat);
-                    return entry ? entry.total : 0;
+                    const found = sidang[jenis].find(s => s.status === status);
+                    return found ? found.total : 0;
                 }),
-                backgroundColor: sidangColors[stat]
+                backgroundColor: sidangColors[status]
             }));
-
             new Chart(document.getElementById('sidangChart'), {
                 type: 'bar',
                 data: {
-                    labels: sidangLabels.map(s => s.toUpperCase()),
+                    labels: sidangLabels,
                     datasets: sidangDatasets
                 },
                 options: {
                     responsive: true,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
                     plugins: {
-                        tooltip: {
-                            mode: 'index'
-                        },
                         legend: {
                             position: 'bottom'
                         }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
                     },
                     scales: {
                         y: {
                             beginAtZero: true
                         }
                     }
+                }
+            });
+
+            // Similarity Chart
+            new Chart(document.getElementById('similarityChart'), {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($similarityStat->pluck('kategori')) !!},
+                    datasets: [{
+                        label: 'Jumlah',
+                        data: {!! json_encode($similarityStat->pluck('total')) !!},
+                        backgroundColor: '#f97316'
+                    }]
+                }
+            });
+
+            // Revisi Chart
+            new Chart(document.getElementById('revisiChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: {!! json_encode($revisiStatus->pluck('status_revisi')) !!},
+                    datasets: [{
+                        data: {!! json_encode($revisiStatus->pluck('total')) !!},
+                        backgroundColor: ['#60a5fa', '#f87171']
+                    }]
                 }
             });
         });
