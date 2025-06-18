@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TugasAkhirController;
 use App\Http\Controllers\PendaftaranSidangController;
 use App\Http\Controllers\TopikController;
+use App\Http\Controllers\MahasiswaProfileController;
 use App\Models\TawaranTopik;
 
 Route::prefix('/mahasiswa')->group(function () {
@@ -77,5 +78,12 @@ Route::prefix('/mahasiswa')->group(function () {
 
         Route::get('/daftar-sidang', [PendaftaranSidangController::class, 'form'])->name('pendaftaran_sidang.form');
         Route::post('/daftar-sidang', [PendaftaranSidangController::class, 'store'])->name('pendaftaran_sidang.store');
+    });
+
+    // Profile
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [MahasiswaProfileController::class, 'profile'])->name('user.profile');
+        Route::put('/update', [MahasiswaProfileController::class, 'update'])->name('user.profile.update');
+        Route::put('/logout', [MahasiswaProfileController::class, ''])->name('logout');
     });
 });
