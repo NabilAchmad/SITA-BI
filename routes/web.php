@@ -57,7 +57,11 @@ Route::prefix('admin')->group(function () {
 
         // Daftar mahasiswa sudah punya pembimbing
         Route::get('/list-mahasiswa', [PenugasanPembimbingController::class, 'indexPembimbing'])->name('list-mahasiswa');
+
+        // Update pembimbing (edit via modal)
+        Route::put('/update-pembimbing/{tugasAkhirId}', [PenugasanPembimbingController::class, 'update'])->name('pembimbing.update');
     });
+
 
     // =========================
     // ROUTE KELOLA AKUN
