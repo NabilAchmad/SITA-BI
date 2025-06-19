@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\DosenApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\MahasiswaApiController;
@@ -16,4 +17,13 @@ Route::prefix('mahasiswa')->group(function () {
     Route::post('/', [MahasiswaApiController::class, 'store']);
     Route::put('/{id}', [MahasiswaApiController::class, 'update']);
     Route::delete('/{id}', [MahasiswaApiController::class, 'destroy']);
+});
+
+// Dosen API routes
+Route::prefix('dosen')->group(function () {
+    Route::get('/', [DosenApiController::class, 'index']);
+    Route::get('/{id}', [DosenApiController::class, 'show']);
+    Route::post('/', [DosenApiController::class, 'store']);
+    Route::put('/{id}', [DosenApiController::class, 'update']);
+    Route::delete('/{id}', [DosenApiController::class, 'destroy']);
 });
