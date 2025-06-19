@@ -14,7 +14,7 @@ class TopikController extends Controller
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return 20;
+        return 1;
     }
 
     public function index(Request $request)

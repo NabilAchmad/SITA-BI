@@ -13,6 +13,9 @@ class PeranDosenTa extends Model
         'dosen_id',
         'tugas_akhir_id',
         'peran',
+        'setuju_pembatalan',
+        'tanggal_verifikasi',
+        'catatan_verifikasi',
     ];
 
     // Relasi ke Dosen

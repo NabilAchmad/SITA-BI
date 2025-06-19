@@ -14,7 +14,7 @@ class BimbinganController extends Controller
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return \App\Models\User::find(20);
+        return \App\Models\User::find(1);
     }
 
     public function dashboard()
@@ -29,18 +29,41 @@ class BimbinganController extends Controller
         $tugasAkhir = $mahasiswa->tugasAkhir;
 
         if (!$tugasAkhir) {
-            return view('mahasiswa.bimbingan.dashboard.dashboard', ['jadwals' => []])
-                ->with('info', 'Anda belum memiliki data tugas akhir.');
+            return view('mahasiswa.bimbingan.dashboard.dashboard', [
+                'tugasAkhir' => null,
+                'jadwals' => collect(),
+            ])->with('info', 'Anda belum memiliki data tugas akhir.');
         }
 
-        // Ambil data bimbingan termasuk dosen, user dosen, dan catatan
+        // Cek status TA apakah boleh bimbingan
+        $statusValid = in_array($tugasAkhir->status, ['disetujui', 'draft']);
+        if (!$statusValid) {
+            return view('mahasiswa.bimbingan.dashboard.dashboard', [
+                'tugasAkhir' => $tugasAkhir,
+                'jadwals' => collect(),
+            ])->with('info', 'Tugas Akhir Anda belum dapat dibimbing karena status saat ini: ' . $tugasAkhir->status);
+        }
+
+        // Cek apakah sudah punya pembimbing
+        $pembimbingAda = $tugasAkhir->peranDosenTa()
+            ->whereIn('peran', ['pembimbing1', 'pembimbing2'])
+            ->exists();
+
+        if (!$pembimbingAda) {
+            return view('mahasiswa.bimbingan.dashboard.dashboard', [
+                'tugasAkhir' => $tugasAkhir,
+                'jadwals' => collect(),
+            ])->with('info', 'Belum ada dosen pembimbing yang ditetapkan.');
+        }
+
+        // Ambil data bimbingan
         $jadwals = $tugasAkhir->bimbingan()
             ->with(['dosen.user', 'catatanBimbingan'])
             ->orderBy('tanggal_bimbingan', 'desc')
-            ->orderBy('jam_bimbingan', 'asc') // Menambahkan urutan jam jika diperlukan
+            ->orderBy('jam_bimbingan', 'asc')
             ->get();
 
-        return view('mahasiswa.bimbingan.dashboard.dashboard', compact('jadwals'));
+        return view('mahasiswa.bimbingan.dashboard.dashboard', compact('jadwals', 'tugasAkhir'));
     }
 
     public function ajukanJadwal()

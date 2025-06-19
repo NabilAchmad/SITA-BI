@@ -12,7 +12,7 @@ class TugasAkhirController extends Controller
 {
     private function assumedMahasiswa()
     {
-        return Mahasiswa::where('user_id', 20)->firstOrFail();
+        return Mahasiswa::where('user_id', 1)->firstOrFail();
     }
 
     public function dashboard()
@@ -64,52 +64,87 @@ class TugasAkhirController extends Controller
         $mahasiswa = $this->assumedMahasiswa();
         $tugasAkhir = $mahasiswa->tugasAkhir;
 
-        $isMengajukanTA = $tugasAkhir && in_array($tugasAkhir->status, ['diajukan', 'revisi', 'disetujui', 'lulus_tanpa_revisi', 'draft']);
+        $isMengajukanTA = $tugasAkhir && in_array($tugasAkhir->status, [
+            'diajukan',
+            'revisi',
+            'disetujui',
+            'lulus_tanpa_revisi',
+            'draft',
+            'menunggu_pembatalan'
+        ]);
 
-        $progressBimbingan = $tugasAkhir ? BimbinganTA::where('tugas_akhir_id', $tugasAkhir->id)->latest('tanggal_bimbingan')->get() : collect();
-        $revisi = $tugasAkhir ? RevisiTa::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get() : collect();
-        $dokumen = $tugasAkhir ? DokumenTa::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get() : collect();
-        $sidang = $tugasAkhir ? Sidang::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get() : collect();
+        $progressBimbingan = $tugasAkhir
+            ? BimbinganTA::where('tugas_akhir_id', $tugasAkhir->id)
+            ->latest('tanggal_bimbingan')
+            ->get()
+            : collect();
+
+        $revisi = $tugasAkhir
+            ? RevisiTa::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get()
+            : collect();
+
+        $dokumen = $tugasAkhir
+            ? DokumenTa::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get()
+            : collect();
+
+        $sidang = $tugasAkhir
+            ? Sidang::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get()
+            : collect();
 
         $jumlahBimbingan = $progressBimbingan->count();
+
         $progress = match ($tugasAkhir?->status) {
             'diajukan' => min(ceil(($jumlahBimbingan / 7) * 100), 49),
             'disetujui' => 50 + min(ceil(($jumlahBimbingan / 7) * 50), 49),
             'selesai', 'lulus_tanpa_revisi', 'lulus_dengan_revisi' => 100,
-            'draft' => 0,
+            'draft', 'menunggu_pembatalan' => 0,
             default => 0,
         };
 
-        return view('mahasiswa.tugas-akhir.crud-ta.progress', compact('tugasAkhir', 'progressBimbingan', 'revisi', 'dokumen', 'sidang', 'isMengajukanTA', 'progress'));
+        return view('mahasiswa.tugas-akhir.crud-ta.progress', compact(
+            'tugasAkhir',
+            'progressBimbingan',
+            'revisi',
+            'dokumen',
+            'sidang',
+            'isMengajukanTA',
+            'progress'
+        ));
     }
+
 
     public function cancel(Request $request, $id)
     {
         $mahasiswa = $this->assumedMahasiswa();
-        $tugasAkhir = TugasAkhir::findOrFail($id);
+        $tugasAkhir = TugasAkhir::with('peranDosenTa')->findOrFail($id);
 
         if ($tugasAkhir->mahasiswa_id !== $mahasiswa->id) {
             return back()->with('error', 'Anda tidak memiliki akses untuk membatalkan tugas akhir ini.');
         }
 
+        // Jika status sudah draft, tidak perlu diproses ulang
+        if ($tugasAkhir->status === 'draft') {
+            return back()->with('info', 'Tugas akhir Anda sudah berstatus draft.');
+        }
+
+        // Set status menjadi "menunggu_pembatalan"
         $tugasAkhir->update([
-            'status' => 'draft',
+            'status' => 'menunggu_pembatalan',
             'alasan_pembatalan' => $request->input('alasan'),
         ]);
 
-        return redirect()->route('tugas-akhir.progress')->with('success', 'Tugas Akhir berhasil dibatalkan.');
-    }
-
-    public function edit($id)
-    {
-        $mahasiswa = $this->assumedMahasiswa();
-        $tugasAkhir = TugasAkhir::findOrFail($id);
-
-        if ($tugasAkhir->mahasiswa_id !== $mahasiswa->id) {
-            return back()->with('error', 'Anda tidak memiliki akses.');
+        // Kosongkan status setuju_pembatalan semua pembimbing (jika pernah diajukan sebelumnya)
+        foreach ($tugasAkhir->peranDosenTa as $peran) {
+            if (in_array($peran->peran, ['pembimbing1', 'pembimbing2'])) {
+                $peran->update([
+                    'setuju_pembatalan' => null,
+                    'tanggal_verifikasi' => null,
+                    'catatan_verifikasi' => null,
+                ]);
+            }
         }
 
-        return view('mahasiswa.tugas-akhir.edit', compact('tugasAkhir'));
+        return redirect()->route('tugas-akhir.progress')->with('success', 'Pengajuan pembatalan Tugas Akhir telah dikirim dan menunggu verifikasi dosen pembimbing.');
     }
 
     public function update(Request $request, $id)
@@ -143,24 +178,13 @@ class TugasAkhirController extends Controller
         return redirect()->route('tugasAkhir.progress')->with('success', 'Tugas Akhir berhasil diperbarui!');
     }
 
-    public function destroy($id)
-    {
-        $tugasAkhir = TugasAkhir::findOrFail($id);
-
-        if ($tugasAkhir->mahasiswa_id !== $this->assumedMahasiswa()->id) {
-            return back()->with('error', 'Tidak diizinkan.');
-        }
-
-        $tugasAkhir->delete();
-
-        return redirect()->route('tugasAkhir.progress')->with('success', 'Tugas Akhir berhasil dibatalkan.');
-    }
-
     public function showCancelled()
     {
         $mahasiswa = $this->assumedMahasiswa();
+
+        // Ambil TA yang pembatalannya diajukan
         $tugasAkhirDibatalkan = TugasAkhir::where('mahasiswa_id', $mahasiswa->id)
-            ->where('status', 'draft')
+            ->whereIn('status', ['menunggu_pembatalan', 'dibatalkan']) // tergantung logika
             ->latest()
             ->get();
 

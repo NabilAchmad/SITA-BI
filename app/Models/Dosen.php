@@ -58,4 +58,12 @@ class Dosen extends Model
     {
         return $this->hasMany(PeranDosenTA::class);
     }
+    public function permintaanPembatalan()
+    {
+        return $this->peranDosenTa()
+            ->whereNull('setuju_pembatalan')
+            ->whereHas('tugasAkhir', function ($query) {
+                $query->where('status', 'menunggu_pembatalan');
+            });
+    }
 }

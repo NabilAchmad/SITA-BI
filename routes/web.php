@@ -40,7 +40,6 @@ Route::prefix('/mahasiswa')->group(function () {
         Route::get('/cancel', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.cancelled');
     });
 
-
     Route::prefix('bimbingan')->group(function () {
         // Tambahkan route untuk Bimbingan di sini jika diperlukan
         Route::get('/', [BimbinganController::class, 'dashboard'])->name('dashboard.bimbingan');

@@ -65,6 +65,8 @@
                         'lulus_tanpa_revisi' => 'Lulus Tanpa Revisi',
                         'lulus_dengan_revisi' => 'Lulus Dengan Revisi',
                         'ditolak' => 'Ditolak',
+                        'dibatalkan' => 'Dibatalkan',
+                        'menunggu_pembatalan' => 'Menunggu Persetujuan Pembatalan',
                     ];
                     $progress = match ($ta->status) {
                         'diajukan' => 0,
