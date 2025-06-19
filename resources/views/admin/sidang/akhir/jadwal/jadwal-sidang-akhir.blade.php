@@ -42,60 +42,122 @@
 
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body">
+                <ul class="nav nav-tabs mb-3" id="jadwalTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="menunggu-tab" data-bs-toggle="tab" data-bs-target="#menunggu"
+                        type="button" role="tab" aria-controls="menunggu" aria-selected="true">
+                        Menunggu Penjadwalan
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="jadwal-sidang-tab" data-bs-toggle="tab" data-bs-target="#jadwal-sidang"
+                        type="button" role="tab" aria-controls="jadwal-sidang" aria-selected="false">
+                        Jadwal Sidang Akhir
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tidak-lulus-tab" data-bs-toggle="tab" data-bs-target="#tidak-lulus"
+                        type="button" role="tab" aria-controls="tidak-lulus" aria-selected="false">
+                        Mengulang Sidang (Tidak Lulus Sidang Akhir)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="lulus-tab" data-bs-toggle="tab" data-bs-target="#lulus" type="button"
+                        role="tab" aria-controls="lulus" aria-selected="false">
+                        Lulus Sidang Akhir
+                    </button>
+                </li>
+            </ul>
                 <div class="tab-content" id="jadwalTabContent">
-                    {{-- Tab dijadwalkan --}}
-                    <div class="tab-pane fade show active" id="dijadwalkan" role="tabpanel"
-                        aria-labelledby="dijadwalkan-tab">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-bordered align-middle">
-                                <thead class="table-dark text-center">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Judul Tugas Akhir</th>
-                                        <th>Tanggal</th>
-                                        <th>Waktu</th>
-                                        <th>Ruangan</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dijadwalkan">
-                                    @forelse ($jadwalList as $index => $jadwal)
-                                        @php
-                                            $ta = $jadwal->sidang->tugasAkhir;
-                                            $mahasiswa = $ta?->mahasiswa;
-                                        @endphp
-
-                                        <tr>
-                                            <td class="text-center">{{ $loop->iteration + ($jadwalList->firstItem() - 1) }}
-                                            </td>
-                                            </td>
-                                            <td>{{ $mahasiswa?->user?->name ?? '-' }}</td>
-                                            <td>{{ $ta?->judul ?? '-' }}</td>
-                                            <td class="text-center">{{ $jadwal->tanggal }}</td>
-                                            <td class="text-center">
-                                                {{ \Carbon\Carbon::parse($jadwal->waktu_mulai)->format('H:i') }} -
-                                                {{ \Carbon\Carbon::parse($jadwal->waktu_selesai)->format('H:i') }}
-                                            </td>
-                                            <td>{{ $jadwal->ruangan?->lokasi ?? '-' }}</td>
-                                            <td class="text-center">
-                                                <div class="d-flex justify-content-center gap-2">
-                                                    <a class="btn btn-warning btn-sm"
-                                                        href="{{ route('jadwal-sidang.show', ['sidang_id' => $jadwal->sidang_id]) }}">Detail</a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="10" class="text-center text-muted">Belum ada jadwal sidang yang
-                                                tersedia.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                {{-- Tab Menunggu Jadwal --}}
+                <div class="tab-pane fade show active" id="menunggu" role="tabpanel" aria-labelledby="menunggu-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Mahasiswa</th>
+                                    <th>NIM</th>
+                                    <th>Program Studi</th>
+                                    <th>Judul TA</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menunggu">
+                                @include('admin.sidang.akhir.partials.table-menunggu-jadwal')
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+
+                {{-- Tab Jadwal Sidang Akhir --}}
+                <div class="tab-pane fade" id="jadwal-sidang" role="tabpanel" aria-labelledby="jadwal-sidang-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>Judul Tugas Akhir</th>
+                                    <th>Tanggal</th>
+                                    <th>Waktu</th>
+                                    <th>Ruangan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jadwal-sidang">
+                                @include('admin.sidang.akhir.partials.table-jadwal-sidang')                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Tab Tidak Lulus dan Mengulang Sidang --}}
+                <div class="tab-pane fade" id="tidak-lulus" role="tabpanel" aria-labelledby="tidak-lulus-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Mahasiswa</th>
+                                    <th>NIM</th>
+                                    <th>Judul TA</th>
+                                    <th>Status Terakhir</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tidak-lulus">
+                                @include('admin.sidang.akhir.partials.table-ulang-sidang')
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Tab Lulus Sidang Akhir --}}
+                <div class="tab-pane fade" id="lulus" role="tabpanel" aria-labelledby="lulus-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Mahasiswa</th>
+                                    <th>NIM</th>
+                                    <th>Judul TA</th>
+                                    <th>Tanggal Sidang</th>
+                                    <th>Nilai Akhir</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lulus">
+                                @include('admin.sidang.akhir.partials.table-lulus-sidang')
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+
             </div>
         </div>
     </div>
