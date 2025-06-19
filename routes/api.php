@@ -21,9 +21,15 @@ Route::prefix('mahasiswa')->group(function () {
 
 // Dosen API routes
 Route::prefix('dosen')->group(function () {
-    Route::get('/', [DosenApiController::class, 'index']);
-    Route::get('/{id}', [DosenApiController::class, 'show']);
-    Route::post('/', [DosenApiController::class, 'store']);
-    Route::put('/{id}', [DosenApiController::class, 'update']);
-    Route::delete('/{id}', [DosenApiController::class, 'destroy']);
+    // Route::get('/', [DosenApiController::class, 'index']);
+    // Route::get('/{id}', [DosenApiController::class, 'show']);
+    // Route::post('/', [DosenApiController::class, 'store']);
+    // Route::put('/{id}', [DosenApiController::class, 'update']);
+    // Route::delete('/{id}', [DosenApiController::class, 'destroy']);
+    // Route::apiResource('/', DosenApiController::class);
 });
+Route::get('/dosen', [DosenApiController::class, 'index']);
+Route::get('/{id}', [DosenApiController::class, 'show']);
+Route::post('/dosen', [DosenApiController::class, 'store']);
+Route::put('/editdosen/{id}', [DosenApiController::class, 'update']);
+Route::delete('/deletedosen/{id}', [DosenApiController::class, 'destroy']);
