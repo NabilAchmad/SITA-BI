@@ -4,7 +4,7 @@
         $sidangTerakhir = $ta?->sidangTerakhir ?? null;
         $jadwalSidang = $sidangTerakhir?->jadwalSidang ?? null;
 
-        // Ambil semua skor dari nilai_sidang berdasarkan sidang_id
+        // Ambil rata-rata skor dari nilai sidang
         $nilaiAkhir = $sidangTerakhir
             ? \App\Models\NilaiSidang::where('sidang_id', $sidangTerakhir->id)->avg('skor')
             : null;
@@ -12,20 +12,20 @@
 
     <tr>
         <td class="text-center">
-            {{ ($mahasiswaLulus->currentPage() - 1) * $mahasiswaLulus->perPage() + $index + 1 }}
+            {{ $mahasiswaLulus->firstItem() + $index }}
         </td>
-        <td>{{ $mhs?->user?->name ?? '-' }}</td>
-        <td>{{ $mhs?->nim ?? '-' }}</td>
+        <td>{{ $mhs->user->name ?? '-' }}</td>
+        <td>{{ $mhs->nim ?? '-' }}</td>
         <td>{{ $ta?->judul ?? '-' }}</td>
         <td class="text-center">
-            {{ $jadwalSidang?->tanggal ? \Carbon\Carbon::parse($jadwalSidang->tanggal)->translatedFormat('d F Y') : '-' }}
+            {{ $jadwalSidang?->tanggal ? \Carbon\Carbon::parse($jadwalSidang->tanggal)->format('d-m-Y') : '-' }}
         </td>
         <td class="text-center">
             {{ $nilaiAkhir ? number_format($nilaiAkhir, 2) : '-' }}
         </td>
         <td class="text-center">
-            <a href="#" class="btn btn-sm btn-primary">
-                Cetak
+            <a href="#" class="btn btn-sm btn-primary disabled">
+                <i class="bi bi-printer"></i> Cetak
             </a>
         </td>
     </tr>

@@ -140,18 +140,35 @@ Route::prefix('dosen')->group(function () {
 
         Route::prefix('akhir')->group(function () {
 
-            // Daftar mahasiswa yang sudah punya jadwal sidang akhir
-            Route::get('/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'listJadwalAkhir'])->name('jadwal.sidang.akhir');
+             // ✅ Halaman utama kelola jadwal sidang akhir (semua tab: menunggu, jadwal, lulus, tidak lulus)
+        Route::get('/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'sidangAkhir'])
+            ->name('jadwal.sidang.akhir');
 
-            // Simpan data jadwal sidang
-            Route::post('/jadwal-sidang', [JadwalSidangAkhirController::class, 'store'])->name('jadwal-sidang.store');
+        // ✅ Alias tambahan (opsional) jika Blade masih memanggil route ini
+        Route::get('/menunggu', [JadwalSidangAkhirController::class, 'sidangAkhir'])
+            ->name('sidang.menunggu.penjadwalan.akhir');
 
-            // Lihat Detail Jadwal Sidang akhir
-            Route::get('/detail-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'show'])->name('jadwal-sidang.show');
+        // ✅ Simpan data jadwal sidang
+        Route::post('/jadwal-sidang', [JadwalSidangAkhirController::class, 'store'])
+            ->name('jadwal-sidang.store');
 
-            // Edit dan Hapus Jadwal Sidang
-            Route::put('/update-jadwal/{id}', [JadwalSidangAkhirController::class, 'update'])->name('jadwal-sidang.update');
-            Route::delete('/delete-jadwal/{id}', [JadwalSidangAkhirController::class, 'destroy'])->name('jadwal-sidang.destroy');
+        // ✅ Lihat detail jadwal sidang akhir
+        Route::get('/detail-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'show'])
+            ->name('jadwal-sidang.show');
+
+        // ✅ Update & hapus jadwal sidang
+        Route::put('/update-jadwal/{id}', [JadwalSidangAkhirController::class, 'update'])
+            ->name('jadwal-sidang.update');
+        Route::delete('/delete-jadwal/{id}', [JadwalSidangAkhirController::class, 'destroy'])
+            ->name('jadwal-sidang.destroy');
+
+        // ✅ Simpan penguji
+        Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])
+            ->name('jadwal-sidang.simpanPenguji');
+
+        // ✅ Tandai status sidang
+        Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'tandaiSidang'])
+            ->name('jadwal-sidang.mark-done');
 
             // ============================
             // 5. Routes nilai sidang

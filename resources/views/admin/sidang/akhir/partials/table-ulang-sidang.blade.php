@@ -21,12 +21,14 @@
 
         <td class="text-center">
             @php
-                $sidangMengulang = $mhs->tugasAkhir?->sidang?->whereIn('status', ['tidak_lulus'])->first();
+                $sidangMengulang = $mhs->tugasAkhir?->sidang?->where('status', 'tidak_lulus')->first();
             @endphp
             @if ($sidangMengulang)
                 <button type="button" class="btn btn-sm btn-warning btn-jadwalkan"
-                    data-sidang-id="{{ $sidangMengulang->id }}" data-nama="{{ $mhs->user->name ?? '-' }}"
-                    data-nim="{{ $mhs->nim ?? '-' }}" data-judul="{{ $mhs->tugasAkhir->judul ?? '-' }}"
+                    data-sidang-id="{{ $sidangMengulang->id }}"
+                    data-nama="{{ $mhs->user->name ?? '-' }}"
+                    data-nim="{{ $mhs->nim ?? '-' }}"
+                    data-judul="{{ $mhs->tugasAkhir->judul ?? '-' }}"
                     data-url="{{ route('jadwal-sidang.simpanPenguji', ['sidang_id' => $sidangMengulang->id]) }}">
                     <i class="bi bi-calendar-plus me-1"></i> Jadwalkan Ulang
                 </button>
@@ -38,8 +40,8 @@
 @empty
     <tr>
         <td colspan="7" class="text-center text-muted py-4">
-            <i class="bi bi-exclamation-circle-fill me-2"></i> Tidak ada mahasiswa yang
-            mengulang sidang.
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            Tidak ada mahasiswa yang mengulang sidang.
         </td>
     </tr>
 @endforelse
