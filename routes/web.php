@@ -59,13 +59,27 @@ Route::prefix('ketua-jurusan')->group(function () {
 
     // Sidang Routes for Kajur
     Route::prefix('sidang')->group(function () {
-        Route::get('/sempro/penjadwalan-sidang-sempro', [JadwalSidangSemproController::class, 'menungguSidangSempro'])->name('kajursidang.menunggu.penjadwalan.sempro');
-        Route::get('/sempro/jadwal-sidang-sempro', [JadwalSidangSemproController::class, 'listJadwalSempro'])->name('kajurjadwal.sidang.sempro');
-        Route::get('/sempro/pasca-sidang-sempro', [JadwalSidangSemproController::class, 'pascaSidangSempro'])->name('kajurpasca.sidang.sempro');
+        Route::get('/sempro/penjadwalan-sidang-sempro', [JadwalSidangSemproController::class, 'menungguSidangSempro'])->name('kajur.sidang.menunggu.sempro');
+        Route::get('/sempro/jadwal-sidang-sempro', [JadwalSidangSemproController::class, 'listJadwalSempro'])->name('kajur.sidang.jadwal.sempro');
+        Route::get('/sempro/pasca-sidang-sempro', [JadwalSidangSemproController::class, 'pascaSidangSempro'])->name('kajur.sidang.pasca.sempro');
 
-        Route::get('/akhir/penjadwalan-sidang-akhir', [JadwalSidangAkhirController::class, 'menungguSidangAkhir'])->name('kajursidang.menunggu.penjadwalan.akhir');
-        Route::get('/akhir/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'listJadwalAkhir'])->name('kajurjadwal.sidang.akhir');
-        Route::get('/akhir/pasca-sidang-akhir', [JadwalSidangAkhirController::class, 'pascaSidangAkhir'])->name('kajurpasca.sidang.akhir');
+        Route::get('/akhir/penjadwalan-sidang-akhir', [JadwalSidangAkhirController::class, 'menungguSidangAkhir'])->name('kajur.sidang.menunggu.akhir');
+        Route::get('/akhir/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'listJadwalAkhir'])->name('kajur.sidang.jadwal.akhir');
+        Route::get('/akhir/pasca-sidang-akhir', [JadwalSidangAkhirController::class, 'pascaSidangAkhir'])->name('kajur.sidang.pasca.akhir');
+
+        // Additional routes for dashboard and other sidang views
+        Route::get('/dashboard', [KajurController::class, 'showSidangDashboard'])->name('sidangDashboard.kajur');
+        Route::get('/mahasiswaSidang', [KajurController::class, 'showMahasiswaSidang'])->name('kajur.sidang');
+        Route::get('/lihat-jadwal', [KajurController::class, 'showJadwal'])->name('kajur.jadwal');
+        Route::get('/lihat-nilai', [KajurController::class, 'showNilaiSidang'])->name('kajur.nilai.page');
+        
+        // Add missing routes for menunggu sempro and menunggu akhir views
+        Route::get('/dashboard-sidang', [KajurController::class, 'showSidangDashboard'])->name('dashboard-sidang.kajur');
+        Route::get('/sempro/menunggu', [KajurController::class, 'showMahasiswaSidangSempro'])->name('kajur.sidang.menunggu.sempro');
+        Route::get('/akhir/menunggu', [KajurController::class, 'showMahasiswaMenungguAkhir'])->name('kajur.sidang.menunggu.akhir');
+
+        // Add dashboard-sidang route for kajur
+        Route::get('/dashboard-sidang', [KajurController::class, 'showSidangDashboard'])->name('dashboard-sidang.kajur');
     });
 });
 
@@ -140,6 +154,8 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+        // Add dashboard-sidang route for admin
 
         // Other admin routes...
     });

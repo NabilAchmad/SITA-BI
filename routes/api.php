@@ -14,3 +14,4 @@ Route::get('/mahasiswa/{id}', [MahasiswaController::class, 'apiShow']);
 Route::post('/mahasiswa', [MahasiswaController::class, 'apiStore']);
 Route::put('/mahasiswa/{id}', [MahasiswaController::class, 'apiUpdate']);
 Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'apiDestroy']);
+

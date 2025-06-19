@@ -20,11 +20,32 @@ class KajurController extends Controller
         return view('kajur.views.dashboard', compact('mahasiswaCount'));
     }
 
-    // Jadwal Sidang
+    // Jadwal Sidang Akhir
     public function showJadwal()
     {
-        $jadwals = Jadwal::all();
-        return view('kajur.jadwal.readJadwal', compact('jadwals'));
+        $jadwalAkhir = JadwalSidang::where('jenis_sidang', 'akhir')->paginate(10);
+        return view('kajur.sidang.akhir.views.jadwal-akhir', compact('jadwalAkhir'));
+    }
+
+    // Jadwal Sidang Sempro
+    public function showSidangSemproTerjadwal()
+    {
+        $jadwalSempro = JadwalSidang::where('jenis_sidang', 'sempro')->paginate(10);
+        return view('kajur.sidang.sempro.jadwal-sempro', compact('jadwalSempro'));
+    }
+
+    // Pasca Sidang Sempro
+    public function showPascaSidangSempro()
+    {
+        $pascaSempro = Sidang::where('jenis_sidang', 'sempro')->paginate(10);
+        return view('kajur.sidang.sempro.pasca-sempro', compact('pascaSempro'));
+    }
+
+    // Pasca Sidang Akhir
+    public function showPascaSidangAkhir()
+    {
+        $pascaAkhir = Sidang::where('jenis_sidang', 'akhir')->paginate(10);
+        return view('kajur.sidang.akhir.pasca-akhir', compact('pascaAkhir'));
     }
 
     // Judul Tugas Akhir
@@ -34,22 +55,28 @@ class KajurController extends Controller
         return view('kajur.judulTA.AccJudulTA', compact('judulTAs'));
     }
 
-    public function showAcc(){
+    public function showAcc()
+    {
         $judulAcc = JudulTA::where('status', 'disetujui')->get();
-        return view('kajur.judulTA.readAcc', compact('judulTAs'));
+        return view('kajur.judulTA.readAcc', compact('judulAcc'));
     }
 
-    public function showTolak(){
+    public function showTolak()
+    {
         $judulTolak = JudulTA::where('status', 'ditolak')->get();
-        // Assuming you want to return a view with the rejected titles
         return view('kajur.judulTA.readTolak', compact('judulTolak'));
     }
 
     // Nilai Sidang
     public function showNilaiSidang()
     {
-        $nilais = Nilai::all();
-        return view('kajur.sidang.readSidang', compact('nilais'));
+        $nilais = Nilai::with([
+            'mahasiswa',
+            'tugasAkhir',
+            'dosenPenguji'
+        ])->paginate(15);
+
+        return view('kajur.nilai.read', compact('nilais'));
     }
 
     // Pengumuman
@@ -90,6 +117,7 @@ class KajurController extends Controller
         ));
     }
 
+    // Show Mahasiswa Sidang Dashboard Card
     public function showMahasiswaSidang()
     {
         $mahasiswaCount = Mahasiswa::count();
@@ -102,5 +130,26 @@ class KajurController extends Controller
         $jadwalSidangs = JadwalSidang::with(['sidang.nilai', 'sidang.tugasAkhir.mahasiswa'])->get();
 
         return view('kajur.sidang.read', compact('jadwalSidangs'));
+    }
+
+    /**
+     * Menampilkan mahasiswa menunggu sidang sempro
+     */
+    public function showMahasiswaSidangSempro()
+    {
+        $mahasiswaMenunggu = Mahasiswa::whereDoesntHave('jadwalSidangSempro')->paginate(10);
+        $mahasiswaTidakLulus = Mahasiswa::whereHas('tugasAkhir', function ($query) {
+            $query->where('status', 'tidak lulus');
+        })->paginate(10);
+        return view('kajur.sidang.sempro.views.mhs-sidang', compact('mahasiswaMenunggu', 'mahasiswaTidakLulus'));
+    }
+
+    /**
+     * Menampilkan mahasiswa menunggu sidang akhir
+     */
+    public function showMahasiswaMenungguAkhir()
+    {
+        $mahasiswaMenunggu = Mahasiswa::whereDoesntHave('jadwalSidangAkhir')->paginate(10);
+        return view('kajur.sidang.akhir.views.mhs-menunggu-akhir', compact('mahasiswaMenunggu'));
     }
 }

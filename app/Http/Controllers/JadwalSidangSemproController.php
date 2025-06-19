@@ -44,12 +44,12 @@ class JadwalSidangSemproController extends Controller
         // Mahasiswa yang tidak lulus sidang sempro dan belum aktif lagi
         $mahasiswaTidakLulusQuery = Mahasiswa::whereHas('tugasAkhir.sidang', function ($query) {
             $query->where('jenis_sidang', 'proposal')  // ganti ke 'sempro'
-                ->where('status', 'tidak_lulus')
-                ->where('is_active', false);
+                ->where('status', 'tidak_lulus');
+                //->where('is_active', false);
         })
             ->whereDoesntHave('tugasAkhir.sidang', function ($query) {
-                $query->where('jenis_sidang', 'proposal')  // ganti ke 'sempro'
-                    ->where('is_active', true);
+                $query->where('jenis_sidang', 'proposal');  // ganti ke 'sempro'
+                    //->where('is_active', true);
             })
             ->with([
                 'user',
