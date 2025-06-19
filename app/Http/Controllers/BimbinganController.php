@@ -14,7 +14,7 @@ class BimbinganController extends Controller
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return \App\Models\User::find(1);
+        return \App\Models\User::find(20);
     }
 
     public function dashboard()
