@@ -14,7 +14,7 @@ class TopikController extends Controller
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return 1;
+        return 18;
     }
 
     public function index(Request $request)
@@ -22,9 +22,17 @@ class TopikController extends Controller
         $search = $request->input('search');
         $mahasiswaId = $this->assumedMahasiswaId();
 
-        // Cek apakah mahasiswa sudah punya TA dengan status tertentu
+        // Cek apakah mahasiswa sudah punya TA aktif (selain ditolak/dibatalkan)
         $mahasiswaSudahPunyaTA = TugasAkhir::where('mahasiswa_id', $mahasiswaId)
-            ->whereIn('status', ['diajukan', 'revisi', 'disetujui', 'lulus_tanpa_revisi'])
+            ->whereIn('status', [
+                'diajukan',
+                'revisi',
+                'disetujui',
+                'lulus_tanpa_revisi',
+                'lulus_dengan_revisi',
+                'draft',
+                'menunggu_pembatalan'
+            ])
             ->exists();
 
         $topikList = TawaranTopik::with('dosen')
@@ -46,29 +54,38 @@ class TopikController extends Controller
     {
         $mahasiswaId = $this->assumedMahasiswaId();
 
-        // Cek apakah mahasiswa sudah memiliki TA
-        if (TugasAkhir::where('mahasiswa_id', $mahasiswaId)->exists()) {
+        // Cek apakah mahasiswa sudah memiliki TA aktif
+        if (TugasAkhir::where('mahasiswa_id', $mahasiswaId)->whereNull('deleted_at')->exists()) {
             return redirect()->back()->with('error', 'Anda sudah memiliki tugas akhir.');
         }
 
-        $topik = TawaranTopik::findOrFail($id);
+        $topik = TawaranTopik::with('dosen')->findOrFail($id);
 
         // Cek kuota
         if (!$topik->isAvailable()) {
             return redirect()->back()->with('error', 'Kuota topik ini sudah penuh.');
         }
 
-        // Buat tugas akhir
-        TugasAkhir::create([
+        // Buat tugas akhir baru
+        $ta = TugasAkhir::create([
             'mahasiswa_id' => $mahasiswaId,
             'tawaran_topik_id' => $topik->id,
             'judul' => $topik->judul_topik,
+            'abstrak' => $topik->deskripsi ?? '-',
             'status' => 'diajukan',
+            'tanggal_pengajuan' => now(),
             'created_at' => now(),
             'updated_at' => now()
         ]);
 
+        // Tambahkan dosen sebagai pembimbing1 otomatis
+        \App\Models\PeranDosenTA::create([
+            'tugas_akhir_id' => $ta->id,
+            'dosen_id' => $topik->dosen_id,
+            'peran' => 'pembimbing1'
+        ]);
+
         return redirect()->route('tugas-akhir.index')
-            ->with('success', 'Topik berhasil diambil.');
+            ->with('success', 'Topik berhasil diambil dan pembimbing ditetapkan.');
     }
 }

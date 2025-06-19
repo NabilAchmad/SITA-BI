@@ -16,7 +16,7 @@ class MahasiswaProfileController extends Controller
      */
     public function profile()
     {
-        $user = User::findOrFail(1); // atau Auth::user();
+        $user = User::findOrFail(18); // atau Auth::user();
         $mahasiswa = $user->mahasiswa;
 
         // Ambil prodi unik dari tabel mahasiswa (misalnya D3, D4)

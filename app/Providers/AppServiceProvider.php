@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Kirim data user yang sedang login ke view profil di header
         View::composer('layouts.components.border-mahasiswa.profile', function ($view) {
-            $user = User::find(1); // Ambil user yang sedang login
+            $user = User::find(18); // Ambil user yang sedang login
 
             if ($user) {
                 $mahasiswa = $user->mahasiswa; // relasi ke tabel mahasiswa (jika ada)

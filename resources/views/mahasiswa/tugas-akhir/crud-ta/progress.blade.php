@@ -107,6 +107,19 @@
                         </div>
                     </div>
 
+                    @if ($pembimbingList->count())
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-primary"><i class="bi bi-person-badge"></i> Dosen Pembimbing</h5>
+                            <ul class="list-group">
+                                @foreach ($pembimbingList as $pembimbing)
+                                    <li class="list-group-item">
+                                        {{ ucfirst($pembimbing->peran) }}: {{ $pembimbing->dosen->user->name ?? '-' }}
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     {{-- Abstrak --}}
                     <div class="mb-4">
                         <label class="fw-semibold text-secondary d-block mb-2">Abstrak</label>

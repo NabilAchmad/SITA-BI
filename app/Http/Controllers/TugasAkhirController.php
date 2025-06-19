@@ -12,7 +12,7 @@ class TugasAkhirController extends Controller
 {
     private function assumedMahasiswa()
     {
-        return Mahasiswa::where('user_id', 1)->firstOrFail();
+        return Mahasiswa::where('user_id', 18)->firstOrFail();
     }
 
     public function dashboard()
@@ -62,7 +62,11 @@ class TugasAkhirController extends Controller
     public function progress()
     {
         $mahasiswa = $this->assumedMahasiswa();
-        $tugasAkhir = $mahasiswa->tugasAkhir;
+        $tugasAkhir = $mahasiswa->tugasAkhir()
+            ->with(['peranDosenTa' => function ($query) {
+                $query->whereIn('peran', ['pembimbing1', 'pembimbing2'])
+                    ->with('dosen.user');
+            }])->first();
 
         $isMengajukanTA = $tugasAkhir && in_array($tugasAkhir->status, [
             'diajukan',
@@ -101,6 +105,8 @@ class TugasAkhirController extends Controller
             default => 0,
         };
 
+        $pembimbingList = $tugasAkhir?->peranDosenTa ?? collect();
+
         return view('mahasiswa.tugas-akhir.crud-ta.progress', compact(
             'tugasAkhir',
             'progressBimbingan',
@@ -108,10 +114,10 @@ class TugasAkhirController extends Controller
             'dokumen',
             'sidang',
             'isMengajukanTA',
-            'progress'
+            'progress',
+            'pembimbingList'
         ));
     }
-
 
     public function cancel(Request $request, $id)
     {

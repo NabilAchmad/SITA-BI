@@ -14,7 +14,7 @@ class BimbinganController extends Controller
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return \App\Models\User::find(1);
+        return \App\Models\User::find(18);
     }
 
     public function dashboard()
@@ -85,6 +85,14 @@ class BimbinganController extends Controller
             return redirect()->back()->with('error', 'Data tugas akhir belum tersedia.');
         }
 
+        if (!in_array($tugasAkhir->status, ['disetujui', 'revisi', 'menunggu_pembatalan'])) {
+            return redirect()->back()->with('error', 'Status tugas akhir Anda tidak memenuhi syarat untuk bimbingan.');
+        }
+
+        if (empty($tugasAkhir->file_path)) {
+            return redirect()->back()->with('error', 'Silakan upload file proposal terlebih dahulu sebelum mengajukan bimbingan.');
+        }
+
         $dosenList = $tugasAkhir->peranDosenTa;
         $bimbinganCount = [];
         $statusBimbingan = [];
@@ -93,30 +101,21 @@ class BimbinganController extends Controller
         foreach ($dosenList as $peran) {
             $dosenId = $peran->dosen_id;
 
-            // Hitung sesi terakhir per dosen
             $jumlah = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
                 ->where('dosen_id', $dosenId)
                 ->max('sesi_ke') ?? 0;
             $bimbinganCount[$dosenId] = $jumlah;
 
-            // Status terakhir
             $last = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
                 ->where('dosen_id', $dosenId)
                 ->orderByDesc('created_at')
                 ->first();
             $statusBimbingan[$dosenId] = $last?->status_bimbingan ?? '-';
 
-            // Logika disable pengajuan
-            if ($jumlah >= 9) {
-                $disabled = true;
-            } else {
-                $adaPengajuan = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
-                    ->where('dosen_id', $dosenId)
-                    ->where('status_bimbingan', 'diajukan')
-                    ->exists();
-
-                $disabled = $adaPengajuan;
-            }
+            $disabled = $jumlah >= 9 || BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
+                ->where('dosen_id', $dosenId)
+                ->where('status_bimbingan', 'diajukan')
+                ->exists();
 
             $disabledPengajuan[$dosenId] = $disabled;
         }
@@ -144,11 +143,10 @@ class BimbinganController extends Controller
         $mahasiswa = $user->mahasiswa;
         $tugasAkhir = $mahasiswa->tugasAkhir;
 
-        if (!$tugasAkhir) {
-            return back()->withErrors(['error' => 'Tugas Akhir belum ada.']);
+        if (!$tugasAkhir || empty($tugasAkhir->file_path) || !in_array($tugasAkhir->status, ['disetujui', 'revisi', 'menunggu_pembatalan'])) {
+            return back()->withErrors(['error' => 'Tugas Akhir belum valid untuk diajukan bimbingan.']);
         }
 
-        // Hitung sesi terakhir dosen ini
         $lastSesi = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
             ->where('dosen_id', $request->dosen_id)
             ->max('sesi_ke') ?? 0;
@@ -157,7 +155,6 @@ class BimbinganController extends Controller
             return back()->withErrors(['error' => 'Bimbingan sudah mencapai batas maksimal 9 sesi.']);
         }
 
-        // Cek apakah masih ada pengajuan berjalan
         $adaPengajuanBerjalan = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
             ->where('dosen_id', $request->dosen_id)
             ->where('status_bimbingan', 'diajukan')
@@ -167,7 +164,6 @@ class BimbinganController extends Controller
             return back()->withErrors(['error' => 'Masih ada pengajuan bimbingan yang sedang diproses.']);
         }
 
-        // Buat pengajuan baru
         $bimbingan = BimbinganTa::create([
             'tugas_akhir_id' => $tugasAkhir->id,
             'dosen_id' => $request->dosen_id,
