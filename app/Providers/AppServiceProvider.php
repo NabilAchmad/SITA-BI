@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         View::composer('layouts.components.border-admin.profile', function ($view) {
-            $admin = User::find(37); // pastikan admin dengan id 21 ada
+            $admin = User::find(17); // pastikan admin dengan id 21 ada
             $view->with('adminProfile', $admin);
         });
     }
