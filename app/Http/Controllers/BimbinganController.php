@@ -52,7 +52,12 @@ class BimbinganController extends Controller
             return abort(404, 'Data mahasiswa tidak ditemukan.');
         }
 
-        $tugasAkhir = $mahasiswa->tugasAkhir()->with('peranDosenTa.dosen.user')->first();
+        $tugasAkhir = $mahasiswa->tugasAkhir()
+            ->with(['peranDosenTa' => function ($query) {
+                $query->whereIn('peran', ['pembimbing1', 'pembimbing2']);
+            }, 'peranDosenTa.dosen.user'])
+            ->first();
+
         if (!$tugasAkhir) {
             return redirect()->back()->with('error', 'Data tugas akhir belum tersedia.');
         }
@@ -65,31 +70,29 @@ class BimbinganController extends Controller
         foreach ($dosenList as $peran) {
             $dosenId = $peran->dosen_id;
 
-            // Hitung sesi terakhir per dosen (bukan status selesai lagi)
+            // Hitung sesi terakhir per dosen
             $jumlah = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
                 ->where('dosen_id', $dosenId)
                 ->max('sesi_ke') ?? 0;
             $bimbinganCount[$dosenId] = $jumlah;
 
-            // Ambil status terakhir
+            // Status terakhir
             $last = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
                 ->where('dosen_id', $dosenId)
                 ->orderByDesc('created_at')
                 ->first();
-            $status = $last?->status_bimbingan;
-            $statusBimbingan[$dosenId] = $status ?? '-';
+            $statusBimbingan[$dosenId] = $last?->status_bimbingan ?? '-';
 
-            // Logika pengajuan
+            // Logika disable pengajuan
             if ($jumlah >= 9) {
-                $disabled = true; // Sudah maksimal 9 sesi
+                $disabled = true;
             } else {
-                // Cek apakah masih ada pengajuan berjalan (status diajukan)
-                $adaPengajuanBerjalan = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
+                $adaPengajuan = BimbinganTa::where('tugas_akhir_id', $tugasAkhir->id)
                     ->where('dosen_id', $dosenId)
                     ->where('status_bimbingan', 'diajukan')
                     ->exists();
 
-                $disabled = $adaPengajuanBerjalan;
+                $disabled = $adaPengajuan;
             }
 
             $disabledPengajuan[$dosenId] = $disabled;
