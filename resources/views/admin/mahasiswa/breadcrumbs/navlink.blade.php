@@ -1,0 +1,21 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-2">
+        <li class="breadcrumb-item">Penugasan Bimbingan</li>
+
+        <li class="breadcrumb-item {{ request()->routeIs('penugasan-bimbingan.index') ? 'active' : '' }}">
+            @if(request()->routeIs('penugasan-bimbingan.index'))
+                <span class="text-primary">Mahasiswa Belum Punya Pembimbing</span>
+            @else
+                <a href="{{ route('penugasan-bimbingan.index') }}" class="text-dark">Mahasiswa Belum Punya Pembimbing</a>
+            @endif
+        </li>
+
+        <li class="breadcrumb-item {{ request()->routeIs('list-mahasiswa') ? 'active' : '' }}">
+            @if(request()->routeIs('list-mahasiswa'))
+                <span class="text-primary">Mahasiswa Sudah Punya Pembimbing</span>
+            @else
+                <a href="{{ route('list-mahasiswa') }}" class="text-dark">Mahasiswa Sudah Punya Pembimbing</a>
+            @endif
+        </li>
+    </ol>
+</nav>
