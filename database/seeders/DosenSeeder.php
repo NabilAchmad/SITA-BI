@@ -187,7 +187,7 @@ class DosenSeeder extends Seeder
                 'user_id' => $dosenId,
                 'judul_topik' => $judul,
                 'deskripsi' => $deskripsi,
-                'kuota' => $faker->numberBetween(1, 3),
+                'kuota' => $faker->numberBetween(1, 2),
                 'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
                 'updated_at' => now(),
             ]);
