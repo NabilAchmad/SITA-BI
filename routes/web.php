@@ -118,24 +118,23 @@ Route::prefix('dosen')->group(function () {
 
         Route::get('dashboard-sidang', [JadwalSidangAkhirController::class, 'dashboard'])->name('dashboard-sidang');
 
-        Route::prefix('sempro')->group(function () {
+       Route::prefix('sempro')->group(function () {
 
-            // Daftar mahasiswa yang sudah punya jadwal sidang
-            Route::get('/jadwal-sidang-sempro', [JadwalSidangSemproController::class, 'listJadwalSempro'])->name('jadwal.sidang.sempro');
+         Route::get('/jadwal-sidang-sempro', [JadwalSidangSemproController::class, 'SidangSempro'])
+        ->name('sidang.kelola.sempro'); // ← perbaikan di sini
 
-            // Simpan penguji
-            Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangSemproController::class, 'simpanPenguji'])->name('jadwal-sempro.simpanPenguji');
+        Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangSemproController::class, 'simpanPenguji'])
+        ->name('jadwal-sempro.simpanPenguji');
 
-            // Simpan data jadwal sidang
-            Route::post('/jadwal-sidang', [JadwalSidangSemproController::class, 'store'])->name('jadwal-sempro.store');
+        Route::post('/jadwal-sidang', [JadwalSidangSemproController::class, 'store'])
+        ->name('jadwal-sempro.store');
 
-            // Lihat Detail Jadwal Sidang akhir
-            Route::get('/detail-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'show'])->name('jadwal-sempro.show');
+        Route::get('/detail-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'show'])
+        ->name('jadwal-sempro.show');
 
-            // Tandai akhir sidang selesai 
-            Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidangSempro'])
-                ->name('jadwal-sidang-sempro.mark-done');
-        });
+        Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidangSempro'])
+        ->name('jadwal-sidang-sempro.mark-done');
+});
 
 
         Route::prefix('akhir')->group(function () {

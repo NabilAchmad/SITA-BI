@@ -21,7 +21,7 @@
                         'icon' => 'bi-calendar-event',
                         'color' => 'warning',
                         'count' => $scheduledSemproCount ?? 0,
-                        'route' => route('jadwal.sidang.sempro'),
+                        'route' => route('sidang.kelola.sempro'),
                         'btn' => 'Lihat Jadwal',
                     ],
                     [
