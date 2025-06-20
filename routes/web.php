@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\BimbinganController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Mahasiswa\BimbinganController;
+use App\Http\Controllers\Mahasiswa\DashboardController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TugasAkhirController;
-use App\Http\Controllers\PendaftaranSidangController;
-use App\Http\Controllers\TopikController;
-use App\Http\Controllers\MahasiswaProfileController;
+use App\Http\Controllers\Mahasiswa\TugasAkhirController;
+use App\Http\Controllers\Mahasiswa\PendaftaranSidangController;
+use App\Http\Controllers\Mahasiswa\TopikController;
+use App\Http\Controllers\Mahasiswa\MahasiswaProfileController;
 use App\Models\TawaranTopik;
 
 Route::prefix('/mahasiswa')->group(function () {
