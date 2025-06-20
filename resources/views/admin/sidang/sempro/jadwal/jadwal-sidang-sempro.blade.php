@@ -1,107 +1,175 @@
-@extends('layouts.template.main')
-@section('title', 'Jadwal Sidang Akhir')
-@section('content')
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <h1 class="fw-bold text-primary"><i class="bi bi-calendar-check me-2"></i> Jadwal Sidang Sempro</h1>
-                <p class="text-muted mb-0">Daftar mahasiswa yang telah dijadwalkan sidang sempro.</p>
-            </div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard-sidang') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Kelola Jadwal</li>
-                </ol>
-            </nav>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="fw-bold text-primary"><i class="bi bi-calendar-x me-2"></i> Kelola Jadwal Sidang Sempro</h1>
+            <p class="text-muted mb-0">Daftar mahasiswa yang telah terdaftar sidang sempro, termasuk yang belum
+                dijadwalkan dan yang mengulang sidang.</p>
         </div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard-sidang') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Kelola Jadwal</li>
+            </ol>
+        </nav>
+    </div>
 
-        {{-- Tabs Program Studi --}}
-        <ul class="nav nav-tabs mb-3">
-            <li class="nav-item">
-                <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
-                    href="{{ route('jadwal.sidang.akhir') }}">All</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}"
-                    href="{{ route('jadwal.sidang.akhir', ['prodi' => 'D4']) }}">D4</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}"
-                    href="{{ route('jadwal.sidang.akhir', ['prodi' => 'D3']) }}">D3</a>
-            </li>
-        </ul>
+    {{-- Tabs Program Studi --}}
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
+                href="{{ route('sidang.kelola.sempro') }}">All</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}"
+                href="{{ route('sidang.kelola.sempro', ['prodi' => 'D4']) }}">D4</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}"
+                href="{{ route('sidang.kelola.sempro', ['prodi' => 'D3']) }}">D3</a>
+        </li>
+    </ul>
 
-        <form action="{{ route('jadwal.sidang.sempro') }}" method="GET" class="mb-3">
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" name="search" class="form-control" placeholder="Cari nama atau NIM mahasiswa..."
-                    value="{{ request('search') }}">
-                <button type="submit" class="btn btn-primary">Cari</button>
-            </div>
-        </form>
+    <form method="GET" action="{{ route('sidang.kelola.sempro') }}">
+        <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" name="search" id="searchInput" class="form-control"
+                placeholder="Cari nama atau NIM mahasiswa..." value="{{ request('search') }}" autocomplete="off">
+            <button class="btn btn-primary" type="submit">Cari</button>
+        </div>
+    </form>
 
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-body">
-                <div class="tab-content" id="jadwalTabContent">
-                    {{-- Tab dijadwalkan --}}
-                    <div class="tab-pane fade show active" id="dijadwalkan" role="tabpanel"
-                        aria-labelledby="dijadwalkan-tab">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-bordered align-middle">
-                                <thead class="table-dark text-center">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Judul Tugas Akhir</th>
-                                        <th>Tanggal</th>
-                                        <th>Waktu</th>
-                                        <th>Ruangan</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dijadwalkan">
-                                    @forelse ($jadwalList as $index => $jadwal)
-                                        @php
-                                            $ta = $jadwal->sidang->tugasAkhir;
-                                            $mahasiswa = $ta?->mahasiswa;
-                                        @endphp
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body">
+            {{-- Tabs Jadwal --}}
+            <ul class="nav nav-tabs mb-3" id="jadwalTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="menunggu-tab" data-bs-toggle="tab" data-bs-target="#menunggu"
+                        type="button" role="tab" aria-controls="menunggu" aria-selected="true">
+                        Menunggu Jadwal
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="dijadwalkan-tab" data-bs-toggle="tab" data-bs-target="#dijadwalkan"
+                        type="button" role="tab" aria-controls="dijadwalkan" aria-selected="false">
+                        Dijadwalkan
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tidak-lulus-tab" data-bs-toggle="tab" data-bs-target="#tidak-lulus"
+                        type="button" role="tab" aria-controls="tidak-lulus" aria-selected="false">
+                        Mengulang Sidang (Tidak Lulus)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="lulus-sempro-tab" data-bs-toggle="tab" data-bs-target="#lulus-sempro"
+                        type="button" role="tab" aria-controls="lulus-sempro" aria-selected="false">
+                        Lulus Sidang Sempro
+                    </button>
+                </li>
+            </ul>
 
-                                        <tr>
-                                            <td class="text-center">{{ $loop->iteration + ($jadwalList->firstItem() - 1) }}
-                                            </td>
-                                            </td>
-                                            <td>{{ $mahasiswa?->user?->name ?? '-' }}</td>
-                                            <td>{{ $ta?->judul ?? '-' }}</td>
-                                            <td class="text-center">{{ $jadwal->tanggal }}</td>
-                                            <td class="text-center">
-                                                {{ \Carbon\Carbon::parse($jadwal->waktu_mulai)->format('H:i') }} -
-                                                {{ \Carbon\Carbon::parse($jadwal->waktu_selesai)->format('H:i') }}
-                                            </td>
-                                            <td>{{ $jadwal->ruangan?->lokasi ?? '-' }}</td>
-                                            <td class="text-center">
-                                                <div class="d-flex justify-content-center gap-2">
-                                                    <a class="btn btn-warning btn-sm"
-                                                        href="{{ route('jadwal-sempro.show', ['sidang_id' => $jadwal->sidang_id]) }}">Detail</a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="10" class="text-center text-muted">Belum ada jadwal sidang yang
-                                                tersedia.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+            <div class="tab-content" id="jadwalTabContent">
+                {{-- Tab Menunggu Jadwal --}}
+                <div class="tab-pane fade show active" id="menunggu" role="tabpanel" aria-labelledby="menunggu-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Mahasiswa</th>
+                                    <th>NIM</th>
+                                    <th>Program Studi</th>
+                                    <th>Judul TA</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menunggu">
+                                @include('admin.sidang.sempro.partials.table-menunggu-jadwal')
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+
+                <div class="tab-pane fade" id="dijadwalkan" role="tabpanel" aria-labelledby="dijadwalkan-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>NIM</th>
+                                    <th>Prodi</th>
+                                    <th>Judul Tugas Akhir</th>
+                                    <th>Tanggal Sidang</th>
+                                    <th>Waktu</th>
+                                    <th>Ruangan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dijadwalkan">
+                                @include('admin.sidang.sempro.partials.table-jadwal-sidang')
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                {{-- Tab Tidak Lulus dan Mengulang Sidang --}}
+                <div class="tab-pane fade" id="tidak-lulus" role="tabpanel" aria-labelledby="tidak-lulus-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Mahasiswa</th>
+                                    <th>NIM</th>
+                                    <th>Judul TA</th>
+                                    <th>Status Terakhir</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tidak-lulus">
+                                @include('admin.sidang.sempro.partials.table-ulang-sidang')
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Tab lulus sidang sempro --}}
+                <div class="tab-pane fade" id="lulus-sempro" role="tabpanel" aria-labelledby="lulus-sempro-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>NIM</th>
+                                    <th>Judul TA</th>
+                                    <th>Tanggal Sidang</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @include('admin.sidang.sempro.partials.table-lulus-sempro')
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
+</div>
 
-    <div class="mt-3">
-        {{ $jadwalList->links() }}
-    </div>
+{{-- Untuk Mahasiswa Menunggu --}}
+{{ $mahasiswaMenunggu->links() }}
 
-@endsection
+{{-- Untuk Mahasiswa Tidak Lulus --}}
+{{ $mahasiswaTidakLulus->links() }}
+
+<!-- Modal container untuk modal dinamis -->
+<div id="modalContainer"></div>
+
+@include('admin.sidang.akhir.modal.penguji')
+@include('admin.sidang.akhir.modal.jadwal-sidang')
