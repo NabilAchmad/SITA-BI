@@ -10,6 +10,7 @@ use Illuminate\Pagination\Paginator; // Tambahkan di bagian atas jika belum ada
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use App\Models\User;
+use App\Http\Controllers\Controller;
 
 class AppServiceProvider extends ServiceProvider
 {

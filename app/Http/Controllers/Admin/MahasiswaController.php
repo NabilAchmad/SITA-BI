@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\Mahasiswa;
 use App\Models\JadwalSidang;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class MahasiswaController extends Controller
 {

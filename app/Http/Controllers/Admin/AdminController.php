@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\Dosen;
 use App\Models\Mahasiswa;
@@ -11,6 +11,7 @@ use App\Models\PeranDosenTA;
 use App\Models\Log;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Controller;
 
 class AdminController extends Controller
 {

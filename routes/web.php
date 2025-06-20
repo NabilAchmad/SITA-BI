@@ -1,15 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PengumumanController;
-use App\Http\Controllers\PenugasanPembimbingController;
-use App\Http\Controllers\MahasiswaController;
-use App\Http\Controllers\DosenController;
-use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\LogController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\JadwalSidangAkhirController;
-use App\Http\Controllers\JadwalSidangSemproController;
+use App\Http\Controllers\Admin\PengumumanController;
+use App\Http\Controllers\Admin\PenugasanPembimbingController;
+use App\Http\Controllers\Admin\MahasiswaController;
+use App\Http\Controllers\Admin\DosenController;
+use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\Admin\LogController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\JadwalSidangAkhirController;
+use App\Http\Controllers\Admin\JadwalSidangSemproController;
 
 Route::prefix('admin')->group(function () {
 
