@@ -12,7 +12,7 @@ class TugasAkhirController extends Controller
 {
     private function assumedMahasiswa()
     {
-        return Mahasiswa::where('user_id', 18)->firstOrFail();
+        return Mahasiswa::where('user_id', 2)->firstOrFail();
     }
 
     public function dashboard()

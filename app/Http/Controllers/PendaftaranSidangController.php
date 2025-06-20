@@ -15,7 +15,7 @@ class PendaftaranSidangController extends Controller
 {
     public function form()
     {
-        $userId = 18;
+        $userId = 2;
 
         $mahasiswa = Mahasiswa::with(['tugasAkhir.peranDosen.dosen', 'tugasAkhir'])->where('user_id', $userId)->first();
 
