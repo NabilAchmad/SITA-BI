@@ -1,162 +1,123 @@
 @extends('layouts.template.kajur')
 
-@section('title', 'Dashboard Sidang Kajur')
+@section('title', 'Dashboard Sidang')
+
+@push('styles')
+    <style>
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+        }
+
+        .icon-container {
+            width: 4rem;
+            height: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .badge-detail {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .bg-soft-primary {
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+
+        .bg-soft-success {
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+
+        .opacity-bg-icon {
+            font-size: 7rem;
+            position: absolute;
+            bottom: -1.2rem;
+            right: 1rem;
+            opacity: 0.08;
+        }
+
+        .card-title-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .card-desc-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+@endpush
 
 @section('content')
-    <div class="container my-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Dashboard Sidang Kajur</h1>
-            <div class="text-muted">{{ now()->format('l, d F Y') }}</div>
-        </div>
-        <div class="row g-4">
-            <!-- Seminar Proposal Card with Tabs -->
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Seminar Proposal</h5>
-                    </div>
-                    <div class="card-body">
-                        <ul class="nav nav-tabs" id="seminarProposalTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="menunggu-sempro-tab" data-bs-toggle="tab" data-bs-target="#menunggu-sempro" type="button" role="tab" aria-controls="menunggu-sempro" aria-selected="true">
-                                    Menunggu Sidang Sempro
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="terjadwal-sempro-tab" data-bs-toggle="tab" data-bs-target="#terjadwal-sempro" type="button" role="tab" aria-controls="terjadwal-sempro" aria-selected="false">
-                                    Sempro Terjadwal
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="pasca-sempro-tab" data-bs-toggle="tab" data-bs-target="#pasca-sempro" type="button" role="tab" aria-controls="pasca-sempro" aria-selected="false">
-                                    Pasca Sidang Sempro
-                                </button>
-                            </li>
-                        </ul>
-                        <div class="tab-content mt-3" id="seminarProposalTabsContent">
-                            <div class="tab-pane fade show active" id="menunggu-sempro" role="tabpanel" aria-labelledby="menunggu-sempro-tab">
-                                <a href="{{ route('kajur.sidang.menunggu.sempro') }}" class="text-decoration-none card-hover">
-                                    <div class="card text-white bg-primary h-100 shadow-sm">
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <h5 class="card-title"><i class="fas fa-clock me-2"></i>Menunggu Sidang Sempro</h5>
-                                                <i class="fas fa-users fa-2x opacity-50"></i>
-                                            </div>
-                                            <p class="card-text display-4 mt-3 mb-0 text-center">{{ $waitingSemproCount }}</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="tab-pane fade" id="terjadwal-sempro" role="tabpanel" aria-labelledby="terjadwal-sempro-tab">
-                                <a href="{{ route('kajur.sidang.jadwal.sempro') }}" class="text-decoration-none card-hover">
-                                    <div class="card text-white bg-success h-100 shadow-sm">
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <h5 class="card-title"><i class="fas fa-calendar-check me-2"></i>Sempro Terjadwal</h5>
-                                                <i class="fas fa-calendar-alt fa-2x opacity-50"></i>
-                                            </div>
-                                            <p class="card-text display-4 mt-3 mb-0 text-center">{{ $scheduledSemproCount }}</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="tab-pane fade" id="pasca-sempro" role="tabpanel" aria-labelledby="pasca-sempro-tab">
-                                <a href="{{ route('kajur.sidang.pasca.sempro') }}" class="text-decoration-none card-hover">
-                                    <div class="card text-white bg-warning h-100 shadow-sm">
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <h5 class="card-title"><i class="fas fa-check-circle me-2"></i>Pasca Sidang Sempro</h5>
-                                                <i class="fas fa-file-alt fa-2x opacity-50"></i>
-                                            </div>
-                                            <p class="card-text display-4 mt-3 mb-0 text-center">{{ $pascaSemproCount }}</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="container-fluid py-4">
 
-            <!-- Sidang Akhir Card with Tabs -->
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Sidang Akhir</h5>
-                    </div>
-                    <div class="card-body">
-                        <ul class="nav nav-tabs" id="sidangAkhirTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="menunggu-akhir-tab" data-bs-toggle="tab" data-bs-target="#menunggu-akhir" type="button" role="tab" aria-controls="menunggu-akhir" aria-selected="true">
-                                    Menunggu Sidang Akhir
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="terjadwal-akhir-tab" data-bs-toggle="tab" data-bs-target="#terjadwal-akhir" type="button" role="tab" aria-controls="terjadwal-akhir" aria-selected="false">
-                                    Sidang Akhir Terjadwal
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="pasca-akhir-tab" data-bs-toggle="tab" data-bs-target="#pasca-akhir" type="button" role="tab" aria-controls="pasca-akhir" aria-selected="false">
-                                    Pasca Sidang Akhir
-                                </button>
-                            </li>
-                        </ul>
-                        <div class="tab-content mt-3" id="sidangAkhirTabsContent">
-                            <div class="tab-pane fade show active" id="menunggu-akhir" role="tabpanel" aria-labelledby="menunggu-akhir-tab">
-                                <a href="{{ route('kajur.sidang.menunggu.akhir') }}" class="text-decoration-none card-hover">
-                                    <div class="card text-white bg-secondary h-100 shadow-sm">
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <h5 class="card-title"><i class="fas fa-hourglass-half me-2"></i>Menunggu Sidang Akhir</h5>
-                                                <i class="fas fa-user-graduate fa-2x opacity-50"></i>
-                                            </div>
-                                            <p class="card-text display-4 mt-3 mb-0 text-center">{{ $waitingAkhirCount }}</p>
-                                        </div>
+        <!-- Header -->
+        <div class="position-relative overflow-hidden rounded-3 mb-4 p-4"
+            style="background: linear-gradient(135deg, #e3f2fd, #f1f8ff); border-left: 5px solid #0d6efd;">
+            <div class="position-relative z-1">
+                <h4 class="fw-bold text-primary mb-1">
+                    <i class="bi bi-columns-gap me-2"></i> Dashboard Sidang
+                </h4>
+                <p class="text-muted mb-0">Statistik pelaksanaan sidang Tugas Akhir dan perkembangannya</p>
+            </div>
+            <i class="bi bi-hourglass-split text-primary opacity-bg-icon"></i>
+        </div>
+
+        <!-- Cards -->
+        <div class="row g-4">
+            @php
+                $cards = [
+                    [
+                        'title' => 'Kelola Jadwal Seminar Proposal',
+                        'icon' => 'bi-hourglass-split',
+                        'color' => 'primary',
+                        'route' => route('kajur.sidang.menunggu.sempro'),
+                        'btn' => 'Lihat Detail',
+                        'desc' => 'Mahasiswa yang belum dijadwalkan',
+                    ],
+                    [
+                        'title' => 'Kelola Jadwal Sidang Akhir',
+                        'icon' => 'bi-hourglass-top',
+                        'color' => 'success',
+                        'route' => route('kajur.sidang.menunggu.akhir'),
+                        'btn' => 'Lihat Detail',
+                        'desc' => 'Mahasiswa menunggu sidang akhir',
+                    ],
+                ];
+            @endphp
+
+            @foreach ($cards as $card)
+                <div class="col-md-6 col-xl-6">
+                    <a href="{{ $card['route'] }}" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-3 card-hover h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon-container rounded-circle text-white bg-{{ $card['color'] }} me-3">
+                                        <i class="bi {{ $card['icon'] }}"></i>
                                     </div>
-                                </a>
-                            </div>
-                            <div class="tab-pane fade" id="terjadwal-akhir" role="tabpanel" aria-labelledby="terjadwal-akhir-tab">
-                                <a href="{{ route('kajur.sidang.jadwal.akhir') }}" class="text-decoration-none card-hover">
-                                    <div class="card text-white bg-danger h-100 shadow-sm">
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <h5 class="card-title"><i class="fas fa-calendar-day me-2"></i>Sidang Akhir Terjadwal</h5>
-                                                <i class="fas fa-tasks fa-2x opacity-50"></i>
-                                            </div>
-                                            <p class="card-text display-4 mt-3 mb-0 text-center">{{ $scheduledAkhirCount }}</p>
-                                        </div>
+                                    <div>
+                                        <div class="card-title-text text-dark">{{ $card['title'] }}</div>
+                                        <div class="card-desc-text">{{ $card['desc'] }}</div>
                                     </div>
-                                </a>
-                            </div>
-                            <div class="tab-pane fade" id="pasca-akhir" role="tabpanel" aria-labelledby="pasca-akhir-tab">
-                                <a href="{{ route('kajur.sidang.pasca.akhir') }}" class="text-decoration-none card-hover">
-                                    <div class="card text-white bg-info h-100 shadow-sm">
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <h5 class="card-title"><i class="fas fa-flag-checkered me-2"></i>Pasca Sidang Akhir</h5>
-                                                <i class="fas fa-graduation-cap fa-2x opacity-50"></i>
-                                            </div>
-                                            <p class="card-text display-4 mt-3 mb-0 text-center">{{ $pascaAkhirCount }}</p>
-                                        </div>
-                                    </div>
-                                </a>
+                                </div>
+                                <div class="mt-3">
+                                    <span
+                                        class="badge badge-detail bg-soft-{{ $card['color'] }} text-{{ $card['color'] }} py-2 px-3">
+                                        <i class="bi bi-arrow-right-circle me-1"></i> {{ $card['btn'] }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
-            </div>
+            @endforeach
         </div>
     </div>
-
-    <style>
-        .card-hover:hover .card {
-            transform: translateY(-5px);
-            transition: transform 0.3s ease;
-        }
-        .card {
-            transition: transform 0.3s ease;
-        }
-        .opacity-50 {
-            opacity: 0.5;
-        }
+@endsection

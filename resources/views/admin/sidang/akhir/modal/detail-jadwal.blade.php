@@ -46,20 +46,21 @@
                                         </li>
                                         <li class="mb-3"><strong>Penguji 1:</strong>
                                             <span
-                                                id="penguji1Display">{{ optional($jadwal->sidang->tugasAkhir->peranDosenTa->firstWhere('peran', 'penguji1'))->dosen->user->name ?? '-' }}</span>
+                                                id="penguji1Display">{{ $peranDosen['penguji1']->user->name ?? '-' }}</span>
                                         </li>
                                         <li class="mb-3"><strong>Penguji 2:</strong>
                                             <span
-                                                id="penguji2Display">{{ optional($jadwal->sidang->tugasAkhir->peranDosenTa->firstWhere('peran', 'penguji2'))->dosen->user->name ?? '-' }}</span>
+                                                id="penguji2Display">{{ $peranDosen['penguji2']->user->name ?? '-' }}</span>
                                         </li>
                                         <li class="mb-3"><strong>Penguji 3:</strong>
                                             <span
-                                                id="penguji3Display">{{ optional($jadwal->sidang->tugasAkhir->peranDosenTa->firstWhere('peran', 'penguji3'))->dosen->user->name ?? '-' }}</span>
+                                                id="penguji3Display">{{ $peranDosen['penguji3']->user->name ?? '-' }}</span>
                                         </li>
                                         <li class="mb-3"><strong>Penguji 4:</strong>
                                             <span
-                                                id="penguji4Display">{{ optional($jadwal->sidang->tugasAkhir->peranDosenTa->firstWhere('peran', 'penguji4'))->dosen->user->name ?? '-' }}</span>
+                                                id="penguji4Display">{{ $peranDosen['penguji4']->user->name ?? '-' }}</span>
                                         </li>
+
                                         <li class="mb-3"><strong>Tanggal Sidang:</strong> <span
                                                 id="tanggalDisplay">{{ $jadwal->tanggal }}</span></li>
                                         <li class="mb-3"><strong>Waktu:</strong>
@@ -121,7 +122,7 @@
                         </a>
 
                         <!-- Tombol Kembali -->
-                        <a href="{{ route('jadwal.sidang.akhir') }}" class="btn btn-outline-dark btn-sm">
+                        <a href="{{ route('sidang.kelola.akhir') }}" class="btn btn-outline-dark btn-sm">
                             <i class="bi bi-arrow-left-circle me-1"></i> Kembali
                         </a>
 

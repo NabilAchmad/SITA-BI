@@ -93,9 +93,9 @@
                                         const errorData = await response.json();
                                         const messages = Object.values(errorData.errors)
                                             .flat().join('\n');
-                                        alert('Validasi gagal:\n' + messages);
+                                        swal("Validasi gagal", messages, "warning");
                                     } else {
-                                        alert('Terjadi kesalahan server.');
+                                        swal("Error", "Terjadi kesalahan server.", "error");
                                     }
                                     throw new Error('Fetch error');
                                 }
@@ -111,16 +111,16 @@
                                         judul: btn.dataset.judul
                                     });
                                 } else {
-                                    alert(data.message || 'Gagal menyimpan penguji.');
+                                    swal("Gagal", data.message || 'Gagal menyimpan penguji.',
+                                        "error");
                                 }
                             })
                             .catch(err => {
                                 if (err.message !== 'Fetch error') {
-                                    alert('Terjadi kesalahan saat menyimpan penguji.');
+                                    swal("Error", "Terjadi kesalahan saat menyimpan penguji.",
+                                        "error");
                                 }
                             });
-                    }, {
-                        once: true
                     });
                 }
             });
@@ -148,8 +148,12 @@
                 const bsModalJadwal = new bootstrap.Modal(currentJadwalModal);
                 bsModalJadwal.show();
 
+                let isSubmitting = false;
+
                 formJadwal.addEventListener('submit', function(e) {
                     e.preventDefault();
+                    if (isSubmitting) return;
+                    isSubmitting = true;
 
                     let formData = new FormData(formJadwal);
 
@@ -162,47 +166,52 @@
                             body: formData
                         })
                         .then(async response => {
+                            isSubmitting = false;
                             if (!response.ok) {
                                 if (response.status === 422) {
                                     const errorData = await response.json();
                                     const messages = Object.values(errorData.errors).flat().join(
                                         '\n');
-                                    alert('Validasi gagal:\n' + messages);
+                                    swal("Validasi gagal", messages, "warning");
                                 } else {
-                                    alert('Terjadi kesalahan server.');
+                                    swal("Error", "Terjadi kesalahan server.", "error");
                                 }
                                 throw new Error('Fetch error');
                             }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                bsModalJadwal.hide();
 
-                                swal({
-                                    title: "Berhasil!",
-                                    text: data.message || "Jadwal sidang berhasil dibuat.",
-                                    icon: "success",
-                                    buttons: {
-                                        confirm: {
-                                            text: "OK",
-                                            className: "btn btn-primary"
+                            try {
+                                const data = await response.json();
+                                if (data.success) {
+                                    bsModalJadwal.hide();
+                                    swal({
+                                        title: "Berhasil!",
+                                        text: data.message ||
+                                            "Jadwal sidang berhasil dibuat.",
+                                        icon: "success",
+                                        buttons: {
+                                            confirm: {
+                                                text: "OK",
+                                                className: "btn btn-primary"
+                                            }
                                         }
-                                    }
-                                }).then(() => {
-                                    window.location.href = "{{ route('jadwal.sidang.sempro') }}";
-                                });
-                            } else {
-                                alert(data.message || 'Gagal menyimpan jadwal sidang.');
+                                    }).then(() => {
+                                        window.location.href =
+                                            "{{ route('sidang.kelola.sempro') }}";
+                                    });
+                                } else {
+                                    swal("Gagal", data.message || 'Gagal menyimpan jadwal sidang.',
+                                        "error");
+                                }
+                            } catch (e) {
+                                swal("Error", "Respons tidak valid dari server.", "error");
                             }
                         })
                         .catch(err => {
+                            isSubmitting = false;
                             if (err.message !== 'Fetch error') {
-                                alert('Terjadi kesalahan saat menyimpan jadwal.');
+                                swal("Error", "Terjadi kesalahan saat menyimpan jadwal.", "error");
                             }
                         });
-                }, {
-                    once: true
                 });
             }
 
@@ -218,7 +227,6 @@
                         }
                     }
                 });
-                
             @endif
         });
     </script>

@@ -17,19 +17,19 @@
     <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
             <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
-                href="{{ route('sidang.menunggu.penjadwalan.sempro') }}">All</a>
+                href="{{ route('sidang.kelola.sempro') }}">All</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}"
-                href="{{ route('sidang.menunggu.penjadwalan.sempro', ['prodi' => 'D4']) }}">D4</a>
+                href="{{ route('sidang.kelola.sempro', ['prodi' => 'D4']) }}">D4</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}"
-                href="{{ route('sidang.menunggu.penjadwalan.sempro', ['prodi' => 'D3']) }}">D3</a>
+                href="{{ route('sidang.kelola.sempro', ['prodi' => 'D3']) }}">D3</a>
         </li>
     </ul>
 
-    <form method="GET" action="{{ route('sidang.menunggu.penjadwalan.sempro') }}">
+    <form method="GET" action="{{ route('sidang.kelola.sempro') }}">
         <div class="input-group mb-3">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
             <input type="text" name="search" id="searchInput" class="form-control"
@@ -49,9 +49,21 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="dijadwalkan-tab" data-bs-toggle="tab" data-bs-target="#dijadwalkan"
+                        type="button" role="tab" aria-controls="dijadwalkan" aria-selected="false">
+                        Dijadwalkan
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="tidak-lulus-tab" data-bs-toggle="tab" data-bs-target="#tidak-lulus"
                         type="button" role="tab" aria-controls="tidak-lulus" aria-selected="false">
                         Mengulang Sidang (Tidak Lulus)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="lulus-sempro-tab" data-bs-toggle="tab" data-bs-target="#lulus-sempro"
+                        type="button" role="tab" aria-controls="lulus-sempro" aria-selected="false">
+                        Lulus Sidang Sempro
                     </button>
                 </li>
             </ul>
@@ -79,6 +91,30 @@
                     </div>
                 </div>
 
+                <div class="tab-pane fade" id="dijadwalkan" role="tabpanel" aria-labelledby="dijadwalkan-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>NIM</th>
+                                    <th>Prodi</th>
+                                    <th>Judul Tugas Akhir</th>
+                                    <th>Tanggal Sidang</th>
+                                    <th>Waktu</th>
+                                    <th>Ruangan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dijadwalkan">
+                                @include('admin.sidang.sempro.partials.table-jadwal-sidang')
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
                 {{-- Tab Tidak Lulus dan Mengulang Sidang --}}
                 <div class="tab-pane fade" id="tidak-lulus" role="tabpanel" aria-labelledby="tidak-lulus-tab">
                     <div class="table-responsive">
@@ -95,6 +131,27 @@
                             </thead>
                             <tbody id="tidak-lulus">
                                 @include('admin.sidang.sempro.partials.table-ulang-sidang')
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Tab lulus sidang sempro --}}
+                <div class="tab-pane fade" id="lulus-sempro" role="tabpanel" aria-labelledby="lulus-sempro-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>NIM</th>
+                                    <th>Judul TA</th>
+                                    <th>Tanggal Sidang</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @include('admin.sidang.sempro.partials.table-lulus-sempro')
                             </tbody>
                         </table>
                     </div>

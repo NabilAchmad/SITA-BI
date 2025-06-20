@@ -74,53 +74,53 @@
                         bsModalPenguji.hide();
                     });
 
-                    formPenguji.addEventListener('submit', function(e) {
+                    let isSubmittingPenguji = false;
+                    formPenguji.addEventListener('submit', async function(e) {
                         e.preventDefault();
+                        if (isSubmittingPenguji) return;
+                        isSubmittingPenguji = true;
 
-                        let formData = new FormData(formPenguji);
-
-                        fetch(formPenguji.action, {
+                        try {
+                            let formData = new FormData(formPenguji);
+                            const response = await fetch(formPenguji.action, {
                                 method: 'POST',
                                 headers: {
                                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                     'Accept': 'application/json'
                                 },
                                 body: formData
-                            })
-                            .then(async response => {
-                                if (!response.ok) {
-                                    if (response.status === 422) {
-                                        const errorData = await response.json();
-                                        const messages = Object.values(errorData.errors)
-                                            .flat().join('\n');
-                                        alert('Validasi gagal:\n' + messages);
-                                    } else {
-                                        alert('Terjadi kesalahan server.');
-                                    }
-                                    throw new Error('Fetch error');
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                if (data.success) {
-                                    bsModalPenguji.hide();
-                                    openModalJadwalSidang({
-                                        sidang_id: sidangId,
-                                        nama: btn.dataset.nama,
-                                        nim: btn.dataset.nim,
-                                        judul: btn.dataset.judul
-                                    });
-                                } else {
-                                    alert(data.message || 'Gagal menyimpan penguji.');
-                                }
-                            })
-                            .catch(err => {
-                                if (err.message !== 'Fetch error') {
-                                    alert('Terjadi kesalahan saat menyimpan penguji.');
-                                }
                             });
-                    }, {
-                        once: true
+
+                            if (!response.ok) {
+                                if (response.status === 422) {
+                                    const errorData = await response.json();
+                                    const messages = Object.values(errorData.errors).flat()
+                                        .join('\n');
+                                    swal("Validasi gagal", messages, "warning");
+                                } else {
+                                    swal("Error", "Terjadi kesalahan server.", "error");
+                                }
+                                return;
+                            }
+
+                            const data = await response.json();
+                            if (data.success) {
+                                bsModalPenguji.hide();
+                                openModalJadwalSidang({
+                                    sidang_id: sidangId,
+                                    nama: btn.dataset.nama,
+                                    nim: btn.dataset.nim,
+                                    judul: btn.dataset.judul
+                                });
+                            } else {
+                                swal("Gagal", data.message || 'Gagal menyimpan penguji.',
+                                    "error");
+                            }
+                        } catch (err) {
+                            swal("Error", "Terjadi kesalahan saat menyimpan penguji.", "error");
+                        } finally {
+                            isSubmittingPenguji = false;
+                        }
                     });
                 }
             });
@@ -148,61 +148,58 @@
                 const bsModalJadwal = new bootstrap.Modal(currentJadwalModal);
                 bsModalJadwal.show();
 
-                formJadwal.addEventListener('submit', function(e) {
+                let isSubmittingJadwal = false;
+                formJadwal.addEventListener('submit', async function(e) {
                     e.preventDefault();
+                    if (isSubmittingJadwal) return;
+                    isSubmittingJadwal = true;
 
-                    let formData = new FormData(formJadwal);
-
-                    fetch(formJadwal.action, {
+                    try {
+                        let formData = new FormData(formJadwal);
+                        const response = await fetch(formJadwal.action, {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'Accept': 'application/json'
                             },
                             body: formData
-                        })
-                        .then(async response => {
-                            if (!response.ok) {
-                                if (response.status === 422) {
-                                    const errorData = await response.json();
-                                    const messages = Object.values(errorData.errors).flat().join(
-                                        '\n');
-                                    alert('Validasi gagal:\n' + messages);
-                                } else {
-                                    alert('Terjadi kesalahan server.');
-                                }
-                                throw new Error('Fetch error');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                bsModalJadwal.hide();
-
-                                swal({
-                                    title: "Berhasil!",
-                                    text: data.message || "Jadwal sidang berhasil dibuat.",
-                                    icon: "success",
-                                    buttons: {
-                                        confirm: {
-                                            text: "OK",
-                                            className: "btn btn-primary"
-                                        }
-                                    }
-                                }).then(() => {
-                                    window.location.href = "{{ route('jadwal.sidang.akhir') }}";
-                                });
-                            } else {
-                                alert(data.message || 'Gagal menyimpan jadwal sidang.');
-                            }
-                        })
-                        .catch(err => {
-                            if (err.message !== 'Fetch error') {
-                                alert('Terjadi kesalahan saat menyimpan jadwal.');
-                            }
                         });
-                }, {
-                    once: true
+
+                        if (!response.ok) {
+                            if (response.status === 422) {
+                                const errorData = await response.json();
+                                const messages = Object.values(errorData.errors).flat().join('\n');
+                                swal("Validasi gagal", messages, "warning");
+                            } else {
+                                swal("Error", "Terjadi kesalahan server.", "error");
+                            }
+                            return;
+                        }
+
+                        const data = await response.json();
+                        if (data.success) {
+                            bsModalJadwal.hide();
+                            swal({
+                                title: "Berhasil!",
+                                text: data.message || "Jadwal sidang berhasil dibuat.",
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        text: "OK",
+                                        className: "btn btn-primary"
+                                    }
+                                }
+                            }).then(() => {
+                                window.location.href = "{{ route('sidang.kelola.sempro') }}";
+                            });
+                        } else {
+                            swal("Gagal", data.message || 'Gagal menyimpan jadwal sidang.', "error");
+                        }
+                    } catch (err) {
+                        swal("Error", "Terjadi kesalahan saat menyimpan jadwal.", "error");
+                    } finally {
+                        isSubmittingJadwal = false;
+                    }
                 });
             }
 

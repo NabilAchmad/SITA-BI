@@ -32,12 +32,15 @@ class AdminController extends Controller
 
     public function profile()
     {
+        $user = User::findOrFail(37);
+        // dd($user);
         $user = User::findOrFail(21); // Ubah ID hardcoded bila perlu
         return view('admin.user.views.profile', compact('user'));
     }
 
     public function update(Request $request)
     {
+        $user = User::findOrFail(37);
         $user = User::findOrFail(21); // Ubah ID hardcoded bila perlu
 
         $validated = $request->validate([

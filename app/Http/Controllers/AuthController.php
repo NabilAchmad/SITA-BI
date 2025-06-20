@@ -75,12 +75,63 @@ class AuthController extends Controller
             'angkatan' => date('Y'),
         ]);
 
-        $this->sendEmailVerification($user);
+        $this->sendOtpVerification($user);
 
-        return redirect()->route('login')->with('success', 'Registrasi berhasil. Silakan periksa email Anda untuk verifikasi.');
+        return redirect()->route('auth.otp.form')->with('success', 'Registrasi berhasil. Silakan periksa email Anda untuk kode OTP verifikasi.');
     }
 
-    // Email verification handler
+    // Show OTP input form
+    public function showOtpForm()
+    {
+        return view('auth.otp');
+    }
+
+    // Handle OTP verification and login
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+            'otp'   => ['required', 'digits:6'],
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'Email tidak ditemukan.']);
+        }
+
+        $otpRecord = EmailVerificationToken::where('user_id', $user->id)
+            ->where('token', $request->otp)
+            ->first();
+
+        if (!$otpRecord) {
+            return back()->withErrors(['otp' => 'Kode OTP tidak valid.']);
+        }
+
+        // Check OTP expiration (10 minutes)
+        $created = $otpRecord->created_at;
+        if (now()->diffInMinutes($created) > 10) {
+            $otpRecord->delete();
+            return back()->withErrors(['otp' => 'Kode OTP sudah kadaluarsa.']);
+        }
+
+        // Mark email as verified
+        if (!$user->email_verified_at) {
+            $user->email_verified_at = now();
+            $user->save();
+        }
+
+        // Delete OTP record
+        $otpRecord->delete();
+
+        // Log in the user
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->intended($this->redirectByRole($user));
+    }
+
+    // Email verification handler (deprecated, kept for backward compatibility)
     public function verifyEmail($token)
     {
         $verification = EmailVerificationToken::where('token', $token)->first();
@@ -154,6 +205,19 @@ class AuthController extends Controller
         ]);
 
         Mail::to($user->email)->send(new VerifyEmail($user, $token));
+    }
+
+    private function sendOtpVerification(User $user)
+    {
+        $otp = random_int(100000, 999999);
+
+        EmailVerificationToken::create([
+            'user_id'    => $user->id,
+            'token'      => $otp,
+            'created_at' => now(),
+        ]);
+
+        Mail::to($user->email)->send(new \App\Mail\OtpVerification($user, $otp));
     }
 
     // Optional: Assign role to user (currently commented)
