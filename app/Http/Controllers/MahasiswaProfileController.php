@@ -30,7 +30,7 @@ class MahasiswaProfileController extends Controller
      */
     public function update(Request $request)
     {
-        $user = User::findOrFail(1); // atau Auth::user();
+        $user = User::findOrFail(18); // atau Auth::user();
         $mahasiswa = $user->mahasiswa;
 
         if (!$mahasiswa) {
