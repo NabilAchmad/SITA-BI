@@ -22,6 +22,19 @@ class Mahasiswa extends Model
         return $this->hasOne(TugasAkhir::class); // ✔️ Ini yang benar jika hanya 1 TA per mahasiswa
     }
 
+    // Jika ingin akses langsung peran dosen lewat mahasiswa
+    public function peranDosenTA()
+    {
+        return $this->hasManyThrough(
+            PeranDosenTA::class,
+            TugasAkhir::class,
+            'mahasiswa_id',
+            'tugas_akhir_id',
+            'id',
+            'id'
+        );
+    }
+
     public function historyTopik(): HasMany
     {
         return $this->hasMany(HistoryTopikMahasiswa::class);
@@ -32,13 +45,9 @@ class Mahasiswa extends Model
         return $this->hasMany(NotifikasiTa::class);
     }
 
-    public function pembimbing1()
+    public function sidang(): HasMany
     {
-        return $this->tugasAkhir()->with('pembimbing1')->first()->pembimbing1 ?? null;
-    }
-
-    public function pembimbing2()
-    {
-        return $this->tugasAkhir()->with('pembimbing2')->first()->pembimbing2 ?? null;
+        // Ganti 'foreign_key' dan 'local_key' sesuai dengan struktur tabel Anda
+        return $this->hasMany(Sidang::class, 'tugas_akhir_id', 'id');
     }
 }

@@ -79,7 +79,7 @@ class DosenSeeder extends Seeder
             // 3. Berikan role dosen
             DB::table('user_roles')->insert([
                 'user_id' => $userId,
-                'role_id' => 2,
+                'role_id' => 4,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

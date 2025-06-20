@@ -23,8 +23,8 @@ class MahasiswaSeeder extends Seeder
 
         // Buat akun user mahasiswa
         $user = User::create([
-            'name' => 'Avriela Ariestiany',
-            'email' => 'avirestiany@gmail.com',
+            'name' => 'Erland Agsya Agustian',
+            'email' => 'erlandagsya458@gmail.com',
             'password' => Hash::make('password'), // Ganti jika perlu
         ]);
 
@@ -37,9 +37,9 @@ class MahasiswaSeeder extends Seeder
         // Masukkan data ke tabel mahasiswa
         Mahasiswa::create([
             'user_id' => $user->id,
-            'nim' => '2311083007', // Harus unik
+            'nim' => '2311082007', // Harus unik
             'prodi' => 'd4',     // Sesuai enum
-            'angkatan' => '2021',
+            'angkatan' => '2023',
             'kelas' => 'a',      // Sesuai enum
         ]);
     }
