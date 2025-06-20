@@ -42,6 +42,15 @@
                         'btn' => 'Beri Nilai',
                     ],
 
+                    [
+                        'title' => 'Penilaian Sidang Sempro',
+                        'icon' => 'bi-pencil-square',
+                        'color' => 'success', 
+                        'count' => $nilaiSidangCount ?? 0,
+                        'route' => route('penilaian.sidang.index'), 
+                        'btn' => 'Beri Nilai',
+                    ],
+
                    
                 ];
             @endphp
