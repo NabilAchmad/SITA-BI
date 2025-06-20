@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Mahasiswa;
 
 use Illuminate\Http\Request;
 use App\Models\{TugasAkhir, Mahasiswa, BimbinganTA, RevisiTa, DokumenTa, Sidang, File};
 use Illuminate\Support\Facades\{Storage};
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Http\Controllers\Controller;
 
 class TugasAkhirController extends Controller
 {

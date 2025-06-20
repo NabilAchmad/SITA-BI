@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Mahasiswa;
 
 use Illuminate\Http\Request;
 use App\Models\Mahasiswa;
@@ -10,6 +10,7 @@ use App\Models\TugasAkhir;
 use App\Models\PeranDosenTA;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 
 class PendaftaranSidangController extends Controller
 {

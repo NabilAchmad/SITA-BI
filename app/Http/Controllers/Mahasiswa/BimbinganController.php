@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Mahasiswa;
 
 use App\Models\Dosen;
 use App\Models\TugasAkhir;
@@ -8,6 +8,7 @@ use App\Models\PeranDosenTa;
 use App\Models\BimbinganTA;
 use App\Models\CatatanBimbingan;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class BimbinganController extends Controller
 {
