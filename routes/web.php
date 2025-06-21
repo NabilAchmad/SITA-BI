@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Homepage\HomepageController;
+
 use App\Http\Controllers\Mahasiswa\BimbinganController;
 use App\Http\Controllers\Mahasiswa\DashboardController;
 use Illuminate\Support\Facades\Route;
@@ -27,9 +29,7 @@ use App\Http\Controllers\Dosen\BimbinganMahasiswaController;
 
 
 // Homepage
-Route::get('/', function () {
-    return view('home.homepage');
-})->name('home');
+Route::get('/', [HomepageController::class, 'index'])->name('home');
 
 // Authentication routes
 Route::prefix('auth')->group(function () {
