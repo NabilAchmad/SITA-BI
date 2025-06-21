@@ -45,6 +45,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/read', [PengumumanController::class, 'read'])->name('pengumuman.read');
 
     });
+});
 // Homepage
 Route::get('/', function () {
     return view('home.homepage');
