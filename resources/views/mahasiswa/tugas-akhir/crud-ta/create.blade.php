@@ -1,4 +1,4 @@
-@extends('layouts.template.mahasiswa')
+@extends('layouts.template.main')
 @section('title', 'Ajukan TA')
 @section('content')
     <!-- Page Header with Back Button -->

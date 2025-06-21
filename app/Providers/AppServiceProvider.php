@@ -39,8 +39,20 @@ class AppServiceProvider extends ServiceProvider
         });
 
         View::composer('layouts.components.border-admin.profile', function ($view) {
-            $admin = User::find(1); // pastikan admin dengan id 21 ada
+            $admin = User::find(Auth::id());
             $view->with('adminProfile', $admin);
+        });
+
+        View::composer('layouts.components.border-mahasiswa.profile', function ($view) {
+            $user = User::find(Auth::id());
+
+            if ($user) {
+                $mahasiswa = $user->mahasiswa; // relasi ke tabel mahasiswa (jika ada)
+                $view->with([
+                    'userProfile' => $user,
+                    'mahasiswa' => $mahasiswa,
+                ]);
+            }
         });
     }
 }

@@ -17,8 +17,23 @@ use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\JadwalSidangAkhirController;
 use App\Http\Controllers\Admin\JadwalSidangSemproController;
+use App\Http\Controllers\Auth\AuthController;
 
-Route::prefix('/mahasiswa')->group(function () {
+// Homepage
+Route::get('/', function () {
+    return view('home.homepage');
+})->name('home');
+
+// Authentication routes
+Route::prefix('auth')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+});
+
+Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(function () {
 
     // Dashboard Mahasiswa
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.mahasiswa');
@@ -87,9 +102,14 @@ Route::prefix('/mahasiswa')->group(function () {
         Route::get('/daftar-sidang', [PendaftaranSidangController::class, 'form'])->name('pendaftaran_sidang.form');
         Route::post('/daftar-sidang', [PendaftaranSidangController::class, 'store'])->name('pendaftaran_sidang.store');
     });
+
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [MahasiswaProfileController::class, 'profile'])->name('user.profile.mhs');
+        Route::put('/update', [MahasiswaProfileController::class, 'update'])->name('user.profile.update.mhs');
+    });
 });
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -236,11 +256,7 @@ Route::prefix('admin')->group(function () {
 
     // Profile
     Route::prefix('profile')->group(function () {
-        Route::get('/', [MahasiswaProfileController::class, 'profile'])->name('user.profile');
-        Route::put('/update', [MahasiswaProfileController::class, 'update'])->name('user.profile.update');
-        Route::put('/logout', [MahasiswaProfileController::class, ''])->name('logout');
         Route::get('/', [AdminController::class, 'profile'])->name('user.profile');
         Route::put('/update', [AdminController::class, 'update'])->name('user.profile.update');
-        Route::put('/logout', [AdminController::class, ''])->name('logout');
     });
 });

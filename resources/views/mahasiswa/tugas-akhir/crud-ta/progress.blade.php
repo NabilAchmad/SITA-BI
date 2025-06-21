@@ -1,4 +1,4 @@
-@extends('layouts.template.mahasiswa')
+@extends('layouts.template.main')
 @section('title', 'Progress Tugas Akhir')
 
 @push('styles')

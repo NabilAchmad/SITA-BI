@@ -23,7 +23,7 @@
                         <p class="text-muted">
                             {{ ucfirst($userProfile->roles->first()->nama_role ?? 'Mahasiswa') }}
                         </p>
-                        <a href="{{ route('user.profile') }}" class="btn btn-xs btn-secondary btn-sm">View Profile</a>
+                        <a href="{{ route('user.profile.mhs') }}" class="btn btn-xs btn-secondary btn-sm">View Profile</a>
                     </div>
                 </div>
             </li>

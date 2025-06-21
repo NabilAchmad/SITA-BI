@@ -12,6 +12,7 @@ use App\Models\Log;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -60,14 +61,13 @@ class AdminController extends Controller
 
     public function profile()
     {
-        $user = \App\Models\User::findOrFail(1);
-        // dd($user);
+        $user = User::find(Auth::id());
         return view('admin.user.views.profile', compact('user'));
     }
 
     public function update(Request $request)
     {
-        $user = User::findOrFail(1);
+        $user = User::find(Auth::id());
 
         $request->validate([
             'name' => 'required|string|max:255',

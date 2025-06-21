@@ -43,12 +43,17 @@
 <body>
     <div class="wrapper sidebar_minimize">
         <!-- Sidebar -->
-        @include('layouts.components.border-admin.sidebar')
+        @php
+            $user = auth()->user();
+            $role = strtolower($user->roles->first()->nama_role ?? 'guest');
+        @endphp
+
+        @includeIf("layouts.components.border-{$role}.sidebar")
         <!-- End Sidebar -->
 
         <!-- Main Panel -->
         <div class="main-panel">
-            @include('layouts.components.border-admin.header')
+            @includeIf("layouts.components.border-{$role}.header")
 
             <div class="container">
                 <div class="page-inner">
@@ -57,7 +62,7 @@
             </div>
 
             <!-- Footer -->
-            @include('layouts.components.border-admin.footer')
+            @includeIf("layouts.components.border-{$role}.footer")
             <!-- End Footer -->
 
         </div>
