@@ -28,8 +28,6 @@ return new class extends Migration
                 'menunggu_pembatalan', // ← NEW
                 'dibatalkan'           // ← NEW
             ])->default('diajukan');
-
-            $table->enum('status', ['diajukan', 'disetujui', 'ditolak', 'selesai']);
             $table->string('approved_by')->nullable();
             $table->date('tanggal_pengajuan');
 
