@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Dosen;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class BimbinganController extends Controller
+class BimbinganMahasiswaController extends Controller
 {
     public function dashboard()
     {
         // Logika untuk menampilkan daftar bimbingan
-        return view('admin.bimbingan.dashboard.dashboard');
+        return view('dosen.bimbingan.dashboard.dashboard');
     }
 
     public function ajukanJadwal()

@@ -24,49 +24,32 @@
 
                 <!-- List -->
                 <ul class="list-unstyled mb-0" id="announcementList">
-                    <li class="mb-4 pb-3 border-bottom d-flex align-items-start">
-                        <div class="flex-grow-1">
-                            <div class="mb-1 d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar-alt me-1"></i>
-                                    10 Jun 2024
-                                </small>
-                                <small class="text-muted">
-                                    <i class="fas fa-user me-1"></i>
-                                    Admin
-                                </small>
+                    @forelse ($pengumuman as $item)
+                        <li class="mb-4 pb-3 border-bottom d-flex align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="mb-1 d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        {{ \Carbon\Carbon::parse($item->tanggal_dibuat)->format('d M Y') }}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ $item->pembuat->name ?? 'Admin' }}
+                                    </small>
+                                </div>
+                                <h6 class="fw-semibold text-primary mb-1" style="font-size: 1.05rem;">
+                                    {{ $item->judul }}
+                                </h6>
+                                <p class="mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                                    {{ $item->isi }}
+                                </p>
                             </div>
-                            <h6 class="fw-semibold text-primary mb-1" style="font-size: 1.05rem;">
-                                Jadwal Ujian Tengah Semester
-                            </h6>
-                            <p class="mb-0" style="font-size: 0.95rem; line-height: 1.6;">
-                                Ujian Tengah Semester akan dilaksanakan mulai tanggal 17 Juni 2024. Silakan cek jadwal
-                                di portal akademik.
-                            </p>
-                        </div>
-                    </li>
-                    <li class="mb-4 pb-3 border-bottom d-flex align-items-start">
-                        <div class="flex-grow-1">
-                            <div class="mb-1 d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar-alt me-1"></i>
-                                    05 Jun 2024
-                                </small>
-                                <small class="text-muted">
-                                    <i class="fas fa-user me-1"></i>
-                                    Admin
-                                </small>
-                            </div>
-                            <h6 class="fw-semibold text-primary mb-1" style="font-size: 1.05rem;">
-                                Pengumpulan Tugas Akhir
-                            </h6>
-                            <p class="mb-0" style="font-size: 0.95rem; line-height: 1.6;">
-                                Batas akhir pengumpulan tugas akhir adalah 15 Juni 2024. Pastikan semua tugas sudah
-                                diunggah.
-                            </p>
-                        </div>
-                    </li>
+                        </li>
+                    @empty
+                        <li class="text-center text-muted">Tidak ada pengumuman.</li>
+                    @endforelse
                 </ul>
+
             </div>
         </div>
     </div>

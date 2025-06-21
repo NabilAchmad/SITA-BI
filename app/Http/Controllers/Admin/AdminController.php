@@ -92,6 +92,4 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
     }
-
-    public function logout() {}
 }

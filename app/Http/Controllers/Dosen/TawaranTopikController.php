@@ -47,7 +47,7 @@ class TawaranTopikController extends Controller
         }
 
         $tawaranTopik = $query->orderBy('created_at', 'desc')->paginate(10);
-        return view('admin.TawaranTopik.crud-TawaranTopik.read', compact('tawaranTopik'));
+        return view('dosen.tawaran-topik.crud-TawaranTopik.read', compact('tawaranTopik'));
     }
 
     // UPDATE
@@ -67,7 +67,7 @@ class TawaranTopikController extends Controller
             'kuota' => $request->kuota,
         ]);
 
-        return redirect()->route('TawaranTopik.read')->with('success', 'Tawaran topik berhasil diperbarui.');
+        return redirect()->route('dosen.tawaran-topik.index')->with('success', 'Tawaran topik berhasil diperbarui.');
     }
 
     // EDIT (tampilkan form edit)

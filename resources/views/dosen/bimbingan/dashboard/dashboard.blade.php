@@ -121,7 +121,7 @@
     {{-- Modal Tolak Bimbingan --}}
     <div class="modal fade" id="tolakBimbinganModal" tabindex="-1" aria-labelledby="tolakBimbinganModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <form method="POST" action="{{ route('bimbingan.tolak') }}">
+            <form method="POST" action="{{ route('dosen.bimbingan.tolak') }}">
                 @csrf
                 <input type="hidden" name="bimbingan_id" id="bimbingan_id_input">
                 <div class="modal-content">

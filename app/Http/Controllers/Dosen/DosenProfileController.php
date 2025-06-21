@@ -9,12 +9,15 @@ use App\Models\TugasAkhir;
 use Illuminate\Http\Request;
 use App\Models\PeranDosenTA;
 use App\Models\Log;
+use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
-class AdminController extends Controller
+class DosenProfileController extends Controller
 {
 
-    public function index()
+    public function index_dosen()
     {
         $totalDosen = Dosen::count();
         $totalMahasiswa = Mahasiswa::count();
@@ -44,7 +47,7 @@ class AdminController extends Controller
             ->distinct('mahasiswa_id')
             ->count('mahasiswa_id');
 
-        return view('admin.views.dashboard', compact(
+        return view('dosen.views.dashboard', compact(
             'totalDosen',
             'totalMahasiswa',
             'totalPengumuman',
@@ -56,5 +59,39 @@ class AdminController extends Controller
             'mahasiswaAktif',
             'logs'
         ));
+    }
+
+    public function profile()
+    {
+        $user = User::find(Auth::id());
+        return view('admin.user.views.profile', compact('user'));
+    }
+
+    public function update(Request $request)
+    {
+        $user = User::find(Auth::id());
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        if ($request->hasFile('avatar')) {
+            // Hapus foto lama jika ada
+            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
+
+            // Simpan foto baru
+            $user->photo = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user->save();
+
+        return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
     }
 }

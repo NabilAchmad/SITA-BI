@@ -44,7 +44,7 @@
         </div>
 
         {{-- Search --}}
-        <form method="GET" action="{{ route('TawaranTopik.read') }}" class="row g-2 mb-3 justify-content-end">
+        <form method="GET" action="{{ route('dosen.tawaran-topik.index') }}" class="row g-2 mb-3 justify-content-end">
             <input type="hidden" name="audiens" value="{{ request('audiens') }}">
             <div class="col-auto">
                 <input type="text" name="search" class="form-control form-control-sm"
@@ -111,8 +111,8 @@
     </div>
 </div>
 
-@include('admin.TawaranTopik.modal.create')
-@include('admin.TawaranTopik.modal.edit')
+@include('dosen.tawaran-topik.modal.create')
+@include('dosen.tawaran-topik.modal.edit')
 
 @push('scripts')
     <script>
