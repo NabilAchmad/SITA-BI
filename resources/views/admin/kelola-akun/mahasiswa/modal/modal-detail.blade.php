@@ -12,7 +12,7 @@
             <div class="modal-body text-start">
                 <div class="row">
                     <div class="col-md-4 text-center mb-3">
-                        <img src="{{ $mhs->user->foto ?? asset('assets/img/default-user.png') }}"
+                        <img src="{{ $mhs->user->photo ? asset('storage/' . $mhs->user->photo) : asset('assets/img/default-user.png') }}"
                             class="img-thumbnail rounded" alt="Foto Mahasiswa" style="max-width: 150px;">
                     </div>
                     <div class="col-md-8">

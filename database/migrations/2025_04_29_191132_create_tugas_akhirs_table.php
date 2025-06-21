@@ -16,9 +16,28 @@ return new class extends Migration
             $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
             $table->string('judul', 255);
             $table->text('abstrak');
+
+            $table->enum('status', [
+                'diajukan',
+                'draft',
+                'revisi',
+                'disetujui',
+                'lulus_tanpa_revisi',
+                'lulus_dengan_revisi',
+                'ditolak',
+                'menunggu_pembatalan', // ← NEW
+                'dibatalkan'           // ← NEW
+            ])->default('diajukan');
+
             $table->enum('status', ['diajukan', 'disetujui', 'ditolak', 'selesai']);
             $table->string('approved_by')->nullable();
             $table->date('tanggal_pengajuan');
+
+            // Plagiarisme
+            $table->float('similarity_score')->nullable()->comment('Skor kemiripan judul/abstrak (0-100%)');
+            $table->text('alasan_penolakan')->nullable()->comment('Catatan jika status=ditolak');
+            $table->timestamp('terakhir_dicek')->nullable()->comment('Terakhir cek plagiasi');
+
             $table->timestamps();
             $table->softDeletes();
         });

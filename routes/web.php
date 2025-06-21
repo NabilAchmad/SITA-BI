@@ -1,23 +1,50 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PengumumanController;
-use App\Http\Controllers\PenugasanPembimbingController;
-use App\Http\Controllers\MahasiswaController;
-use App\Http\Controllers\DosenController;
-use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\LogController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\JadwalSidangAkhirController;
-use App\Http\Controllers\JadwalSidangSemproController;
-use App\Http\Controllers\KajurController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\KajurController;
 use App\Http\Controllers\KaprodiController;
 use App\Http\Controllers\TugasAkhirController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\PengumumanController;
+use App\Http\Controllers\Admin\PenugasanPembimbingController;
+use App\Http\Controllers\Admin\MahasiswaController;
+use App\Http\Controllers\Admin\DosenController;
+use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\Admin\LogController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\JadwalSidangAkhirController;
+use App\Http\Controllers\Admin\JadwalSidangSemproController;
+// use App\Http\Controllers\PengumumanController;
+// use App\Http\Controllers\PenugasanPembimbingController;
+// use App\Http\Controllers\MahasiswaController;
+// use App\Http\Controllers\DosenController;
+// use App\Http\Controllers\LaporanController;
+// use App\Http\Controllers\LogController;
+// use App\Http\Controllers\AdminController;
+// use App\Http\Controllers\JadwalSidangAkhirController;
+// use App\Http\Controllers\JadwalSidangSemproController;
+// use App\Http\Controllers\KajurController;
+// use App\Http\Controllers\AuthController;
+// use App\Http\Controllers\KaprodiController;
+// use App\Http\Controllers\TugasAkhirController;
 use App\Http\Controllers\PendaftaranSidangController;
 use App\Models\JudulTA;
 use App\Models\TugasAkhir;
 
+Route::prefix('admin')->group(function () {
+
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+    });
+
+    // =========================
+    // ROUTE PENGUMUMAN
+    // =========================
+    Route::prefix('pengumuman')->group(function () {
+        // READ
+        Route::get('/read', [PengumumanController::class, 'read'])->name('pengumuman.read');
+
+    });
 // Homepage
 Route::get('/', function () {
     return view('home.homepage');

@@ -10,6 +10,7 @@ use Illuminate\Pagination\Paginator; // Tambahkan di bagian atas jika belum ada
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use App\Models\User;
+use App\Http\Controllers\Controller;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         View::composer('layouts.components.border-admin.profile', function ($view) {
-            $admin = User::find(37); // pastikan admin dengan id 21 ada
+            $admin = User::find(1); // pastikan admin dengan id 21 ada
             $view->with('adminProfile', $admin);
         });
     }

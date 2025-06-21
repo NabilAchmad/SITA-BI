@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\{JadwalSidang, Ruangan, Sidang, Dosen, Mahasiswa, PeranDosenTA};
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Controllers\Controller;
 
 class JadwalSidangAkhirController extends Controller
 {

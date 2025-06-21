@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\Mahasiswa;
 use App\Models\JadwalSidang;
@@ -9,8 +9,9 @@ use App\Models\JudulTA;
 use App\Models\Sidang;
 use App\Models\Nilai;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class MahasiswaController extends Controller
 {
