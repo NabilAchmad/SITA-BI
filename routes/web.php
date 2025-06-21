@@ -35,6 +35,10 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.po
 Route::get('/otp-verification', [AuthController::class, 'showOtpForm'])->name('auth.otp.form');
 Route::post('/otp-verification', [AuthController::class, 'verifyOtp'])->name('auth.otp.verify');
 
+Route::get('/auth/read', function () {
+    return view('auth.read');
+})->name('auth.read');
+
 // Kajur Routes
 Route::prefix('ketua-jurusan')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('kajur.login');

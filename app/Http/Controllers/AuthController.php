@@ -90,22 +90,19 @@ class AuthController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email'],
             'otp'   => ['required', 'digits:6'],
         ]);
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return back()->withErrors(['email' => 'Email tidak ditemukan.']);
-        }
-
-        $otpRecord = EmailVerificationToken::where('user_id', $user->id)
-            ->where('token', $request->otp)
-            ->first();
+        $otpRecord = EmailVerificationToken::where('token', $request->otp)->first();
 
         if (!$otpRecord) {
             return back()->withErrors(['otp' => 'Kode OTP tidak valid.']);
+        }
+
+        $user = User::find($otpRecord->user_id);
+
+        if (!$user) {
+            return back()->withErrors(['otp' => 'User tidak ditemukan.']);
         }
 
         // Check OTP expiration (10 minutes)
@@ -128,7 +125,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->intended($this->redirectByRole($user));
+        return redirect($this->redirectByRole($user));
     }
 
     // Email verification handler (deprecated, kept for backward compatibility)
