@@ -15,7 +15,7 @@ class DosenController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Dosen::with(['user.roles']);
+        $query = Dosen::with(['user', 'user.roles']);
 
         // Filter berdasarkan nama dosen
         if ($request->has('search')) {

@@ -279,6 +279,11 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         Route::get('/', [DosenProfileController::class, 'index_dosen'])->name('dosen.dashboard');
     });
 
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [DosenProfileController::class, 'profile'])->name('user.profile.dosen');
+        Route::put('/update', [DosenProfileController::class, 'update'])->name('user.profile.update.dosen');
+    });
+
     // validasi tugas akhir: kaprodi
     Route::prefix('validasi')->middleware(['auth', 'role:kaprodi'])->group(function () {
         Route::get('/tugas-akhir', [ValidasiController::class, 'index'])->name('dosen.validasi-tugas-akhir.index');
@@ -307,7 +312,7 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         })->name('dosen.bimbingan.crud-bimbingan.ajukan.perubahan');
 
         // ROUTE UNTUK TOLAK BIMBINGAN (POST)
-        Route::post('/tolak', [BimbinganMahasiswaController::class, 'tolak'])->name('dosen.bimbingan.tolak');
+        Route::post('/tolak', [BimbinganMahasiswaController::class, 'tolak'])->name('bimbingan.tolak');
     });
 
 

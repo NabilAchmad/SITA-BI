@@ -64,7 +64,7 @@ class DosenProfileController extends Controller
     public function profile()
     {
         $user = User::find(Auth::id());
-        return view('admin.user.views.profile', compact('user'));
+        return view('dosen.user.profile', compact('user'));
     }
 
     public function update(Request $request)

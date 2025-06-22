@@ -175,5 +175,13 @@
                     console.error(err);
                 });
         }
+
+        @if (session('success'))
+            swal("Berhasil!", "{{ session('success') }}", "success");
+        @endif
+
+        @if (session('error'))
+            swal("Gagal!", "{{ session('error') }}", "error");
+        @endif
     </script>
 @endpush

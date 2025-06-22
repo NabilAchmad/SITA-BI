@@ -100,6 +100,14 @@
                 </div>
             </div>
         </div>
+    @else
+        <div class="alert alert-warning d-flex align-items-center gap-2 shadow-sm border-0 rounded-3">
+            <i class="bi bi-exclamation-circle-fill fs-5 text-warning"></i>
+            <div>
+                <strong>Belum Ada Pembimbing</strong><br>
+                Menunggu penunjukan dosen pembimbing oleh admin.
+            </div>
+        </div>
     @endif
 
     <!-- Main Content -->
@@ -269,18 +277,37 @@
                 <!-- Action Buttons -->
                 @if ($isMengajukanTA && $ta->status === 'disetujui')
                     <div class="d-flex flex-wrap gap-2 justify-content-center">
-                        <a href="{{ asset('storage/' . $ta->file_path) }}" target="_blank"
-                            class="btn btn-outline-primary rounded-pill px-4">
-                            <i class="fas fa-file-pdf me-2"></i>Lihat Proposal
-                        </a>
-                        <button type="button" class="btn btn-outline-warning rounded-pill px-4" data-bs-toggle="modal"
-                            data-bs-target="#revisiModal{{ $ta->id }}">
-                            <i class="fas fa-edit me-2"></i>Revisi Proposal
-                        </button>
-                        <button type="button" class="btn btn-outline-danger rounded-pill px-4" data-bs-toggle="collapse"
-                            data-bs-target="#cancelForm{{ $ta->id }}">
-                            <i class="fas fa-times-circle me-2"></i>Batalkan TA
-                        </button>
+                        @if ($ta->peranDosenTa->count() > 0)
+                            @if ($ta->file_path)
+                                {{-- Sudah upload file --}}
+                                <a href="{{ asset('storage/' . $ta->file_path) }}" target="_blank"
+                                    class="btn btn-outline-primary rounded-pill px-4">
+                                    <i class="fas fa-file-pdf me-2"></i>Lihat Proposal
+                                </a>
+                                <button type="button" class="btn btn-outline-warning rounded-pill px-4"
+                                    data-bs-toggle="modal" data-bs-target="#revisiModal{{ $ta->id }}">
+                                    <i class="fas fa-edit me-2"></i>Revisi Proposal
+                                </button>
+                            @else
+                                {{-- Belum upload file --}}
+                                <button type="button" class="btn btn-outline-success rounded-pill px-4"
+                                    data-bs-toggle="modal" data-bs-target="#uploadFileModal{{ $ta->id }}">
+                                    <i class="fas fa-upload me-2"></i>Upload Proposal
+                                </button>
+                            @endif
+
+                            {{-- Selalu boleh batalkan jika sudah ada pembimbing --}}
+                            <button type="button" class="btn btn-outline-danger rounded-pill px-4"
+                                data-bs-toggle="collapse" data-bs-target="#cancelForm{{ $ta->id }}">
+                                <i class="fas fa-times-circle me-2"></i>Batalkan TA
+                            </button>
+                        @else
+                            {{-- Tidak ada pembimbing --}}
+                            <div class="alert alert-info mt-3 text-center w-100">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Menunggu penugasan dosen pembimbing oleh admin.
+                            </div>
+                        @endif
                     </div>
                 @endif
             </div>

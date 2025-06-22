@@ -47,6 +47,12 @@ class AppServiceProvider extends ServiceProvider
             $view->with('loggedInUser', Auth::user());
         });
 
+        View::composer('layouts.components.border-dosen.profile', function ($view) {
+            $user = User::find(Auth::id());
+
+            $view->with('userProfile', $user);
+        });
+
         View::composer('layouts.components.border-mahasiswa.profile', function ($view) {
             $user = User::find(Auth::id());
 

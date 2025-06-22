@@ -146,7 +146,7 @@
                                 <button class="btn btn-info btn-detail btn-xs me-1" data-bs-toggle="modal"
                                     data-bs-target="#detailModal" data-nama="{{ $dosen->user->name }}"
                                     data-email="{{ $dosen->user->email }}" data-nidn="{{ $dosen->nidn }}"
-                                    data-foto="{{ $dosen->user->profile_photo_url ?? asset('default-avatar.png') }}"
+                                    data-foto="{{ $dosen->user->photo ? asset('storage/' . $dosen->user->photo) : asset('assets/img/default-user.png') }}"
                                     data-created="{{ $dosen->created_at->format('d-m-Y H:i') }}"
                                     data-updated="{{ $dosen->updated_at->format('d-m-Y H:i') }}">
                                     Detail

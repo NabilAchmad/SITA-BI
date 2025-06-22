@@ -9,7 +9,7 @@
             @method('PUT')
 
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3><i class="fas fa-user-circle me-2 text-primary"></i>Profil Mahasiswa</h3>
+                <h3><i class="fas fa-user-circle me-2 text-primary"></i>Admin Profile</h3>
             </div>
 
             <!-- Avatar -->
@@ -17,7 +17,7 @@
                 <div style="position: relative; display: inline-block;">
                     <img id="avatarPreview"
                         src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://placehold.co/400?text=Profile' }}"
-                        class="rounded-circle border border-3 border-primary shadow-sm" alt="Foto Mahasiswa"
+                        class="rounded-circle border border-3 border-primary shadow-sm" alt="Admin Avatar"
                         style="width: 140px; height: 140px; object-fit: cover;">
 
                     <label for="avatarInput"
@@ -31,10 +31,10 @@
                     onchange="previewAvatar(event)">
             </div>
 
-            <!-- Data User -->
+            <!-- Form Fields -->
             <div class="row mb-3">
                 <label for="name" class="col-sm-2 col-form-label fw-semibold">
-                    <i class="fas fa-user me-1 text-primary"></i>Nama:
+                    <i class="fas fa-user me-1 text-primary"></i>Name:
                 </label>
                 <div class="col-sm-10">
                     <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}"
@@ -58,72 +58,29 @@
                 </div>
             </div>
 
-            <!-- Data Mahasiswa -->
             <div class="row mb-3">
-                <label for="nim" class="col-sm-2 col-form-label fw-semibold">
-                    <i class="fas fa-id-badge me-1 text-primary"></i>NIM:
+                <label for="role" class="col-sm-2 col-form-label fw-semibold">
+                    <i class="fas fa-user-shield me-1 text-primary"></i>Role:
                 </label>
                 <div class="col-sm-10">
-                    <input type="text" id="nim" name="nim" value="{{ old('nim', $mahasiswa->nim) }}"
-                        class="form-control @error('nim') is-invalid @enderror">
-                    @error('nim')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <label for="angkatan" class="col-sm-2 col-form-label fw-semibold">
-                    <i class="fas fa-calendar-alt me-1 text-primary"></i>Angkatan:
-                </label>
-                <div class="col-sm-10">
-                    <input type="number" id="angkatan" name="angkatan" value="{{ old('angkatan', $mahasiswa->angkatan) }}"
-                        class="form-control @error('angkatan') is-invalid @enderror">
-                    @error('angkatan')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <input type="text" id="role" value="{{ $user->roles->first()->nama_role ?? 'Tidak Diketahui' }}"
+                        class="form-control" disabled>
                 </div>
             </div>
 
             <div class="row mb-4">
-                <label for="prodi" class="col-sm-2 col-form-label fw-semibold">
-                    <i class="fas fa-graduation-cap me-1 text-primary"></i>Program Studi:
+                <label for="joined" class="col-sm-2 col-form-label fw-semibold">
+                    <i class="fas fa-calendar-alt me-1 text-primary"></i>Joined:
                 </label>
                 <div class="col-sm-10">
-                    <select id="prodi" name="prodi" class="form-select @error('prodi') is-invalid @enderror">
-                        <option value="D3"
-                            {{ strtoupper(old('prodi', $mahasiswa->prodi)) === 'D3' ? 'selected' : '' }}>
-                            D3 Bahasa Inggris
-                        </option>
-                        <option value="D4"
-                            {{ strtoupper(old('prodi', $mahasiswa->prodi)) === 'D4' ? 'selected' : '' }}>
-                            D4 Bahasa Inggris
-                        </option>
-                    </select>
-                    @error('prodi')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <input type="text" id="joined" value="{{ $user->created_at->format('F j, Y') }}"
+                        class="form-control" disabled>
                 </div>
             </div>
 
-            <div class="row mb-4">
-                <label for="kelas" class="col-sm-2 col-form-label fw-semibold">
-                    <i class="fas fa-chalkboard-teacher me-1 text-primary"></i>Kelas:
-                </label>
-                <div class="col-sm-10">
-                    <select id="kelas" name="kelas" class="form-select @error('kelas') is-invalid @enderror">
-                        <!-- Diisi via JavaScript -->
-                    </select>
-                    @error('kelas')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <!-- Tombol Submit -->
             <div class="text-end">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save me-1"></i>Perbarui Profil
+                    <i class="fas fa-save me-1"></i>Update Profile
                 </button>
             </div>
         </form>
@@ -142,36 +99,18 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-
-        const kelasOptions = {
-            D3: ['a', 'b', 'c'],
-            D4: ['a', 'b']
-        };
-
-        function updateKelasDropdown() {
-            const prodi = document.getElementById('prodi').value.toUpperCase();
-            const kelasSelect = document.getElementById('kelas');
-            const selectedKelas = "{{ strtolower(old('kelas', $mahasiswa->kelas)) }}";
-
-            kelasSelect.innerHTML = '';
-
-            if (kelasOptions[prodi]) {
-                kelasOptions[prodi].forEach(kls => {
-                    const option = document.createElement('option');
-                    option.value = kls;
-                    option.textContent = 'Kelas ' + kls.toUpperCase();
-                    if (kls === selectedKelas) {
-                        option.selected = true;
-                    }
-                    kelasSelect.appendChild(option);
-                });
+    </script>
+    <script>
+        function previewAvatar(event) {
+            const input = event.target;
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('avatarPreview').src = reader.result;
+            };
+            if (input.files && input.files[0]) {
+                reader.readAsDataURL(input.files[0]);
             }
         }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('prodi').addEventListener('change', updateKelasDropdown);
-            updateKelasDropdown();
-        });
 
         @if (session('success'))
             swal({

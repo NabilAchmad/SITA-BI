@@ -37,6 +37,7 @@
                             data-bs-target="#editAkunMahasiswaModal">
                             <i class="bi bi-pencil-square"></i> Edit
                         </button>
+                        
                         <button class="btn btn-info btn-xs" data-bs-toggle="modal"
                             data-bs-target="#detailMahasiswaModal{{ $mhs->id }}">
                             <i class="bi bi-info-circle"></i> Detail

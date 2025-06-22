@@ -58,6 +58,61 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {{-- Contoh filter manual untuk data statis --}}
+                    @php
+                        $search = strtolower(request('search', ''));
+                    @endphp
+                    <tr @if((request('prodi') && request('prodi') !== 'Sistem Informasi' && request('prodi') !== 'D4' && request('prodi') !== 'D3') || ($search && strpos(strtolower('Ahmad Fauzi'), $search) === false)) style="display:none" @endif>
+                        <td>1</td>
+                        <td>Ahmad Fauzi</td>
+                        <td>123456789</td>
+                        <td>Sistem Informasi</td>
+                        <td>Sistem Informasi Akademik</td>
+                        <td>Dr. Budi Santoso</td>
+                        <td>2025-06-10</td>
+                        <td>09:00 - 10:00</td>
+                        <td>
+                            <button class="btn btn-success btn-sm">ACC</button>
+                            <button class="btn btn-danger btn-sm btn-tolak"
+                                data-bs-toggle="modal"
+                                data-bs-target="#tolakBimbinganModal"
+                                data-id="1">Tolak</button>
+                        </td>
+                    </tr>
+                    <tr @if((request('prodi') !== 'D4') || ($search && strpos(strtolower('Siti Aminah'), $search) === false)) style="display:none" @endif>
+                        <td>2</td>
+                        <td>Siti Aminah</td>
+                        <td>987654321</td>
+                        <td>D4</td>
+                        <td>Analisis Data Penjualan</td>
+                        <td>Dr. Rina Dewi</td>
+                        <td>2025-06-11</td>
+                        <td>10:00 - 11:00</td>
+                        <td>
+                            <button class="btn btn-success btn-sm">ACC</button>
+                            <button class="btn btn-danger btn-sm btn-tolak"
+                                data-bs-toggle="modal"
+                                data-bs-target="#tolakBimbinganModal"
+                                data-id="2">Tolak</button>
+                        </td>
+                    </tr>
+                    <tr @if((request('prodi') !== 'D3') || ($search && strpos(strtolower('Rizky Hidayat'), $search) === false)) style="display:none" @endif>
+                        <td>3</td>
+                        <td>Rizky Hidayat</td>
+                        <td>192837465</td>
+                        <td>D3</td>
+                        <td>Pengembangan Aplikasi Mobile</td>
+                        <td>Dr. Andi Wijaya</td>
+                        <td>2025-06-12</td>
+                        <td>13:00 - 14:00</td>
+                        <td>
+                            <button class="btn btn-success btn-sm">ACC</button>
+                            <button class="btn btn-danger btn-sm btn-tolak"
+                                data-bs-toggle="modal"
+                                data-bs-target="#tolakBimbinganModal"
+                                data-id="3">Tolak</button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -66,7 +121,7 @@
     {{-- Modal Tolak Bimbingan --}}
     <div class="modal fade" id="tolakBimbinganModal" tabindex="-1" aria-labelledby="tolakBimbinganModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <form method="POST" action="{{ route('dosen.bimbingan.tolak') }}">
+            <form method="POST" action="{{ route('bimbingan.tolak') }}">
                 @csrf
                 <input type="hidden" name="bimbingan_id" id="bimbingan_id_input">
                 <div class="modal-content">
