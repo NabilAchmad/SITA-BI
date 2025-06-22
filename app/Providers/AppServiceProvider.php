@@ -43,6 +43,10 @@ class AppServiceProvider extends ServiceProvider
             $view->with('adminProfile', $admin);
         });
 
+        View::composer('*', function ($view) {
+            $view->with('loggedInUser', Auth::user());
+        });
+
         View::composer('layouts.components.border-mahasiswa.profile', function ($view) {
             $user = User::find(Auth::id());
 

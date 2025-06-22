@@ -1,3 +1,8 @@
+<!-- Validasi Tugas Akhir: Hanya untuk Kaprodi -->
+@php
+    $userRoles = auth()->user()?->roles->pluck('nama_role')->toArray();
+@endphp
+
 <div class="sidebar sidebar-style-2" data-background-color="dark2">
     <div class="sidebar-logo">
         <!-- Logo Header -->
@@ -13,7 +18,13 @@
                 <!-- Teks -->
                 <span class="fw-bold d-none d-md-inline text-truncate"
                     style="max-width: 100%; white-space: nowrap; letter-spacing: 0.5px; font-size: 1.1rem;">
-                    Dosen
+                    @if ($loggedInUser && $loggedInUser->roles->contains('nama_role', 'kajur'))
+                        Kajur
+                    @elseif($loggedInUser && $loggedInUser->roles->contains('nama_role', 'kaprodi'))
+                        Kaprodi
+                    @else
+                        Dosen
+                    @endif
                 </span>
             </a>
 
@@ -77,6 +88,28 @@
                         <p>Sidang</p>
                     </a>
                 </li>
+
+                <!-- Validasi Tugas Akhir: Hanya untuk Kaprodi -->
+                @if (in_array('kaprodi', $userRoles))
+                    <li
+                        class="nav-item {{ request()->is('dosen/validasi') || request()->is('dosen/validasi/*') ? 'active' : '' }}">
+                        <a href="{{ route('dosen.validasi-tugas-akhir.index') }}" class="nav-link">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <p>Validasi Judul Tugas Akhir</p>
+                        </a>
+                    </li>
+                @endif
+
+                <!-- Validasi Nilai Tugas Akhir: Hanya untuk Kajur -->
+                @if (in_array('kajur', $userRoles))
+                    <li
+                        class="nav-item {{ request()->is('dosen/validasi-nilai-tugas-akhir') || request()->is('dosen/validasi-nilai-tugas-akhir/*') ? 'active' : '' }}">
+                        <a href="{{ route('dosen.validasi-nilai-tugas-akhir.index') }}" class="nav-link">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <p>Validasi Nilai Tugas Akhir</p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </div>
     </div>

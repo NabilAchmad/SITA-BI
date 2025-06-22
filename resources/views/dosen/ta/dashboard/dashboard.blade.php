@@ -160,7 +160,7 @@
 </div>
 
 {{-- Modal Revisi --}}
-@include('admin.ta.modal.revisi')
+@include('dosen.ta.modal.revisi')
 @endsection
 
 @push('scripts')

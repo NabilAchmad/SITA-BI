@@ -1,15 +1,18 @@
 <?php
 
 use App\Http\Controllers\Homepage\HomepageController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthController;
 
+// Mahasiswa routes
 use App\Http\Controllers\Mahasiswa\BimbinganController;
 use App\Http\Controllers\Mahasiswa\DashboardController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Mahasiswa\TugasAkhirController;
 use App\Http\Controllers\Mahasiswa\PendaftaranSidangController;
 use App\Http\Controllers\Mahasiswa\TopikController;
 use App\Http\Controllers\Mahasiswa\MahasiswaProfileController;
 
+// Admin routes
 use App\Http\Controllers\Admin\PengumumanController;
 use App\Http\Controllers\Admin\PenugasanPembimbingController;
 use App\Http\Controllers\Admin\MahasiswaController;
@@ -20,12 +23,14 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\JadwalSidangAkhirController;
 use App\Http\Controllers\Admin\JadwalSidangSemproController;
 
-use App\Http\Controllers\Auth\AuthController;
-
+// Dosen routes
+use App\Http\Controllers\Dosen\BimbinganMahasiswaController;
+use App\Http\Controllers\Dosen\DosenProfileController;
 use App\Http\Controllers\Dosen\TawaranTopikController;
 use App\Http\Controllers\Dosen\PenilaianSidangController;
-use App\Http\Controllers\Dosen\DosenProfileController;
-use App\Http\Controllers\Dosen\BimbinganMahasiswaController;
+
+//Kaprodi
+use App\Http\Controllers\Dosen\Kaprodi\ValidasiController;
 
 
 // Homepage
@@ -274,14 +279,27 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         Route::get('/', [DosenProfileController::class, 'index_dosen'])->name('dosen.dashboard');
     });
 
-    // bimbingan
+    // validasi tugas akhir: kaprodi
+    Route::prefix('validasi')->middleware(['auth', 'role:kaprodi'])->group(function () {
+        Route::get('/tugas-akhir', [ValidasiController::class, 'index'])->name('dosen.validasi-tugas-akhir.index');
+        Route::post('/terima/{id}', [ValidasiController::class, 'validasi'])->name('dosen.validasi-tugas-akhir.validasi');
+        Route::get('/detail/{id}', [ValidasiController::class, 'detail'])->name('dosen.validasi-tugas-akhir.detail');
+        Route::post('/tolak/{id}', [ValidasiController::class, 'tolak'])->name('tolak');
+    });
+
+    // Validasi nilai sidang akhir: kajur
+    Route::prefix('validasi-nilai')->middleware(['auth', 'role:kajur'])->group(function () {
+        Route::get('/sidang-akhir', [PenilaianSidangController::class, 'index'])->name('dosen.validasi-nilai-tugas-akhir.index');
+    });
+
+    // Bimbingan
     Route::prefix('bimbingan')->group(function () {
         // Daftar bimbingan
         Route::get('/', [BimbinganMahasiswaController::class, 'dashboard'])->name('dosen.bimbingan.index');
 
-        Route::get('/belumMulai', [BimbinganController::class, 'ajukanJadwal'])->name('dosen.bimbingan.crud-bimbingan.ajukan.jadwal');
+        Route::get('/belumMulai', [BimbinganMahasiswaController::class, 'ajukanJadwal'])->name('dosen.bimbingan.crud-bimbingan.ajukan.jadwal');
 
-        Route::get('/sedangBerlangsung', [BimbinganController::class, 'lihatBimbingan'])->name('dosen.bimbingan.crud-bimbingan.lihat.bimbingan');
+        Route::get('/sedangBerlangsung', [BimbinganMahasiswaController::class, 'lihatBimbingan'])->name('dosen.bimbingan.crud-bimbingan.lihat.bimbingan');
 
         // ROUTE UNTUK AJUKAN PERUBAHAN JADWAL (EDIT JADWAL)
         Route::get('/menungguReview', function () {
@@ -289,7 +307,7 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         })->name('dosen.bimbingan.crud-bimbingan.ajukan.perubahan');
 
         // ROUTE UNTUK TOLAK BIMBINGAN (POST)
-        Route::post('/tolak', [BimbinganController::class, 'tolak'])->name('dosen.bimbingan.tolak');
+        Route::post('/tolak', [BimbinganMahasiswaController::class, 'tolak'])->name('dosen.bimbingan.tolak');
     });
 
 
@@ -319,22 +337,6 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         Route::get('/trash', [TawaranTopikController::class, 'trashed'])->name('TawaranTopik.trashed'); // Tampilkan data terhapus
         Route::post('/{id}/restore', [TawaranTopikController::class, 'restore'])->name('TawaranTopik.restore'); // Restore data
         Route::delete('/{id}/force-delete', [TawaranTopikController::class, 'forceDelete'])->name('TawaranTopik.force-delete'); // Hapus permanen
-    });
-
-    // =========================
-    // ROUTE Mahasiswa
-    // =========================
-
-    Route::prefix('mahasiswa')->group(function () {
-        // Daftar mahasiswa belum punya pembimbing
-        Route::get('/belum-pembimbing', [PenugasanPembimbingController::class, 'indexWithOutPembimbing'])->name('dosen.penugasan-bimbingan.index');
-
-        // Form pilih pembimbing untuk mahasiswa tertentu
-        Route::get('/pilih-pembimbing/{id}', [PenugasanPembimbingController::class, 'create'])->name('dosen.penugasan-bimbingan.create');
-        Route::post('/pilih-pembimbing/{id}', [PenugasanPembimbingController::class, 'store'])->name('dosen.penugasan-bimbingan.store');
-
-        // Daftar mahasiswa sudah punya pembimbing
-        Route::get('/list-mahasiswa', [PenugasanPembimbingController::class, 'indexPembimbing'])->name('dosen.list-mahasiswa');
     });
 
     // =========================
@@ -417,20 +419,6 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         });
     });
 
-    // Admin: Laporan dan Statistik
-    Route::prefix('/laporan')->name('laporan.')->group(function () {
-        // Lihat laporan dan statistik
-        Route::get('/lihat', [LaporanController::class, 'show'])
-            ->name('statistik.dosen');
-    });
-
-    // Admin: Logs
-    Route::prefix('/logs')->name('log.')->group(function () {
-        // Lihat log aktivitas sistem
-        Route::get('/lihat', [LogController::class, 'index'])
-            ->name('aktifitas');
-    });
-
     //tugas akhir
 
     Route::prefix('ta')->group(function () {
@@ -444,8 +432,4 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         Route::post('/acc/{id}', [TugasAkhirController::class, 'acc'])->name('ta.acc');
         Route::post('/tolak/{id}', [TugasAkhirController::class, 'tolak'])->name('ta.tolak');
     });
-
-
-    // Profile
-    Route::view('/profile', 'admin/user/views/profile')->name('dosen.user.profile');
 });
