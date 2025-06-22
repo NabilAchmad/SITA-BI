@@ -19,12 +19,10 @@ class Dosen extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-
     public function isOnline()
     {
         return Cache::has('user-is-online-' . $this->id);
     }
-
 
     public function topik(): HasMany
     {
@@ -56,8 +54,16 @@ class Dosen extends Model
         return $this->hasMany(RevisiTa::class);
     }
 
-    public function peranDosen()
+    public function peranDosenTa()
     {
         return $this->hasMany(PeranDosenTA::class);
+    }
+    public function permintaanPembatalan()
+    {
+        return $this->peranDosenTa()
+            ->whereNull('setuju_pembatalan')
+            ->whereHas('tugasAkhir', function ($query) {
+                $query->where('status', 'menunggu_pembatalan');
+            });
     }
 }

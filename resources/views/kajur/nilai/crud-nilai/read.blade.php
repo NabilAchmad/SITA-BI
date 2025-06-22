@@ -26,6 +26,7 @@
                             <th scope="col"><i class="bi bi-info-circle me-2 icon-bounce"></i>Status</th>
                             <th scope="col"><i class="bi bi-award me-2 icon-bounce"></i>Nilai Akhir</th>
                             <th scope="col"><i class="bi bi-patch-check-fill me-2 icon-bounce"></i>Status Akhir</th>
+                            <th scope="col"><i class="bi bi-pencil-square me-2 icon-bounce"></i>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="nilaiTable">
@@ -61,6 +62,11 @@
                                     @else
                                         <span class="badge bg-secondary status-badge glass-badge">-</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <a href="{{ route('kajur.nilai.edit', $nilai->id) }}" class="btn btn-primary btn-sm">
+                                        Isi Nilai
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

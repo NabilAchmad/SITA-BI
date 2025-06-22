@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Mahasiswa;
 
 use Illuminate\Http\Request;
 use App\Models\Mahasiswa;
@@ -10,12 +10,13 @@ use App\Models\TugasAkhir;
 use App\Models\PeranDosenTA;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 
 class PendaftaranSidangController extends Controller
 {
     public function form()
     {
-        $userId = 35;
+        $userId = 2;
 
         $mahasiswa = Mahasiswa::with(['tugasAkhir.peranDosen.dosen', 'tugasAkhir'])->where('user_id', $userId)->first();
 

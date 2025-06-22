@@ -17,7 +17,12 @@ return new class extends Migration
             $table->string('judul', 255);
             $table->text('abstrak');
 
+
             $table->enum('status', [
+                'diajukan',
+                'draft',
+                'revisi',
+                'disetujui',
                 'diajukan',
                 'draft',
                 'revisi',
@@ -27,10 +32,15 @@ return new class extends Migration
                 'ditolak',
                 'menunggu_pembatalan', // ← NEW
                 'dibatalkan'           // ← NEW
+                // 'ditolak',
+                // 'menunggu_pembatalan', // ← NEW
+                // 'dibatalkan' ,          // ← NEW
             ])->default('diajukan');
             $table->string('approved_by')->nullable();
+
             $table->date('tanggal_pengajuan');
 
+            // Plagiarisme
             // Plagiarisme
             $table->float('similarity_score')->nullable()->comment('Skor kemiripan judul/abstrak (0-100%)');
             $table->text('alasan_penolakan')->nullable()->comment('Catatan jika status=ditolak');

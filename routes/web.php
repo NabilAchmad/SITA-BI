@@ -1,10 +1,18 @@
 <?php
 
+use App\Http\Controllers\Mahasiswa\BimbinganController;
+use App\Http\Controllers\Mahasiswa\DashboardController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Mahasiswa\TugasAkhirController;
+use App\Http\Controllers\Mahasiswa\PendaftaranSidangController;
+use App\Http\Controllers\Mahasiswa\TopikController;
+use App\Http\Controllers\Mahasiswa\MahasiswaProfileController;
+use App\Models\TawaranTopik;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KajurController;
 use App\Http\Controllers\KaprodiController;
-use App\Http\Controllers\TugasAkhirController;
-use Illuminate\Support\Facades\Route;
+// use App\Http\Controllers\TugasAkhirController;
+// use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\PengumumanController;
 use App\Http\Controllers\Admin\PenugasanPembimbingController;
 use App\Http\Controllers\Admin\MahasiswaController;
@@ -27,12 +35,53 @@ use App\Http\Controllers\Admin\JadwalSidangSemproController;
 // use App\Http\Controllers\AuthController;
 // use App\Http\Controllers\KaprodiController;
 // use App\Http\Controllers\TugasAkhirController;
-use App\Http\Controllers\PendaftaranSidangController;
+// use App\Http\Controllers\PendaftaranSidangController;
 use App\Models\JudulTA;
 use App\Models\TugasAkhir;
 
+// Homepage
+Route::get('/', function () {
+    return view('home.homepage');
+});
+
+Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
+
 Route::prefix('admin')->group(function () {
 
+    // Dashboard Mahasiswa
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard.mahasiswa');
+
+    Route::prefix('/tugas-akhir')->group(function () {
+        Route::get('/', [TugasAkhirController::class, 'dashboard'])->name('tugas-akhir.dashboard');
+
+        // Menampilkan form ajukan Tugas Akhir
+        Route::get('/ajukan-ta-mandiri', [TugasAkhirController::class, 'ajukanForm'])->name('tugas-akhir.ajukan');
+
+        // Menampilkan form progress TA
+        Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugas-akhir.progress');
+
+        // Menangani revisi TA
+        Route::get('/revisi', [TugasAkhirController::class, ''])->name('tugas-akhir.revisi');
+
+        // Tangani form POST ajukan TA
+        Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
+
+        Route::delete('tugasAkhir/{id}', [TugasAkhirController::class, 'destroy'])->name('tugasAkhir.destroy');
+        Route::post('tugasAkhir/{id}/cancel', [TugasAkhirController::class, 'cancel'])->name('tugasAkhir.cancelTA');
+        Route::get('tugasAkhir/dibatalkan', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.dibatalkan');
+
+        // Menampilkan form ajukan berdasarkan topik dosen
+        Route::get('/list-topik-dosen', [TopikController::class, 'index'])->name('mahasiswa.topik.index');
+        Route::get('/ambil-topik', [TopikController::class, ''])->name('mahasiswa.topik.ambil');
+
+        Route::get('/cancel', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.cancelled');
+    });
+
+    Route::prefix('bimbingan')->group(function () {
+        // Tambahkan route untuk Bimbingan di sini jika diperlukan
+        Route::get('/', [BimbinganController::class, 'dashboard'])->name('dashboard.bimbingan');
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
     });
@@ -46,10 +95,7 @@ Route::prefix('admin')->group(function () {
 
     });
 });
-// Homepage
-Route::get('/', function () {
-    return view('home.homepage');
-});
+
 
 
 // Authentication routes
@@ -84,6 +130,27 @@ Route::prefix('ketua-jurusan')->group(function () {
         // Pengumuman
         Route::get('/pengumuman', [KajurController::class, 'showPengumuman'])->name('kajurpengumuman.page');
 
+        Route::get('/ajukan-jadwal', [BimbinganController::class, 'ajukanJadwal'])->name('bimbingan.ajukanJadwal');
+        Route::post('/store', [BimbinganController::class, 'store'])->name('simpan.jadwal');
+
+        Route::get('/jadwal-bimbingan', [BimbinganController::class, 'jadwalBimbingan'])->name('jadwal.bimbingan');
+
+        Route::put('/bimbingan/jadwal/{id}', [BimbinganController::class, 'ubahJadwal'])->name('bimbingan.updateJadwal');
+
+        Route::get('/revisi', function () {
+            return view('mahasiswa.Bimbingan.views.revisiTA');
+        });
+
+        // Nilai Sidang routes for Kajur
+        Route::get('/nilai/edit/{id}', [KajurController::class, 'editNilai'])->name('kajur.nilai.edit');
+        Route::post('/nilai/update/{id}', [KajurController::class, 'updateNilai'])->name('kajur.nilai.update');
+
+        // Bimbingan routes for Kajur
+        Route::get('/bimbingan', [KajurController::class, 'indexBimbingan'])->name('kajur.bimbingan.index');
+        Route::get('/bimbingan/create', [KajurController::class, 'createBimbingan'])->name('kajur.bimbingan.create');
+        Route::post('/bimbingan/store', [KajurController::class, 'storeBimbingan'])->name('kajur.bimbingan.store');
+    });
+
         // Sidang Routes
         Route::get('/sidang/dashboard', [KajurController::class, 'showSidangDashboard'])->name('sidangDashboard.kajur');
         Route::get('/sidang/mahasiswaSidang', [KajurController::class, 'showMahasiswaSidang'])->name('kajur.sidang');
@@ -96,6 +163,26 @@ Route::prefix('ketua-jurusan')->group(function () {
 
     // Sidang Routes for Kajur
     Route::prefix('sidang')->group(function () {
+        Route::get('dashboard', function () {
+            return view('mahasiswa.Sidang.dashboard.dashboard');
+        })->name('dashboard.sidang');
+
+        //sempro
+        Route::get('/daftar-sempro', function () {
+            return view('mahasiswa.Sidang.views.sempro');
+        })->name('daftar-sempro');
+
+
+        Route::get('/lihat-nilai', function () {
+            return view('mahasiswa.sidang.views.nilaiSidang');
+        });
+
+        Route::get('/lihat-jadwal', function () {
+            return view('mahasiswa.sidang.views.jadwal');
+        });
+
+        Route::get('/daftar-sidang', [PendaftaranSidangController::class, 'form'])->name('pendaftaran_sidang.form');
+        Route::post('/daftar-sidang', [PendaftaranSidangController::class, 'store'])->name('pendaftaran_sidang.store');
         Route::get('/sempro/penjadwalan-sidang-sempro', [JadwalSidangSemproController::class, 'menungguSidangSempro'])->name('kajur.sidang.menunggu.sempro');
         Route::get('/sempro/jadwal-sidang-sempro', [JadwalSidangSemproController::class, 'listJadwalSempro'])->name('kajur.sidang.jadwal.sempro');
         Route::get('/sempro/pasca-sidang-sempro', [JadwalSidangSemproController::class, 'pascaSidangSempro'])->name('kajur.sidang.pasca.sempro');
@@ -317,5 +404,12 @@ Route::prefix('ketua-jurusan')->group(function () {
             });
             return view('loginRegister');
         });
+    });
+
+    // Profile
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [MahasiswaProfileController::class, 'profile'])->name('user.profile');
+        Route::put('/update', [MahasiswaProfileController::class, 'update'])->name('user.profile.update');
+        Route::put('/logout', [MahasiswaProfileController::class, ''])->name('logout');
     });
 });
