@@ -172,7 +172,6 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::put('/update-pembimbing/{tugasAkhirId}', [PenugasanPembimbingController::class, 'update'])->name('pembimbing.update');
     });
 
-
     // =========================
     // ROUTE KELOLA AKUN
     // =========================
