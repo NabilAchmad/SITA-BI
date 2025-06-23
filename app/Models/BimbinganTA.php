@@ -25,7 +25,7 @@ class BimbinganTA extends Model
     // Relasi ke Tugas Akhir
     public function tugasAkhir()
     {
-        return $this->belongsTo(TugasAkhir::class);
+        return $this->belongsTo(TugasAkhir::class, 'tugas_akhir_id');
     }
 
     // Relasi ke Dosen
@@ -37,7 +37,14 @@ class BimbinganTA extends Model
     // Relasi ke Mahasiswa (tidak wajib jika bisa diakses via Tugas Akhir)
     public function mahasiswa()
     {
-        return $this->belongsTo(Mahasiswa::class);
+        return $this->hasOneThrough(
+            Mahasiswa::class,
+            TugasAkhir::class,
+            'id',              // tugas_akhir.id
+            'id',              // mahasiswa.id
+            'tugas_akhir_id',  // bimbingan_ta.tugas_akhir_id
+            'mahasiswa_id'     // tugas_akhir.mahasiswa_id
+        );
     }
 
     // Relasi ke Catatan Bimbingan

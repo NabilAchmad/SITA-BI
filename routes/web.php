@@ -65,6 +65,8 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(functi
         // Tangani form POST ajukan TA
         Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
 
+        Route::post('/upload', [TugasAkhirController::class, 'uploadProposal'])->name('tugas-akhir.uploadProposal');
+
         Route::delete('tugasAkhir/{id}', [TugasAkhirController::class, 'destroy'])->name('tugasAkhir.destroy');
         Route::post('tugasAkhir/{id}/cancel', [TugasAkhirController::class, 'cancel'])->name('tugasAkhir.cancelTA');
         Route::get('tugasAkhir/dibatalkan', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.dibatalkan');
@@ -81,15 +83,12 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(functi
         Route::get('/', [BimbinganController::class, 'dashboard'])->name('dashboard.bimbingan');
 
         Route::get('/ajukan-jadwal', [BimbinganController::class, 'ajukanJadwal'])->name('bimbingan.ajukanJadwal');
+
         Route::post('/store', [BimbinganController::class, 'store'])->name('simpan.jadwal');
 
         Route::get('/jadwal-bimbingan', [BimbinganController::class, 'jadwalBimbingan'])->name('jadwal.bimbingan');
 
         Route::put('/bimbingan/jadwal/{id}', [BimbinganController::class, 'ubahJadwal'])->name('bimbingan.updateJadwal');
-
-        Route::get('/revisi', function () {
-            return view('mahasiswa.Bimbingan.views.revisiTA');
-        });
     });
 
     Route::prefix('sidang')->group(function () {
@@ -301,7 +300,7 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         // Daftar bimbingan
         Route::get('/', [BimbinganMahasiswaController::class, 'dashboard'])->name('dosen.bimbingan.index');
 
-        Route::get('/belumMulai', [BimbinganMahasiswaController::class, 'ajukanJadwal'])->name('dosen.bimbingan.crud-bimbingan.ajukan.jadwal');
+        Route::get('/belumMulai', [BimbinganMahasiswaController::class, 'ajukanJadwal'])->name('bimbingan.detail');
 
         Route::get('/sedangBerlangsung', [BimbinganMahasiswaController::class, 'lihatBimbingan'])->name('dosen.bimbingan.crud-bimbingan.lihat.bimbingan');
 

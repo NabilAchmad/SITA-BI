@@ -112,10 +112,6 @@ $(document).ready(function(){
 	});
 
 	var toggle_sidebar = false,
-<<<<<<< HEAD
-=======
-	toggle_quick_sidebar = false,
->>>>>>> admin
 	toggle_topbar = false,
 	minimize_sidebar = false,
 	first_toggle_sidebar = false,

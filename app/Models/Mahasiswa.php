@@ -10,16 +10,16 @@ class Mahasiswa extends Model
 {
     protected $table = 'mahasiswa'; // nama tabel sesuai DB
 
-    protected $fillable = ['user_id', 'nim', 'phone', 'address', 'prodi', 'angkatan'];
+    protected $fillable = ['user_id', 'nim', 'prodi', 'angkatan', 'kelas'];
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function tugasAkhir()
     {
-        return $this->hasOne(TugasAkhir::class); // ✔️ Ini yang benar jika hanya 1 TA per mahasiswa
+        return $this->hasOne(TugasAkhir::class, 'mahasiswa_id'); // ✔️ Ini yang benar jika hanya 1 TA per mahasiswa
     }
 
     // Jika ingin akses langsung peran dosen lewat mahasiswa

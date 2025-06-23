@@ -10,12 +10,6 @@
                 <h5 class="fw-bold text-primary"><i class="bi bi-calendar-check me-2"></i> Daftar Jadwal Bimbingan</h5>
                 <p class="text-muted mb-0">Daftar mahasiswa yang telah dijadwalkan bimbingan.</p>
             </div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Kelola Jadwal Bimbingan</li>
-                </ol>
-            </nav>
         </div>
 
         {{-- Tabs Program Studi --}}
@@ -35,7 +29,8 @@
         <form method="GET" class="mb-3">
             <div class="input-group">
                 <input type="hidden" name="prodi" value="{{ request('prodi') }}">
-                <input type="text" name="search" class="form-control" placeholder="Cari nama mahasiswa..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control" placeholder="Cari nama mahasiswa..."
+                    value="{{ request('search') }}">
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-search"></i> Cari
                 </button>
@@ -43,29 +38,55 @@
         </form>
 
         <div class="table-responsive">
-            <table class="table table-striped table-bordered mt-2">
-                <thead class="thead-dark">
+            <table class="table table-bordered table-striped text-center align-middle">
+                <thead class="thead-dark text-center">
                     <tr>
                         <th scope="col">No</th>
                         <th scope="col">Nama Mahasiswa</th>
                         <th scope="col">NIM</th>
                         <th scope="col">Program Studi</th>
-                        <th scope="col">Judul Sidang</th>
-                        <th scope="col">Dosen Pembimbing</th>
-                        <th scope="col">Tanggal</th>
-                        <th scope="col">Waktu</th>
-                        <th scope="col">Status Bimbingan</th>
+                        <th scope="col">Judul Tugas Akhir</th>
+                        <th scope="col">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-
+                    @forelse ($mahasiswaList as $item)
+                        @php
+                            $mhs = $item->tugasAkhir->mahasiswa ?? null;
+                            $ta = $item->tugasAkhir ?? null;
+                        @endphp
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $mhs?->user?->name ?? '-' }}</td>
+                            <td>{{ $mhs?->nim ?? '-' }}</td>
+                            <td>
+                                @if ($mhs->prodi === 'd4')
+                                    D4 Bahasa Inggris
+                                @elseif ($mhs->prodi === 'd3')
+                                    D3 Bahasa Inggris
+                                @else
+                                    {{ $mhs->prodi }}
+                                @endif
+                            </td>
+                            <td>{{ $ta?->judul ?? '-' }}</td>
+                            <td>
+                                <span class="badge bg-primary">{{ ucfirst($item->peran) }}</span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">Belum ada mahasiswa yang Anda bimbing.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
+
             </table>
         </div>
     </div>
 
     {{-- Modal Tolak Bimbingan --}}
-    <div class="modal fade" id="tolakBimbinganModal" tabindex="-1" aria-labelledby="tolakBimbinganModalLabel" aria-hidden="true">
+    <div class="modal fade" id="tolakBimbinganModal" tabindex="-1" aria-labelledby="tolakBimbinganModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <form method="POST" action="{{ route('bimbingan.tolak') }}">
                 @csrf
@@ -91,15 +112,15 @@
 @endsection
 
 @push('scripts')
-<script>
-    // Script untuk memasukkan ID ke dalam input tersembunyi saat tombol tolak diklik
-    const modal = document.getElementById('tolakBimbinganModal');
-    if(modal){
-        modal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const id = button.getAttribute('data-id');
-            modal.querySelector('#bimbingan_id_input').value = id;
-        });
-    }
-</script>
+    <script>
+        // Script untuk memasukkan ID ke dalam input tersembunyi saat tombol tolak diklik
+        const modal = document.getElementById('tolakBimbinganModal');
+        if (modal) {
+            modal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                modal.querySelector('#bimbingan_id_input').value = id;
+            });
+        }
+    </script>
 @endpush

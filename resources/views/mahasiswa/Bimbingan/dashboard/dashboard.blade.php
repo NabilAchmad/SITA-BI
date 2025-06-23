@@ -190,28 +190,26 @@
                 </div>
             </div>
         </div>
-
         <!-- Modal Edit Jadwal -->
         @include('mahasiswa.Bimbingan.modal.edit', ['jadwals' => $jadwals])
-        {{-- Bagian tampilan jadwal bimbingan --}}
-        {{-- ... seluruh card yang kamu tulis tetap disini --}}
     @endif
-
 @endsection
 
 @push('scripts')
-    @if (session('success'))
+    @if (session('alert'))
         <script>
-            swal({
-                title: "Berhasil!",
-                text: "{{ session('success') }}",
-                icon: "success",
-                buttons: {
-                    confirm: {
-                        text: "OK",
-                        className: "btn btn-primary"
+            document.addEventListener('DOMContentLoaded', function() {
+                swal({
+                    title: "{{ session('alert.title') }}",
+                    text: "{{ session('alert.text') }}",
+                    icon: "{{ session('alert.type') }}",
+                    buttons: {
+                        confirm: {
+                            text: "OK",
+                            className: "btn btn-danger"
+                        }
                     }
-                }
+                });
             });
         </script>
     @endif

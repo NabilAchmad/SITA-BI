@@ -36,7 +36,7 @@ class Dosen extends Model
 
     public function peranTa(): HasMany
     {
-        return $this->hasMany(PeranDosenTa::class);
+        return $this->hasMany(PeranDosenTa::class, 'dosen_id');
     }
 
     public function nilaiSidang(): HasMany

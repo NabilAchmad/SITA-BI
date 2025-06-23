@@ -313,6 +313,50 @@
             </div>
         </div>
 
+        <!-- Modal Upload File Proposal -->
+        <div class="modal fade" id="uploadFileModal{{ $ta->id }}" tabindex="-1"
+            aria-labelledby="uploadFileModalLabel{{ $ta->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-primary text-white py-3">
+                        <h5 class="modal-title fw-bold mb-0" id="uploadFileModalLabel{{ $ta->id }}">
+                            <i class="fas fa-cloud-upload-alt me-2"></i> Upload Proposal Tugas Akhir
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <form action="{{ route('tugas-akhir.uploadProposal', $ta->id) }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body py-4">
+                            <div class="mb-4">
+                                <label for="file_proposal_{{ $ta->id }}" class="form-label fw-semibold mb-2">
+                                    <i class="fas fa-file-alt me-1"></i> Pilih File Proposal
+                                </label>
+                                <input type="file" name="file_proposal" id="file_proposal_{{ $ta->id }}"
+                                    class="form-control form-control-lg" accept=".pdf,.doc,.docx" required>
+                                <div class="form-text mt-1">
+                                    <small>
+                                        <i class="fas fa-info-circle me-1"></i> Format file: PDF, DOC, atau DOCX (Maksimal
+                                        25MB)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                                data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i> Batal
+                            </button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
+                                <i class="fas fa-upload me-2"></i> Upload Proposal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Form Pembatalan -->
         @if ($isMengajukanTA && $ta->status === 'disetujui')
             <div class="collapse" id="cancelForm{{ $ta->id }}">
@@ -441,30 +485,16 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            @if (session('cancel_success'))
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('alert'))
                 swal({
-                    title: "Pembatalan Berhasil!",
-                    text: "{{ session('cancel_success') }}",
-                    icon: "success",
+                    title: "{{ session('alert.title') }}",
+                    text: "{{ session('alert.message') }}",
+                    icon: "{{ session('alert.type') }}",
                     buttons: {
                         confirm: {
                             text: "OK",
-                            className: "btn btn-primary"
-                        }
-                    }
-                });
-            @endif
-
-            @if (session('revisi_success'))
-                swal({
-                    title: "Revisi Terkirim!",
-                    text: "{{ session('revisi_success') }}",
-                    icon: "success",
-                    buttons: {
-                        confirm: {
-                            text: "OK",
-                            className: "btn btn-primary"
+                            className: "btn btn-{{ session('alert.type') === 'error' ? 'danger' : (session('alert.type') === 'warning' ? 'warning' : 'primary') }}"
                         }
                     }
                 });

@@ -76,23 +76,22 @@
     <script>
         const modalAjukan = document.getElementById('modalAjukanJadwal');
 
-        modalAjukan.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            const dosenId = button.getAttribute('data-dosenid');
-            const peran = button.getAttribute('data-peran');
+        if (modalAjukan) {
+            modalAjukan.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const dosenId = button.getAttribute('data-dosenid');
+                const peran = button.getAttribute('data-peran');
 
-            modalAjukan.querySelector('#modal_dosen_id').value = dosenId;
-            modalAjukan.querySelector('#modal_tipe_dospem').value = peran === 'pembimbing1' ? 1 : 2;
-            modalAjukan.querySelector('#modal_label_peran').textContent = peran.replace('pembimbing',
-                'Dosen Pembimbing ');
-        });
-    </script>
+                modalAjukan.querySelector('#modal_dosen_id').value = dosenId;
+                modalAjukan.querySelector('#modal_tipe_dospem').value = peran === 'pembimbing1' ? 1 : 2;
+                modalAjukan.querySelector('#modal_label_peran').textContent = peran.replace('pembimbing',
+                    'Dosen Pembimbing ');
+            });
+        }
 
-    {{-- Tempatkan di bagian paling bawah atau di section scripts --}}
-    @if (session('success'))
-        <script>
+        @if (session('success'))
             swal({
-                title: "Jadwal Berhasil Diajukan!",
+                title: "Berhasil!",
                 text: "{{ session('success') }}",
                 icon: "success",
                 buttons: {
@@ -102,14 +101,12 @@
                     }
                 }
             });
-        </script>
-    @endif
+        @endif
 
-    @if ($errors->has('error'))
-        <script>
+        @if (session('error'))
             swal({
                 title: "Gagal!",
-                text: "{{ $errors->first('error') }}",
+                text: "{{ session('error') }}",
                 icon: "error",
                 buttons: {
                     confirm: {
@@ -118,34 +115,6 @@
                     }
                 }
             });
-        </script>
-    @endif
-
+        @endif
+    </script>
 @endpush
-
-{{-- Validasi error --}}
-@if ($errors->any())
-    @php
-        $uniqueErrors = collect($errors->all())->filter(
-            fn($e) => str_contains(strtolower($e), 'email') || str_contains(strtolower($e), 'nidn'),
-        );
-    @endphp
-
-    @if ($uniqueErrors->isNotEmpty())
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                swal({
-                    title: "Error!",
-                    text: "{{ $uniqueErrors->first() }}",
-                    icon: "error",
-                    buttons: {
-                        confirm: {
-                            text: "OK",
-                            className: "btn btn-danger"
-                        }
-                    }
-                });
-            });
-        </script>
-    @endif
-@endif

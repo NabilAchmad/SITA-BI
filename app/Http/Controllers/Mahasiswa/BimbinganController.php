@@ -9,13 +9,14 @@ use App\Models\BimbinganTA;
 use App\Models\CatatanBimbingan;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class BimbinganController extends Controller
 {
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return \App\Models\User::find(2);
+        return Auth::user();
     }
 
     public function dashboard()
@@ -29,23 +30,29 @@ class BimbinganController extends Controller
 
         $tugasAkhir = $mahasiswa->tugasAkhir;
 
+        // ❌ Jika belum punya TA
         if (!$tugasAkhir) {
-            return view('mahasiswa.bimbingan.dashboard.dashboard', [
-                'tugasAkhir' => null,
-                'jadwals' => collect(),
-            ])->with('info', 'Anda belum memiliki data tugas akhir.');
+            return redirect()->route('dashboard.mahasiswa')
+                ->with('alert', [
+                    'type' => 'error',
+                    'title' => 'Data Tidak Ditemukan',
+                    'text' => 'Data tugas akhir belum tersedia.'
+                ]);
         }
 
-        // Cek status TA apakah boleh bimbingan
-        $statusValid = in_array($tugasAkhir->status, ['disetujui', 'draft']);
-        if (!$statusValid) {
+        // ❌ Status TA belum valid untuk bimbingan
+        if (!in_array($tugasAkhir->status, ['disetujui', 'draft'])) {
             return view('mahasiswa.bimbingan.dashboard.dashboard', [
                 'tugasAkhir' => $tugasAkhir,
                 'jadwals' => collect(),
-            ])->with('info', 'Tugas Akhir Anda belum dapat dibimbing karena status saat ini: ' . $tugasAkhir->status);
+            ])->with('alert', [
+                'type' => 'info',
+                'title' => 'Status Tidak Sesuai',
+                'text' => 'Tugas Akhir Anda belum dapat dibimbing karena status saat ini: ' . $tugasAkhir->status
+            ]);
         }
 
-        // Cek apakah sudah punya pembimbing
+        // ❌ Belum punya dosen pembimbing
         $pembimbingAda = $tugasAkhir->peranDosenTa()
             ->whereIn('peran', ['pembimbing1', 'pembimbing2'])
             ->exists();
@@ -54,10 +61,14 @@ class BimbinganController extends Controller
             return view('mahasiswa.bimbingan.dashboard.dashboard', [
                 'tugasAkhir' => $tugasAkhir,
                 'jadwals' => collect(),
-            ])->with('info', 'Belum ada dosen pembimbing yang ditetapkan.');
+            ])->with('alert', [
+                'type' => 'info',
+                'title' => 'Belum Ada Pembimbing',
+                'text' => 'Belum ada dosen pembimbing yang ditetapkan.'
+            ]);
         }
 
-        // Ambil data bimbingan
+        // ✅ Bimbingan dapat dimuat
         $jadwals = $tugasAkhir->bimbingan()
             ->with(['dosen.user', 'catatanBimbingan'])
             ->orderBy('tanggal_bimbingan', 'desc')
@@ -82,18 +93,34 @@ class BimbinganController extends Controller
             }, 'peranDosenTa.dosen.user'])
             ->first();
 
+        // ⛔ Belum ada TA
         if (!$tugasAkhir) {
-            return redirect()->back()->with('error', 'Data tugas akhir belum tersedia.');
+            return redirect()->route('dashboard.bimbingan')->with('alert', [
+                'type' => 'error',
+                'title' => 'Pengajuan Gagal',
+                'text' => 'Data tugas akhir belum tersedia.'
+            ]);
         }
 
+        // ⛔ Status tidak valid
         if (!in_array($tugasAkhir->status, ['disetujui', 'revisi', 'menunggu_pembatalan'])) {
-            return redirect()->back()->with('error', 'Status tugas akhir Anda tidak memenuhi syarat untuk bimbingan.');
+            return redirect()->route('dashboard.bimbingan')->with('alert', [
+                'type' => 'error',
+                'title' => 'Pengajuan Ditolak',
+                'text' => 'Status tugas akhir Anda tidak memenuhi syarat untuk bimbingan.'
+            ]);
         }
 
+        // ⛔ Belum upload file proposal
         if (empty($tugasAkhir->file_path)) {
-            return redirect()->back()->with('error', 'Silakan upload file proposal terlebih dahulu sebelum mengajukan bimbingan.');
+            return redirect()->route('dashboard.bimbingan')->with('alert', [
+                'type' => 'error',
+                'title' => 'Pengajuan Ditolak',
+                'text' => 'Upload file proposal sebelum bimbingan!'
+            ]);
         }
 
+        // ✅ Jika semua syarat terpenuhi
         $dosenList = $tugasAkhir->peranDosenTa;
         $bimbinganCount = [];
         $statusBimbingan = [];

@@ -8,12 +8,13 @@ use Illuminate\Support\Facades\{Storage};
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class TugasAkhirController extends Controller
 {
     private function assumedMahasiswa()
     {
-        return Mahasiswa::where('user_id', 2)->firstOrFail();
+        return Auth::user()->mahasiswa;
     }
 
     public function dashboard()
@@ -126,12 +127,19 @@ class TugasAkhirController extends Controller
         $tugasAkhir = TugasAkhir::with('peranDosenTa')->findOrFail($id);
 
         if ($tugasAkhir->mahasiswa_id !== $mahasiswa->id) {
-            return back()->with('error', 'Anda tidak memiliki akses untuk membatalkan tugas akhir ini.');
+            return back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Akses Ditolak',
+                'message' => 'Anda tidak memiliki akses untuk membatalkan tugas akhir ini.'
+            ]);
         }
 
-        // Jika status sudah draft, tidak perlu diproses ulang
         if ($tugasAkhir->status === 'draft') {
-            return back()->with('info', 'Tugas akhir Anda sudah berstatus draft.');
+            return back()->with('alert', [
+                'type' => 'info',
+                'title' => 'Sudah Draft',
+                'message' => 'Tugas akhir Anda sudah berstatus draft.'
+            ]);
         }
 
         // Set status menjadi "menunggu_pembatalan"
@@ -151,38 +159,119 @@ class TugasAkhirController extends Controller
             }
         }
 
-        return redirect()->route('tugas-akhir.progress')->with('success', 'Pengajuan pembatalan Tugas Akhir telah dikirim dan menunggu verifikasi dosen pembimbing.');
+        return redirect()->route('tugas-akhir.progress')->with('alert', [
+            'type' => 'success',
+            'title' => 'Berhasil!',
+            'message' => 'Pengajuan pembatalan Tugas Akhir telah dikirim dan menunggu verifikasi dosen pembimbing.'
+        ]);
     }
 
-    public function update(Request $request, $id)
+    public function uploadProposal(Request $request)
     {
-        $tugasAkhir = TugasAkhir::findOrFail($id);
-        $mahasiswa = $this->assumedMahasiswa();
+        $mahasiswa = Auth::user()->mahasiswa;
 
-        if ($tugasAkhir->mahasiswa_id !== $mahasiswa->id) {
-            return back()->with('error', 'Anda tidak memiliki akses.');
+        // Validasi file
+        $request->validate([
+            'file_proposal' => 'required|file|mimes:pdf,doc,docx|max:25600', // 25MB
+        ]);
+
+        // Ambil entri TA mahasiswa yang sudah disetujui
+        $tugasAkhir = $mahasiswa->tugasAkhir;
+
+        if (!$tugasAkhir) {
+            return redirect()->back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Belum Mengajukan Judul',
+                'message' => 'Anda belum mengajukan atau belum disetujui untuk tugas akhir.',
+            ]);
+        }
+
+        // Pastikan status TA valid untuk upload proposal
+        if (!in_array($tugasAkhir->status, ['disetujui', 'revisi', 'draft'])) {
+            return redirect()->back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Status Tidak Valid',
+                'message' => 'Status tugas akhir Anda saat ini belum dapat upload proposal.',
+            ]);
+        }
+
+        // Hapus file lama jika ada
+        if ($tugasAkhir->file_path) {
+            Storage::disk('public')->delete($tugasAkhir->file_path);
+        }
+
+        // Upload file baru
+        $path = $request->file('file_proposal')->storeAs(
+            'proposal_ta',
+            time() . '_' . Str::slug($request->file('file_proposal')->getClientOriginalName(), '_'),
+            'public'
+        );
+
+        // Update file_path dan status TA
+        $tugasAkhir->update([
+            'file_path' => $path,
+            'tanggal_pengajuan' => now(),
+        ]);
+
+        // Simpan juga ke tabel files (untuk riwayat file)
+        File::create([
+            'file_path' => $path,
+            'file_type' => $request->file('file_proposal')->getClientMimeType(),
+            'uploaded_by' => $mahasiswa->id,
+        ]);
+
+        return redirect()->route('tugas-akhir.progress')->with('alert', [
+            'type' => 'success',
+            'title' => 'Upload Berhasil',
+            'message' => 'Proposal berhasil diunggah dan disimpan.',
+        ]);
+    }
+
+    public function uploadRevisi(Request $request)
+    {
+        $mahasiswa = Auth::user()->mahasiswa;
+        $tugasAkhir = $mahasiswa->tugasAkhir;
+
+        if (!$tugasAkhir) {
+            return back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Data Tidak Ditemukan',
+                'message' => 'Tugas akhir belum tersedia untuk direvisi.'
+            ]);
         }
 
         $request->validate([
-            'judul' => 'required|string|max:255',
-            'abstrak' => 'required|string',
-            'file_proposal' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+            'file_proposal' => 'required|file|mimes:pdf,doc,docx|max:25600',
         ]);
 
-        if ($request->hasFile('file_proposal')) {
-            if ($tugasAkhir->file_path) Storage::disk('public')->delete($tugasAkhir->file_path);
-            $path = $request->file('file_proposal')->storeAs('proposal_ta', time() . '_' . Str::slug($request->file('file_proposal')->getClientOriginalName(), '_'), 'public');
-            File::create([
-                'file_path' => $path,
-                'file_type' => $request->file('file_proposal')->getClientMimeType(),
-                'uploaded_by' => $mahasiswa->id,
-            ]);
-            $tugasAkhir->file_path = $path;
+        // Hapus file lama jika ada
+        if ($tugasAkhir->file_path) {
+            Storage::disk('public')->delete($tugasAkhir->file_path);
         }
 
-        $tugasAkhir->update(['judul' => $request->judul, 'abstrak' => $request->abstrak]);
+        $path = $request->file('file_proposal')->storeAs(
+            'proposal_ta',
+            time() . '_' . Str::slug($request->file('file_proposal')->getClientOriginalName(), '_'),
+            'public'
+        );
 
-        return redirect()->route('tugasAkhir.progress')->with('success', 'Tugas Akhir berhasil diperbarui!');
+        // Simpan path file baru, tidak ubah status
+        $tugasAkhir->update([
+            'file_path' => $path,
+            // 'status' => 'revisi', // opsional, tergantung sistem
+        ]);
+
+        File::create([
+            'file_path' => $path,
+            'file_type' => $request->file('file_proposal')->getClientMimeType(),
+            'uploaded_by' => $mahasiswa->id,
+        ]);
+
+        return redirect()->back()->with('alert', [
+            'type' => 'success',
+            'title' => 'Revisi Diunggah',
+            'message' => 'File revisi proposal berhasil disimpan.'
+        ]);
     }
 
     public function showCancelled()

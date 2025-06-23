@@ -29,9 +29,8 @@ class TugasAkhir extends Model
     /** Relasi ke Mahasiswa */
     public function mahasiswa(): BelongsTo
     {
-        return $this->belongsTo(Mahasiswa::class);
+        return $this->belongsTo(Mahasiswa::class, 'mahasiswa_id');
     }
-
 
     public function peranDosenTa()
     {
