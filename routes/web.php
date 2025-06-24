@@ -43,6 +43,10 @@ Route::prefix('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+
+    // OTP verification routes
+    Route::get('/otp-verify', [AuthController::class, 'showOtpVerificationForm'])->name('auth.otp.verify.form');
+    Route::post('/otp-verify', [AuthController::class, 'verifyOtp'])->name('auth.otp.verify.post');
 });
 
 Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(function () {
