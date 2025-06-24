@@ -47,7 +47,9 @@ class BimbinganMahasiswaController extends Controller
 
     public function showDetail($id)
     {
-        $ta = TugasAkhir::with(['mahasiswa.user'])->findOrFail($id);
+        $ta = TugasAkhir::with(['mahasiswa.user'])
+            ->where('mahasiswa_id', $id)
+            ->firstOrFail();
         $bimbinganList = $ta->bimbingan()->latest()->get(); // relasi bimbingan
         $revisiList = $ta->revisi()->latest()->get();       // relasi revisi
 

@@ -81,14 +81,16 @@
                 </li>
 
                 <!-- Sidang -->
-                <li
-                    class="nav-item {{ request()->is('dosen/sidang') || request()->is('dosen/sidang/*') ? 'active' : '' }}">
-                    <a href="{{ route('dosen.sidang.index') }}" class="nav-link">
-                        <i class="fas fa-chalkboard-teacher me-2"></i>
-                        <p>Sidang</p>
-                    </a>
-                </li>
-
+                @if(in_array('kaprodi', $userRoles) || in_array('kajur', $userRoles))
+                    <li
+                        class="nav-item {{ request()->is('dosen/sidang') || request()->is('dosen/sidang/*') ? 'active' : '' }}">
+                        <a href="{{ route('dosen.sidang.index') }}" class="nav-link">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            <p>Sidang Mahasiswa</p>
+                        </a>
+                    </li>
+                @endif
+                
                 <!-- Validasi Tugas Akhir: Hanya untuk Kaprodi -->
                 @if (in_array('kaprodi', $userRoles))
                     <li
