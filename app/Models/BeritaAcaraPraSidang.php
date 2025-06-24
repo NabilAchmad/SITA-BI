@@ -17,12 +17,12 @@ class BeritaAcaraPraSidang extends Model
         'file_path'
     ];
 
-    public function sidang(): BelongsTo
+    public function sidang()
     {
         return $this->belongsTo(Sidang::class);
     }
 
-    public function pencetak(): BelongsTo
+    public function pencetak()
     {
         return $this->belongsTo(User::class, 'dicetak_oleh');
     }

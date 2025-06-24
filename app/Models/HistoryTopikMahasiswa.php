@@ -13,12 +13,12 @@ class HistoryTopikMahasiswa extends Model
         'mahasiswa_id', 'tawaran_topik_id', 'status_topik', 'tanggal_pemilihan'
     ];
 
-    public function mahasiswa(): BelongsTo
+    public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class);
     }
 
-    public function tawaranTopik(): BelongsTo
+    public function tawaranTopik()
     {
         return $this->belongsTo(TawaranTopik::class);
     }

@@ -10,23 +10,16 @@ class PeranDosenTa extends Model
     protected $table = 'peran_dosen_ta';
 
     protected $fillable = [
-        'dosen_id',
-        'tugas_akhir_id',
-        'peran',
-        'setuju_pembatalan',
-        'tanggal_verifikasi',
-        'catatan_verifikasi',
+        'dosen_id', 'tugas_akhir_id', 'peran'
     ];
 
-    // Relasi ke Dosen
-    public function dosen(): BelongsTo
+    public function dosen()
     {
-        return $this->belongsTo(Dosen::class, 'dosen_id');
+        return $this->belongsTo(Dosen::class);
     }
 
-    // Relasi ke Tugas Akhir
-    public function tugasAkhir(): BelongsTo
+    public function tugasAkhir()
     {
-        return $this->belongsTo(TugasAkhir::class, 'tugas_akhir_id');
+        return $this->belongsTo(TugasAkhir::class);
     }
 }

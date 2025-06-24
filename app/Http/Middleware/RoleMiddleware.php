@@ -16,15 +16,18 @@ class RoleMiddleware
      * @param  string  $role
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, $role)
     {
         $user = Auth::user();
-        if (!$user) return redirect()->route('login');
 
-        $userRoles = $user->roles->pluck('nama_role')->toArray();
+        if (!$user) {
+            return redirect()->route('login');
+        }
 
-        if (empty(array_intersect($roles, $userRoles))) {
-            abort(403, 'Unauthorized.');
+        $roles = $user->roles->pluck('nama_role')->toArray();
+
+        if (!in_array($role, $roles)) {
+            abort(403, 'Unauthorized action.');
         }
 
         return $next($request);
