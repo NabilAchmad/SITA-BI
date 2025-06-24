@@ -2,33 +2,44 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Dosen;
 
-/**
- * @property-read \App\Models\Mahasiswa|null $mahasiswa
- * @property-read \App\Models\Dosen|null $dosen
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Role[] $roles
- * @property-read string $avatar_url
- */
-class User extends Authenticatable
+
+class User extends Authenticatable implements MustVerifyEmail
 {
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'photo', // jika ada kolom ini
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
@@ -36,10 +47,6 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    // =========================
-    //        RELATIONSHIP
-    // =========================
 
     public function mahasiswa()
     {
@@ -56,33 +63,5 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
 
-    public function logs()
-    {
-        return $this->hasMany(Log::class);
-    }
-
-    // =========================
-    //       CUSTOM ACCESSORS
-    // =========================
-
-    public function getAvatarUrlAttribute(): string
-    {
-        return $this->photo && Storage::disk('public')->exists($this->photo)
-            ? asset('storage/' . $this->photo)
-            : asset('assets/img/default-user.png');
-    }
-
-    // =========================
-    //         HELPERS
-    // =========================
-
-    public function hasRole(string $role): bool
-    {
-        return $this->roles->contains('nama_role', $role);
-    }
-
-    public function hasAnyRole(array $roles): bool
-    {
-        return $this->roles->pluck('nama_role')->intersect($roles)->isNotEmpty();
-    }
+    
 }

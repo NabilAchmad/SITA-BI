@@ -92,7 +92,10 @@ class AuthController extends Controller
 
         $this->sendEmailVerification($user);
 
-        return redirect()->route('login')->with('success', 'Registrasi berhasil. Silakan periksa email Anda untuk verifikasi.');
+        // Store user id in session for OTP verification
+        session(['otp_user_id' => $user->id]);
+
+        return redirect()->route('auth.otp.verify.form')->with('success', 'Registrasi berhasil. Silakan masukkan kode OTP yang telah dikirim ke email Anda.');
     }
 
     // Email verification handler
@@ -117,6 +120,60 @@ class AuthController extends Controller
 
         $redirectTo = Session::pull('url.intended', route('login'));
         return redirect($redirectTo)->with('success', 'Verifikasi email berhasil.');
+    }
+
+    // Show OTP verification form
+    public function showOtpVerificationForm()
+    {
+        // Check if user id is in session
+        if (!session()->has('otp_user_id')) {
+            return redirect()->route('login')->with('error', 'Sesi verifikasi OTP tidak ditemukan. Silakan login kembali.');
+        }
+
+        return view('auth.otp_verification');
+    }
+
+    // Handle OTP verification
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'otp_code' => ['required', 'digits:6'],
+        ]);
+
+        $userId = session('otp_user_id');
+        if (!$userId) {
+            return redirect()->route('login')->with('error', 'Sesi verifikasi OTP tidak ditemukan. Silakan login kembali.');
+        }
+
+        $otpCode = $request->input('otp_code');
+
+        $verification = EmailVerificationToken::where('user_id', $userId)
+            ->where('token', $otpCode)
+            ->first();
+
+        if (!$verification) {
+            return back()->withErrors(['otp_code' => 'Kode OTP tidak valid atau sudah kadaluarsa.']);
+        }
+
+        $user = $verification->user;
+
+        if ($user->email_verified_at) {
+            // Already verified, log in user
+            Auth::login($user);
+            session()->forget('otp_user_id');
+            return redirect($this->redirectByRole($user))->with('info', 'Email sudah diverifikasi sebelumnya.');
+        }
+
+        $user->email_verified_at = now();
+        $user->save();
+
+        $verification->delete();
+
+        // Log in user automatically
+        Auth::login($user);
+        session()->forget('otp_user_id');
+
+        return redirect($this->redirectByRole($user))->with('success', 'Verifikasi email berhasil. Anda sudah masuk ke dalam sistem.');
     }
 
     // Handle logout
@@ -160,15 +217,15 @@ class AuthController extends Controller
 
     private function sendEmailVerification(User $user)
     {
-        $token = Str::random(64);
+        // Generate 6-digit numeric OTP code
+        $otpCode = random_int(100000, 999999);
 
-        EmailVerificationToken::create([
-            'user_id'    => $user->id,
-            'token'      => $token,
-            'created_at' => now(),
-        ]);
+        EmailVerificationToken::updateOrCreate(
+            ['user_id' => $user->id],
+            ['token' => $otpCode, 'created_at' => now()]
+        );
 
-        Mail::to($user->email)->send(new VerifyEmail($user, $token));
+        Mail::to($user->email)->send(new VerifyEmail($user, $otpCode));
     }
 
     // Optional: Assign role to user (currently commented)

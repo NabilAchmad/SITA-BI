@@ -11,31 +11,17 @@ class BimbinganTA extends Model
 
     protected $table = 'bimbingan_ta';
 
-    // Tambahkan properti fillable untuk mendukung mass assignment
-    protected $fillable = [
-        'tugas_akhir_id',
-        'dosen_id',
-        'tanggal_bimbingan',
-        'jam_bimbingan', // pastikan ini ad
-        'catatan',
-        'status_bimbingan',
-        'file_id',
-    ];
-
-    // Relasi ke Tugas Akhir
     public function tugasAkhir()
     {
         return $this->belongsTo(TugasAkhir::class, 'tugas_akhir_id');
     }
 
-    // Relasi ke Dosen
     public function dosen()
     {
         return $this->belongsTo(Dosen::class);
     }
 
-    // Relasi ke Mahasiswa (tidak wajib jika bisa diakses via Tugas Akhir)
-    public function mahasiswa()
+    public function file()
     {
         return $this->hasOneThrough(
             Mahasiswa::class,
