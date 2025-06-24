@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BimbinganTA;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PeranDosenTA;
+use App\Models\TugasAkhir;
 
 class BimbinganMahasiswaController extends Controller
 {
@@ -42,6 +43,20 @@ class BimbinganMahasiswaController extends Controller
         $mahasiswaList = $query->latest()->get();
 
         return view('dosen.bimbingan.dashboard.dashboard', compact('mahasiswaList'));
+    }
+
+    public function showDetail($id)
+    {
+        $ta = TugasAkhir::with(['mahasiswa.user'])->findOrFail($id);
+        $bimbinganList = $ta->bimbingan()->latest()->get(); // relasi bimbingan
+        $revisiList = $ta->revisi()->latest()->get();       // relasi revisi
+
+        return view('dosen.bimbingan.detail-bimbingan.detail', [
+            'mahasiswa' => $ta->mahasiswa,
+            'tugasAkhir' => $ta,
+            'bimbinganList' => $bimbinganList,
+            'revisiList' => $revisiList,
+        ]);
     }
 
     public function ajukanJadwal()

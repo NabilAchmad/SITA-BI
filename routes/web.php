@@ -300,7 +300,7 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         // Daftar bimbingan
         Route::get('/', [BimbinganMahasiswaController::class, 'dashboard'])->name('dosen.bimbingan.index');
 
-        Route::get('/belumMulai', [BimbinganMahasiswaController::class, 'ajukanJadwal'])->name('bimbingan.detail');
+        Route::get('/detail/{id}', [BimbinganMahasiswaController::class, 'showDetail'])->name('bimbingan.detail');
 
         Route::get('/sedangBerlangsung', [BimbinganMahasiswaController::class, 'lihatBimbingan'])->name('dosen.bimbingan.crud-bimbingan.lihat.bimbingan');
 

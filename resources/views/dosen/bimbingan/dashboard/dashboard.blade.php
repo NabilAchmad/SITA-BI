@@ -46,6 +46,7 @@
                         <th scope="col">NIM</th>
                         <th scope="col">Program Studi</th>
                         <th scope="col">Judul Tugas Akhir</th>
+                        <th scope="col">Peran</th>
                         <th scope="col">Aksi</th>
                     </tr>
                 </thead>
@@ -70,7 +71,18 @@
                             </td>
                             <td>{{ $ta?->judul ?? '-' }}</td>
                             <td>
-                                <span class="badge bg-primary">{{ ucfirst($item->peran) }}</span>
+                                <span class="badge bg-primary">
+                                    @if ($item->peran === 'pembimbing1')
+                                        Pembimbing 1
+                                    @elseif($item->peran === 'pembimbing2')
+                                        Pembimbing 2
+                                    @endif
+                                </span>
+                            </td>
+                            <td>
+                                <a class="btn btn-primary btn-xs" href="{{ route('bimbingan.detail', $mhs->id) }}">
+                                    <i class="bi bi-info-circle"></i>Detail
+                                </a>
                             </td>
                         </tr>
                     @empty

@@ -10,7 +10,7 @@
             <div class="modal-body d-flex gap-4 align-items-center">
                 <!-- Foto Profil -->
                 <div style="min-width: 150px; max-width: 150px;">
-                    <img id="detailFoto" src="{{ asset('assets/img/team/nabil.jpg') }}" alt="Foto Profil"
+                    <img id="detailFoto" src="" alt="Foto Profil"
                         class="img-thumbnail"
                         style="width: 150px; height: 200px; object-fit: cover; border-radius: 8px;">
                 </div>
