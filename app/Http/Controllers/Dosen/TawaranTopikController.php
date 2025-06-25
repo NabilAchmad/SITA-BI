@@ -23,7 +23,7 @@ class TawaranTopikController extends Controller
                 'judul_topik' => $request->judul_topik,
                 'deskripsi' => $request->deskripsi,
                 'kuota' => $request->kuota,
-                'user_id' => Auth::id() ?? 1,
+                'user_id' => Auth::id(), // langsung ambil dari user yang login
             ]);
 
             return redirect()->route('TawaranTopik.read')->with('success', 'Tawaran topik berhasil ditambahkan!');
@@ -31,6 +31,7 @@ class TawaranTopikController extends Controller
             return back()->with('error', 'Gagal menyimpan tawaran topik: ' . $e->getMessage());
         }
     }
+
 
     // READ (menampilkan list dengan fitur search)
     public function read(Request $request)
@@ -42,7 +43,7 @@ class TawaranTopikController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('judul_topik', 'like', '%' . $search . '%')
-                  ->orWhere('deskripsi', 'like', '%' . $search . '%');
+                    ->orWhere('deskripsi', 'like', '%' . $search . '%');
             });
         }
 
