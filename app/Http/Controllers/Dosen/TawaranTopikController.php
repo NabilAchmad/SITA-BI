@@ -43,7 +43,7 @@ class TawaranTopikController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('judul_topik', 'like', '%' . $search . '%')
-                  ->orWhere('deskripsi', 'like', '%' . $search . '%');
+                    ->orWhere('deskripsi', 'like', '%' . $search . '%');
             });
         }
 
