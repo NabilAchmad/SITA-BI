@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\TawaranTopik;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 
 class TawaranTopikController extends Controller
 {
@@ -23,10 +24,10 @@ class TawaranTopikController extends Controller
                 'judul_topik' => $request->judul_topik,
                 'deskripsi' => $request->deskripsi,
                 'kuota' => $request->kuota,
-                'user_id' => Auth::id() ?? 1,
+                'user_id' => Auth::id(),
             ]);
 
-            return redirect()->route('TawaranTopik.read')->with('success', 'Tawaran topik berhasil ditambahkan!');
+            return redirect()->route('dosen.tawaran-topik.index')->with('success', 'Tawaran topik berhasil ditambahkan!');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal menyimpan tawaran topik: ' . $e->getMessage());
         }

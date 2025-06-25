@@ -134,9 +134,27 @@
                                     {{ \Carbon\Carbon::parse($bimbingan->tanggal_bimbingan)->format('d M Y') }} •
                                     {{ $bimbingan->jam_bimbingan }}
                                 </h6>
-                                <span
-                                    class="badge bg-success bg-opacity-10 text-success mb-2">{{ $bimbingan->status_bimbingan }}</span>
-                                <p class="mb-2">{{ $bimbingan->catatan ?? 'Tidak ada catatan' }}</p>
+                                <span class="badge bg-success bg-opacity-10 text-white mb-2">
+                                    {{ ucfirst($bimbingan->status_bimbingan) }}
+                                </span>
+
+                                {{-- Menampilkan semua catatan --}}
+                                @if ($bimbingan->catatanBimbingan->isNotEmpty())
+                                    @foreach ($bimbingan->catatanBimbingan as $catatan)
+                                        <div class="mb-2 p-2 bg-light rounded">
+                                            <small class="text-muted">
+                                                <i
+                                                    class="bi bi-chat-left-dots me-1"></i><strong>{{ ucfirst($catatan->author_type) }}</strong>
+                                                pada {{ $catatan->created_at->format('d M Y, H:i') }}
+                                            </small>
+                                            <p class="mb-0">{{ $catatan->catatan }}</p>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <p class="mb-2">Tidak ada catatan</p>
+                                @endif
+
+                                {{-- Tombol unduh jika ada file --}}
                                 @if ($bimbingan->file_path)
                                     <a href="{{ asset('storage/' . $bimbingan->file_path) }}" target="_blank"
                                         class="btn btn-sm btn-outline-success rounded-pill">

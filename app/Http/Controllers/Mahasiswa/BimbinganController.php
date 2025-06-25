@@ -30,7 +30,7 @@ class BimbinganController extends Controller
 
         $tugasAkhir = $mahasiswa->tugasAkhir;
 
-        // ❌ Jika belum punya TA
+        // Jika belum punya TA
         if (!$tugasAkhir) {
             return redirect()->route('dashboard.mahasiswa')
                 ->with('alert', [
@@ -40,7 +40,7 @@ class BimbinganController extends Controller
                 ]);
         }
 
-        // ❌ Status TA belum valid untuk bimbingan
+        // Status TA belum valid untuk bimbingan
         if (!in_array($tugasAkhir->status, ['disetujui', 'draft'])) {
             return view('mahasiswa.bimbingan.dashboard.dashboard', [
                 'tugasAkhir' => $tugasAkhir,
@@ -52,7 +52,7 @@ class BimbinganController extends Controller
             ]);
         }
 
-        // ❌ Belum punya dosen pembimbing
+        // Belum punya dosen pembimbing
         $pembimbingAda = $tugasAkhir->peranDosenTa()
             ->whereIn('peran', ['pembimbing1', 'pembimbing2'])
             ->exists();
@@ -93,7 +93,7 @@ class BimbinganController extends Controller
             }, 'peranDosenTa.dosen.user'])
             ->first();
 
-        // ⛔ Belum ada TA
+        // Belum ada TA
         if (!$tugasAkhir) {
             return redirect()->route('dashboard.bimbingan')->with('alert', [
                 'type' => 'error',
@@ -102,7 +102,7 @@ class BimbinganController extends Controller
             ]);
         }
 
-        // ⛔ Status tidak valid
+        // Status tidak valid
         if (!in_array($tugasAkhir->status, ['disetujui', 'revisi', 'menunggu_pembatalan'])) {
             return redirect()->route('dashboard.bimbingan')->with('alert', [
                 'type' => 'error',
@@ -111,7 +111,7 @@ class BimbinganController extends Controller
             ]);
         }
 
-        // ⛔ Belum upload file proposal
+        // Belum upload file proposal
         if (empty($tugasAkhir->file_path)) {
             return redirect()->route('dashboard.bimbingan')->with('alert', [
                 'type' => 'error',
@@ -120,7 +120,7 @@ class BimbinganController extends Controller
             ]);
         }
 
-        // ✅ Jika semua syarat terpenuhi
+        // Jika semua syarat terpenuhi
         $dosenList = $tugasAkhir->peranDosenTa;
         $bimbinganCount = [];
         $statusBimbingan = [];
@@ -199,7 +199,6 @@ class BimbinganController extends Controller
             'sesi_ke' => $lastSesi + 1,
             'tanggal_bimbingan' => $request->tanggal_jadwal,
             'jam_bimbingan' => $request->waktu_jadwal,
-            'catatan' => $request->catatan,
             'status_bimbingan' => 'diajukan',
         ]);
 

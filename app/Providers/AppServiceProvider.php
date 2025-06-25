@@ -11,6 +11,7 @@ use Illuminate\Pagination\Paginator; // Tambahkan di bagian atas jika belum ada
 use Carbon\Carbon;
 use Illuminate\Support\Facades\View;
 use App\Models\User;
+use App\Models\TawaranTopik;
 use App\Http\Controllers\Controller;
 
 class AppServiceProvider extends ServiceProvider
@@ -51,6 +52,20 @@ class AppServiceProvider extends ServiceProvider
             $user = User::find(Auth::id());
 
             $view->with('userProfile', $user);
+        });
+
+        View::composer('layouts.components.content-homepage.tawarantopik', function ($view) {
+            $today = now()->format('Y-m-d'); // atau Date::now()->toDateString();
+            $cacheKey = 'topik_tugas_akhir_' . $today;
+
+            $topikTugasAkhir = Cache::remember($cacheKey, now()->endOfDay()->diffInSeconds(now()), function () {
+                return \App\Models\TawaranTopik::with('user')
+                    ->latest()
+                    ->take(5)
+                    ->get();
+            });
+
+            $view->with('topikTugasAkhir', $topikTugasAkhir);
         });
 
         View::composer('layouts.components.border-mahasiswa.profile', function ($view) {

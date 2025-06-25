@@ -11,6 +11,18 @@ class BimbinganTA extends Model
 
     protected $table = 'bimbingan_ta';
 
+    // Tambahkan ini
+    protected $fillable = [
+        'tugas_akhir_id',
+        'dosen_id',
+        'peran',
+        'sesi_ke',
+        'tanggal_bimbingan',
+        'jam_bimbingan',
+        'catatan',
+        'status_bimbingan',
+    ];
+
     public function tugasAkhir()
     {
         return $this->belongsTo(TugasAkhir::class, 'tugas_akhir_id');
@@ -26,14 +38,13 @@ class BimbinganTA extends Model
         return $this->hasOneThrough(
             Mahasiswa::class,
             TugasAkhir::class,
-            'id',              // tugas_akhir.id
-            'id',              // mahasiswa.id
-            'tugas_akhir_id',  // bimbingan_ta.tugas_akhir_id
-            'mahasiswa_id'     // tugas_akhir.mahasiswa_id
+            'id',
+            'id',
+            'tugas_akhir_id',
+            'mahasiswa_id'
         );
     }
 
-    // Relasi ke Catatan Bimbingan
     public function catatanBimbingan()
     {
         return $this->hasMany(CatatanBimbingan::class, 'bimbingan_ta_id');
