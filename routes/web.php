@@ -425,18 +425,4 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
             Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
         });
     });
-
-    //tugas akhir
-
-    Route::prefix('ta')->group(function () {
-        // 1. Halaman dashboard TA
-        Route::get('/dashboard', [TugasAkhirController::class, 'dashboard'])->name('ta.dashboard');
-
-        // 2. Kirim komentar revisi (dari modal revisi)
-        Route::post('/revisi', [TugasAkhirController::class, 'revisiStore'])->name('ta.revisi');
-
-        // 3. Aksi ACC dan Tolak per revisi
-        Route::post('/acc/{id}', [TugasAkhirController::class, 'acc'])->name('ta.acc');
-        Route::post('/tolak/{id}', [TugasAkhirController::class, 'tolak'])->name('ta.tolak');
-    });
 });

@@ -28,3 +28,23 @@
     </div>
     <!-- end main -->
 @endsection
+
+@push('scripts')
+    @if (session('alert'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                swal({
+                    title: "{{ session('alert.title') }}",
+                    text: "{{ session('alert.text') }}",
+                    icon: "{{ session('alert.type') }}",
+                    buttons: {
+                        confirm: {
+                            text: "OK",
+                            className: "btn btn-danger"
+                        }
+                    }
+                });
+            });
+        </script>
+    @endif
+@endpush
