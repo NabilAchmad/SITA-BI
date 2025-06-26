@@ -39,4 +39,4 @@ Sebelum adanya SITA-BI, pengelolaan tugas akhir di Jurusan Bahasa Inggris dilaku
 
 1. Clone repositori:
    ```bash
-   git clone [https://github.com/username/sita-bi.git](https://github.com/NabilAchmad/SITA-BI.git)
+   git clone https://github.com/NabilAchmad/SITA-BI.git
