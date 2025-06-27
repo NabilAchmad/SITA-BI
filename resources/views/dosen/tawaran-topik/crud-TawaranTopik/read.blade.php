@@ -119,9 +119,9 @@
 
 @push('scripts')
 <script>
-    $(document).ready(function() {
-        // Hapus
-        $(document).on("click", ".btn-hapus", function(e) {
+    $(document).ready(function () {
+        // Tombol Hapus
+        $(document).on("click", ".btn-hapus", function (e) {
             e.preventDefault();
             const id = $(this).data("id");
 
@@ -148,7 +148,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
                         },
-                        success: function(res) {
+                        success: function (res) {
                             swal({
                                 title: "Berhasil!",
                                 text: "Tawaran topik telah dihapus.",
@@ -161,9 +161,10 @@
                                 },
                             }).then(() => location.reload());
                         },
-                        error: function() {
+                        error: function () {
                             swal("Gagal!",
-                                "Terjadi kesalahan saat menghapus tawaran topik.", {
+                                "Terjadi kesalahan saat menghapus tawaran topik.",
+                                {
                                     icon: "error",
                                     buttons: false,
                                     timer: 2000,
@@ -180,8 +181,8 @@
             });
         });
 
-        // Edit
-        $('#editTawaranTopikModal').on('show.bs.modal', function(event) {
+        // Modal Edit
+        $('#editTawaranTopikModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var id = button.data('id');
             var judul = button.data('judul');
@@ -197,31 +198,31 @@
         });
 
         @if (session('success'))
-            swal({
-                title: "Berhasil!",
-                text: "{{ session('success') }}",
-                icon: "success",
-                buttons: {
-                    confirm: {
-                        text: "OK",
-                        className: "btn btn-primary",
-                    },
+        swal({
+            title: "Berhasil!",
+            text: "{{ session('success') }}",
+            icon: "success",
+            buttons: {
+                confirm: {
+                    text: "OK",
+                    className: "btn btn-primary",
                 },
-            });
+            },
+        });
         @endif
 
         @if (session('error'))
-            swal({
-                title: "Gagal!",
-                text: "{{ session('error') }}",
-                icon: "error",
-                buttons: {
-                    confirm: {
-                        text: "OK",
-                        className: "btn btn-danger",
-                    },
+        swal({
+            title: "Gagal!",
+            text: "{{ session('error') }}",
+            icon: "error",
+            buttons: {
+                confirm: {
+                    text: "OK",
+                    className: "btn btn-danger",
                 },
-            });
+            },
+        });
         @endif
     });
 </script>

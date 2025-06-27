@@ -72,8 +72,7 @@
                 </li>
 
                 <!-- Tawaran Topik -->
-                <li
-                    class="nav-item {{ request()->is('dosen/tawaran-topik') || request()->is('dosen/tawaran-topik/*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is('tawaran-topik/read') ? 'active' : '' }}">
                     <a href="{{ route('dosen.tawaran-topik.index') }}" class="nav-link">
                         <i class="fas fa-clipboard-list me-2"></i>
                         <p>Tawaran Topik</p>

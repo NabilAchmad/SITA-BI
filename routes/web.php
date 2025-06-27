@@ -323,9 +323,7 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
 // Route Tawaran Topik
 // =========================
 
-Route::prefix('tawaran-topik')->group(function () {
-    // READ
-    Route::get('/read', [TawaranTopikController::class, 'read'])->name('dosen.tawaran-topik.index');
+
     Route::prefix('tawaran-topik')->middleware(['auth', 'role:dosen'])->group(function () {
         // READ
         Route::get('/read', [TawaranTopikController::class, 'read'])->name('dosen.tawaran-topik.index');
@@ -431,5 +429,4 @@ Route::prefix('tawaran-topik')->group(function () {
             Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
         });
     });
-});
 });
