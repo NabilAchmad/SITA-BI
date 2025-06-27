@@ -1,7 +1,8 @@
+<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\dosen\tawaran-topik\modal\create.blade.php -->
 <!-- Modal Tambah -->
 <div class="modal fade" id="tambahTawaranTopikModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <form method="POST" action="{{ route('TawaranTopik.create') }}">
+        <form method="POST" action="{{ route('tawaran-topik.create') }}">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">

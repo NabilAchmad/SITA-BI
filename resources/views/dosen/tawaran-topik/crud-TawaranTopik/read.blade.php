@@ -1,4 +1,4 @@
-<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\admin\TawaranTopik\crud-TawaranTopik\read.blade.php -->
+{{-- filepath: resources/views/dosen/tawaran-topik/crud-TawaranTopik/read.blade.php --}}
 @extends('layouts.template.main')
 @section('title', 'Daftar Tawaran Topik')
 @section('content')
@@ -25,7 +25,7 @@
 <div class="card shadow-sm mb-4">
     <div class="card-header">
         <div class="mb-2">
-            <a href="{{ route('TawaranTopik.trashed') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ route('tawaran-topik.trashed') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-trash"></i> Tawaran Topik Terhapus
             </a>
         </div>
@@ -113,116 +113,116 @@
 
 @include('dosen.tawaran-topik.modal.create')
 @include('dosen.tawaran-topik.modal.edit')
+@include('dosen.tawaran-topik.modal.delete')
+
+@endsection
 
 @push('scripts')
-    <script>
-        $(document).ready(function() {
-            // Hapus
-            $(document).on("click", ".btn-hapus", function(e) {
-                e.preventDefault();
-                const id = $(this).data("id");
+<script>
+    $(document).ready(function() {
+        // Hapus
+        $(document).on("click", ".btn-hapus", function(e) {
+            e.preventDefault();
+            const id = $(this).data("id");
 
-                swal({
-                    title: "Apakah Anda yakin?",
-                    text: "Tawaran topik yang dihapus tidak dapat dikembalikan!",
-                    icon: "warning",
-                    buttons: {
-                        cancel: {
-                            text: "Batal",
-                            visible: true,
-                            className: "btn btn-danger",
-                        },
-                        confirm: {
-                            text: "Ya, hapus!",
-                            className: "btn btn-success",
-                        },
+            swal({
+                title: "Apakah Anda yakin?",
+                text: "Tawaran topik yang dihapus tidak dapat dikembalikan!",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "Batal",
+                        visible: true,
+                        className: "btn btn-danger",
                     },
-                }).then((willDelete) => {
-                    if (willDelete) {
-                        $.ajax({
-                            // GANTI PREFIX admin MENJADI dosen
-                            url: "/dosen/TawaranTopik/" + id + "/soft-delete",
-                            type: "DELETE",
-                            headers: {
-                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                            },
-                            success: function(res) {
-                                swal({
-                                    title: "Berhasil!",
-                                    text: "Tawaran topik telah dihapus.",
-                                    icon: "success",
-                                    buttons: {
-                                        confirm: {
-                                            text: "OK",
-                                            className: "btn btn-primary",
-                                        },
+                    confirm: {
+                        text: "Ya, hapus!",
+                        className: "btn btn-success",
+                    },
+                },
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: "/dosen/tawaran-topik/" + id + "/soft-delete",
+                        type: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                        },
+                        success: function(res) {
+                            swal({
+                                title: "Berhasil!",
+                                text: "Tawaran topik telah dihapus.",
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        text: "OK",
+                                        className: "btn btn-primary",
                                     },
-                                }).then(() => location.reload());
-                            },
-                            error: function() {
-                                swal("Gagal!",
-                                    "Terjadi kesalahan saat menghapus tawaran topik.", {
-                                        icon: "error",
-                                        buttons: false,
-                                        timer: 2000,
-                                    });
-                            },
-                        });
-                    } else {
-                        swal("Dibatalkan", "Tawaran topik Anda tetap aman.", {
-                            icon: "info",
-                            timer: 1500,
-                            buttons: false,
-                        });
-                    }
-                });
-            });
-
-            // Edit
-            $('#editTawaranTopikModal').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget);
-                var id = button.data('id');
-                var judul = button.data('judul');
-                var deskripsi = button.data('deskripsi');
-                var kuota = button.data('kuota');
-
-                var modal = $(this);
-                // GANTI PREFIX admin MENJADI dosen
-                modal.find('form').attr('action', '/dosen/TawaranTopik/' + id + '/update');
-                modal.find('#edit_id_TawaranTopik').val(id);
-                modal.find('#edit_judul_topik').val(judul);
-                modal.find('#edit_deskripsi').val(deskripsi);
-                modal.find('#edit_kuota').val(kuota);
-            });
-
-            @if (session('success'))
-                swal({
-                    title: "Berhasil!",
-                    text: "{{ session('success') }}",
-                    icon: "success",
-                    buttons: {
-                        confirm: {
-                            text: "OK",
-                            className: "btn btn-primary",
+                                },
+                            }).then(() => location.reload());
                         },
-                    },
-                });
-            @endif
-
-            @if (session('error'))
-                swal({
-                    title: "Gagal!",
-                    text: "{{ session('error') }}",
-                    icon: "error",
-                    buttons: {
-                        confirm: {
-                            text: "OK",
-                            className: "btn btn-danger",
+                        error: function() {
+                            swal("Gagal!",
+                                "Terjadi kesalahan saat menghapus tawaran topik.", {
+                                    icon: "error",
+                                    buttons: false,
+                                    timer: 2000,
+                                });
                         },
-                    },
-                });
-            @endif
+                    });
+                } else {
+                    swal("Dibatalkan", "Tawaran topik Anda tetap aman.", {
+                        icon: "info",
+                        timer: 1500,
+                        buttons: false,
+                    });
+                }
+            });
         });
-    </script>
+
+        // Edit
+        $('#editTawaranTopikModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var judul = button.data('judul');
+            var deskripsi = button.data('deskripsi');
+            var kuota = button.data('kuota');
+
+            var modal = $(this);
+            modal.find('form').attr('action', '/dosen/tawaran-topik/' + id + '/update');
+            modal.find('#edit_id_TawaranTopik').val(id);
+            modal.find('#edit_judul_topik').val(judul);
+            modal.find('#edit_deskripsi').val(deskripsi);
+            modal.find('#edit_kuota').val(kuota);
+        });
+
+        @if (session('success'))
+            swal({
+                title: "Berhasil!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                buttons: {
+                    confirm: {
+                        text: "OK",
+                        className: "btn btn-primary",
+                    },
+                },
+            });
+        @endif
+
+        @if (session('error'))
+            swal({
+                title: "Gagal!",
+                text: "{{ session('error') }}",
+                icon: "error",
+                buttons: {
+                    confirm: {
+                        text: "OK",
+                        className: "btn btn-danger",
+                    },
+                },
+            });
+        @endif
+    });
+</script>
 @endpush
-@endsection

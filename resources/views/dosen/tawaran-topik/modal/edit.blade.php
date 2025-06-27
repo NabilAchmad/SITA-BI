@@ -1,8 +1,8 @@
-<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\admin\TawaranTopik\modal\edit.blade.php -->
+<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\dosen\tawaran-topik\modal\edit.blade.php -->
 <!-- Modal Edit Tawaran Topik -->
 <div class="modal fade" id="editTawaranTopikModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <form method="POST" id="formEditTawaranTopik">
+        <form method="POST" id="formEditTawaranTopik" action="">
             @csrf
             @method('PUT')
             <div class="modal-content">

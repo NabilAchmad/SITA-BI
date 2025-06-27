@@ -2,5 +2,5 @@
 
 @section('title', 'TawaranTopik Dihapus')
 @section('content')
-    @include('admin.TawaranTopik.crud-TawaranTopik.trashed')
+    @include('dosen.tawaran-topik.crud-TawaranTopik.trashed')
 @endsection

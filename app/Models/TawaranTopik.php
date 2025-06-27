@@ -14,11 +14,7 @@ class TawaranTopik extends Model
     protected $table = 'tawaran_topik';
 
     protected $fillable = [
-        'dosen_id',
-        'judul_topik',
-        'deskripsi',
-        'kuota',
-        'user_id'
+        'user_id','dosen_id', 'judul_topik', 'deskripsi', 'kuota'
     ];
 
     public function user()
