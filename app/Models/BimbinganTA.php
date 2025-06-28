@@ -49,4 +49,9 @@ class BimbinganTA extends Model
     {
         return $this->hasMany(CatatanBimbingan::class, 'bimbingan_ta_id');
     }
+
+    public function historyPerubahan()
+    {
+        return $this->hasMany(HistoryPerubahanJadwal::class, 'bimbingan_ta_id');
+    }
 }

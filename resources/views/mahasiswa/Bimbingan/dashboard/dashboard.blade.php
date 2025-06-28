@@ -19,7 +19,6 @@
         </div>
     @else
         <div class="container-fluid py-4">
-            <!-- Header -->
             <div class="position-relative overflow-hidden rounded-3 mb-4 p-4"
                 style="background: linear-gradient(135deg, #e3f2fd, #f1f8ff); border-left: 5px solid #0d6efd;">
                 <div class="position-relative z-1">
@@ -33,7 +32,6 @@
                     style="font-size: 7rem; right: 1.5rem; bottom: -1rem;"></i>
             </div>
 
-            <!-- Jadwal Bimbingan -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -53,7 +51,6 @@
                     @endif
 
                     @php
-                        // Filter hanya jadwal aktif, tidak termasuk yang statusnya ditolak atau selesai
                         $jadwalAktif = $jadwals->filter(function ($item) {
                             return !in_array(strtolower($item->status_bimbingan), ['ditolak', 'selesai']);
                         });
@@ -82,31 +79,25 @@
                                         <div class="row g-4">
                                             <div class="col-md-6">
                                                 <div class="mb-2">
-                                                    <div class="mb-2">
-                                                        <strong class="me-2">Status:</strong>
-                                                        @php
-                                                            $status = strtolower($jadwal->status_bimbingan);
-                                                        @endphp
-                                                        <span
-                                                            class="badge rounded-pill px-3 py-2
+                                                    <strong class="me-2">Status:</strong>
+                                                    @php $status = strtolower($jadwal->status_bimbingan); @endphp
+                                                    <span
+                                                        class="badge rounded-pill px-3 py-2
                                                         @if ($status === 'diajukan') bg-warning text-dark
                                                         @elseif ($status === 'disetujui') bg-success
                                                         @elseif ($status === 'ditolak') bg-danger
                                                         @else bg-secondary @endif">
-                                                            <i
-                                                                class="bi
+                                                        <i
+                                                            class="bi
                                                             @if ($status === 'diajukan') bi-hourglass-split
                                                             @elseif ($status === 'disetujui') bi-check-circle
                                                             @elseif ($status === 'ditolak') bi-x-circle
                                                             @else bi-question-circle @endif me-1"></i>
-                                                            {{ ucfirst($status ?? '-') }}
-                                                        </span>
-                                                    </div>
+                                                        {{ ucfirst($status ?? '-') }}
+                                                    </span>
                                                     <div>
                                                         <strong class="me-2">Waktu:</strong>
-                                                        <span>
-                                                            {{ $jadwal->jam_bimbingan ? date('H:i', strtotime($jadwal->jam_bimbingan)) . ' WIB' : 'Belum diatur' }}
-                                                        </span>
+                                                        {{ $jadwal->jam_bimbingan ? date('H:i', strtotime($jadwal->jam_bimbingan)) . ' WIB' : 'Belum diatur' }}
                                                     </div>
                                                 </div>
                                             </div>
@@ -119,7 +110,6 @@
                                             </div>
                                         </div>
 
-                                        {{-- Catatan Bimbingan --}}
                                         @if ($jadwal->catatanBimbingan->count())
                                             <div class="bimbingan-notes mt-4">
                                                 <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
@@ -128,9 +118,7 @@
                                                 <div class="timeline-notes position-relative ps-4">
                                                     @foreach ($jadwal->catatanBimbingan as $catatan)
                                                         <div class="timeline-item mb-4 position-relative">
-                                                            <div class="timeline-badge
-                                                            {{ $catatan->author_type === 'mahasiswa' ? 'bg-info' : 'bg-success' }}
-                                                            position-absolute start-0 top-0 rounded-circle"
+                                                            <div class="timeline-badge {{ $catatan->author_type === 'mahasiswa' ? 'bg-info' : 'bg-success' }} position-absolute start-0 top-0 rounded-circle"
                                                                 style="width: 15px; height: 15px;"></div>
                                                             <div class="card ms-4 shadow-sm border-0">
                                                                 <div class="card-body p-3">
@@ -152,21 +140,30 @@
                                                     @endforeach
                                                 </div>
                                             </div>
+                                        @endif
+
+                                        @include('mahasiswa.bimbingan.modal.history-perubahan-jadwal', ['jadwal' => $jadwal])
+
+                                    </div>
+                                    <div
+                                        class="card-footer bg-light d-flex justify-content-between align-items-center rounded-bottom-4">
+                                        @php
+                                            $perubahanBelumDiproses =
+                                                $jadwal->historyPerubahan->where('status', 'menunggu')->count() > 0;
+                                        @endphp
+
+                                        @if (!$perubahanBelumDiproses)
+                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                                data-bs-target="#modalEditJadwal-{{ $jadwal->id }}">
+                                                <i class="bi bi-pencil me-2"></i> Ajukan Perubahan Jadwal
+                                            </button>
                                         @else
-                                            <div class="alert alert-light border mt-4">
-                                                <i class="bi bi-info-circle text-muted me-2"></i>
-                                                Belum ada catatan bimbingan untuk jadwal ini.
-                                            </div>
+                                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                                                <i class="bi bi-clock-history me-1"></i> Menunggu Persetujuan Perubahan
+                                            </span>
                                         @endif
                                     </div>
 
-                                    <div
-                                        class="card-footer bg-light d-flex justify-content-between align-items-center rounded-bottom-4">
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                            data-bs-target="#modalEditJadwal-{{ $jadwal->id }}">
-                                            <i class="bi bi-pencil me-2"></i> Ajukan Perubahan Jadwal
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
                         @empty
@@ -190,7 +187,6 @@
                 </div>
             </div>
         </div>
-        <!-- Modal Edit Jadwal -->
         @include('mahasiswa.Bimbingan.modal.edit', ['jadwals' => $jadwals])
     @endif
 @endsection
@@ -206,7 +202,7 @@
                     buttons: {
                         confirm: {
                             text: "OK",
-                            className: "btn btn-danger"
+                            className: "btn btn-success"
                         }
                     }
                 });

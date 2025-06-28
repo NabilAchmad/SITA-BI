@@ -87,7 +87,7 @@ class AuthController extends Controller
             'nim'      => $validated['nim'],
             'prodi'    => $validated['prodi'],
             'kelas'    => $validated['kelas'],
-            'angkatan' => date('Y'),
+            'angkatan' => 2000 + intval(substr($validated['nim'], 0, 2)),
         ]);
 
         $this->sendEmailVerification($user);

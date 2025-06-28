@@ -19,12 +19,10 @@ class Dosen extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-
     public function isOnline()
     {
         return Cache::has('user-is-online-' . $this->id);
     }
-
 
     public function topik(): HasMany
     {

@@ -306,15 +306,28 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
 
         Route::get('/detail/{id}', [BimbinganMahasiswaController::class, 'showDetail'])->name('bimbingan.detail');
 
-        Route::get('/sedangBerlangsung', [BimbinganMahasiswaController::class, 'lihatBimbingan'])->name('dosen.bimbingan.crud-bimbingan.lihat.bimbingan');
+        Route::prefix('tugas-akhir')->group(function (){
+            Route::post('/{id}/setuju-pembatalan', [BimbinganMahasiswaController::class, 'terimaPembatalanTugasAkhir'])->name('setuju-pembatalan-tugas-akhir');
+            
+            Route::post('/{id}/tolak-pembatalan', [BimbinganMahasiswaController::class, 'tolakPembatalanTugasAkhir'])->name('tolak-pembatalan-tugas-akhir');
+        });
 
-        // ROUTE UNTUK AJUKAN PERUBAHAN JADWAL (EDIT JADWAL)
-        Route::get('/menungguReview', function () {
-            return view('admin.bimbingan.crud-bimbingan.ajukan-perubahan');
-        })->name('dosen.bimbingan.crud-bimbingan.ajukan.perubahan');
+        // setujui bimbingan
+        Route::post('/setujui/{id}', [BimbinganMahasiswaController::class, 'setujui'])->name('bimbingan.setujui');
 
         // ROUTE UNTUK TOLAK BIMBINGAN (POST)
-        Route::post('/tolak', [BimbinganMahasiswaController::class, 'tolak'])->name('bimbingan.tolak');
+        Route::post('/tolak/{id}', [BimbinganMahasiswaController::class, 'tolak'])->name('bimbingan.tolak');
+        
+        // tandai bimbingan selesai
+        Route::post('/selesai/{id}', [BimbinganMahasiswaController::class, 'selesaiBimbingan'])->name('bimbingan.selesai');
+
+        // terima pengajuan perubahan jadwal bimbingan
+        Route::post('/terima-perubahan-jadwal/{id}', [BimbinganMahasiswaController::class, 'terimaJadwal'])
+            ->name('jadwal.terima'); // ← perbaikan di sini
+
+        // tolak pengajuan perubahan jadwal bimbingan
+        Route::post('/tolak-perubahan-jadwal/{id}', [BimbinganMahasiswaController::class, 'tolakJadwal'])
+            ->name('jadwal.tolak'); // ← perbaikan di sini
     });
 
 

@@ -28,11 +28,28 @@ class TawaranTopik extends Model
 
     public function dosen()
     {
-        return $this->belongsTo(Dosen::class);
+        return $this->belongsTo(Dosen::class, 'dosen_id');
     }
 
     public function historyTopik()
     {
         return $this->hasMany(HistoryTopikMahasiswa::class);
+    }
+
+    public function tugasAkhir()
+    {
+        return $this->hasMany(TugasAkhir::class, 'tawaran_topik_id');
+    }
+
+    // ✅ Tambahkan ini
+    public function scopeAvailable($query)
+    {
+        return $query->where('kuota', '>', 0);
+    }
+
+    // ✅ Fungsi bantu lain jika ingin dipakai di controller
+    public function isAvailable()
+    {
+        return $this->kuota > 0;
     }
 }

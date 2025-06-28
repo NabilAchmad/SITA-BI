@@ -14,7 +14,7 @@ class TopikController extends Controller
     private function assumedMahasiswaId()
     {
         // Ganti ini sesuai ID mahasiswa yang ada di tabel users
-        return 2;
+        return Auth::user()->mahasiswa->id;
     }
 
     public function index(Request $request)
@@ -35,7 +35,7 @@ class TopikController extends Controller
             ])
             ->exists();
 
-        $topikList = TawaranTopik::with('dosen')
+        $topikList = TawaranTopik::with('dosen.user')
             ->when($search, function ($query, $search) {
                 return $query->where('judul_topik', 'like', "%{$search}%")
                     ->orWhere('deskripsi', 'like', "%{$search}%");

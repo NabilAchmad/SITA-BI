@@ -52,7 +52,7 @@
                                     <td class="text-center">
                                         {{ ($topikList->currentPage() - 1) * $topikList->perPage() + $loop->iteration }}
                                     </td>
-                                    <td class="text-center">{{ $topik->dosen->name ?? '-' }}</td>
+                                    <td class="text-center">{{ $topik->user->name ?? '-' }}</td>
                                     <td class="fw-semibold">{{ $topik->judul_topik }}</td>
                                     <td>{{ Str::limit($topik->deskripsi, 120) }}</td>
                                     <td class="text-center">{{ $topik->kuota }}</td>

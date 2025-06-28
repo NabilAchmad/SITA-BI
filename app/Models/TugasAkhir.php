@@ -77,18 +77,6 @@ class TugasAkhir extends Model
         return $this->hasMany(PeranDosenTA::class, 'tugas_akhir_id');
     }
 
-    // relasi 1 ke PeranDosenTA yang peran pembimbing1
-    // public function pembimbing1()
-    // {
-    //     return $this->hasOne(PeranDosenTA::class, 'tugas_akhir_id')->where('peran', 'pembimbing1');
-    // }
-
-    // // relasi 1 ke PeranDosenTA yang peran pembimbing2
-    // public function pembimbing2()
-    // {
-    //     return $this->hasOne(PeranDosenTA::class, 'tugas_akhir_id')->where('peran', 'pembimbing2');
-    // }
-
     public function sidangTerakhir()
     {
         return $this->hasOne(Sidang::class)

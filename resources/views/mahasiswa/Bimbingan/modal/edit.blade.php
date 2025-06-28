@@ -23,6 +23,11 @@
                         <input type="time" name="jam_bimbingan" id="jam_bimbingan-{{ $jadwal->id }}"
                             class="form-control" value="{{ $jadwal->jam_bimbingan }}" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="catatan-{{ $jadwal->id }}" class="form-label">Alasan Perubahan</label>
+                        <textarea name="catatan" id="catatan-{{ $jadwal->id }}" rows="3" class="form-control"
+                            placeholder="Contoh: Dosen berhalangan hadir, ingin ubah jadwal..."></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

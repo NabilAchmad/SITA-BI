@@ -12,7 +12,7 @@
                         <th>Nama Dosen</th>
                         <th>Peran</th>
                         <th>Jumlah Bimbingan</th>
-                        <th>Status Terakhir</th>
+                        <th>Status Bimbingan</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>

@@ -4,7 +4,6 @@
         <div class="section-title mt-3">
             <h1>Tawaran Topik</h1>
         </div>
-
         {{-- Card Tawaran Topik --}}
         @forelse ($topikTugasAkhir as $topik)
             <div class="card mb-4 bg-white shadow-sm border-0">
@@ -17,7 +16,7 @@
                     </p>
                     <p class="card-text text-secondary d-flex justify-content-between align-items-center">
                         <span><strong>Dosen Pembimbing:</strong>
-                            {{ optional($topik->user)->name ?? 'Tidak diketahui' }}</span>
+                            {{ $topik->user->name ?? 'Tidak diketahui' }}</span>
                         <span class="badge bg-primary">Kuota Tersisa: {{ $topik->kuota }}</span>
                     </p>
                 </div>
