@@ -331,33 +331,37 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
     });
 
 
-    // =========================
-    // Route Tawaran Topik
-    // =========================
+
+// =========================
+// Route Tawaran Topik
+// =========================
+
 
     Route::prefix('tawaran-topik')->middleware(['auth', 'role:dosen'])->group(function () {
         // READ
         Route::get('/read', [TawaranTopikController::class, 'read'])->name('dosen.tawaran-topik.index');
 
-        // CREATE
-        Route::get('/create', [TawaranTopikController::class, 'create'])->name('TawaranTopik.form'); // Form tambah
-        Route::post('/create', [TawaranTopikController::class, 'store'])->name('TawaranTopik.create'); // Simpan data baru
+    // CREATE
+    Route::get('/create', [TawaranTopikController::class, 'create'])->name('tawaran-topik.form'); // Form tambah
+    Route::post('/create', [TawaranTopikController::class, 'store'])->name('tawaran-topik.create'); // Simpan data baru
 
-        // EDIT / UPDATE
-        Route::get('/{id}/edit', [TawaranTopikController::class, 'edit'])->name('TawaranTopik.edit'); // Form edit
-        Route::put('/{id}/update', [TawaranTopikController::class, 'update'])->name('TawaranTopik.update'); // Update data
+    // EDIT / UPDATE
+    Route::get('/{id}/edit', [TawaranTopikController::class, 'edit'])->name('tawaran-topik.edit'); // Form edit
+    Route::put('/{id}/update', [TawaranTopikController::class, 'update'])->name('tawaran-topik.update'); // Update data
 
-        // DELETE (Soft Delete)
-        Route::delete('/{id}/soft-delete', [TawaranTopikController::class, 'destroy'])->name('TawaranTopik.destroy'); // Soft delete
+    // DELETE (Soft Delete) - BENAR
+    Route::delete('/{id}/soft-delete', [TawaranTopikController::class, 'destroy'])->name('tawaran-topik.destroy');
 
-        // DELETE ALL (Force delete)
-        Route::delete('/force-delete-all', [TawaranTopikController::class, 'forceDeleteAll'])->name('TawaranTopik.force-delete-all');
+    // TRASHED (Manajemen soft delete)
+    Route::get('/trash', [TawaranTopikController::class, 'trashed'])->name('tawaran-topik.trashed'); // Tampilkan data terhapus
+    Route::post('/{id}/restore', [TawaranTopikController::class, 'restore'])->name('tawaran-topik.restore'); // Restore data
 
-        // TRASHED (Manajemen soft delete)
-        Route::get('/trash', [TawaranTopikController::class, 'trashed'])->name('TawaranTopik.trashed'); // Tampilkan data terhapus
-        Route::post('/{id}/restore', [TawaranTopikController::class, 'restore'])->name('TawaranTopik.restore'); // Restore data
-        Route::delete('/{id}/force-delete', [TawaranTopikController::class, 'forceDelete'])->name('TawaranTopik.force-delete'); // Hapus permanen
-    });
+    // DELETE ALL (Force delete)
+    Route::delete('/force-delete-all', [TawaranTopikController::class, 'forceDeleteAll'])->name('tawaran-topik.force-delete-all');
+
+    // DELETE (Force Delete Satu Data)
+    Route::delete('/{id}/force-delete', [TawaranTopikController::class, 'forceDelete'])->name('tawaran-topik.force-delete'); // Hapus permanen
+});
 
     // =========================
     // ROUTE SIDANG

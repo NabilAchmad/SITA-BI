@@ -1,4 +1,4 @@
-<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\admin\TawaranTopik\crud-TawaranTopik\trashed.blade.php -->
+{{-- filepath: resources/views/dosen/tawaran-topik/crud-TawaranTopik/trashed.blade.php --}}
 @extends('layouts.template.main')
 @section('title', 'Tawaran Topik Terhapus')
 @section('content')
@@ -8,7 +8,9 @@
         {{-- Breadcrumbs --}}
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{{ route('TawaranTopik.read') }}">Daftar Tawaran Topik</a></li>
+                <li class="breadcrumb-item">
+                    <a href="{{ route('dosen.tawaran-topik.index') }}">Daftar Tawaran Topik</a>
+                </li>
                 <li class="breadcrumb-item active" aria-current="page">Tawaran Topik Terhapus</li>
             </ol>
         </nav>
@@ -46,7 +48,7 @@
                             <td>{{ $item->deleted_at ? $item->deleted_at->format('d M Y, H:i:s') : '-' }}</td>
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
-                                    <form action="{{ route('TawaranTopik.restore', $item->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('tawaran-topik.restore', $item->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="btn btn-success btn-sm">
                                             <i class="bi bi-arrow-clockwise"></i> Pulihkan
@@ -105,7 +107,7 @@
 <div class="modal fade" id="modalForceDeleteAll" tabindex="-1" aria-labelledby="modalForceDeleteAllLabel"
     aria-hidden="true">
     <div class="modal-dialog">
-        <form method="POST" action="{{ route('TawaranTopik.force-delete-all') }}">
+        <form method="POST" action="{{ url('dosen/tawaran-topik/force-delete-all') }}">
             @csrf
             @method('DELETE')
             <div class="modal-content">
@@ -126,13 +128,16 @@
     </div>
 </div>
 
+@endsection
+
 @push('scripts')
     <script>
         $(document).ready(function() {
             // Event delegation agar tetap bekerja jika elemen dinamis
             $(document).on('click', '.btn-force-delete', function() {
                 const id = $(this).data('id');
-                const url = `/admin/TawaranTopik/${id}/force-delete`;
+                // Perbaikan: gunakan prefix dosen sesuai route-list kamu!
+                const url = `/dosen/tawaran-topik/${id}/force-delete`;
                 $('#formHapusPermanen').attr('action', url);
             });
         });
@@ -162,4 +167,3 @@
         </script>
     @endif
 @endpush
-@endsection

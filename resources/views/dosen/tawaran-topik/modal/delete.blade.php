@@ -1,9 +1,9 @@
-<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\admin\TawaranTopik\modal\delete.blade.php -->
+<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\dosen\tawaran-topik\modal\delete.blade.php -->
 <!-- Modal Hapus Tawaran Topik -->
 <div class="modal fade" id="hapusTawaranTopikModal" tabindex="-1" aria-labelledby="hapusTawaranTopikLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form id="formHapusTawaranTopik" method="POST">
+            <form id="formHapusTawaranTopik" method="POST" action="">
                 @csrf
                 @method('DELETE')
                 <div class="modal-header bg-danger text-white">

@@ -75,7 +75,7 @@ class TawaranTopikController extends Controller
     public function edit($id)
     {
         $tawaranTopik = TawaranTopik::findOrFail($id);
-        return view('admin.TawaranTopik.crud-TawaranTopik.edit', compact('tawaranTopik'));
+        return view('dosen.tawaran-topik.crud-TawaranTopik.edit', compact('tawaranTopik'));
     }
 
     // DELETE (soft delete)
@@ -91,7 +91,7 @@ class TawaranTopikController extends Controller
     public function trashed()
     {
         $tawaranTopik = TawaranTopik::onlyTrashed()->paginate(10);
-        return view('admin.TawaranTopik.crud-TawaranTopik.trashed', compact('tawaranTopik'));
+        return view('dosen.tawaran-topik.crud-TawaranTopik.trashed', compact('tawaranTopik'));
     }
 
     // Pulihkan soft-deleted
