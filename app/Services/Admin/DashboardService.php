@@ -19,8 +19,12 @@ class DashboardService
      */
     public function getDashboardData(): array
     {
-        // Menggunakan Cache untuk data yang tidak sering berubah untuk meningkatkan performa
-        return Cache::remember('admin_dashboard_data', now()->addMinutes(5), function () {
+        // PERBAIKAN: Mengubah kunci cache untuk memaksa Laravel membuat cache baru.
+        // Ini akan menyelesaikan error 'Undefined variable'.
+        return Cache::remember('admin_dashboard_data_v2', now()->addMinutes(5), function () {
+
+            $dosenAktif = Dosen::with('user')->get()->filter(fn($d) => $d->isOnline());
+
             return [
                 'totalDosen' => Dosen::count(),
                 'totalMahasiswa' => Mahasiswa::count(),
@@ -31,6 +35,7 @@ class DashboardService
                 'totalPembimbing' => PeranDosenTa::whereIn('peran', ['pembimbing1', 'pembimbing2'])->distinct('dosen_id')->count(),
                 'totalPenguji' => PeranDosenTa::whereIn('peran', ['penguji1', 'penguji2', 'penguji3'])->distinct('dosen_id')->count(),
                 'mahasiswaAktif' => TugasAkhir::where('status', '!=', 'dibatalkan')->distinct('mahasiswa_id')->count(),
+                'dosenAktif' => $dosenAktif,
             ];
         });
     }
