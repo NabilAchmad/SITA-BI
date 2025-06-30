@@ -19,6 +19,7 @@ class PeranDosenTa extends Model
     const PERAN_PENGUJI_1 = 'penguji1';
     const PERAN_PENGUJI_2 = 'penguji2';
     const PERAN_PENGUJI_3 = 'penguji3';
+    const PERAN_PENGUJI_4 = 'penguji4';
 
 
     // Relasi ke model induk

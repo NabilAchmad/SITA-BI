@@ -25,43 +25,45 @@ class PenilaianSidangService
      */
     public function getSidangUntukDinilai(): \Illuminate\Database\Eloquent\Collection
     {
-        // Dapatkan semua ID tugas akhir di mana dosen ini berperan sebagai penguji
         $peranPengujiTaIds = $this->dosen->peranDosenTa()
             ->where('peran', 'like', 'penguji%')
             ->pluck('tugas_akhir_id');
 
-        // Ambil sidang dari tugas akhir tersebut yang statusnya "dijadwalkan"
+        // PERBAIKAN: Menggunakan nama kolom 'status' sesuai skema DB Anda.
         return Sidang::whereIn('tugas_akhir_id', $peranPengujiTaIds)
-            ->where('status_sidang', 'dijadwalkan') // Asumsi status
+            ->where('status', 'dijadwalkan')
             ->with(['tugasAkhir.mahasiswa.user', 'jadwalSidang.ruangan'])
             ->get();
     }
 
     /**
      * Menyimpan nilai sidang dari seorang penguji.
+     * Logika ini sekarang menangani penyimpanan beberapa baris nilai (per aspek).
      */
-    public function storeNilai(Sidang $sidang, array $validatedData): NilaiSidang
+    public function storeNilai(Sidang $sidang, array $validatedData): void
     {
-        // Otorisasi sudah ditangani oleh FormRequest, tapi bisa ditambahkan pengecekan ganda
         $this->authorizeDosenIsPenguji($sidang->tugasAkhir);
 
-        // Tambahkan ID yang diperlukan
-        $validatedData['sidang_id'] = $sidang->id;
-        $validatedData['dosen_id'] = $this->dosen->id;
+        DB::transaction(function () use ($sidang, $validatedData) {
+            // Hapus nilai lama dari dosen ini untuk sidang ini, untuk menghindari duplikasi
+            NilaiSidang::where('sidang_id', $sidang->id)
+                ->where('dosen_id', $this->dosen->id)
+                ->delete();
 
-        // Gunakan updateOrCreate untuk menghindari duplikasi nilai dari penguji yang sama
-        $nilai = NilaiSidang::updateOrCreate(
-            [
-                'sidang_id' => $sidang->id,
-                'dosen_id' => $this->dosen->id,
-            ],
-            $validatedData
-        );
+            // Loop melalui setiap aspek penilaian yang dikirim dari form
+            foreach ($validatedData['penilaian'] as $item) {
+                NilaiSidang::create([
+                    'sidang_id' => $sidang->id,
+                    'dosen_id'  => $this->dosen->id,
+                    'aspek'     => $item['aspek'],
+                    'skor'      => $item['skor'],
+                    'komentar'  => $item['komentar'] ?? null,
+                ]);
+            }
+        });
 
         // Setelah menyimpan, cek apakah semua penguji sudah memberi nilai
         $this->cekDanFinalisasiSidang($sidang);
-
-        return $nilai;
     }
 
     /**
@@ -71,25 +73,27 @@ class PenilaianSidangService
     {
         $tugasAkhir = $sidang->tugasAkhir->load('peranDosenTa');
         $jumlahPenguji = $tugasAkhir->peranDosenTa->where('peran', 'like', 'penguji%')->count();
-        $jumlahNilaiMasuk = $sidang->nilaiSidang()->count();
+
+        // Dapatkan semua ID dosen penguji
+        $pengujiIds = $tugasAkhir->peranDosenTa->where('peran', 'like', 'penguji%')->pluck('dosen_id');
+
+        // Hitung berapa banyak penguji yang sudah submit nilai
+        $jumlahNilaiMasuk = NilaiSidang::where('sidang_id', $sidang->id)
+            ->whereIn('dosen_id', $pengujiIds)
+            ->distinct('dosen_id')
+            ->count();
 
         if ($jumlahPenguji > 0 && $jumlahNilaiMasuk >= $jumlahPenguji) {
-            // Logika untuk menghitung rata-rata nilai dan menentukan kelulusan
-            $totalNilai = $sidang->nilaiSidang()->sum('total_nilai'); // Asumsi ada kolom 'total_nilai'
-            $rataRata = $totalNilai / $jumlahNilaiMasuk;
+            // Logika untuk menghitung rata-rata nilai
+            $totalSkor = NilaiSidang::where('sidang_id', $sidang->id)->sum('skor');
+            $jumlahAspek = NilaiSidang::where('sidang_id', $sidang->id)->count();
+            $rataRata = ($jumlahAspek > 0) ? $totalSkor / $jumlahAspek : 0;
 
             // Tentukan status lulus/tidak lulus berdasarkan rata-rata
             $statusKelulusan = ($rataRata >= 56) ? 'lulus' : 'tidak_lulus'; // Contoh batas nilai
 
-            $sidang->update([
-                'status_sidang' => $statusKelulusan,
-                'nilai_akhir' => $rataRata,
-            ]);
-
-            // Update juga status Tugas Akhir
-            $tugasAkhir->update([
-                'status' => $statusKelulusan === 'lulus' ? TugasAkhir::STATUS_LULUS_DENGAN_REVISI : TugasAkhir::STATUS_REVISI
-            ]);
+            // PERBAIKAN: Menggunakan nama kolom 'status' sesuai skema DB
+            $sidang->update(['status' => $statusKelulusan]);
         }
     }
 

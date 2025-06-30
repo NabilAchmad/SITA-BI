@@ -2,47 +2,60 @@
 
 namespace App\Http\Controllers\Dosen;
 
-use App\Models\NilaiSidang;
-use App\Models\Sidang;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dosen\StorePenilaianRequest;
+use App\Models\Sidang;
+use App\Services\Dosen\PenilaianSidangService;
+use Illuminate\Http\Request;
 
 class PenilaianSidangController extends Controller
 {
-    // Tampilkan daftar semua sidang
+    protected PenilaianSidangService $penilaianSidangService;
+
+    public function __construct(PenilaianSidangService $penilaianSidangService)
+    {
+        $this->penilaianSidangService = $penilaianSidangService;
+    }
+
+    /**
+     * Menampilkan daftar sidang yang perlu dinilai.
+     */
     public function index()
     {
-        // Pastikan relasi penilaians diambil agar nilai langsung tampil di index
-        $sidangs = Sidang::with(['mahasiswa', 'penilaians'])->get();
-        return view('admin.sidang.penilaian.index', compact('sidangs'));
+        $daftarSidang = $this->penilaianSidangService->getSidangUntukDinilai();
+        return view('dosen.sidang.penilaian.index', compact('daftarSidang'));
     }
 
-    // Tampilkan form penilaian untuk satu sidang
-    public function form($sidang_id)
+    /**
+     * Menampilkan form untuk memberikan nilai pada sidang tertentu.
+     */
+    public function create(Sidang $sidang)
     {
-        $sidang = Sidang::with('mahasiswa')->findOrFail($sidang_id);
-        return view('admin.sidang.penilaian.form', compact('sidang'));
+        // Memuat relasi yang dibutuhkan oleh form
+        $sidang->load('tugasAkhir.mahasiswa.user');
+        return view('dosen.sidang.penilaian.form', compact('sidang'));
     }
 
-    // Simpan nilai sidang
-    public function simpan(Request $request, $sidang_id)
+    /**
+     * Menyimpan data penilaian.
+     */
+    public function store(StorePenilaianRequest $request, Sidang $sidang)
     {
-        $request->validate([
-            'aspek' => 'required|string',
-            'komentar' => 'nullable|string',
-            'skor' => 'required|numeric|min:0|max:100',
-        ]);
+        try {
+            $this->penilaianSidangService->storeNilai($sidang, $request->validated());
 
-        NilaiSidang::create([
-            'sidang_id' => $sidang_id,
-            'dosen_id' => Auth::id() ?? 4, // gunakan id dosen login, fallback ke 4 jika belum login
-            'aspek' => $request->aspek,
-            'komentar' => $request->komentar,
-            'skor' => $request->skor,
-        ]);
-
-        // Redirect ke route index yang BENAR
-        return redirect()->route('penilaian.sidang.index')->with('success', 'Nilai berhasil disimpan!');
+            return redirect()->route('dosen.penilaian-sidang.index')
+                ->with('alert', [
+                    'type' => 'success',
+                    'title' => 'Berhasil',
+                    'message' => 'Nilai berhasil disimpan. Terima kasih.'
+                ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Gagal',
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ])->withInput();
+        }
     }
 }

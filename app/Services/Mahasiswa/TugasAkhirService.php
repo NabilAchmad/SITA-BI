@@ -34,9 +34,9 @@ class TugasAkhirService
                 'revisiTa' => fn($q) => $q->latest(),
                 'dokumenTa' => fn($q) => $q->latest(),
                 'sidang' => fn($q) => $q->latest(),
-                // Eager load relasi spesifik yang sudah kita buat
-                'pembimbingSatu.dosen.user',
-                'pembimbingDua.dosen.user',
+                // PERBAIKAN: Memuat relasi asli 'peranDosenTa' beserta turunannya.
+                // Accessor 'pembimbingSatu' dan 'pembimbingDua' akan menggunakan data ini.
+                'peranDosenTa.dosen.user',
             ])
             ->latest()
             ->first();

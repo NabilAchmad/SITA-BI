@@ -3,85 +3,66 @@
 namespace App\Http\Controllers\Dosen\Kaprodi;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Kaprodi\RejectTugasAkhirRequest;
 use App\Models\TugasAkhir;
+use App\Services\Kaprodi\ValidasiService;
 use Illuminate\Http\Request;
 
 class ValidasiController extends Controller
 {
-    // Dosen/ValidasiJudulController.php
+    protected ValidasiService $validasiService;
+
+    public function __construct(ValidasiService $validasiService)
+    {
+        // PERBAIKAN: Middleware telah dipindahkan ke file routes/web.php
+        // untuk praktik terbaik dan untuk menghilangkan peringatan dari Intelephense.
+        $this->validasiService = $validasiService;
+    }
+
+    /**
+     * Menampilkan daftar tugas akhir yang perlu divalidasi.
+     */
     public function index(Request $request)
     {
-        $query = TugasAkhir::with(['mahasiswa.user'])
-            ->where('status', 'diajukan');
-
-        if ($request->prodi) {
-            $query->whereHas('mahasiswa', fn($q) => $q->where('prodi', strtolower($request->prodi)));
-        }
-
-        if ($request->search) {
-            $query->whereHas(
-                'mahasiswa.user',
-                fn($q) =>
-                $q->where('name', 'like', '%' . $request->search . '%')
-            );
-        }
-
-        $tugasAkhir = $query->latest()->get();
+        $tugasAkhir = $this->validasiService->getTugasAkhirForValidation($request);
         return view('dosen.kaprodi.validasi.index', compact('tugasAkhir'));
     }
 
-    public function detail($id)
+    /**
+     * Menampilkan detail tugas akhir untuk divalidasi.
+     */
+    public function show(TugasAkhir $tugasAkhir)
     {
-        $ta = TugasAkhir::with('mahasiswa.user')->findOrFail($id);
-        $judul = strtolower($ta->judul);
+        // Memuat relasi yang dibutuhkan oleh view detail
+        $tugasAkhir->load('mahasiswa.user', 'revisiTa.pemberiRevisi');
+        return view('dosen.kaprodi.validasi.show', compact('tugasAkhir'));
+    }
 
-        // Cari judul serupa
-        $similar = TugasAkhir::where('id', '!=', $id)
-            ->where('status', '!=', 'ditolak')
-            ->pluck('judul')
-            ->filter(function ($item) use ($judul) {
-                similar_text(strtolower($item), $judul, $percent);
-                return $percent > 60;
-            });
+    /**
+     * Menyetujui pengajuan tugas akhir.
+     */
+    public function approve(TugasAkhir $tugasAkhir)
+    {
+        $this->validasiService->approveTugasAkhir($tugasAkhir);
 
-        // Ambil score tertinggi dan simpan (opsional)
-        $maxScore = 0;
-        foreach ($similar as $item) {
-            similar_text(strtolower($item), $judul, $score);
-            $maxScore = max($maxScore, $score);
-        }
-
-        $ta->similarity_score = $maxScore;
-        $ta->terakhir_dicek = now();
-        $ta->save();
-
-        return response()->json([
-            'nama' => $ta->mahasiswa->user->name,
-            'nim' => $ta->mahasiswa->nim,
-            'prodi' => strtoupper($ta->mahasiswa->prodi) === 'D3' ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris',
-            'judul' => $ta->judul,
-            'similar' => $similar->values(),
+        return redirect()->route('dosen.validasi.index')->with('alert', [
+            'type' => 'success',
+            'title' => 'Berhasil',
+            'message' => 'Tugas akhir telah disetujui.'
         ]);
     }
 
-    public function validasi($id)
+    /**
+     * Menolak pengajuan tugas akhir.
+     */
+    public function reject(RejectTugasAkhirRequest $request, TugasAkhir $tugasAkhir)
     {
-        $ta = TugasAkhir::findOrFail($id);
-        $ta->status = 'disetujui';
-        $ta->save();
+        $this->validasiService->rejectTugasAkhir($tugasAkhir, $request->input('catatan'));
 
-        return back()->with('success', 'Judul disetujui.');
-    }
-
-    public function tolak(Request $request, $id)
-    {
-        $request->validate(['komentar' => 'required|string']);
-
-        $ta = TugasAkhir::findOrFail($id);
-        $ta->status = 'ditolak';
-        $ta->alasan_penolakan = $request->komentar;
-        $ta->save();
-
-        return back()->with('success', 'Judul ditolak.');
+        return redirect()->route('dosen.validasi.index')->with('alert', [
+            'type' => 'success',
+            'title' => 'Berhasil',
+            'message' => 'Tugas akhir telah ditolak dan catatan revisi telah dikirim.'
+        ]);
     }
 }
