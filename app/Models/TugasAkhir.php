@@ -2,85 +2,117 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TugasAkhir extends Model
 {
-    use SoftDeletes;
+    use HasFactory;
+
+    // 1. DEFINISIKAN SEMUA STATUS SEBAGAI KONSTANTA
+    // Ini menghilangkan 'magic strings' dan mencegah typo.
+    const STATUS_DRAFT = 'draft';
+    const STATUS_DIAJUKAN = 'diajukan';
+    const STATUS_DISETUJUI = 'disetujui';
+    const STATUS_REVISI = 'revisi';
+    const STATUS_MENUNGGU_PEMBATALAN = 'menunggu_pembatalan';
+    const STATUS_DIBATALKAN = 'dibatalkan';
+    const STATUS_LULUS_TANPA_REVISI = 'lulus_tanpa_revisi';
+    const STATUS_LULUS_DENGAN_REVISI = 'lulus_dengan_revisi';
+    const STATUS_SELESAI = 'selesai';
 
     protected $table = 'tugas_akhir';
+    protected $guarded = ['id'];
 
-    protected $fillable = [
-        'mahasiswa_id',
-        'judul',
-        'abstrak',
-        'status',
-        'alasan_pembatalan',
-        'tanggal_pengajuan',
-        'file_path',
+    // 2. LENGKAPI TIPE DATA CASTS
+    // Pastikan semua kolom tanggal menjadi objek Carbon.
+    protected $casts = [
+        'tanggal_pengajuan' => 'date',
+        'tanggal_mulai' => 'date',
+        'tanggal_selesai' => 'date',
     ];
 
-    // Relasi ke Mahasiswa
+    // --- RELASI DASAR ---
     public function mahasiswa()
     {
-        return $this->belongsTo(Mahasiswa::class, 'mahasiswa_id');
+        return $this->belongsTo(Mahasiswa::class);
+    }
+
+    public function bimbinganTa()
+    {
+        return $this->hasMany(BimbinganTA::class);
+    }
+
+    public function revisiTa()
+    {
+        return $this->hasMany(RevisiTa::class);
+    }
+
+    public function dokumenTa()
+    {
+        return $this->hasMany(DokumenTa::class);
+    }
+
+    public function sidang()
+    {
+        return $this->hasMany(Sidang::class);
     }
 
     public function peranDosenTa()
     {
-        return $this->hasMany(PeranDosenTa::class, 'tugas_akhir_id');
+        return $this->hasMany(PeranDosenTa::class);
     }
 
-    // Relasi ke Bimbingan TA
-    public function bimbingan()
+    // 3. TAMBAHKAN RELASI SPESIFIK UNTUK PEMBIMBING
+    // Membuat pengambilan data pembimbing menjadi super mudah.
+    protected function pembimbingSatu(): Attribute
     {
-        return $this->hasMany(BimbinganTa::class, 'tugas_akhir_id');
+        return Attribute::make(
+            get: fn() => $this->peranDosenTa->firstWhere('peran', PeranDosenTa::PERAN_PEMBIMBING_1)
+        );
     }
 
-    // Relasi ke Dokumen TA (proposal, draft, final)
-    public function dokumen()
+    // Atribut ini akan mencari pembimbing 2 dari relasi peranDosenTa
+    protected function pembimbingDua(): Attribute
     {
-        return $this->hasMany(DokumenTa::class, 'tugas_akhir_id');
+        return Attribute::make(
+            get: fn() => $this->peranDosenTa->firstWhere('peran', PeranDosenTa::PERAN_PEMBIMBING_2)
+        );
     }
 
-    // Relasi ke Revisi TA
-    public function revisi()
+    // 4. IMPLEMENTASI QUERY SCOPE UNTUK TA AKTIF
+    // Sederhanakan query yang berulang di banyak tempat.
+    public function scopeActive(Builder $query): Builder
     {
-        return $this->hasMany(RevisiTa::class, 'tugas_akhir_id');
+        return $query->whereNotIn('status', [
+            self::STATUS_DIBATALKAN,
+            self::STATUS_LULUS_DENGAN_REVISI,
+            self::STATUS_LULUS_TANPA_REVISI,
+            self::STATUS_SELESAI,
+        ]);
     }
 
-    // public function sidang()
-    // Relasi ke Sidang TA (bisa juga hasMany jika ada banyak sidang)
-    public function sidang()
+    // 5. PINDAHKAN LOGIKA PROGRESS KE ACCESSOR
+    // Controller tidak perlu tahu cara menghitung ini.
+    protected function progressPercentage(): Attribute
     {
-        return $this->hasMany(Sidang::class);
-        // return $this->hasOne(Sidang::class, 'tugas_akhir_id');
-    }
-    // Relasi ke Notifikasi TA
-    public function notifikasi()
-    {
-        return $this->hasMany(NotifikasiTa::class, 'tugas_akhir_id');
-    }
+        return Attribute::make(
+            get: function () {
+                // Eager load relasi jika belum ada untuk efisiensi
+                if (! $this->relationLoaded('bimbinganTa')) {
+                    $this->load('bimbinganTa');
+                }
+                $jumlahBimbingan = $this->bimbinganTa->count();
 
-    public function dosenPembimbing()
-    {
-        return $this->hasMany(PeranDosenTA::class);
-    }
-
-    // relasi banyak ke PeranDosenTA
-    public function peranDosen()
-    {
-        return $this->hasMany(PeranDosenTA::class, 'tugas_akhir_id');
-    }
-
-    public function sidangTerakhir()
-    {
-        return $this->hasOne(Sidang::class)
-            ->whereIn('jenis_sidang', ['akhir', 'proposal'])
-            ->latestOfMany();
+                return match ($this->status) {
+                    self::STATUS_DIAJUKAN, self::STATUS_REVISI => min(ceil(($jumlahBimbingan / 8) * 50), 49), // 0-49%
+                    self::STATUS_DISETUJUI => 50 + min(ceil(($jumlahBimbingan / 8) * 50), 49), // 50-99%
+                    self::STATUS_LULUS_DENGAN_REVISI, self::STATUS_LULUS_TANPA_REVISI, self::STATUS_SELESAI => 100,
+                    default => 0,
+                };
+            }
+        );
     }
 }
