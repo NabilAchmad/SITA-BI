@@ -308,7 +308,6 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
 
         Route::prefix('tugas-akhir')->group(function (){
             Route::post('/{id}/setuju-pembatalan', [BimbinganMahasiswaController::class, 'terimaPembatalanTugasAkhir'])->name('setuju-pembatalan-tugas-akhir');
-            
             Route::post('/{id}/tolak-pembatalan', [BimbinganMahasiswaController::class, 'tolakPembatalanTugasAkhir'])->name('tolak-pembatalan-tugas-akhir');
         });
 
