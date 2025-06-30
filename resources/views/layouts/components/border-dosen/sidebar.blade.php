@@ -1,7 +1,8 @@
 @php
     $user = auth()->user();
     $userRoles = $user?->roles->pluck('nama_role')->toArray() ?? [];
-    $dosenRoles = $user?->dosen?->peranTa?->pluck('peran')->unique()->toArray() ?? [];
+    // PERBAIKAN: Menggunakan nama relasi yang benar 'peranDosenTa' sesuai definisi di Model Dosen.
+    $dosenRoles = $user?->dosen?->peranDosenTa?->pluck('peran')->unique()->toArray() ?? [];
 @endphp
 
 <div class="sidebar sidebar-style-2" data-background-color="dark2">

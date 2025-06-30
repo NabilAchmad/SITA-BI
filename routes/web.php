@@ -306,7 +306,7 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
 
         Route::get('/detail/{id}', [BimbinganMahasiswaController::class, 'showDetail'])->name('bimbingan.detail');
 
-        Route::prefix('tugas-akhir')->group(function (){
+        Route::prefix('tugas-akhir')->group(function () {
             Route::post('/{id}/setuju-pembatalan', [BimbinganMahasiswaController::class, 'terimaPembatalanTugasAkhir'])->name('setuju-pembatalan-tugas-akhir');
             Route::post('/{id}/tolak-pembatalan', [BimbinganMahasiswaController::class, 'tolakPembatalanTugasAkhir'])->name('tolak-pembatalan-tugas-akhir');
         });
@@ -316,7 +316,7 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
 
         // ROUTE UNTUK TOLAK BIMBINGAN (POST)
         Route::post('/tolak/{id}', [BimbinganMahasiswaController::class, 'tolak'])->name('bimbingan.tolak');
-        
+
         // tandai bimbingan selesai
         Route::post('/selesai/{id}', [BimbinganMahasiswaController::class, 'selesaiBimbingan'])->name('bimbingan.selesai');
 
@@ -329,38 +329,35 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
             ->name('jadwal.tolak'); // ← perbaikan di sini
     });
 
-
-
-// =========================
-// Route Tawaran Topik
-// =========================
-
-
+    // =========================
+    // Route Tawaran Topik
+    // =========================
     Route::prefix('tawaran-topik')->middleware(['auth', 'role:dosen'])->group(function () {
         // READ
         Route::get('/read', [TawaranTopikController::class, 'read'])->name('dosen.tawaran-topik.index');
 
-    // CREATE
-    Route::get('/create', [TawaranTopikController::class, 'create'])->name('tawaran-topik.form'); // Form tambah
-    Route::post('/create', [TawaranTopikController::class, 'store'])->name('tawaran-topik.create'); // Simpan data baru
+        // CREATE
+        Route::post('/create', [TawaranTopikController::class, 'store'])->name('tawaran-topik.create');
 
-    // EDIT / UPDATE
-    Route::get('/{id}/edit', [TawaranTopikController::class, 'edit'])->name('tawaran-topik.edit'); // Form edit
-    Route::put('/{id}/update', [TawaranTopikController::class, 'update'])->name('tawaran-topik.update'); // Update data
+        // PERBAIKAN: Mengubah parameter dari {id} menjadi {tawaranTopik}
+        // agar cocok dengan nama variabel di Controller dan mengaktifkan Route Model Binding.
+        // EDIT / UPDATE
+        Route::put('/{tawaranTopik}/update', [TawaranTopikController::class, 'update'])->name('dosen.tawaran-topik.update');
 
-    // DELETE (Soft Delete) - BENAR
-    Route::delete('/{id}/soft-delete', [TawaranTopikController::class, 'destroy'])->name('tawaran-topik.destroy');
+        // DELETE (Soft Delete)
+        Route::delete('/{tawaranTopik}/soft-delete', [TawaranTopikController::class, 'destroy'])->name('dosen.tawaran-topik.destroy');
 
-    // TRASHED (Manajemen soft delete)
-    Route::get('/trash', [TawaranTopikController::class, 'trashed'])->name('tawaran-topik.trashed'); // Tampilkan data terhapus
-    Route::post('/{id}/restore', [TawaranTopikController::class, 'restore'])->name('tawaran-topik.restore'); // Restore data
+        // TRASHED (Manajemen soft delete)
+        Route::get('/trash', [TawaranTopikController::class, 'trashed'])->name('dosen.tawaran-topik.trashed');
 
-    // DELETE ALL (Force delete)
-    Route::delete('/force-delete-all', [TawaranTopikController::class, 'forceDeleteAll'])->name('tawaran-topik.force-delete-all');
+        // Untuk restore dan force-delete, kita tetap bisa menggunakan {id} karena kita mencarinya secara manual di service.
+        // Namun, untuk konsistensi, mengubahnya juga merupakan ide yang baik.
+        Route::post('/{id}/restore', [TawaranTopikController::class, 'restore'])->name('dosen.tawaran-topik.restore');
+        Route::delete('/{id}/force-delete', [TawaranTopikController::class, 'forceDelete'])->name('dosen.tawaran-topik.force-delete');
 
-    // DELETE (Force Delete Satu Data)
-    Route::delete('/{id}/force-delete', [TawaranTopikController::class, 'forceDelete'])->name('tawaran-topik.force-delete'); // Hapus permanen
-});
+        // DELETE ALL (Force delete)
+        Route::delete('/force-delete-all', [TawaranTopikController::class, 'forceDeleteAll'])->name('dosen.tawaran-topik.force-delete-all');
+    });
 
     // =========================
     // ROUTE SIDANG

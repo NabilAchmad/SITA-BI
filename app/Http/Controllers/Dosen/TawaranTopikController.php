@@ -2,121 +2,107 @@
 
 namespace App\Http\Controllers\Dosen;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\TawaranTopik;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Http\Requests\Dosen\StoreTawaranTopikRequest;
+use App\Http\Requests\Dosen\UpdateTawaranTopikRequest;
+use App\Models\TawaranTopik;
+use App\Services\Dosen\TawaranTopikService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth; // PERBAIKAN: Tambahkan use statement untuk Auth Facade
 
 class TawaranTopikController extends Controller
 {
-    // CREATE (store data)
-    public function store(Request $request)
-    {
-        $request->validate([
-            'judul_topik' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'kuota' => 'required|integer|min:1',
-        ]);
+    protected TawaranTopikService $tawaranTopikService;
 
-        try {
-            TawaranTopik::create([
-                'judul_topik' => $request->judul_topik,
-                'deskripsi' => $request->deskripsi,
-                'kuota' => $request->kuota,
-                'user_id' => Auth::id(),
+    public function __construct(TawaranTopikService $tawaranTopikService)
+    {
+        $this->tawaranTopikService = $tawaranTopikService;
+    }
+
+    public function read()
+    {
+        $tawaranTopiks = $this->tawaranTopikService->getActiveTopics();
+        $tawaranTopik = new TawaranTopik();
+        return view('dosen.tawaran-topik.views.readTawaranTopik', compact('tawaranTopiks', 'tawaranTopik'));
+    }
+
+    public function store(StoreTawaranTopikRequest $request)
+    {
+        $this->tawaranTopikService->createTopic($request->validated());
+        return redirect()->route('dosen.tawaran-topik.index')->with('alert', [
+            'type' => 'success',
+            'title' => 'Berhasil',
+            'message' => 'Tawaran topik berhasil ditambahkan.'
+        ]);
+    }
+
+    public function update(UpdateTawaranTopikRequest $request, TawaranTopik $tawaranTopik)
+    {
+        $this->tawaranTopikService->updateTopic($tawaranTopik, $request->validated());
+        return redirect()->route('dosen.tawaran-topik.index')->with('alert', [
+            'type' => 'success',
+            'title' => 'Berhasil',
+            'message' => 'Tawaran topik berhasil diperbarui.'
+        ]);
+    }
+
+    /**
+     * Menghapus (soft delete) tawaran topik.
+     */
+    public function destroy(TawaranTopik $tawaranTopik): RedirectResponse
+    {
+        // PERBAIKAN: Menggunakan sintaks Auth::id() yang lebih eksplisit dan ramah untuk IDE.
+        if ($tawaranTopik->user_id !== Auth::id()) {
+            return redirect()->route('dosen.tawaran-topik.index')->with('alert', [
+                'type' => 'error',
+                'title' => 'Akses Ditolak',
+                'message' => 'Anda tidak memiliki izin untuk menghapus topik ini.'
             ]);
-
-            return redirect()->route('dosen.tawaran-topik.index')->with('success', 'Tawaran topik berhasil ditambahkan!');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Gagal menyimpan tawaran topik: ' . $e->getMessage());
-        }
-    }
-
-    // READ (menampilkan list dengan fitur search)
-    public function read(Request $request)
-    {
-        $query = TawaranTopik::query();
-
-        // Fitur search berdasarkan judul atau deskripsi
-        if ($request->has('search') && $request->search !== null) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('judul_topik', 'like', '%' . $search . '%')
-                    ->orWhere('deskripsi', 'like', '%' . $search . '%');
-            });
         }
 
-        $tawaranTopik = $query->orderBy('created_at', 'desc')->paginate(10);
-        return view('dosen.tawaran-topik.crud-TawaranTopik.read', compact('tawaranTopik'));
-    }
+        $this->tawaranTopikService->deleteTopic($tawaranTopik);
 
-    // UPDATE
-    public function update(Request $request, $id)
-    {
-        $tawaranTopik = TawaranTopik::findOrFail($id);
-
-        $request->validate([
-            'judul_topik' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'kuota' => 'required|integer|min:1',
+        return redirect()->route('dosen.tawaran-topik.index')->with('alert', [
+            'type' => 'success',
+            'title' => 'Berhasil',
+            'message' => 'Tawaran topik berhasil dihapus.'
         ]);
-
-        $tawaranTopik->update([
-            'judul_topik' => $request->judul_topik,
-            'deskripsi' => $request->deskripsi,
-            'kuota' => $request->kuota,
-        ]);
-
-        return redirect()->route('dosen.tawaran-topik.index')->with('success', 'Tawaran topik berhasil diperbarui.');
     }
 
-    // EDIT (tampilkan form edit)
-    public function edit($id)
-    {
-        $tawaranTopik = TawaranTopik::findOrFail($id);
-        return view('dosen.tawaran-topik.crud-TawaranTopik.edit', compact('tawaranTopik'));
-    }
-
-    // DELETE (soft delete)
-    public function destroy($id)
-    {
-        $tawaranTopik = TawaranTopik::findOrFail($id);
-        $tawaranTopik->delete();
-
-        return response()->json(['message' => 'Tawaran topik berhasil dihapus sementara.']);
-    }
-
-    // Tampilkan data yang sudah terhapus (trash)
+    // ... method trashed, restore, forceDelete ...
     public function trashed()
     {
-        $tawaranTopik = TawaranTopik::onlyTrashed()->paginate(10);
-        return view('dosen.tawaran-topik.crud-TawaranTopik.trashed', compact('tawaranTopik'));
+        $tawaranTopiks = $this->tawaranTopikService->getTrashedTopics();
+        return view('dosen.tawaran-topik.views.trashedTawaranTopik', compact('tawaranTopiks'));
     }
 
-    // Pulihkan soft-deleted
     public function restore($id)
     {
-        $tawaranTopik = TawaranTopik::onlyTrashed()->findOrFail($id);
-        $tawaranTopik->restore();
-
-        return redirect()->back()->with('success', 'Tawaran topik berhasil dipulihkan.');
+        $this->tawaranTopikService->restoreTopic($id);
+        return redirect()->back()->with('alert', [
+            'type' => 'success',
+            'title' => 'Berhasil',
+            'message' => 'Tawaran topik berhasil dipulihkan.'
+        ]);
     }
 
-    // Hapus permanen satu
     public function forceDelete($id)
     {
-        $tawaranTopik = TawaranTopik::onlyTrashed()->findOrFail($id);
-        $tawaranTopik->forceDelete();
-
-        return redirect()->back()->with('success', 'Tawaran topik dihapus permanen.');
+        $this->tawaranTopikService->forceDeleteTopic($id);
+        return redirect()->back()->with('alert', [
+            'type' => 'success',
+            'title' => 'Berhasil',
+            'message' => 'Tawaran topik berhasil dihapus permanen.'
+        ]);
     }
 
-    // Hapus permanen semua
     public function forceDeleteAll()
     {
-        TawaranTopik::onlyTrashed()->forceDelete();
-
-        return redirect()->back()->with('success', 'Semua tawaran topik terhapus telah dihapus permanen.');
+        $this->tawaranTopikService->forceDeleteAllTopics();
+        return redirect()->back()->with('alert', [
+            'type' => 'success',
+            'title' => 'Berhasil',
+            'message' => 'Semua tawaran topik di trash telah dihapus permanen.'
+        ]);
     }
 }
