@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Mahasiswa;
 
 use Illuminate\Http\Request;
 use App\Models\{TugasAkhir, Mahasiswa, BimbinganTA, RevisiTa, DokumenTa, Sidang, File};
-use Illuminate\Support\Facades\{Storage};
+use Illuminate\Support\Facades\{Storage, Auth};
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 
 class TugasAkhirController extends Controller
 {
@@ -20,7 +19,8 @@ class TugasAkhirController extends Controller
     public function dashboard()
     {
         $mahasiswa = $this->assumedMahasiswa();
-        $tugasAkhir = $mahasiswa->tugasAkhir;
+        // Mengambil tugas akhir yang aktif (bukan yang dibatalkan atau sudah selesai)
+        $tugasAkhir = $mahasiswa->tugasAkhir()->whereNotIn('status', ['dibatalkan', 'selesai'])->latest()->first();
         $sudahMengajukan = $tugasAkhir !== null;
 
         return view('mahasiswa.tugas-akhir.dashboard.dashboard', compact('tugasAkhir', 'sudahMengajukan', 'mahasiswa'));
@@ -30,8 +30,16 @@ class TugasAkhirController extends Controller
     {
         $mahasiswa = $this->assumedMahasiswa();
 
-        if ($mahasiswa->tugasAkhir) {
-            return redirect()->route('tugas-akhir.dashboard')->withErrors(['error' => 'Anda sudah mengajukan tugas akhir.']);
+        // **MODIFIKASI**: Memeriksa apakah ada tugas akhir yang masih aktif.
+        // Mahasiswa bisa mengajukan lagi jika TA sebelumnya sudah 'dibatalkan' atau 'selesai'.
+        $tugasAkhirAktif = $mahasiswa->tugasAkhir()->whereNotIn('status', ['dibatalkan', 'selesai'])->exists();
+
+        if ($tugasAkhirAktif) {
+            return redirect()->route('tugas-akhir.dashboard')->with('alert', [
+                'type' => 'error',
+                'title' => 'Pengajuan Gagal',
+                'text' => 'Anda masih memiliki tugas akhir yang aktif. Selesaikan atau batalkan terlebih dahulu.'
+            ]);
         }
 
         return view('mahasiswa.tugas-akhir.crud-ta.create', compact('mahasiswa'));
@@ -41,8 +49,14 @@ class TugasAkhirController extends Controller
     {
         $mahasiswa = $this->assumedMahasiswa();
 
-        if ($mahasiswa->tugasAkhir) {
-            return redirect()->route('tugas-akhir.dashboard')->withErrors(['error' => 'Anda sudah mengajukan tugas akhir.']);
+        $tugasAkhirAktif = $mahasiswa->tugasAkhir()->whereNotIn('status', ['dibatalkan', 'selesai'])->exists();
+
+        if ($tugasAkhirAktif) {
+            return redirect()->route('tugas-akhir.dashboard')->with('alert', [
+                'type' => 'error',
+                'title' => 'Pengajuan Gagal',
+                'text' => 'Anda masih memiliki tugas akhir yang aktif.'
+            ]);
         }
 
         $request->validate([
@@ -64,51 +78,52 @@ class TugasAkhirController extends Controller
     public function progress()
     {
         $mahasiswa = $this->assumedMahasiswa();
+
+        // 1. Tetap cari tugas akhir yang aktif. Jika tidak ada, $tugasAkhir akan bernilai null.
         $tugasAkhir = $mahasiswa->tugasAkhir()
+            ->whereNotIn('status', ['dibatalkan', 'selesai'])
             ->with(['peranDosenTa' => function ($query) {
                 $query->whereIn('peran', ['pembimbing1', 'pembimbing2'])
                     ->with('dosen.user');
-            }])->first();
+            }])
+            ->latest()
+            ->first();
 
-        $isMengajukanTA = $tugasAkhir && in_array($tugasAkhir->status, [
-            'diajukan',
-            'revisi',
-            'disetujui',
-            'lulus_tanpa_revisi',
-            'draft',
-            'menunggu_pembatalan'
-        ]);
+        // 2. Tentukan nilai variabel berdasarkan keberadaan $tugasAkhir
+        $isMengajukanTA = $tugasAkhir !== null;
+        $progress = 0;
 
-        $progressBimbingan = $tugasAkhir
-            ? BimbinganTA::where('tugas_akhir_id', $tugasAkhir->id)
-            ->latest('tanggal_bimbingan')
-            ->get()
-            : collect();
+        // Inisialisasi dengan collection kosong untuk mencegah error di view
+        $progressBimbingan = collect();
+        $revisi = collect();
+        $dokumen = collect();
+        $sidang = collect();
+        $pembimbingList = collect();
 
-        $revisi = $tugasAkhir
-            ? RevisiTa::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get()
-            : collect();
+        // 3. Jika tugas akhir DITEMUKAN, isi variabel dengan data yang sebenarnya
+        if ($tugasAkhir) {
+            $progressBimbingan = BimbinganTA::where('tugas_akhir_id', $tugasAkhir->id)
+                ->latest('tanggal_bimbingan')
+                ->get();
 
-        $dokumen = $tugasAkhir
-            ? DokumenTa::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get()
-            : collect();
+            $revisi = RevisiTa::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get();
+            $dokumen = DokumenTa::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get();
+            $sidang = Sidang::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get();
+            $pembimbingList = $tugasAkhir->peranDosenTa ?? collect();
 
-        $sidang = $tugasAkhir
-            ? Sidang::where('tugas_akhir_id', $tugasAkhir->id)->latest()->get()
-            : collect();
+            $jumlahBimbingan = $progressBimbingan->count();
 
-        $jumlahBimbingan = $progressBimbingan->count();
+            $progress = match ($tugasAkhir->status) {
+                'diajukan' => min(ceil(($jumlahBimbingan / 7) * 100), 49),
+                'disetujui' => 50 + min(ceil(($jumlahBimbingan / 7) * 50), 49),
+                'selesai', 'lulus_tanpa_revisi', 'lulus_dengan_revisi' => 100,
+                'draft', 'menunggu_pembatalan' => 0,
+                default => 0,
+            };
+        }
 
-        $progress = match ($tugasAkhir?->status) {
-            'diajukan' => min(ceil(($jumlahBimbingan / 7) * 100), 49),
-            'disetujui' => 50 + min(ceil(($jumlahBimbingan / 7) * 50), 49),
-            'selesai', 'lulus_tanpa_revisi', 'lulus_dengan_revisi' => 100,
-            'draft', 'menunggu_pembatalan', 'dibatalkan' => 0,
-            default => 0,
-        };
-
-        $pembimbingList = $tugasAkhir?->peranDosenTa ?? collect();
-
+        // 4. Kirim semua variabel ke view. View akan menerima $tugasAkhir sebagai null
+        //    atau berisi data, dan variabel lain akan berisi data atau collection kosong.
         return view('mahasiswa.tugas-akhir.crud-ta.progress', compact(
             'tugasAkhir',
             'progressBimbingan',
@@ -124,21 +139,39 @@ class TugasAkhirController extends Controller
     public function cancel(Request $request, $id)
     {
         $mahasiswa = $this->assumedMahasiswa();
-        $tugasAkhir = TugasAkhir::with('peranDosenTa')->findOrFail($id);
+        $tugasAkhir = TugasAkhir::with('peranDosenTa')->find($id);
+
+        // **PENAMBAHAN**: Pengecekan awal jika mahasiswa mencoba mengakses URL cancel tanpa punya TA sama sekali
+        if (!$mahasiswa->tugasAkhir()->exists()) {
+            return redirect()->route('dashboard.mahasiswa')->with('alert', [
+                'type' => 'error',
+                'title' => 'Data Tidak Ditemukan',
+                'text' => 'Data tugas akhir belum tersedia.'
+            ]);
+        }
+
+        // Jika TA dengan ID spesifik tidak ditemukan
+        if (!$tugasAkhir) {
+            return back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Tidak Ditemukan',
+                'text' => 'Tugas akhir yang ingin Anda batalkan tidak ditemukan.'
+            ]);
+        }
 
         if ($tugasAkhir->mahasiswa_id !== $mahasiswa->id) {
             return back()->with('alert', [
                 'type' => 'error',
                 'title' => 'Akses Ditolak',
-                'message' => 'Anda tidak memiliki akses untuk membatalkan tugas akhir ini.'
+                'text' => 'Anda tidak memiliki akses untuk membatalkan tugas akhir ini.'
             ]);
         }
 
-        if (in_array($tugasAkhir->status, ['draft', 'dibatalkan'])) {
+        if (in_array($tugasAkhir->status, ['draft', 'dibatalkan', 'selesai'])) {
             return back()->with('alert', [
                 'type' => 'info',
-                'title' => 'Sudah Tidak Aktif',
-                'message' => 'Tugas akhir Anda sudah berstatus tidak aktif.'
+                'title' => 'Tidak Dapat Dibatalkan',
+                'text' => 'Tugas akhir dengan status ini tidak dapat dibatalkan.'
             ]);
         }
 
@@ -160,11 +193,9 @@ class TugasAkhirController extends Controller
         return redirect()->route('tugas-akhir.progress')->with('alert', [
             'type' => 'success',
             'title' => 'Berhasil!',
-            'message' => 'Pengajuan pembatalan Tugas Akhir telah dikirim dan menunggu verifikasi dosen pembimbing.'
+            'text' => 'Pengajuan pembatalan Tugas Akhir telah dikirim dan menunggu verifikasi dosen pembimbing.'
         ]);
     }
-
-    // Fungsi uploadProposal dan uploadRevisi tetap seperti sebelumnya, dengan path penyimpanan berdasarkan NIM
 
     public function showCancelled()
     {

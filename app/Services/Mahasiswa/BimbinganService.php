@@ -12,6 +12,13 @@ use App\Models\HistoryPerubahanJadwal;
 
 class BimbinganService
 {
+    protected function abortJikaTADibatalkan($tugasAkhir)
+    {
+        if ($tugasAkhir->status === 'dibatalkan') {
+            abort(403, 'Tugas Akhir Anda telah dibatalkan.');
+        }
+    }
+
     public function dashboard()
     {
         $user = Auth::user();
@@ -80,6 +87,8 @@ class BimbinganService
             ]);
         }
 
+        $this->abortJikaTADibatalkan($tugasAkhir);
+
         if (!in_array($tugasAkhir->status, ['disetujui', 'revisi', 'menunggu_pembatalan'])) {
             return redirect()->route('dashboard.bimbingan')->with('alert', [
                 'type' => 'error',
@@ -145,8 +154,14 @@ class BimbinganService
         $mahasiswa = Auth::user()->mahasiswa;
         $tugasAkhir = $mahasiswa->tugasAkhir;
 
-        if (!$tugasAkhir || empty($tugasAkhir->file_path) || !in_array($tugasAkhir->status, ['disetujui', 'revisi', 'menunggu_pembatalan'])) {
+        if (!$tugasAkhir || empty($tugasAkhir->file_path)) {
             return back()->withErrors(['error' => 'Tugas Akhir belum valid untuk diajukan bimbingan.']);
+        }
+
+        $this->abortJikaTADibatalkan($tugasAkhir);
+
+        if (!in_array($tugasAkhir->status, ['disetujui', 'revisi', 'menunggu_pembatalan'])) {
+            return back()->withErrors(['error' => 'Status tugas akhir Anda tidak memenuhi syarat untuk bimbingan.']);
         }
 
         $adaPengajuanBerjalan = BimbinganTA::where('tugas_akhir_id', $tugasAkhir->id)
@@ -206,6 +221,8 @@ class BimbinganService
         if ($jadwal->tugasAkhir->mahasiswa_id !== $mahasiswa->id) {
             abort(403, 'Tidak punya akses ke jadwal ini.');
         }
+
+        $this->abortJikaTADibatalkan($jadwal->tugasAkhir);
 
         if ($jadwal->status_bimbingan !== 'menunggu') {
             return back()->withErrors(['error' => 'Jadwal ini tidak bisa diubah karena sudah diproses.']);

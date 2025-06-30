@@ -173,15 +173,7 @@ class BimbinganMahasiswaController extends Controller
         // Ambil dosen yang login
         $dosen = \App\Models\Dosen::where('user_id', Auth::id())->firstOrFail();
 
-        if (!$dosen) {
-            return back()->with('alert', [
-                'type' => 'error',
-                'title' => 'Akses Ditolak',
-                'message' => 'Hanya dosen yang bisa menyetujui pembatalan.'
-            ]);
-        }
-
-        // Ambil peran dosen (harus pembimbing)
+        // Pastikan dosen ini adalah pembimbing mahasiswa tersebut
         $peran = $tugasAkhir->peranDosenTa()
             ->where('dosen_id', $dosen->id)
             ->whereIn('peran', ['pembimbing1', 'pembimbing2'])
@@ -195,22 +187,25 @@ class BimbinganMahasiswaController extends Controller
             ]);
         }
 
-        // Setujui pembatalan
+        // Simpan persetujuan pembatalan
         $peran->update([
-            'setuju_pembatalan' => true,
+            'setuju_pembatalan' => 'ya', // fix: gunakan string sesuai enum
             'tanggal_verifikasi' => now(),
         ]);
 
-        // Cek apakah semua pembimbing telah setuju
+        // Reload relasi agar data yang digunakan up-to-date
+        $tugasAkhir->load('peranDosenTa');
+
+        // Cek apakah semua pembimbing sudah setuju
         $setujuSemua = $tugasAkhir->peranDosenTa
             ->whereIn('peran', ['pembimbing1', 'pembimbing2'])
-            ->every(fn($p) => $p->setuju_pembatalan === true);
+            ->every(fn($p) => $p->setuju_pembatalan === 'ya'); // fix: bandingkan string
 
         if ($setujuSemua) {
-            // Ubah status TA
+            // Update status TA
             $tugasAkhir->update(['status' => 'dibatalkan']);
 
-            // Hapus relasi dosen pembimbing
+            // Hapus relasi pembimbing
             $tugasAkhir->peranDosenTa()
                 ->whereIn('peran', ['pembimbing1', 'pembimbing2'])
                 ->delete();

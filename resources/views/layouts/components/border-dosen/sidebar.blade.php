@@ -63,13 +63,8 @@
                     </li>
                 @endif
 
-<<<<<<< HEAD
                 <!-- Tawaran Topik: Semua dosen -->
                 <li class="nav-item {{ request()->is('dosen/tawaran-topik*') ? 'active' : '' }}">
-=======
-                <!-- Tawaran Topik -->
-                <li class="nav-item {{ request()->is('tawaran-topik/read') ? 'active' : '' }}">
->>>>>>> e79d0a3065d1afe909cd758abb300acc47f16867
                     <a href="{{ route('dosen.tawaran-topik.index') }}" class="nav-link">
                         <i class="fas fa-clipboard-list me-2"></i>
                         <p>Tawaran Topik</p>

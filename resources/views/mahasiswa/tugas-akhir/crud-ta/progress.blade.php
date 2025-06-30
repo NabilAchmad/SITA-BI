@@ -100,7 +100,7 @@
                 </div>
             </div>
         </div>
-    @elseif($tugasAkhir && $pembimbingList->isEmpty())
+    @elseif($tugasAkhir && $pembimbingList->isEmpty() && $tugasAkhir->status !== 'dibatalkan')
         <div class="alert alert-warning d-flex align-items-center gap-2 shadow-sm border-0 rounded-3">
             <i class="bi bi-exclamation-circle-fill fs-5 text-warning"></i>
             <div>
@@ -111,7 +111,7 @@
     @endif
 
     <!-- Main Content -->
-    @if (!$tugasAkhir)
+    @if (!$tugasAkhir || optional($tugasAkhir)->status !== 'aktif')
         <!-- No Data State -->
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
