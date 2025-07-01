@@ -297,9 +297,12 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
     // validasi tugas akhir: kaprodi
     Route::prefix('validasi')->middleware(['auth', 'role:kaprodi'])->group(function () {
         Route::get('/tugas-akhir', [ValidasiController::class, 'index'])->name('dosen.validasi-tugas-akhir.index');
-        Route::post('/terima/{id}', [ValidasiController::class, 'validasi'])->name('dosen.validasi-tugas-akhir.validasi');
-        Route::get('/detail/{id}', [ValidasiController::class, 'detail'])->name('dosen.validasi-tugas-akhir.detail');
-        Route::post('/tolak/{id}', [ValidasiController::class, 'tolak'])->name('tolak');
+        Route::post('/terima/{tugasAkhir}', [ValidasiController::class, 'validasi'])->name('dosen.validasi-tugas-akhir.validasi');
+
+        // PERBAIKAN: Menggunakan Route Model Binding untuk {id} agar lebih konsisten
+        Route::get('/detail/{tugasAkhir}', [ValidasiController::class, 'getDetail'])->name('dosen.validasi-tugas-akhir.detail');
+        
+        Route::post('/tolak/{tugasAkhir}', [ValidasiController::class, 'tolak'])->name('tolak');
     });
 
     // Validasi nilai sidang akhir: kajur

@@ -22,6 +22,7 @@ class TugasAkhir extends Model
     const STATUS_LULUS_TANPA_REVISI = 'lulus_tanpa_revisi';
     const STATUS_LULUS_DENGAN_REVISI = 'lulus_dengan_revisi';
     const STATUS_SELESAI = 'selesai';
+    const STATUS_DITOLAK = 'ditolak';
 
     protected $table = 'tugas_akhir';
     protected $guarded = ['id'];
@@ -88,6 +89,16 @@ class TugasAkhir extends Model
         );
     }
 
+    public function disetujui_oleh()
+    {
+        return $this->belongsTo(User::class, 'disetujui_oleh');
+    }
+
+    public function ditolak_oleh()
+    {
+        return $this->belongsTo(User::class, 'ditolak_oleh');
+    }
+
     // --- SCOPE ---
     public function scopeActive(Builder $query): Builder
     {
@@ -97,5 +108,15 @@ class TugasAkhir extends Model
             self::STATUS_LULUS_TANPA_REVISI,
             self::STATUS_SELESAI,
         ]);
+    }
+
+    /**
+     * Scope untuk mengambil tugas akhir yang menunggu validasi.
+     */
+    public function scopeAwaitingValidation($query)
+    {
+        return $query->whereIn('status', [self::STATUS_DIAJUKAN]);
+        // Jika revisi judul juga divalidasi di sini, tambahkan:
+        // return $query->whereIn('status', [self::STATUS_DIAJUKAN, self::STATUS_REVISI]);
     }
 }

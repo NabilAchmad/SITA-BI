@@ -24,7 +24,18 @@ class RejectTugasAkhirRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'catatan' => 'required|string|min:10',
+            'alasan_penolakan' => 'required|string|min:10',
+        ];
+    }
+
+    /**
+     * Menambahkan pesan error kustom untuk pengalaman pengguna yang lebih baik.
+     */
+    public function messages(): array
+    {
+        return [
+            'alasan_penolakan.required' => 'Alasan penolakan tidak boleh kosong.',
+            'alasan_penolakan.min' => 'Alasan penolakan harus diisi minimal 10 karakter.',
         ];
     }
 }

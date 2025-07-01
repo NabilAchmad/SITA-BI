@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Kaprodi\RejectTugasAkhirRequest;
 use App\Models\TugasAkhir;
 use App\Services\Kaprodi\ValidasiService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ValidasiController extends Controller
 {
@@ -14,55 +17,98 @@ class ValidasiController extends Controller
 
     public function __construct(ValidasiService $validasiService)
     {
-        // PERBAIKAN: Middleware telah dipindahkan ke file routes/web.php
-        // untuk praktik terbaik dan untuk menghilangkan peringatan dari Intelephense.
         $this->validasiService = $validasiService;
     }
 
     /**
      * Menampilkan daftar tugas akhir yang perlu divalidasi.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $tugasAkhir = $this->validasiService->getTugasAkhirForValidation($request);
-        return view('dosen.kaprodi.validasi.index', compact('tugasAkhir'));
+        // Ambil data untuk setiap tab secara terpisah
+        $tugasAkhirMenunggu = TugasAkhir::with('mahasiswa.user')
+            ->where('status', TugasAkhir::STATUS_DIAJUKAN)
+            ->latest()
+            ->get();
+
+        $tugasAkhirDiterima = TugasAkhir::with('mahasiswa.user')
+            ->where('status', TugasAkhir::STATUS_DISETUJUI)
+            ->latest()
+            ->get();
+
+        $tugasAkhirDitolak = TugasAkhir::with('mahasiswa.user')
+            ->where('status', TugasAkhir::STATUS_DITOLAK)
+            ->latest()
+            ->get();
+
+        // Kirim ketiga variabel tersebut ke view menggunakan compact
+        return view('dosen.kaprodi.validasi.index', compact(
+            'tugasAkhirMenunggu',
+            'tugasAkhirDiterima',
+            'tugasAkhirDitolak'
+        ));
     }
 
     /**
-     * Menampilkan detail tugas akhir untuk divalidasi.
+     * PERBAIKAN: Metode baru untuk menangani AJAX/Fetch request dari modal.
+     * Metode ini akan mengembalikan data dalam format JSON.
+     *
+     * @param TugasAkhir $tugasAkhir
+     * @return JsonResponse
      */
-    public function show(TugasAkhir $tugasAkhir)
+    public function getDetail(TugasAkhir $tugasAkhir): JsonResponse
     {
-        // Memuat relasi yang dibutuhkan oleh view detail
-        $tugasAkhir->load('mahasiswa.user', 'revisiTa.pemberiRevisi');
-        return view('dosen.kaprodi.validasi.show', compact('tugasAkhir'));
+        // Panggil service untuk mendapatkan data yang sudah diformat
+        $details = $this->validasiService->getValidationDetails($tugasAkhir);
+
+        // Kembalikan sebagai respons JSON
+        return response()->json($details);
     }
 
     /**
      * Menyetujui pengajuan tugas akhir.
+     * Nama metode diubah dari 'approve' menjadi 'terima' agar sesuai dengan route di view.
+     *
+     * @param TugasAkhir $tugasAkhir
+     * @return RedirectResponse
      */
-    public function approve(TugasAkhir $tugasAkhir)
+    public function terima(TugasAkhir $tugasAkhir): RedirectResponse
     {
         $this->validasiService->approveTugasAkhir($tugasAkhir);
 
-        return redirect()->route('dosen.validasi.index')->with('alert', [
+        // Menggunakan format notifikasi yang konsisten
+        return redirect()->back()->with('alert', [
             'type' => 'success',
             'title' => 'Berhasil',
-            'message' => 'Tugas akhir telah disetujui.'
+            'message' => 'Tugas akhir telah diterima.'
         ]);
     }
 
     /**
      * Menolak pengajuan tugas akhir.
+     *
+     * @param RejectTugasAkhirRequest $request
+     * @param TugasAkhir $tugasAkhir
+     * @return RedirectResponse
      */
-    public function reject(RejectTugasAkhirRequest $request, TugasAkhir $tugasAkhir)
+    public function tolak(RejectTugasAkhirRequest $request, TugasAkhir $tugasAkhir): RedirectResponse
     {
-        $this->validasiService->rejectTugasAkhir($tugasAkhir, $request->input('catatan'));
+        // Panggil service untuk menolak TA, teruskan alasan penolakan dari request.
+        $this->validasiService->rejectTugasAkhir(
+            $tugasAkhir,
+            $request->input('alasan_penolakan') // Input ini harus cocok dengan name di form view.
+        );
 
-        return redirect()->route('dosen.validasi.index')->with('alert', [
-            'type' => 'success',
+        return redirect()->back()->with('alert', [
+            'type' => 'success', // Gunakan 'success' atau 'error' untuk sweet alert
             'title' => 'Berhasil',
-            'message' => 'Tugas akhir telah ditolak dan catatan revisi telah dikirim.'
+            'message' => 'Pengajuan tugas akhir mahasiswa telah ditolak.'
         ]);
     }
+
+    // CATATAN: Metode show() dan detailPengajuan() yang lama bisa dihapus
+    // karena fungsionalitasnya sudah digantikan oleh getDetail() yang lebih efisien.
 }

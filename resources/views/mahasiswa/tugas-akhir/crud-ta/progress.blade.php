@@ -154,6 +154,7 @@
                 'menunggu_pembatalan' => 'Menunggu Persetujuan Pembatalan',
             ];
             $progress = match ($ta->status) {
+                'ditolak' => 0,
                 'diajukan' => 5,
                 'disetujui' => 10,
                 'selesai', 'lulus_tanpa_revisi', 'lulus_dengan_revisi' => 100,
@@ -209,43 +210,67 @@
 
                 <!-- Stats Cards -->
                 <div class="row g-3 mb-4">
+                    {{-- Card Tanggal Pengajuan --}}
                     <div class="col-md-4">
-                        <div class="card border-0 bg-light h-100">
-                            <div class="card-body text-center">
+                        <div class="card border-0 bg-light h-100 shadow-sm">
+                            <div class="card-body text-center d-flex flex-column justify-content-center">
                                 <div
                                     class="icon-box mx-auto mb-2 bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
                                     <i class="fas fa-calendar-check text-white"></i>
                                 </div>
-                                <h6 class="fw-bold">Tanggal Pengajuan</h6>
+                                <h6 class="fw-bold mb-1">Tanggal Pengajuan</h6>
                                 <p class="text-muted mb-0 small">
-                                    {{ \Carbon\Carbon::parse($ta->tanggal_pengajuan)->format('d M Y') }}</p>
+                                    {{ \Carbon\Carbon::parse($ta->tanggal_pengajuan)->format('d M Y') }}
+                                </p>
                             </div>
                         </div>
                     </div>
+
+                    {{-- Card Status Saat Ini --}}
                     <div class="col-md-4">
-                        <div class="card border-0 bg-light h-100">
-                            <div class="card-body text-center">
+                        <div class="card border-0 bg-light h-100 shadow-sm">
+                            <div class="card-body text-center d-flex flex-column justify-content-center">
                                 <div
                                     class="icon-box mx-auto mb-2 bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-chart-line text-white"></i>
+                                    <i class="fas fa-flag text-white"></i>
                                 </div>
-                                <h6 class="fw-bold">Status Saat Ini</h6>
+                                <h6 class="fw-bold mb-1">Status Saat Ini</h6>
                                 <p class="text-muted mb-0 small">{{ $statusMap[$ta->status] ?? 'Tidak Diketahui' }}</p>
                             </div>
                         </div>
                     </div>
+
+                    {{-- Card Progress --}}
                     <div class="col-md-4">
-                        <div class="card border-0 bg-light h-100">
-                            <div class="card-body text-center">
+                        <div class="card border-0 bg-light h-100 shadow-sm">
+                            <div class="card-body text-center d-flex flex-column justify-content-center">
                                 <div
                                     class="icon-box mx-auto mb-2 bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
                                     <i class="fas fa-tachometer-alt text-white"></i>
                                 </div>
-                                <h6 class="fw-bold">Progress</h6>
+                                <h6 class="fw-bold mb-1">Progress</h6>
                                 <p class="text-muted mb-0 small">{{ $progress }}% Selesai</p>
                             </div>
                         </div>
                     </div>
+
+                    {{-- PERBAIKAN: Card ini hanya muncul jika status TA adalah 'ditolak' --}}
+                    @if ($ta->status === 'ditolak')
+                        <div class="col-md-12 mt-4"> {{-- Ambil lebar penuh untuk visibilitas --}}
+                            <div class="card border-0 bg-light h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div
+                                        class="icon-box mx-auto mb-2 bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-exclamation-triangle text-white"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-1 text-danger">Alasan Penolakan</h6>
+                                    <p class="text-muted mb-0 small fst-italic">
+                                        "{{ $ta->alasan_penolakan ?? 'Tidak ada komentar penolakan yang diberikan.' }}"
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Abstrak Section -->
