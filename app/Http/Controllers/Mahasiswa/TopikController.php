@@ -21,8 +21,9 @@ class TopikController extends Controller
      */
     public function index()
     {
-        $daftarTopik = $this->topikPengajuanService->getAvailableTopics();
-        return view('mahasiswa.tugas-akhir.crud-ta.listTopik', compact('daftarTopik'));
+        $topikList = $this->topikPengajuanService->getAvailableTopics();
+        $mahasiswaSudahPunyaTA = Auth::user()->mahasiswa->tugasAkhir()->active()->exists();
+        return view('mahasiswa.tugas-akhir.crud-ta.listTopik', compact('topikList', 'mahasiswaSudahPunyaTA'));
     }
 
     /**

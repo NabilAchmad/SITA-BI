@@ -39,7 +39,7 @@ class TugasAkhirService
                 'peranDosenTa.dosen.user',
             ])
             ->latest()
-            ->first();
+            ->first(); 
     }
 
     /**
@@ -95,5 +95,15 @@ class TugasAkhirService
         ]);
 
         return $tugasAkhir->save();
+    }
+
+    public function getCancelledTugasAkhir()
+    {
+        // Mengambil semua Tugas Akhir yang sudah dibatalkan
+        return $this->mahasiswa->tugasAkhir()
+            ->where('status', TugasAkhir::STATUS_DIBATALKAN)
+            ->with(['peranDosenTa.dosen.user'])
+            ->latest()
+            ->get();
     }
 }

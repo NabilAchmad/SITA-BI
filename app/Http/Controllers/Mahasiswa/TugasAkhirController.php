@@ -101,6 +101,14 @@ class TugasAkhirController extends Controller
             ]);
         }
     }
+    
+    public function showCancelled()
+    {
+        // Mengambil semua Tugas Akhir yang sudah dibatalkan
+        $tugasAkhirDibatalkan = $this->tugasAkhirService->getCancelledTugasAkhir();
 
-    // Method showCancelled dan lainnya bisa disesuaikan dengan pola yang sama
+        return view('mahasiswa.tugas-akhir.crud-ta.cancel', [
+            'tugasAkhirDibatalkan' => $tugasAkhirDibatalkan,
+        ]);
+    }
 }

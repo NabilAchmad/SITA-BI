@@ -54,32 +54,37 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(functi
     // Dashboard Mahasiswa
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.mahasiswa');
 
-    Route::prefix('/tugas-akhir')->group(function () {
+    // --- Grup Rute untuk Tugas Akhir ---
+    Route::prefix('tugas-akhir')->group(function () {
+
+        // Dashboard utama tugas akhir
         Route::get('/', [TugasAkhirController::class, 'dashboard'])->name('tugas-akhir.dashboard');
 
-        // Menampilkan form ajukan Tugas Akhir
-        Route::get('/ajukan-ta-mandiri', [TugasAkhirController::class, 'ajukanForm'])->name('tugas-akhir.ajukan');
-
-        // Menampilkan form progress TA
+        // Halaman progress tugas akhir yang sedang berjalan
         Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugas-akhir.progress');
 
-        // Menangani revisi TA
-        Route::get('/revisi', [TugasAkhirController::class, ''])->name('tugas-akhir.revisi');
+        // Menampilkan form untuk mengajukan TA secara mandiri
+        Route::get('/ajukan-mandiri', [TugasAkhirController::class, 'ajukanForm'])->name('tugas-akhir.ajukan');
 
-        // Tangani form POST ajukan TA
-        Route::post('/ajukan', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
+        // Menyimpan pengajuan TA mandiri
+        Route::post('/ajukan-mandiri', [TugasAkhirController::class, 'store'])->name('tugasAkhir.store');
 
-        Route::post('/upload', [TugasAkhirController::class, 'uploadProposal'])->name('tugas-akhir.uploadProposal');
+        // Menampilkan daftar topik yang ditawarkan dosen
+        Route::get('/list-topik', [TopikController::class, 'index'])->name('mahasiswa.topik.index');
 
-        Route::delete('tugasAkhir/{id}', [TugasAkhirController::class, 'destroy'])->name('tugasAkhir.destroy');
-        Route::post('tugasAkhir/{id}/cancel', [TugasAkhirController::class, 'cancel'])->name('tugasAkhir.cancelTA');
-        Route::get('tugasAkhir/dibatalkan', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.dibatalkan');
+        // Memproses saat mahasiswa memilih/mengajukan topik dari dosen
+        // Menggunakan Route Model Binding dengan {tawaranTopik}
+        Route::post('/ambil-topik/{tawaranTopik}', [TopikController::class, 'apply'])->name('topik.apply');
 
-        // Menampilkan form ajukan berdasarkan topik dosen
-        Route::get('/list-topik-dosen', [TopikController::class, 'index'])->name('mahasiswa.topik.index');
-        Route::get('/ambil-topik', [TopikController::class, ''])->name('mahasiswa.topik.ambil');
+        // Mengajukan pembatalan tugas akhir
+        // Menggunakan Route Model Binding dengan {tugasAkhir}
+        Route::post('/{tugasAkhir}/cancel', [TugasAkhirController::class, 'cancel'])->name('cancel');
 
-        Route::get('/cancel', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.cancelled');
+        // Menampilkan riwayat tugas akhir yang dibatalkan
+        Route::get('/cancelled', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.cancelled');
+
+        // Contoh rute untuk upload file, bisa disesuaikan
+        // Route::post('/upload-proposal', [TugasAkhirController::class, 'uploadProposal'])->name('uploadProposal');
     });
 
     Route::prefix('bimbingan')->group(function () {
