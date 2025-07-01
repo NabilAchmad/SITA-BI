@@ -6,6 +6,8 @@ use App\Models\Mahasiswa;
 use App\Models\TugasAkhir;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
 class TugasAkhirService
 {
@@ -28,7 +30,7 @@ class TugasAkhirService
     public function getActiveTugasAkhirForProgressPage(): ?TugasAkhir
     {
         return $this->mahasiswa->tugasAkhir()
-            ->active() // <- Menggunakan scope dari model
+            // ->active() // <- Menggunakan scope dari model
             ->with([
                 'bimbinganTa' => fn($q) => $q->latest('tanggal_bimbingan'),
                 'revisiTa' => fn($q) => $q->latest(),
@@ -39,7 +41,7 @@ class TugasAkhirService
                 'peranDosenTa.dosen.user',
             ])
             ->latest()
-            ->first(); 
+            ->first();
     }
 
     /**
@@ -105,5 +107,29 @@ class TugasAkhirService
             ->with(['peranDosenTa.dosen.user'])
             ->latest()
             ->get();
+    }
+
+    /**
+     * Menangani proses unggah proposal, termasuk menghapus file lama,
+     * menyimpan file baru, dan memperbarui database.
+     *
+     * @param TugasAkhir $tugasAkhir Model TugasAkhir yang akan diupdate.
+     * @param UploadedFile $file File proposal yang baru diunggah.
+     * @return string Path file yang baru disimpan.
+     */
+    public function handleUploadProposal(TugasAkhir $tugasAkhir, UploadedFile $file): string
+    {
+        // 1. Hapus file lama jika ada
+        if ($tugasAkhir->file_path && Storage::disk('public')->exists($tugasAkhir->file_path)) {
+            Storage::disk('public')->delete($tugasAkhir->file_path);
+        }
+
+        // 2. Simpan file baru dan dapatkan path-nya
+        $filePath = $file->store('proposal_ta', 'public');
+
+        // 3. Update path di database
+        $tugasAkhir->update(['file_path' => $filePath]);
+
+        return $filePath;
     }
 }

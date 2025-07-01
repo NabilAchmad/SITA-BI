@@ -63,6 +63,9 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(functi
         // Halaman progress tugas akhir yang sedang berjalan
         Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('tugas-akhir.progress');
 
+        Route::post('/upload-ta-proposal', [TugasAkhirController::class, 'uploadProposal'])
+            ->name('tugas-akhir.uploadProposal');
+
         // Menampilkan form untuk mengajukan TA secara mandiri
         Route::get('/ajukan-mandiri', [TugasAkhirController::class, 'ajukanForm'])->name('tugas-akhir.ajukan');
 

@@ -111,7 +111,7 @@
     @endif
 
     <!-- Main Content -->
-    @if (!$tugasAkhir || optional($tugasAkhir)->status !== 'aktif')
+    @if (!$tugasAkhir)
         <!-- No Data State -->
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">

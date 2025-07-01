@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\TugasAkhir;
 use App\Services\Mahasiswa\TugasAkhirService;
 use Illuminate\Http\Request;
+use App\Http\Requests\Mahasiswa\UploadProposalRequest;
 
 class TugasAkhirController extends Controller
 {
@@ -59,6 +60,35 @@ class TugasAkhirController extends Controller
         ]);
     }
 
+    /**
+     * Mengunggah atau memperbarui file proposal tugas akhir.
+     *
+     * @param  UploadProposalRequest $request
+     * @param  int  $id ID dari TugasAkhir
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function uploadProposal(UploadProposalRequest $request, $id)
+    {
+        // Validasi & Otorisasi sudah ditangani oleh UploadProposalRequest
+
+        // Temukan model TugasAkhir (sudah dipastikan ada oleh authorize() di request)
+        $tugasAkhir = TugasAkhir::findOrFail($id);
+
+        // Ambil file dari request
+        $file = $request->file('file_proposal');
+
+        // Panggil service untuk melakukan tugasnya
+        $this->tugasAkhirService->handleUploadProposal($tugasAkhir, $file);
+
+        // Redirect dengan pesan sukses
+        return redirect()->route('tugas-akhir.progress')
+            ->with('alert', [
+                'title' => 'Berhasil!',
+                'message' => 'File proposal tugas akhir Anda telah berhasil diunggah.',
+                'type' => 'success'
+            ]);
+    }
+
     public function ajukanForm()
     {
         // View ini tidak butuh data kompleks, jadi bisa langsung
@@ -101,7 +131,7 @@ class TugasAkhirController extends Controller
             ]);
         }
     }
-    
+
     public function showCancelled()
     {
         // Mengambil semua Tugas Akhir yang sudah dibatalkan
