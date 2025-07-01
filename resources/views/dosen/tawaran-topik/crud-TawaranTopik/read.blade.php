@@ -1,104 +1,50 @@
 @extends('layouts.template.main')
-@section('title', 'Daftar Tawaran Topik')
+@section('title', 'Kelola Tawaran Topik')
 @section('content')
-
-    <style>
-        .table td,
-        .table th {
-            vertical-align: middle;
-        }
-
-        .table th {
-            font-weight: bold;
-        }
-
-        .truncate {
-            max-width: 300px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    </style>
 
     <div class="card shadow-sm mb-4">
         <div class="card-header">
-            <div class="mb-2">
-                <a href="{{ route('dosen.tawaran-topik.trashed') }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-trash"></i> Tawaran Topik Terhapus
-                </a>
-            </div>
-            <div class="text-center">
-                <h4 class="card-title text-primary mb-0">Daftar Tawaran Topik</h4>
-            </div>
+            <h4 class="card-title text-center text-primary mb-0">Kelola Tawaran Topik & Pengajuan</h4>
         </div>
-
         <div class="card-body">
-            <div class="mb-3">
-                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
-                    data-bs-target="#tambahTawaranTopikModal">
-                    <i class="bi bi-plus-lg me-1"></i> Ajukan Tawaran Topik Baru
-                </button>
-            </div>
+            <!-- Navigasi Tab -->
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {{ !request('tab') || request('tab') == 'topik' ? 'active' : '' }}"
+                        id="topik-tab" data-bs-toggle="tab" data-bs-target="#topik-pane" type="button" role="tab"
+                        aria-controls="topik-pane" aria-selected="true">Tawaran Topik Saya</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {{ request('tab') == 'mahasiswa' ? 'active' : '' }}" id="mahasiswa-tab"
+                        data-bs-toggle="tab" data-bs-target="#mahasiswa-pane" type="button" role="tab"
+                        aria-controls="mahasiswa-pane" aria-selected="false">Pengajuan Mahasiswa</button>
+                </li>
+            </ul>
 
-            {{-- ... (kode form search tetap sama) ... --}}
+            <!-- Konten Tab -->
+            <div class="tab-content" id="myTabContent">
+                <!-- Tab 1: Daftar Tawaran Topik -->
+                <div class="tab-pane fade {{ !request('tab') || request('tab') == 'topik' ? 'show active' : '' }}"
+                    id="topik-pane" role="tabpanel" aria-labelledby="topik-tab" tabindex="0">
+                    <div class="py-3">
+                        {{-- Harusnya ini untuk "Tawaran Topik Saya" --}}
+                        @include('dosen.tawaran-topik.partials.tab-tawaran-topik')
+                    </div>
+                </div>
 
-            <div class="table-responsive">
-                <table class="table table-bordered shadow-sm text-center">
-                    <thead class="table-light">
-                        <tr>
-                            <th>No</th>
-                            <th>Judul Topik</th>
-                            <th>Deskripsi</th>
-                            <th>Kuota</th>
-                            <th>Tanggal Diajukan</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($tawaranTopiks as $index => $item)
-                            <tr>
-                                <td>{{ ($tawaranTopiks->firstItem() ?? 0) + $index }}</td>
-                                <td>{{ $item->judul_topik }}</td>
-                                <td class="truncate" title="{{ strip_tags($item->deskripsi) }}">
-                                    {{ \Illuminate\Support\Str::limit(strip_tags($item->deskripsi), 100, '...') }}
-                                </td>
-                                <td>{{ $item->kuota }}</td>
-                                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y, H:i:s') }}</td>
-                                <td>
-                                    <div class="d-flex justify-content-center gap-2">
-                                        {{-- Tombol Edit: Memicu modal edit --}}
-                                        <button class="btn btn-warning btn-sm btn-edit" data-bs-toggle="modal"
-                                            data-bs-target="#editTawaranTopikModal"
-                                            data-action="{{ route('dosen.tawaran-topik.update', $item) }}"
-                                            data-judul="{{ $item->judul_topik }}" data-deskripsi="{{ $item->deskripsi }}"
-                                            data-kuota="{{ $item->kuota }}">
-                                            Edit
-                                        </button>
-                                        {{-- Tombol Hapus: Memicu modal delete --}}
-                                        <button type="button" class="btn btn-danger btn-sm btn-hapus"
-                                            data-url="{{ route('dosen.tawaran-topik.destroy', $item) }}"
-                                            data-bs-toggle="modal" data-bs-target="#hapusTawaranTopikModal">
-                                            Hapus
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center">Belum ada tawaran topik.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="d-flex justify-content-end">
-                {{ $tawaranTopiks->links() }}
+                <!-- Tab 2: Daftar Pengajuan Mahasiswa -->
+                <div class="tab-pane fade {{ request('tab') == 'mahasiswa' ? 'show active' : '' }}" id="mahasiswa-pane"
+                    role="tabpanel" aria-labelledby="mahasiswa-tab" tabindex="0">
+                    <div class="py-3">
+                        {{-- Harusnya ini untuk "Pengajuan Mahasiswa" --}}
+                        @include('dosen.tawaran-topik.partials.tab-pengajuan-mahasiswa')
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- Include semua modal yang dibutuhkan --}}
+    {{-- Include semua modal --}}
     @include('dosen.tawaran-topik.modal.create')
     @include('dosen.tawaran-topik.modal.edit')
     @include('dosen.tawaran-topik.modal.delete')
@@ -106,10 +52,20 @@
 @endsection
 
 @push('scripts')
-    {{-- PERBAIKAN: Menghapus semua skrip AJAX dan SweetAlert. --}}
-    {{-- Skrip minimal ini hanya untuk membuat modal dinamis. --}}
     <script>
         $(document).ready(function() {
+            // Skrip untuk menjaga tab tetap aktif setelah reload halaman atau filter
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set("tab", $(this).attr("aria-controls").replace('-pane', ''));
+                // Hapus parameter paginasi lain agar tidak konflik
+                newUrl.searchParams.delete('page');
+                newUrl.searchParams.delete('mahasiswa_page');
+                window.history.replaceState({
+                    path: newUrl.href
+                }, '', newUrl.href);
+            });
+
             // Skrip untuk Modal Edit
             $(document).on('click', '.btn-edit', function() {
                 var button = $(this);
@@ -128,7 +84,6 @@
             // Skrip untuk Modal Delete
             $(document).on("click", ".btn-hapus", function() {
                 let deleteUrl = $(this).data('url');
-                // Mengatur atribut 'action' dari form di dalam modal delete
                 $('#formHapusTawaranTopik').attr('action', deleteUrl);
             });
         });

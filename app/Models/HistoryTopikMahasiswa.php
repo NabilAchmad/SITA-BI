@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class HistoryTopikMahasiswa extends Model
 {
+    use HasFactory;
+
+    // Gunakan nama tabel singular, Laravel akan menanganinya
     protected $table = 'history_topik_mahasiswa';
 
-    protected $fillable = [
-        'mahasiswa_id', 'tawaran_topik_id', 'status_topik', 'tanggal_pemilihan'
-    ];
+    protected $guarded = ['id'];
 
     public function mahasiswa()
     {
@@ -20,6 +21,6 @@ class HistoryTopikMahasiswa extends Model
 
     public function tawaranTopik()
     {
-        return $this->belongsTo(TawaranTopik::class);
+        return $this->belongsTo(TawaranTopik::class, 'tawaran_topik_id');
     }
 }

@@ -62,7 +62,7 @@ class BimbinganService
             ]);
         }
 
-        $jadwals = $tugasAkhir->bimbingan()
+        $jadwals = $tugasAkhir->bimbinganTa()
             ->with(['dosen.user', 'catatanBimbingan', 'historyPerubahan' => fn($q) => $q->latest()])
             ->orderBy('tanggal_bimbingan', 'desc')
             ->orderBy('jam_bimbingan', 'asc')

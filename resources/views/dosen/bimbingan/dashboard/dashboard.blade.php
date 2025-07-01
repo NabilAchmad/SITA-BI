@@ -1,4 +1,3 @@
-<!-- filepath: d:\SITA-BI\SITA-BI\resources\views\admin\bimbingan\dashboard\dashboard.blade.php -->
 @extends('layouts.template.main')
 
 @section('title', 'Dashboard Bimbingan')

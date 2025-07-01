@@ -5,28 +5,55 @@ namespace App\Http\Controllers\Dosen;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dosen\StoreTawaranTopikRequest;
 use App\Http\Requests\Dosen\UpdateTawaranTopikRequest;
+use App\Models\HistoryTopikMahasiswa;
+use App\Models\Mahasiswa;
 use App\Models\TawaranTopik;
 use App\Services\Dosen\TawaranTopikService;
+use App\Services\TopikPengajuanService;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth; // PERBAIKAN: Tambahkan use statement untuk Auth Facade
+use Illuminate\Support\Facades\Auth;
 
 class TawaranTopikController extends Controller
 {
     protected TawaranTopikService $tawaranTopikService;
+    protected TopikPengajuanService $topikPengajuanService;
 
-    public function __construct(TawaranTopikService $tawaranTopikService)
+    public function __construct(TawaranTopikService $tawaranTopikService, TopikPengajuanService $topikPengajuanService)
     {
         $this->tawaranTopikService = $tawaranTopikService;
+        $this->topikPengajuanService = $topikPengajuanService;
     }
 
-    public function read()
+    /**
+     * Menampilkan halaman utama dengan dua tab:
+     * 1. Daftar topik yang ditawarkan oleh dosen.
+     * 2. Daftar mahasiswa yang mengajukan topik tersebut.
+     */
+    public function read(Request $request)
     {
+        // Data untuk Tab 1: Daftar topik yang ditawarkan
         $tawaranTopiks = $this->tawaranTopikService->getActiveTopics();
-        $tawaranTopik = new TawaranTopik();
-        return view('dosen.tawaran-topik.views.readTawaranTopik', compact('tawaranTopiks', 'tawaranTopik'));
+        $tawaranTopik = new TawaranTopik(); // Untuk modal 'create'
+
+        // Data untuk Tab 2: Daftar mahasiswa yang mengajukan topik
+        $applications = $this->topikPengajuanService->getApplicationsForDosen(Auth::user()->dosen, $request);
+
+        // Data untuk dropdown filter prodi
+        $prodiList = Mahasiswa::select('prodi')->distinct()->pluck('prodi');
+
+        return view('dosen.tawaran-topik.views.readTawaranTopik', compact(
+            'tawaranTopiks',
+            'tawaranTopik',
+            'applications',
+            'prodiList'
+        ));
     }
 
-    public function store(StoreTawaranTopikRequest $request)
+    /**
+     * Menyimpan tawaran topik baru.
+     */
+    public function store(StoreTawaranTopikRequest $request): RedirectResponse
     {
         $this->tawaranTopikService->createTopic($request->validated());
         return redirect()->route('dosen.tawaran-topik.index')->with('alert', [
@@ -36,7 +63,10 @@ class TawaranTopikController extends Controller
         ]);
     }
 
-    public function update(UpdateTawaranTopikRequest $request, TawaranTopik $tawaranTopik)
+    /**
+     * Memperbarui tawaran topik yang ada.
+     */
+    public function update(UpdateTawaranTopikRequest $request, TawaranTopik $tawaranTopik): RedirectResponse
     {
         $this->tawaranTopikService->updateTopic($tawaranTopik, $request->validated());
         return redirect()->route('dosen.tawaran-topik.index')->with('alert', [
@@ -51,9 +81,8 @@ class TawaranTopikController extends Controller
      */
     public function destroy(TawaranTopik $tawaranTopik): RedirectResponse
     {
-        // PERBAIKAN: Menggunakan sintaks Auth::id() yang lebih eksplisit dan ramah untuk IDE.
         if ($tawaranTopik->user_id !== Auth::id()) {
-            return redirect()->route('dosen.tawaran-topik.index')->with('alert', [
+            return redirect()->back()->with('alert', [
                 'type' => 'error',
                 'title' => 'Akses Ditolak',
                 'message' => 'Anda tidak memiliki izin untuk menghapus topik ini.'
@@ -69,14 +98,19 @@ class TawaranTopikController extends Controller
         ]);
     }
 
-    // ... method trashed, restore, forceDelete ...
+    /**
+     * Menampilkan daftar topik yang sudah di-soft delete.
+     */
     public function trashed()
     {
         $tawaranTopiks = $this->tawaranTopikService->getTrashedTopics();
-        return view('dosen.tawaran-topik.views.trashedTawaranTopik', compact('tawaranTopiks'));
+        return view('dosen.tawaran-topik.crud-TawaranTopik.trashed', ['tawaranTopiks' => $tawaranTopiks]);
     }
 
-    public function restore($id)
+    /**
+     * Mengembalikan topik dari soft delete.
+     */
+    public function restore($id): RedirectResponse
     {
         $this->tawaranTopikService->restoreTopic($id);
         return redirect()->back()->with('alert', [
@@ -86,7 +120,10 @@ class TawaranTopikController extends Controller
         ]);
     }
 
-    public function forceDelete($id)
+    /**
+     * Menghapus topik secara permanen dari database.
+     */
+    public function forceDelete($id): RedirectResponse
     {
         $this->tawaranTopikService->forceDeleteTopic($id);
         return redirect()->back()->with('alert', [
@@ -96,13 +133,47 @@ class TawaranTopikController extends Controller
         ]);
     }
 
-    public function forceDeleteAll()
+    public function forceDeleteAll(): RedirectResponse
     {
         $this->tawaranTopikService->forceDeleteAllTopics();
         return redirect()->back()->with('alert', [
             'type' => 'success',
             'title' => 'Berhasil',
-            'message' => 'Semua tawaran topik di trash telah dihapus permanen.'
+            'message' => 'Semua tawaran topik yang dihapus berhasil dihapus permanen.'
+        ]);
+    }
+
+    /**
+     * Menyetujui pengajuan topik dari mahasiswa.
+     */
+    public function approveApplication(HistoryTopikMahasiswa $application): RedirectResponse
+    {
+        try {
+            $this->topikPengajuanService->approveApplication($application);
+            return redirect()->back()->with('alert', [
+                'type' => 'success',
+                'title' => 'Berhasil',
+                'message' => 'Pengajuan mahasiswa telah disetujui.'
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Gagal',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Menolak pengajuan topik dari mahasiswa.
+     */
+    public function rejectApplication(HistoryTopikMahasiswa $application): RedirectResponse
+    {
+        $this->topikPengajuanService->rejectApplication($application);
+        return redirect()->back()->with('alert', [
+            'type' => 'info',
+            'title' => 'Info',
+            'message' => 'Pengajuan mahasiswa telah ditolak.'
         ]);
     }
 }
