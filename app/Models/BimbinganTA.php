@@ -11,7 +11,15 @@ class BimbinganTA extends Model
 
     protected $table = 'bimbingan_ta';
 
-    // Tambahkan ini
+    /**
+     * BARU: Konstanta untuk status bimbingan.
+     * Menghilangkan penggunaan "magic strings" di seluruh aplikasi.
+     */
+    const STATUS_MENUNGGU  = 'menunggu';
+    const STATUS_DISETUJUI = 'disetujui';
+    const STATUS_DITOLAK   = 'ditolak';
+    const STATUS_SELESAI   = 'selesai'; // Jika ada status lain seperti ini
+
     protected $fillable = [
         'tugas_akhir_id',
         'dosen_id',
@@ -23,6 +31,8 @@ class BimbinganTA extends Model
         'status_bimbingan',
     ];
 
+    // Relasi-relasi (sudah benar)
+
     public function tugasAkhir()
     {
         return $this->belongsTo(TugasAkhir::class, 'tugas_akhir_id');
@@ -31,18 +41,6 @@ class BimbinganTA extends Model
     public function dosen()
     {
         return $this->belongsTo(Dosen::class);
-    }
-
-    public function file()
-    {
-        return $this->hasOneThrough(
-            Mahasiswa::class,
-            TugasAkhir::class,
-            'id',
-            'id',
-            'tugas_akhir_id',
-            'mahasiswa_id'
-        );
     }
 
     public function catatanBimbingan()
@@ -54,4 +52,12 @@ class BimbinganTA extends Model
     {
         return $this->hasMany(HistoryPerubahanJadwal::class, 'bimbingan_ta_id');
     }
+
+    // Relasi 'file' sepertinya tidak benar, karena hasOneThrough 
+    // biasanya untuk mendapatkan satu model melalui model perantara.
+    // Relasi ini mencoba mendapatkan Mahasiswa melalui TugasAkhir.
+    // Jika tujuannya mendapatkan mahasiswa, relasi yang benar adalah:
+    // public function mahasiswa() {
+    //     return $this->hasOneThrough(Mahasiswa::class, TugasAkhir::class, 'id', 'id', 'tugas_akhir_id', 'mahasiswa_id');
+    // }
 }

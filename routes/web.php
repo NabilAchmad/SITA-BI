@@ -329,17 +329,17 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         Route::post('/setujui/{id}', [BimbinganMahasiswaController::class, 'setujui'])->name('bimbingan.setujui');
 
         // ROUTE UNTUK TOLAK BIMBINGAN (POST)
-        Route::post('/tolak/{id}', [BimbinganMahasiswaController::class, 'tolak'])->name('bimbingan.tolak');
+        Route::post('/tolak/{id}', [BimbinganMahasiswaController::class, 'tolakBimbingan'])->name('bimbingan.tolak');
 
         // tandai bimbingan selesai
         Route::post('/selesai/{id}', [BimbinganMahasiswaController::class, 'selesaiBimbingan'])->name('bimbingan.selesai');
 
         // terima pengajuan perubahan jadwal bimbingan
-        Route::post('/terima-perubahan-jadwal/{id}', [BimbinganMahasiswaController::class, 'terimaJadwal'])
+        Route::post('/terima-perubahan-jadwal/{id}', [BimbinganMahasiswaController::class, 'terimaPerubahanJadwal'])
             ->name('jadwal.terima'); // ← perbaikan di sini
 
         // tolak pengajuan perubahan jadwal bimbingan
-        Route::post('/tolak-perubahan-jadwal/{id}', [BimbinganMahasiswaController::class, 'tolakJadwal'])
+        Route::post('/tolak-perubahan-jadwal/{id}', [BimbinganMahasiswaController::class, 'tolakPerubahanJadwal'])
             ->name('jadwal.tolak'); // ← perbaikan di sini
     });
 

@@ -18,134 +18,91 @@ class BimbinganMahasiswaController extends Controller
         $this->bimbinganService = $bimbinganService;
     }
 
-    /**
-     * Menampilkan dashboard dengan daftar mahasiswa bimbingan yang sudah difilter.
-     */
     public function dashboard(Request $request)
     {
         $mahasiswaList = $this->bimbinganService->getFilteredMahasiswaBimbingan($request);
         return view('dosen.bimbingan.dashboard.dashboard', compact('mahasiswaList'));
     }
 
-    /**
-     * Menampilkan halaman detail bimbingan untuk seorang mahasiswa.
-     * Laravel akan otomatis menemukan TugasAkhir berdasarkan {id} di URL.
-     */
-    public function showDetail(int $mahasiswaId) // Route Model Binding
+    public function showDetail(int $mahasiswaId)
     {
         try {
-            // Service akan menangani otorisasi dan memuat semua data yang dibutuhkan.
             $dataTugasAkhir = $this->bimbinganService->getTugasAkhirDetailForMahasiswa($mahasiswaId);
-
             return view('dosen.bimbingan.detail-bimbingan.detail', [
                 'mahasiswa'     => $dataTugasAkhir->mahasiswa,
                 'tugasAkhir'    => $dataTugasAkhir,
                 'bimbinganList' => $dataTugasAkhir->bimbinganTa,
                 'revisiList'    => $dataTugasAkhir->revisiTa,
             ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->route('dosen.bimbingan.index')->with('alert', ['type' => 'error', 'title' => 'Tidak Ditemukan', 'message' => 'Data tugas akhir untuk mahasiswa tersebut tidak ditemukan.']);
         } catch (\Exception $e) {
-            return redirect()->route('dosen.bimbingan.index')->with('alert', [
-                'type' => 'error',
-                'title' => 'Akses Ditolak',
-                'message' => $e->getMessage()
-            ]);
+            return redirect()->route('dosen.bimbingan.index')->with('alert', ['type' => 'error', 'title' => 'Akses Ditolak', 'message' => $e->getMessage()]);
         }
     }
 
-    /**
-     * Menyetujui sebuah sesi bimbingan.
-     */
-    public function setujui(BimbinganTA $bimbingan) // Route Model Binding
+    public function setujui(BimbinganTA $bimbingan)
     {
         try {
-            $this->bimbinganService->updateBimbinganStatus($bimbingan, 'disetujui');
-            return redirect()->back()->with('alert', [
-                'type' => 'success',
-                'title' => 'Berhasil!',
-                'message' => 'Bimbingan berhasil diterima.'
-            ]);
+            $this->bimbinganService->updateBimbinganStatus($bimbingan, BimbinganTA::STATUS_DISETUJUI);
+            return redirect()->back()->with('alert', ['type' => 'success', 'title' => 'Berhasil!', 'message' => 'Bimbingan berhasil diterima.']);
         } catch (\Exception $e) {
-            return redirect()->back()->with('alert', [
-                'type' => 'error',
-                'title' => 'Gagal!',
-                'message' => $e->getMessage()
-            ]);
+            return redirect()->back()->with('alert', ['type' => 'error', 'title' => 'Gagal!', 'message' => $e->getMessage()]);
         }
     }
 
-    /**
-     * Menolak sebuah sesi bimbingan dengan catatan.
-     */
-    public function tolak(Request $request, BimbinganTA $bimbingan) // Route Model Binding
+    public function tolakBimbingan(Request $request, BimbinganTA $bimbingan)
     {
-        $validated = $request->validate(['komentar_penolakan' => 'required|string|max:1000']);
+        $request->validate(['komentar_penolakan' => 'required|string|max:1000']);
         try {
-            $this->bimbinganService->updateBimbinganStatus($bimbingan, 'ditolak', $validated['komentar_penolakan']);
-            return redirect()->back()->with('alert', [
-                'type' => 'success',
-                'title' => 'Ditolak!',
-                'message' => 'Bimbingan berhasil ditolak.'
-            ]);
+            $this->bimbinganService->updateBimbinganStatus($bimbingan, BimbinganTA::STATUS_DITOLAK, $request->komentar_penolakan);
+            return redirect()->back()->with('alert', ['type' => 'warning', 'title' => 'Bimbingan Ditolak!', 'message' => 'Penolakan bimbingan berhasil dikirim.']);
         } catch (\Exception $e) {
-            return redirect()->back()->with('alert', [
-                'type' => 'error',
-                'title' => 'Gagal!',
-                'message' => $e->getMessage()
-            ]);
+            return redirect()->back()->with('alert', ['type' => 'error', 'title' => 'Gagal!', 'message' => $e->getMessage()]);
         }
     }
 
-    /**
-     * Menyetujui perubahan jadwal.
-     */
-    public function terimaJadwal(HistoryPerubahanJadwal $perubahan) // Route Model Binding
+    public function terimaPerubahanJadwal(HistoryPerubahanJadwal $perubahan)
     {
         try {
             $this->bimbinganService->approveScheduleChange($perubahan);
-            return redirect()->back()->with('alert', [
-                'type' => 'success',
-                'title' => 'Disetujui!',
-                'message' => 'Perubahan jadwal disetujui.'
-            ]);
+            return redirect()->back()->with('alert', ['type' => 'success', 'title' => 'Disetujui!', 'message' => 'Perubahan jadwal disetujui.']);
         } catch (\Exception $e) {
-            return redirect()->back()->with('alert', [
-                'type' => 'error',
-                'title' => 'Gagal!',
-                'message' => $e->getMessage()
-            ]);
+            return redirect()->back()->with('alert', ['type' => 'error', 'title' => 'Gagal!', 'message' => $e->getMessage()]);
         }
     }
 
-    /**
-     * Menyetujui pembatalan Tugas Akhir.
-     */
-    public function terimaPembatalanTugasAkhir(TugasAkhir $tugasAkhir) // Route Model Binding
+    // BARU: Metode untuk menolak perubahan jadwal
+    public function tolakPerubahanJadwal(Request $request, HistoryPerubahanJadwal $perubahan)
+    {
+        $validated = $request->validate(['catatan_penolakan' => 'required|string|max:1000']);
+        try {
+            $this->bimbinganService->rejectScheduleChange($perubahan, $validated['catatan_penolakan']);
+            return redirect()->back()->with('alert', ['type' => 'warning', 'title' => 'Ditolak!', 'message' => 'Perubahan jadwal berhasil ditolak.']);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('alert', ['type' => 'error', 'title' => 'Gagal!', 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function terimaPembatalanTugasAkhir(TugasAkhir $tugasAkhir)
     {
         try {
             $statusAkhir = $this->bimbinganService->approveThesisCancellation($tugasAkhir);
             $message = $statusAkhir === 'dibatalkan'
                 ? 'TA telah final dibatalkan karena semua pembimbing setuju.'
                 : 'Persetujuan Anda telah disimpan. Menunggu verifikasi pembimbing lain.';
-
             return back()->with('alert', ['type' => 'success', 'title' => 'Berhasil!', 'message' => $message]);
         } catch (\Exception $e) {
             return back()->with('alert', ['type' => 'error', 'title' => 'Gagal', 'message' => $e->getMessage()]);
         }
     }
 
-    /**
-     * Menolak pembatalan Tugas Akhir.
-     */
     public function tolakPembatalanTugasAkhir(Request $request, TugasAkhir $tugasAkhir)
     {
         $validated = $request->validate(['catatan_penolakan' => 'required|string|max:1000']);
         try {
             $this->bimbinganService->rejectThesisCancellation($tugasAkhir, $validated['catatan_penolakan']);
-            return back()->with('alert', [
-                'type' => 'success',
-                'title' => 'Pembatalan Ditolak',
-                'message' => 'Status TA telah dikembalikan.'
-            ]);
+            return back()->with('alert', ['type' => 'success', 'title' => 'Pembatalan Ditolak', 'message' => 'Status TA telah dikembalikan.']);
         } catch (\Exception $e) {
             return back()->with('alert', ['type' => 'error', 'title' => 'Gagal', 'message' => $e->getMessage()]);
         }

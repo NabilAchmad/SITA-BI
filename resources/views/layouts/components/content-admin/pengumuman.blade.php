@@ -43,6 +43,21 @@
                                 <p class="mb-0" style="font-size: 0.95rem; line-height: 1.6;">
                                     {{ \Illuminate\Support\Str::limit(strip_tags($pengumuman->isi), 100, '...') }}
                                 </p>
+                                <span class="badge bg-secondary">Audiens:
+                                    @if ($pengumuman->audiens == 'guest')
+                                        Tamu
+                                    @elseif($pengumuman->audiens == 'registered_users')
+                                        Pengguna Terdaftar
+                                    @elseif($pengumuman->audiens == 'all_users')
+                                        Semua Pengguna
+                                    @elseif($pengumuman->audiens == 'dosen')
+                                        Dosen
+                                    @elseif($pengumuman->audiens == 'mahasiswa')
+                                        Mahasiswa
+                                    @else
+                                        Unknown
+                                    @endif
+                                </span>
                             </div>
                         </li>
                     @endforeach

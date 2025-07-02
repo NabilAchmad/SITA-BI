@@ -94,7 +94,7 @@ class BimbinganService
         $bimbingan->status_bimbingan = $status;
         $bimbingan->save();
 
-        if ($status === 'ditolak' && $catatan) {
+        if ($status === BimbinganTA::STATUS_DITOLAK && $catatan) {
             $bimbingan->catatanBimbingan()->create([
                 'catatan'     => $catatan,
                 'author_type' => 'dosen',
@@ -115,7 +115,20 @@ class BimbinganService
             $perubahan->update(['status' => 'disetujui']);
             $perubahan->bimbingan()->update([
                 'tanggal_bimbingan' => $perubahan->tanggal_baru,
-                'jam_bimbingan' => $perubahan->jam_baru,
+                'jam_bimbingan'     => $perubahan->jam_baru,
+            ]);
+        });
+    }
+
+    // BARU: Metode untuk menolak perubahan jadwal
+    public function rejectScheduleChange(HistoryPerubahanJadwal $perubahan, string $catatan): void
+    {
+        $this->authorizeDosenForBimbingan($perubahan->bimbingan);
+
+        DB::transaction(function () use ($perubahan, $catatan) {
+            $perubahan->update([
+                'status' => 'ditolak',
+                'catatan_penolakan' => $catatan
             ]);
         });
     }

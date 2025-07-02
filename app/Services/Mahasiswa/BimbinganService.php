@@ -224,7 +224,7 @@ class BimbinganService
 
         $this->abortJikaTADibatalkan($jadwal->tugasAkhir);
 
-        if ($jadwal->status_bimbingan !== 'menunggu') {
+        if ($jadwal->status_bimbingan !== 'diajukan') {
             return back()->withErrors(['error' => 'Jadwal ini tidak bisa diubah karena sudah diproses.']);
         }
 

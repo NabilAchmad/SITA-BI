@@ -3,7 +3,7 @@
 @section('title', 'Dashboard Bimbingan')
 
 @section('content')
-    @if (!$tugasAkhir || optional($tugasAkhir)->status !== 'aktif')
+    @if (!$tugasAkhir)
         <div class="position-relative overflow-hidden rounded-3 mb-4 p-4"
             style="background: linear-gradient(135deg, #fde3e3, #fea2a2); border-left: 5px solid #fd0d0d;">
             <div class="position-relative z-1">
