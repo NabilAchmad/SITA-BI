@@ -62,6 +62,10 @@
                                         <span class="badge bg-info text-dark">Lulus Dengan Revisi</span>
                                     @elseif ($status === 'ditolak')
                                         <span class="badge bg-danger">Ditolak</span>
+                                    @elseif($status === 'menunggu_pembatalan')
+                                        <span class="badge bg-success">Menunggu Pembatalan</span>
+                                        @elseif($status === 'dibatalkan')
+                                        <span class="badge bg-secondary">Dibatalkan</span>
                                     @else
                                         <span class="badge bg-secondary">-</span>
                                     @endif

@@ -3,14 +3,14 @@
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-icon">
-                    <div class="icon-big text-center icon-info bubble-shadow-small">
-                        <i class="fas fa-users"></i>
+                    <div class="icon-big text-center icon-primary bubble-shadow-small">
+                        <i class="{{ $card1['icon'] }}"></i>
                     </div>
                 </div>
                 <div class="col col-stats ms-3 ms-sm-0">
                     <div class="numbers">
-                        <p class="card-category">Mahasiswa Aktif</p>
-                        <h4 class="card-title">253</h4>
+                        <p class="card-category">{{ $card1['label'] }}</p>
+                        <h4 class="card-title">{{ $card1['value'] }}</h4>
                     </div>
                 </div>
             </div>

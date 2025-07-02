@@ -1,58 +1,59 @@
 @extends('layouts.template.main')
 
-@section('title', 'Dashboard')
+@php
+    $prioritasRole = ['kajur', 'kaprodi', 'dosen', 'tamu'];
+
+    // Ambil semua nama_role dari user
+    $userRoles = $role->pluck('nama_role')->toArray(); // misalnya ['dosen', 'kaprodi']
+
+    // Ambil role dengan prioritas tertinggi
+    $utama = collect($prioritasRole)->first(fn($r) => in_array($r, $userRoles)) ?? 'dosen';
+@endphp
+
+@section('title', 'Dashboard - ' . ucfirst($utama))
 
 @section('content')
     <!-- Header Main -->
     @include('layouts.components.content-dosen.header')
     <!-- end header main -->
 
-    <!-- main -->
+    <!-- Main Cards (Card 1 - 4) -->
     <div class="row">
-        <!-- dosen section -->
-        @include('layouts.components.content-dosen.dosen')
-        <!-- End dosen section -->
-
-        <!-- Mahasiswa section -->
-        @include('layouts.components.content-dosen.mahasiswa')
-        <!-- End Mahasiswa section -->
-
-        <!-- dosen Penguji section -->
-        @include('layouts.components.content-dosen.dospeng')
-        <!-- End Sales dosen Penguji -->
-
-        <!-- dosen Pembimbing section -->
-        @include('layouts.components.content-dosen.dospem')
-        <!-- End dosen Pembimbing -->
+        @include('layouts.components.content-dosen.card-1')
+        @include('layouts.components.content-dosen.card-2')
+        @include('layouts.components.content-dosen.card-3')
+        @include('layouts.components.content-dosen.card-4')
     </div>
-    <!-- end main -->
+    <!-- end main cards -->
 
-    <!-- main -->
-    <div class="row">
-        <!-- Log Activity -->
-        @include('layouts.components.content-dosen.logactivity')
-        <!-- end Log Activity -->
+    <!-- JADWAL BIMBINGAN KHUSUS PEMBIMBING -->
+    @if (in_array('pembimbing1', $peranDosen) || in_array('pembimbing2', $peranDosen))
+        @include('layouts.components.content-dosen.jadwal-bimbingan')
+    @endif
 
-        <!-- dosen aktif -->
-        <div class="col-md-4">
-            @include('layouts.components.content-dosen.dosenaktif')
-        </div>
-        <!-- end dosen aktif -->
-    </div>
+    <!-- JADWAL SIDANG KHUSUS PENGUJI -->
+    @if (collect($peranDosen)->filter(fn($r) => str_contains($r, 'penguji'))->isNotEmpty())
+        @include('layouts.components.content-dosen.jadwal-sidang')
+    @endif
 
+    <!-- Topik: wajib tampil untuk semua dosen -->
     <div class="row">
         <div class="col-md-12">
-            <!-- Pengumuman -->
-            @include('layouts.components.content-dosen.pengumuman')
-            <!-- End Pengumuman -->
+            @include('layouts.components.content-dosen.topik')
         </div>
     </div>
 
+    <!-- Pengumuman: wajib tampil -->
     <div class="row">
-        <!-- Transaction History -->
-        @include('layouts.components.content-dosen.riwayatpengajuanta')
-        <!-- End Transaction History -->
+        <div class="col-md-12">
+            @include('layouts.components.content-dosen.pengumuman')
+        </div>
     </div>
-    <!-- end main -->
-@endsection
 
+    <!-- RIWAYAT PENGAJUAN TA HANYA UNTUK KAJUR & KAPRODI -->
+    @if (in_array('kajur', $userRoles) || in_array('kaprodi', $userRoles))
+        <div class="row">
+            @include('layouts.components.content-dosen.riwayatpengajuanta')
+        </div>
+    @endif
+@endsection

@@ -81,10 +81,13 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(functi
 
         // Mengajukan pembatalan tugas akhir
         // Menggunakan Route Model Binding dengan {tugasAkhir}
-        Route::post('/{tugasAkhir}/cancel', [TugasAkhirController::class, 'cancel'])->name('cancel');
+        Route::post('/{tugasAkhir}/cancel', [TugasAkhirController::class, 'cancel'])->name('tugasAkhir.cancelTA');
 
         // Menampilkan riwayat tugas akhir yang dibatalkan
         Route::get('/cancelled', [TugasAkhirController::class, 'showCancelled'])->name('tugasAkhir.cancelled');
+
+        // revisi
+        Route::get('/revisi', [TugasAkhirController::class, ''])->name('tugas-akhir.revisi');
 
         // Contoh rute untuk upload file, bisa disesuaikan
         // Route::post('/upload-proposal', [TugasAkhirController::class, 'uploadProposal'])->name('uploadProposal');
@@ -301,7 +304,7 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
 
         // PERBAIKAN: Menggunakan Route Model Binding untuk {id} agar lebih konsisten
         Route::get('/detail/{tugasAkhir}', [ValidasiController::class, 'getDetail'])->name('dosen.validasi-tugas-akhir.detail');
-        
+
         Route::post('/tolak/{tugasAkhir}', [ValidasiController::class, 'tolak'])->name('tolak');
     });
 

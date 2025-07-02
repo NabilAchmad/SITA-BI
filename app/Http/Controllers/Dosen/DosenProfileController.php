@@ -10,54 +10,45 @@ use Illuminate\Http\Request;
 use App\Models\PeranDosenTA;
 use App\Models\Log;
 use App\Models\User;
+use App\Models\TawaranTopik;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
+use App\Services\Dosen\DashboardService;
 use Illuminate\Support\Facades\Auth;
 
 class DosenProfileController extends Controller
 {
 
-    public function index_dosen()
+
+    public function index_dosen(DashboardService $service)
     {
-        $totalDosen = Dosen::count();
-        $totalMahasiswa = Mahasiswa::count();
-        $totalPengumuman = Pengumuman::count();
+        $pengumumans = Pengumuman::with('pembuat')->latest()->get();
         $riwayatTA = TugasAkhir::latest()->get();
-        $pengumumans = Pengumuman::with('pembuat')->orderBy('created_at', 'desc')->get();
-        $logs = Log::with('user') // Jika ada relasi ke user
-            ->latest()
-            ->take(50)
-            ->get();
 
-        // Dosen yang sedang online (menggunakan cache-based online detection)
-        $dosenAktif = Dosen::all()->filter(fn($d) => $d->isOnline());
+        $tawaranTopik = TawaranTopik::with(['tugasAkhir.mahasiswa.user'])
+            ->where('user_id', Auth::id())->get();
 
-        // Dosen Pembimbing (distinct dosen_id dari peran_dosen_ta dengan peran seperti pembimbing1, pembimbing2)
-        $totalPembimbing = PeranDosenTA::whereIn('peran', ['pembimbing1', 'pembimbing2'])
-            ->distinct('dosen_id')
-            ->count('dosen_id');
-
-        // Dosen Penguji (distinct dosen_id dari peran_dosen_ta dengan peran penguji1–penguji4)
-        $totalPenguji = PeranDosenTA::whereIn('peran', ['penguji1', 'penguji2', 'penguji3', 'penguji4'])
-            ->distinct('dosen_id')
-            ->count('dosen_id');
-
-        // Mahasiswa aktif = yang punya tugas akhir dan belum dibatalkan
-        $mahasiswaAktif = TugasAkhir::whereNull('alasan_pembatalan')
-            ->distinct('mahasiswa_id')
-            ->count('mahasiswa_id');
+        $card1 = $service->card1Data();
+        $card2 = $service->card2Data();
+        $card3 = $service->card3Data();
+        $card4 = $service->card4Data();
+        $peranDosen = $service->getPeranDosen();
+        $role = Auth::user()->dosen->user->roles;
+        $jadwalBimbingan = $service->jadwalBimbinganTerdekat();
+        $jadwalSidang = $service->jadwalSidangTerdekat();
 
         return view('dosen.views.dashboard', compact(
-            'totalDosen',
-            'totalMahasiswa',
-            'totalPengumuman',
-            'riwayatTA',
             'pengumumans',
-            'dosenAktif',
-            'totalPembimbing',
-            'totalPenguji',
-            'mahasiswaAktif',
-            'logs'
+            'riwayatTA',
+            'tawaranTopik',
+            'card1',
+            'card2',
+            'card3',
+            'card4',
+            'peranDosen',
+            'role',
+            'jadwalBimbingan',
+            'jadwalSidang'
         ));
     }
 
