@@ -7,6 +7,7 @@ use App\Models\Dosen;
 use App\Models\HistoryPerubahanJadwal;
 use App\Models\PeranDosenTa;
 use App\Models\TugasAkhir;
+use App\Models\CatatanBimbingan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +27,7 @@ class BimbinganService
      */
     public function getFilteredMahasiswaBimbingan(Request $request): \Illuminate\Database\Eloquent\Collection
     {
+        // ... (Tidak ada perubahan di sini)
         $query = PeranDosenTa::query()
             ->where('dosen_id', $this->dosen->id)
             ->whereIn('peran', [PeranDosenTa::PERAN_PEMBIMBING_1, PeranDosenTa::PERAN_PEMBIMBING_2])
@@ -53,30 +55,18 @@ class BimbinganService
     }
 
     /**
-     * PERBAIKAN: Mengambil data detail Tugas Akhir berdasarkan ID Mahasiswa.
-     * Method ini sekarang bertanggung jawab untuk menemukan TA yang benar DAN melakukan otorisasi.
-     *
-     * @param int $mahasiswaId
-     * @return TugasAkhir
-     * @throws \Exception
+     * Mengambil data detail Tugas Akhir berdasarkan ID Mahasiswa.
      */
     public function getTugasAkhirDetailForMahasiswa(int $mahasiswaId): TugasAkhir
     {
-        // 1. Cari tugas akhir yang AKTIF milik mahasiswa dengan ID yang diberikan.
+        // ... (Tidak ada perubahan di sini)
         $tugasAkhir = TugasAkhir::where('mahasiswa_id', $mahasiswaId)
-            ->active() // Menggunakan scope untuk memastikan hanya TA aktif yang diambil
+            ->active()
             ->latest()
-            ->first();
+            ->firstOrFail();
 
-        // 2. Jika tidak ada tugas akhir aktif, lempar error.
-        if (!$tugasAkhir) {
-            throw new \Exception('Tugas akhir aktif untuk mahasiswa ini tidak ditemukan.');
-        }
-
-        // 3. Lakukan otorisasi untuk memastikan dosen yang login adalah pembimbing dari TA ini.
         $this->authorizeDosenIsPembimbing($tugasAkhir);
 
-        // 4. Jika lolos, muat relasi yang dibutuhkan oleh view dan kembalikan.
         return $tugasAkhir->load([
             'mahasiswa.user',
             'revisiTa',
@@ -89,6 +79,7 @@ class BimbinganService
      */
     public function updateBimbinganStatus(BimbinganTA $bimbingan, string $status, ?string $catatan = null): BimbinganTA
     {
+        // ... (Tidak ada perubahan di sini)
         $this->authorizeDosenForBimbingan($bimbingan);
 
         $bimbingan->status_bimbingan = $status;
@@ -104,11 +95,33 @@ class BimbinganService
         return $bimbingan;
     }
 
+    // --- FUNGSI BARU ---
+    /**
+     * Menandai sesi bimbingan sebagai selesai.
+     */
+    public function selesaikanBimbingan(BimbinganTA $bimbingan): BimbinganTA
+    {
+        $this->authorizeDosenForBimbingan($bimbingan);
+
+        // Pastikan Anda sudah menambahkan konstanta STATUS_SELESAI di model BimbinganTA
+        $bimbingan->status_bimbingan = BimbinganTA::STATUS_SELESAI;
+        $bimbingan->save();
+
+        return $bimbingan;
+    }
+
+
+    // --- FUNGSI DIPERBAIKI ---
     /**
      * Menyetujui perubahan jadwal.
      */
     public function approveScheduleChange(HistoryPerubahanJadwal $perubahan): void
     {
+        // PERBAIKAN: Tambahkan pengecekan untuk mencegah error jika relasi bimbingan null
+        if (!$perubahan->bimbingan) {
+            throw new \Exception('Data histori perubahan jadwal ini tidak terhubung dengan bimbingan manapun. ID Bimbingan tidak ditemukan.');
+        }
+
         $this->authorizeDosenForBimbingan($perubahan->bimbingan);
 
         DB::transaction(function () use ($perubahan) {
@@ -117,18 +130,32 @@ class BimbinganService
                 'tanggal_bimbingan' => $perubahan->tanggal_baru,
                 'jam_bimbingan'     => $perubahan->jam_baru,
             ]);
+
+            // Tambahan: Batalkan permintaan lain yang tertunda untuk bimbingan yang sama
+            HistoryPerubahanJadwal::where('bimbingan_ta_id', $perubahan->bimbingan_ta_id)
+                ->where('id', '!=', $perubahan->id)
+                ->where('status', 'menunggu')
+                ->update(['status' => 'dibatalkan']);
         });
     }
 
-    // BARU: Metode untuk menolak perubahan jadwal
+    // --- FUNGSI DIPERBAIKI ---
+    /**
+     * Menolak perubahan jadwal.
+     */
     public function rejectScheduleChange(HistoryPerubahanJadwal $perubahan, string $catatan): void
     {
+        // PERBAIKAN: Tambahkan pengecekan untuk mencegah error jika relasi bimbingan null
+        if (!$perubahan->bimbingan) {
+            throw new \Exception('Data histori perubahan jadwal ini tidak terhubung dengan bimbingan manapun. ID Bimbingan tidak ditemukan.');
+        }
+
         $this->authorizeDosenForBimbingan($perubahan->bimbingan);
 
         DB::transaction(function () use ($perubahan, $catatan) {
             $perubahan->update([
                 'status' => 'ditolak',
-                'catatan_penolakan' => $catatan
+                'catatan_penolakan' => $catatan // Pastikan kolom ini ada di $fillable model HistoryPerubahanJadwal
             ]);
         });
     }
@@ -138,6 +165,7 @@ class BimbinganService
      */
     public function approveThesisCancellation(TugasAkhir $tugasAkhir): string
     {
+        // ... (Tidak ada perubahan di sini)
         $this->authorizeDosenIsPembimbing($tugasAkhir);
 
         if ($tugasAkhir->status !== TugasAkhir::STATUS_MENUNGGU_PEMBATALAN) {
@@ -166,6 +194,7 @@ class BimbinganService
      */
     public function rejectThesisCancellation(TugasAkhir $tugasAkhir, string $catatanPenolakan): void
     {
+        // ... (Tidak ada perubahan di sini)
         $this->authorizeDosenIsPembimbing($tugasAkhir);
 
         if ($tugasAkhir->status !== TugasAkhir::STATUS_MENUNGGU_PEMBATALAN) {

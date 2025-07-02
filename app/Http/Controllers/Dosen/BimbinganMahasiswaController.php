@@ -66,21 +66,39 @@ class BimbinganMahasiswaController extends Controller
     {
         try {
             $this->bimbinganService->approveScheduleChange($perubahan);
-            return redirect()->back()->with('alert', ['type' => 'success', 'title' => 'Disetujui!', 'message' => 'Perubahan jadwal disetujui.']);
+            return redirect()->back()->with('alert', [
+                'type' => 'success',
+                'title' => 'Disetujui!',
+                'message' => 'Perubahan jadwal disetujui.'
+            ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('alert', ['type' => 'error', 'title' => 'Gagal!', 'message' => $e->getMessage()]);
+            return redirect()->back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Gagal!',
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
-    // BARU: Metode untuk menolak perubahan jadwal
     public function tolakPerubahanJadwal(Request $request, HistoryPerubahanJadwal $perubahan)
     {
-        $validated = $request->validate(['catatan_penolakan' => 'required|string|max:1000']);
+        $validated = $request->validate([
+            'catatan_penolakan' => 'required|string|max:1000',
+        ]);
+
         try {
             $this->bimbinganService->rejectScheduleChange($perubahan, $validated['catatan_penolakan']);
-            return redirect()->back()->with('alert', ['type' => 'warning', 'title' => 'Ditolak!', 'message' => 'Perubahan jadwal berhasil ditolak.']);
+            return redirect()->back()->with('alert', [
+                'type' => 'warning',
+                'title' => 'Ditolak!',
+                'message' => 'Perubahan jadwal berhasil ditolak.'
+            ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('alert', ['type' => 'error', 'title' => 'Gagal!', 'message' => $e->getMessage()]);
+            return redirect()->back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Gagal!',
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
@@ -107,4 +125,6 @@ class BimbinganMahasiswaController extends Controller
             return back()->with('alert', ['type' => 'error', 'title' => 'Gagal', 'message' => $e->getMessage()]);
         }
     }
+
+    public function selesaiBimbingan() {}
 }
