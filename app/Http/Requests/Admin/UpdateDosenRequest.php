@@ -15,15 +15,24 @@ class UpdateDosenRequest extends FormRequest
     public function rules(): array
     {
         $dosen = $this->route('dosen');
-        $dosenId = $dosen->id;
         $userId = $dosen->user_id;
 
         return [
-            'name' => 'required|string|max:255',
+            'nama' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($userId)],
-            'password' => 'nullable|string|min:8|confirmed',
-            'nidn' => ['required', 'string', 'max:20', Rule::unique('dosen')->ignore($dosenId)],
-            'jabatan' => 'nullable|string|max:100',
+            'password' => 'nullable|string|min:8',
+            'nidn' => ['required', 'string', 'max:50', Rule::unique('dosen')->ignore($dosen->id)],
+            // Validasi untuk role_id, hanya menerima ID 2, 3, atau 4
+            'role_id' => 'nullable|integer|in:2,3,4',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'nama' => 'Nama Dosen',
+            'nidn' => 'NIDN',
+            'role_id' => 'Jabatan',
         ];
     }
 }

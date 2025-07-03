@@ -195,12 +195,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
         Route::prefix('dosen')->group(function () {
             Route::get('/', [DosenController::class, 'index'])->name('akun-dosen.kelola');
 
-            Route::get('/edit/{id}', [DosenController::class, 'edit'])->name('akun-dosen.edit');
-            Route::put('/update/{id}', [DosenController::class, 'update'])->name('akun-dosen.update');
-            Route::delete('/hapus/{id}', [DosenController::class, 'destroy'])->name('akun-dosen.destroy');
-
-
-            Route::get('/tambah-akun-dosen', [DosenController::class, 'create'])->name('akun-dosen.create');
+            Route::get('/edit/{dosen}', [DosenController::class, 'edit'])->name('akun-dosen.edit');
+            Route::put('/update/{dosen}', [DosenController::class, 'update'])->name('akun-dosen.update');
+            Route::delete('/hapus/{dosen}', [DosenController::class, 'destroy'])->name('akun-dosen.destroy');
             Route::post('/tambah-akun-dosen', [DosenController::class, 'store'])->name('akun-dosen.store');
         });
 
