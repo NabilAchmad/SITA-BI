@@ -300,7 +300,7 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
     // validasi tugas akhir: kaprodi
     Route::prefix('validasi')->middleware(['auth', 'role:kaprodi'])->group(function () {
         Route::get('/tugas-akhir', [ValidasiController::class, 'index'])->name('dosen.validasi-tugas-akhir.index');
-        Route::post('/terima/{tugasAkhir}', [ValidasiController::class, 'validasi'])->name('dosen.validasi-tugas-akhir.validasi');
+        Route::post('/terima/{tugasAkhir}', [ValidasiController::class, 'terima'])->name('dosen.validasi-tugas-akhir.validasi');
 
         // PERBAIKAN: Menggunakan Route Model Binding untuk {id} agar lebih konsisten
         Route::get('/detail/{tugasAkhir}', [ValidasiController::class, 'getDetail'])->name('dosen.validasi-tugas-akhir.detail');
@@ -321,25 +321,25 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         Route::get('/detail/{id}', [BimbinganMahasiswaController::class, 'showDetail'])->name('bimbingan.detail');
 
         Route::prefix('tugas-akhir')->group(function () {
-            Route::post('/{id}/setuju-pembatalan', [BimbinganMahasiswaController::class, 'terimaPembatalanTugasAkhir'])->name('setuju-pembatalan-tugas-akhir');
-            Route::post('/{id}/tolak-pembatalan', [BimbinganMahasiswaController::class, 'tolakPembatalanTugasAkhir'])->name('tolak-pembatalan-tugas-akhir');
+            Route::post('/{tugasAkhir}/setuju-pembatalan', [BimbinganMahasiswaController::class, 'terimaPembatalanTugasAkhir'])->name('setuju-pembatalan-tugas-akhir');
+            Route::post('/{tugasAkhir}/tolak-pembatalan', [BimbinganMahasiswaController::class, 'tolakPembatalanTugasAkhir'])->name('tolak-pembatalan-tugas-akhir');
         });
 
         // setujui bimbingan
-        Route::post('/setujui/{id}', [BimbinganMahasiswaController::class, 'setujui'])->name('bimbingan.setujui');
+        Route::post('/setujui/{bimbingan}', [BimbinganMahasiswaController::class, 'setujui'])->name('bimbingan.setujui');
 
         // ROUTE UNTUK TOLAK BIMBINGAN (POST)
-        Route::post('/tolak/{id}', [BimbinganMahasiswaController::class, 'tolakBimbingan'])->name('bimbingan.tolak');
+        Route::post('/tolak/{bimbingan}', [BimbinganMahasiswaController::class, 'tolakBimbingan'])->name('bimbingan.tolak');
 
         // tandai bimbingan selesai
-        Route::post('/selesai/{id}', [BimbinganMahasiswaController::class, 'selesaiBimbingan'])->name('bimbingan.selesai');
+        Route::post('/selesai/{bimbingan}', [BimbinganMahasiswaController::class, 'selesaiBimbingan'])->name('bimbingan.selesai');
 
         // terima pengajuan perubahan jadwal bimbingan
-        Route::post('/terima-perubahan-jadwal/{id}', [BimbinganMahasiswaController::class, 'terimaPerubahanJadwal'])
+        Route::post('/terima-perubahan-jadwal/{perubahan}', [BimbinganMahasiswaController::class, 'terimaPerubahanJadwal'])
             ->name('jadwal.terima'); // ← perbaikan di sini
 
         // tolak pengajuan perubahan jadwal bimbingan
-        Route::post('/tolak-perubahan-jadwal/{id}', [BimbinganMahasiswaController::class, 'tolakPerubahanJadwal'])
+        Route::post('/tolak-perubahan-jadwal/{perubahan}', [BimbinganMahasiswaController::class, 'tolakPerubahanJadwal'])
             ->name('jadwal.tolak'); // ← perbaikan di sini
     });
 

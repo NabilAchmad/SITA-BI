@@ -8,7 +8,7 @@
                 <ul class="list-unstyled mb-0">
                     @foreach ($jadwalBimbingan as $jadwal)
                         <li class="mb-3 pb-2 border-bottom">
-                            <strong>{{ $jadwal->mahasiswa->user->name ?? '-' }}</strong><br>
+                            <strong>{{ $jadwal->bimbingan->mahasiswa->user->name ?? '-' }}</strong><br>
                             <small class="text-muted">
                                 {{ \Carbon\Carbon::parse($jadwal->tanggal_bimbingan)->format('d M Y H:i') }}
                             </small>

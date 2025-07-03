@@ -104,6 +104,7 @@ class TugasAkhir extends Model
     {
         return $query->whereNotIn('status', [
             self::STATUS_DIBATALKAN,
+            self::STATUS_DITOLAK,
             self::STATUS_LULUS_DENGAN_REVISI,
             self::STATUS_LULUS_TANPA_REVISI,
             self::STATUS_SELESAI,

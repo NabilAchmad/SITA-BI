@@ -19,6 +19,7 @@ class HistoryPerubahanJadwal extends Model
         'tanggal_baru',
         'jam_baru',
         'alasan_perubahan',
+        'status',
     ];
 
     public function bimbingan()

@@ -62,6 +62,35 @@ class BimbinganMahasiswaController extends Controller
         }
     }
 
+    /**
+     * Menandai sebuah sesi bimbingan sebagai 'selesai'.
+     *
+     * @param BimbinganTA $bimbingan
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function selesaiBimbingan(BimbinganTA $bimbingan)
+    {
+        try {
+            // Panggil fungsi 'selesaikanBimbingan' dari service Anda
+            $this->bimbinganService->selesaikanBimbingan($bimbingan);
+
+            // Jika berhasil, kembalikan dengan pesan sukses
+            return redirect()->back()->with('alert', [
+                'type'    => 'success',
+                'title'   => 'Selesai!',
+                'message' => 'Bimbingan telah ditandai selesai dan sesi telah dicatat.'
+            ]);
+        } catch (\Exception $e) {
+            // Jika terjadi error (termasuk error otorisasi dari service),
+            // tangkap dan tampilkan pesannya
+            return redirect()->back()->with('alert', [
+                'type'    => 'error',
+                'title'   => 'Gagal!',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     public function terimaPerubahanJadwal(HistoryPerubahanJadwal $perubahan)
     {
         try {
@@ -83,11 +112,11 @@ class BimbinganMahasiswaController extends Controller
     public function tolakPerubahanJadwal(Request $request, HistoryPerubahanJadwal $perubahan)
     {
         $validated = $request->validate([
-            'catatan_penolakan' => 'required|string|max:1000',
+            'komentar' => 'required|string|max:1000',
         ]);
 
         try {
-            $this->bimbinganService->rejectScheduleChange($perubahan, $validated['catatan_penolakan']);
+            $this->bimbinganService->rejectScheduleChange($perubahan, $validated['komentar']);
             return redirect()->back()->with('alert', [
                 'type' => 'warning',
                 'title' => 'Ditolak!',
@@ -125,6 +154,4 @@ class BimbinganMahasiswaController extends Controller
             return back()->with('alert', ['type' => 'error', 'title' => 'Gagal', 'message' => $e->getMessage()]);
         }
     }
-
-    public function selesaiBimbingan() {}
 }

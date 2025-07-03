@@ -29,15 +29,14 @@ class TugasAkhirService
      */
     public function getActiveTugasAkhirForProgressPage(): ?TugasAkhir
     {
+        // PERBAIKAN DI SINI: Hapus tanda komentar untuk mengaktifkan scope.
         return $this->mahasiswa->tugasAkhir()
-            // ->active() // <- Menggunakan scope dari model
+            ->active() // <-- BARIS INI SEKARANG AKTIF
             ->with([
                 'bimbinganTa' => fn($q) => $q->latest('tanggal_bimbingan'),
                 'revisiTa' => fn($q) => $q->latest(),
                 'dokumenTa' => fn($q) => $q->latest(),
                 'sidang' => fn($q) => $q->latest(),
-                // PERBAIKAN: Memuat relasi asli 'peranDosenTa' beserta turunannya.
-                // Accessor 'pembimbingSatu' dan 'pembimbingDua' akan menggunakan data ini.
                 'peranDosenTa.dosen.user',
             ])
             ->latest()

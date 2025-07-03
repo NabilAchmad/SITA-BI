@@ -57,7 +57,7 @@ class BimbinganTA extends Model
     // biasanya untuk mendapatkan satu model melalui model perantara.
     // Relasi ini mencoba mendapatkan Mahasiswa melalui TugasAkhir.
     // Jika tujuannya mendapatkan mahasiswa, relasi yang benar adalah:
-    // public function mahasiswa() {
-    //     return $this->hasOneThrough(Mahasiswa::class, TugasAkhir::class, 'id', 'id', 'tugas_akhir_id', 'mahasiswa_id');
-    // }
+    public function mahasiswa() {
+        return $this->hasOneThrough(Mahasiswa::class, TugasAkhir::class, 'id', 'id', 'tugas_akhir_id', 'mahasiswa_id');
+    }
 }
