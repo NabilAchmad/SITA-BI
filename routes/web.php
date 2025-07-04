@@ -11,6 +11,7 @@ use App\Http\Controllers\Mahasiswa\TugasAkhirController;
 use App\Http\Controllers\Mahasiswa\PendaftaranSidangController;
 use App\Http\Controllers\Mahasiswa\TopikController;
 use App\Http\Controllers\Mahasiswa\MahasiswaProfileController;
+use App\Http\Controllers\Mahasiswa\SemproController;
 
 // Admin routes
 use App\Http\Controllers\Admin\PengumumanController;
@@ -127,6 +128,10 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(functi
 
         Route::get('/daftar-sidang', [PendaftaranSidangController::class, 'form'])->name('pendaftaran_sidang.form');
         Route::post('/daftar-sidang', [PendaftaranSidangController::class, 'store'])->name('pendaftaran_sidang.store');
+    });
+
+    Route::prefix('sempro')->group(function () {
+        Route::get('/',[SemproController::class, 'dashboard'])->name('dashboard.sempro');
     });
 
     Route::prefix('profile')->group(function () {
@@ -255,7 +260,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
             Route::get('/detail-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'show'])->name('jadwal-sidang.show');
 
             // Edit dan Hapus Jadwal Sidang
-            Route::put('/update-jadwal/{id}', [JadwalSidangAkhirController::class, 'update'])->name('jadwal-sidang.update');
+            Route::put('/update-jadwal/{jadwal}', [JadwalSidangAkhirController::class, 'update'])->name('jadwal-sidang.update');
             Route::delete('/delete-jadwal/{id}', [JadwalSidangAkhirController::class, 'destroy'])->name('jadwal-sidang.destroy');
 
             // Tandai akhir sidang selesai 
@@ -267,7 +272,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
                 ->name('pasca.sidang.akhir');
 
             // POST: Simpan dosen penguji
-            Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
+            Route::post('/simpan-penguji/{sidang}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
         });
     });
 

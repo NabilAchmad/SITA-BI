@@ -63,7 +63,8 @@
                 </li>
 
                 <!-- Bimbingan -->
-                <li class="nav-item {{ request()->is('mahasiswa/bimbingan') || request()->is('mahasiswa/bimbingan/*') ? 'active' : '' }}">
+                <li
+                    class="nav-item {{ request()->is('mahasiswa/bimbingan') || request()->is('mahasiswa/bimbingan/*') ? 'active' : '' }}">
                     <a href="{{ route('dashboard.bimbingan') }}" class="nav-link">
                         <i class="fas fa-users-cog me-2"></i>
                         <p>Bimbingan</p>
@@ -79,11 +80,21 @@
                     </a>
                 </li>
 
-                <!--  Sempro -->
-                <li>
-                    <i class=""></i>
-                    <p>Sempro</p>
-                </li>
+                @php
+                    $mahasiswa = auth()->user()?->mahasiswa;
+                    $isD4 = $mahasiswa && $mahasiswa->prodi === 'd4';
+                @endphp
+
+                @if ($isD4)
+                    <!-- Sempro - Hanya ditampilkan untuk prodi D4 -->
+                    <li
+                        class="nav-item {{ request()->is('mahasiswa/sempro') || request()->is('mahasiswa/sempro/*') ? 'active' : '' }}">
+                        <a href="{{ route('dashboard.sempro') }}">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <p>Seminar Proposal</p>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </div>
     </div>
