@@ -76,7 +76,7 @@
                     modal.querySelector('#detailNama').textContent = nama;
                     modal.querySelector('#detailEmail').textContent = email;
                     modal.querySelector('#detailNidn').textContent = nidn;
-                    modal.querySelector('#detailFoto').src = foto ? `/storage/${foto}` :
+                    modal.querySelector('#detailFoto').src = foto ? `/storage/public/avatars/${foto}` :
                         'https://placehold.co/200x260/6c757d/white?text=Foto';
                     modal.querySelector('#detailCreated').textContent = new Date(created)
                         .toLocaleDateString('id-ID', {

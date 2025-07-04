@@ -3,66 +3,64 @@
 
 @section('content')
     <div class="container-fluid">
+        @php
+            // Cek peran user yang sedang login untuk menampilkan judul yang sesuai
+            $user = auth()->user();
+            $isKaprodiD3 = $user->hasRole('kaprodi-d3');
+            $isKaprodiD4 = $user->hasRole('kaprodi-d4');
+        @endphp
+
         <h5 class="fw-bold text-primary mb-3">
-            <i class="bi bi-journal-text me-2"></i> Daftar Pengajuan Judul Tugas Akhir
+            <i class="bi bi-journal-check me-2"></i>
+            Validasi Pengajuan Judul Tugas Akhir
+            {{-- Menambahkan label prodi yang dikelola oleh Kaprodi --}}
+            @if ($isKaprodiD3)
+                <span class="badge bg-info">Program Studi D3</span>
+            @elseif($isKaprodiD4)
+                <span class="badge bg-info">Program Studi D4</span>
+            @endif
         </h5>
 
-        {{-- Filter Prodi --}}
-        <ul class="nav nav-tabs mb-3">
-            <li class="nav-item"><a class="nav-link {{ request('prodi') == null ? 'active' : '' }}" href="?">All</a></li>
-            <li class="nav-item"><a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}" href="?prodi=D4">D4</a>
-            </li>
-            <li class="nav-item"><a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}" href="?prodi=D3">D3</a>
-            </li>
-        </ul>
-
-        {{-- Search --}}
+        {{-- Search Form --}}
         <form method="GET" class="mb-3">
-            <input type="hidden" name="prodi" value="{{ request('prodi') }}">
             <div class="input-group">
-                <input type="text" name="search" class="form-control" placeholder="Cari nama mahasiswa..."
+                <input type="text" name="search" class="form-control" placeholder="Cari nama atau NIM mahasiswa..."
                     value="{{ request('search') }}">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Cari</button>
             </div>
         </form>
 
         {{-- Tab Status --}}
-        <ul class="nav nav-tabs mb-3" id="statusTab" role="tablist">
+        <ul class="nav nav-pills nav-fill mb-3" id="statusTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="menunggu-tab" data-bs-toggle="tab" data-bs-target="#menunggu"
-                    type="button" role="tab" aria-controls="menunggu" aria-selected="true">Menunggu Validasi</button>
+                    type="button" role="tab" aria-controls="menunggu" aria-selected="true">
+                    Menunggu Validasi <span class="badge bg-warning ms-1">{{ $tugasAkhirMenunggu->count() }}</span>
+                </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="diterima-tab" data-bs-toggle="tab" data-bs-target="#diterima" type="button"
-                    role="tab" aria-controls="diterima" aria-selected="false">Diterima</button>
+                    role="tab" aria-controls="diterima" aria-selected="false">
+                    Diterima <span class="badge bg-success ms-1">{{ $tugasAkhirDiterima->count() }}</span>
+                </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="ditolak-tab" data-bs-toggle="tab" data-bs-target="#ditolak" type="button"
-                    role="tab" aria-controls="ditolak" aria-selected="false">Ditolak</button>
+                    role="tab" aria-controls="ditolak" aria-selected="false">
+                    Ditolak <span class="badge bg-danger ms-1">{{ $tugasAkhirDitolak->count() }}</span>
+                </button>
             </li>
         </ul>
 
         <div class="tab-content" id="statusTabContent">
-            @php
-                $filterByProdi = fn($ta) => request('prodi')
-                    ? $ta->mahasiswa->prodi === strtolower(request('prodi'))
-                    : true;
-            @endphp
-
             <div class="tab-pane fade show active" id="menunggu" role="tabpanel" aria-labelledby="menunggu-tab">
-                @include('dosen.kaprodi.partials.table', [
-                    'tugasAkhir' => $tugasAkhirMenunggu->filter($filterByProdi),
-                ])
+                @include('dosen.kaprodi.partials.table', ['tugasAkhirCollection' => $tugasAkhirMenunggu])
             </div>
             <div class="tab-pane fade" id="diterima" role="tabpanel" aria-labelledby="diterima-tab">
-                @include('dosen.kaprodi.partials.table', [
-                    'tugasAkhir' => $tugasAkhirDiterima->filter($filterByProdi),
-                ])
+                @include('dosen.kaprodi.partials.table', ['tugasAkhirCollection' => $tugasAkhirDiterima])
             </div>
             <div class="tab-pane fade" id="ditolak" role="tabpanel" aria-labelledby="ditolak-tab">
-                @include('dosen.kaprodi.partials.table', [
-                    'tugasAkhir' => $tugasAkhirDitolak->filter($filterByProdi),
-                ])
+                @include('dosen.kaprodi.partials.table', ['tugasAkhirCollection' => $tugasAkhirDitolak])
             </div>
         </div>
     </div>
@@ -219,7 +217,7 @@
                     };
                 })
                 .catch(err => {
-                    alert('Gagal memuat detail. Coba lagi.');
+                    swal('Gagal memuat detail. Coba lagi.');
                     console.error(err);
                 });
         }

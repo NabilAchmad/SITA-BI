@@ -11,31 +11,30 @@ class RejectTugasAkhirRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Otorisasi sederhana, pastikan user memiliki peran 'kaprodi'
-        // Middleware di route sudah menangani ini, tapi ini lapisan tambahan.
-        return $this->user()->hasRole('kaprodi');
+        // Otorisasi utama akan ditangani oleh Policy atau di controller.
+        // Di sini kita pastikan user adalah salah satu Kaprodi.
+        return $this->user()->hasAnyRole(['kaprodi-d3', 'kaprodi-d4']);
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            'alasan_penolakan' => 'required|string|min:10',
+            'alasan_penolakan' => 'required|string|min:10|max:500',
         ];
     }
 
     /**
-     * Menambahkan pesan error kustom untuk pengalaman pengguna yang lebih baik.
+     * Get custom messages for validator errors.
      */
     public function messages(): array
     {
         return [
-            'alasan_penolakan.required' => 'Alasan penolakan tidak boleh kosong.',
-            'alasan_penolakan.min' => 'Alasan penolakan harus diisi minimal 10 karakter.',
+            'alasan_penolakan.required' => 'Alasan penolakan wajib diisi.',
+            'alasan_penolakan.min' => 'Alasan penolakan minimal harus 10 karakter.',
+            'alasan_penolakan.max' => 'Alasan penolakan tidak boleh lebih dari 500 karakter.',
         ];
     }
 }

@@ -6,7 +6,7 @@
     <div class="card shadow-sm mb-4">
         <div class="card-header">
             @include('admin.mahasiswa.breadcrumbs.navlink')
-            <div class="text-center">
+            <div class="text-center mt-5">
                 <h4 class="card-title text-primary mb-0">Daftar Mahasiswa Sudah Memiliki Pembimbing</h4>
             </div>
         </div>
@@ -15,6 +15,7 @@
             <!-- Filter Prodi -->
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item">
+                    {{-- Asumsi route name adalah 'penugasan-pembimbing.list' --}}
                     <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
                         href="{{ route('list-mahasiswa') }}">All</a>
                 </li>
@@ -58,20 +59,29 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($mahasiswa as $index => $mhs)
+                        {{-- ========================================================================= --}}
+                        {{-- PERBAIKAN: Iterasi menggunakan $tugasAkhirList sesuai data dari controller --}}
+                        {{-- ========================================================================= --}}
+                        @forelse ($tugasAkhirList as $index => $ta)
+                            @php
+                                // Helper untuk membuat kode di dalam <td> lebih bersih
+                                $mahasiswa = $ta->mahasiswa;
+                                $pembimbing1 = $ta->peranDosenTA->where('peran', 'pembimbing1')->first();
+                                $pembimbing2 = $ta->peranDosenTA->where('peran', 'pembimbing2')->first();
+                            @endphp
                             <tr>
-                                <td>{{ ($mahasiswa->firstItem() ?? 0) + $index }}</td>
-                                <td>{{ $mhs->user->name }}</td>
-                                <td>{{ $mhs->nim }}</td>
-                                <td>{{ strtoupper($mhs->prodi) }} Bahasa Inggris</td>
-                                <td>{{ $mhs->tugasAkhir->judul ?? '-' }}</td>
-                                <td>{{ optional($mhs->tugasAkhir->peranDosenTa->where('peran', 'pembimbing1')->first())->dosen->user->name ?? '-' }}
-                                </td>
-                                <td>{{ optional($mhs->tugasAkhir->peranDosenTa->where('peran', 'pembimbing2')->first())->dosen->user->name ?? '-' }}
-                                </td>
+                                {{-- PERBAIKAN: Menggunakan $tugasAkhirList untuk paginasi --}}
+                                <td>{{ ($tugasAkhirList->firstItem() ?? 0) + $index }}</td>
+                                <td>{{ $mahasiswa->user->name }}</td>
+                                <td>{{ $mahasiswa->nim }}</td>
+                                <td>{{ strtoupper($mahasiswa->prodi) }} Bahasa Inggris</td>
+                                <td>{{ $ta->judul ?? '-' }}</td>
+                                {{-- PERBAIKAN: Menggunakan helper untuk menampilkan nama pembimbing --}}
+                                <td>{{ $pembimbing1->dosen->user->name ?? '-' }}</td>
+                                <td>{{ $pembimbing2->dosen->user->name ?? '-' }}</td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                        data-bs-target="#modalEditPembimbing-{{ $mhs->id }}">
+                                        data-bs-target="#modalEditPembimbing-{{ $ta->id }}">
                                         <i class="bi bi-pencil-square"></i> Edit
                                     </button>
                                 </td>
@@ -87,63 +97,17 @@
 
             <!-- Pagination -->
             <div class="d-flex justify-content-end">
-                {{ $mahasiswa->links() }}
+                {{ $tugasAkhirList->links() }}
             </div>
         </div>
     </div>
 
     <!-- Semua Modal Ditempatkan di Luar Tabel -->
-    @foreach ($mahasiswa as $mhs)
+    {{-- PERBAIKAN: Iterasi menggunakan $tugasAkhirList untuk menyertakan modal --}}
+    @foreach ($tugasAkhirList as $ta)
         @include('admin.mahasiswa.partials.modal-edit-pembimbing', [
-            'mhs' => $mhs,
-            'dosen' => $dosen,
+            'tugasAkhir' => $ta,
+            'dosenList' => $dosenList, // Pastikan nama variabel 'dosen' menjadi 'dosenList'
         ])
     @endforeach
 @endsection
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('[id^="searchDosenEdit-"]').forEach(input => {
-                const id = input.id.split('-')[1];
-                const tbody = document.getElementById(`tbodyDosenEdit-${id}`);
-                input.addEventListener('input', function() {
-                    const filter = this.value.toLowerCase();
-                    tbody.querySelectorAll('tr').forEach(row => {
-                        const nama = row.querySelector('.nama-dosen').textContent
-                            .toLowerCase();
-                        row.style.display = nama.includes(filter) ? '' : 'none';
-                    });
-                });
-            });
-
-            document.querySelectorAll('[id^="modalEditPembimbing-"]').forEach(modal => {
-                modal.addEventListener('show.bs.modal', function() {
-                    const form = this.querySelector('form');
-                    form.addEventListener('submit', function(e) {
-                        const p1 = form.querySelector('input[name="pembimbing1"]:checked');
-                        const p2 = form.querySelector('input[name="pembimbing2"]:checked');
-
-                        if (!p1 || !p2) {
-                            e.preventDefault();
-                            swal("Peringatan!", "Pilih Pembimbing 1 dan Pembimbing 2!",
-                                "warning");
-                        } else if (p1.value === p2.value) {
-                            e.preventDefault();
-                            swal("Peringatan!", "Pembimbing 1 dan 2 tidak boleh sama!",
-                                "warning");
-                        }
-                    });
-                });
-            });
-
-            @if (session('success'))
-                swal("Berhasil!", "{{ session('success') }}", "success");
-            @endif
-
-            @if (session('error'))
-                swal("Gagal!", "{{ session('error') }}", "error");
-            @endif
-        });
-    </script>
-@endpush

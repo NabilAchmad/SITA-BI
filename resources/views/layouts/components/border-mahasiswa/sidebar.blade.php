@@ -78,6 +78,12 @@
                         <p>Sidang</p>
                     </a>
                 </li>
+
+                <!--  Sempro -->
+                <li>
+                    <i class=""></i>
+                    <p>Sempro</p>
+                </li>
             </ul>
         </div>
     </div>

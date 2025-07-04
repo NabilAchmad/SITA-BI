@@ -41,7 +41,7 @@
 </head>
 
 <body>
-    <div class="wrapper sidebar_minimize">
+    <div class="wrapper">
         <!-- Sidebar -->
         @php
             $user = auth()->user();

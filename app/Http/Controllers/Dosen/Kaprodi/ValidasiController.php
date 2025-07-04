@@ -8,7 +8,6 @@ use App\Models\TugasAkhir;
 use App\Services\Kaprodi\ValidasiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ValidasiController extends Controller
@@ -21,94 +20,61 @@ class ValidasiController extends Controller
     }
 
     /**
-     * Menampilkan daftar tugas akhir yang perlu divalidasi.
-     *
-     * @param Request $request
-     * @return \Illuminate\View\View
+     * Menampilkan halaman validasi dengan data yang sudah difilter
+     * berdasarkan prodi Kaprodi yang login.
      */
-    public function index(Request $request): View
+    public function index(): View
     {
-        // Ambil data untuk setiap tab secara terpisah
-        $tugasAkhirMenunggu = TugasAkhir::with('mahasiswa.user')
-            ->where('status', TugasAkhir::STATUS_DIAJUKAN)
-            ->latest()
-            ->get();
+        $data = $this->validasiService->getValidationLists();
 
-        $tugasAkhirDiterima = TugasAkhir::with('mahasiswa.user')
-            ->where('status', TugasAkhir::STATUS_DISETUJUI)
-            ->latest()
-            ->get();
-
-        $tugasAkhirDitolak = TugasAkhir::with('mahasiswa.user')
-            ->where('status', TugasAkhir::STATUS_DITOLAK)
-            ->latest()
-            ->get();
-
-        // Kirim ketiga variabel tersebut ke view menggunakan compact
-        return view('dosen.kaprodi.validasi.index', compact(
-            'tugasAkhirMenunggu',
-            'tugasAkhirDiterima',
-            'tugasAkhirDitolak'
-        ));
+        return view('dosen.kaprodi.validasi.index', $data);
     }
 
     /**
-     * PERBAIKAN: Metode baru untuk menangani AJAX/Fetch request dari modal.
-     * Metode ini akan mengembalikan data dalam format JSON.
-     *
-     * @param TugasAkhir $tugasAkhir
-     * @return JsonResponse
+     * Mengambil detail Tugas Akhir untuk ditampilkan di modal.
      */
     public function getDetail(TugasAkhir $tugasAkhir): JsonResponse
     {
-        // Panggil service untuk mendapatkan data yang sudah diformat
-        $details = $this->validasiService->getValidationDetails($tugasAkhir);
+        // Pastikan Kaprodi hanya bisa melihat detail dari prodinya sendiri
+        $this->authorize('view', $tugasAkhir);
 
-        // Kembalikan sebagai respons JSON
+        $details = $this->validasiService->getValidationDetails($tugasAkhir);
         return response()->json($details);
     }
 
     /**
      * Menyetujui pengajuan tugas akhir.
-     * Nama metode diubah dari 'approve' menjadi 'terima' agar sesuai dengan route di view.
-     *
-     * @param TugasAkhir $tugasAkhir
-     * @return RedirectResponse
      */
     public function terima(TugasAkhir $tugasAkhir): RedirectResponse
     {
+        $this->authorize('update', $tugasAkhir);
+
         $this->validasiService->approveTugasAkhir($tugasAkhir);
 
-        // Menggunakan format notifikasi yang konsisten
         return redirect()->back()->with('alert', [
             'type' => 'success',
-            'title' => 'Berhasil',
+            'title' => 'Berhasil!',
             'message' => 'Tugas akhir telah diterima.'
         ]);
     }
 
     /**
      * Menolak pengajuan tugas akhir.
-     *
-     * @param RejectTugasAkhirRequest $request
-     * @param TugasAkhir $tugasAkhir
-     * @return RedirectResponse
      */
     public function tolak(RejectTugasAkhirRequest $request, TugasAkhir $tugasAkhir): RedirectResponse
     {
-        // Panggil service untuk menolak TA, teruskan alasan penolakan dari request.
+        // Otorisasi sudah ditangani oleh RejectTugasAkhirRequest dan policy
+        $this->authorize('update', $tugasAkhir);
+
         $this->validasiService->rejectTugasAkhir(
             $tugasAkhir,
-            $request->input('alasan_penolakan') // Input ini harus cocok dengan name di form view.
+            $request->validated()['alasan_penolakan']
         );
 
         return redirect()->back()->with('alert', [
-            'type' => 'success', // Gunakan 'success' atau 'error' untuk sweet alert
-            'title' => 'Berhasil',
-            'message' => 'Pengajuan tugas akhir mahasiswa telah ditolak.'
+            'type' => 'warning',
+            'title' => 'Ditolak!',
+            'message' => 'Pengajuan tugas akhir telah ditolak.'
         ]);
     }
-
-    // CATATAN: Metode show() dan detailPengajuan() yang lama bisa dihapus
-    // karena fungsionalitasnya sudah digantikan oleh getDetail() yang lebih efisien.
 }

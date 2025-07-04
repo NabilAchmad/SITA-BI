@@ -3,165 +3,103 @@
 namespace App\Services\Kaprodi;
 
 use App\Models\TugasAkhir;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class ValidasiService
 {
     /**
-     * Mengambil daftar tugas akhir yang menunggu validasi, dengan filter.
-     *
-     * @param Request $request
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * Mengambil semua daftar tugas akhir untuk halaman validasi,
+     * otomatis terfilter berdasarkan prodi Kaprodi yang login.
      */
-    public function getTugasAkhirForValidation(Request $request): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getValidationLists(): array
     {
-        // PERBAIKAN: Gunakan scope model untuk query yang lebih bersih.
-        // Anda perlu menambahkan scope ini di model TugasAkhir.
-        $query = TugasAkhir::awaitingValidation();
+        $user = Auth::user();
+        $programStudi = null;
 
-        // Terapkan filter prodi
-        if ($request->filled('prodi')) {
-            $query->whereHas('mahasiswa', fn($q) => $q->where('prodi', $request->prodi));
+        if ($user->hasRole('kaprodi-d3')) {
+            $programStudi = 'D3';
+        } elseif ($user->hasRole('kaprodi-d4')) {
+            $programStudi = 'D4';
         }
 
-        // Terapkan filter pencarian
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('mahasiswa.user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('nim', 'like', "%{$search}%");
+        $baseQuery = TugasAkhir::with('mahasiswa.user');
+
+        if ($programStudi) {
+            $baseQuery->whereHas('mahasiswa', function ($query) use ($programStudi) {
+                $query->where('prodi', $programStudi);
             });
         }
 
-        // Eager load relasi untuk menghindari N+1 query problem di view.
-        return $query->with('mahasiswa.user')
-            ->latest()
-            ->paginate(10)
-            ->withQueryString(); // Agar filter tetap ada saat paginasi
+        return [
+            'tugasAkhirMenunggu' => (clone $baseQuery)->where('status', TugasAkhir::STATUS_DIAJUKAN)->latest()->get(),
+            'tugasAkhirDiterima' => (clone $baseQuery)->where('status', TugasAkhir::STATUS_DISETUJUI)->latest()->get(),
+            'tugasAkhirDitolak'  => (clone $baseQuery)->where('status', TugasAkhir::STATUS_DITOLAK)->latest()->get(),
+        ];
     }
 
     /**
-     * Mengambil semua data yang diperlukan untuk modal detail validasi.
-     *
-     * @param TugasAkhir $tugasAkhir
-     * @return array
+     * Mengambil detail yang diperlukan untuk modal.
      */
     public function getValidationDetails(TugasAkhir $tugasAkhir): array
     {
-        $tugasAkhir->load('mahasiswa.user');
+        $tugasAkhir->load('mahasiswa.user', 'disetujuiOleh', 'ditolakOleh');
 
-        $base = [
+        $details = [
             'nama' => $tugasAkhir->mahasiswa->user->name,
             'nim' => $tugasAkhir->mahasiswa->nim,
-            'prodi' => $tugasAkhir->mahasiswa->prodi === 'd3' ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris',
+            'prodi' => $tugasAkhir->mahasiswa->prodi,
             'judul' => $tugasAkhir->judul,
-            'status' => $tugasAkhir->status,
             'status_label' => strtoupper($tugasAkhir->status),
+            'actionable' => $tugasAkhir->status === TugasAkhir::STATUS_DIAJUKAN,
+            'similar' => $tugasAkhir->status === TugasAkhir::STATUS_DIAJUKAN ? $this->findSimilarTitles($tugasAkhir) : [],
+            'disetujui_oleh' => optional($tugasAkhir->disetujuiOleh)->name,
+            'tanggal_disetujui' => optional($tugasAkhir->tanggal_persetujuan)->format('d F Y'),
+            'alasan_penolakan' => $tugasAkhir->alasan_penolakan,
+            'ditolak_oleh' => optional($tugasAkhir->ditolakOleh)->name,
+            'tanggal_ditolak' => $tugasAkhir->status === TugasAkhir::STATUS_DITOLAK ? $tugasAkhir->updated_at->format('d F Y') : null,
         ];
 
-        switch ($tugasAkhir->status) {
-            case TugasAkhir::STATUS_DIAJUKAN:
-                return array_merge($base, [
-                    'similar' => $this->findSimilarTitles($tugasAkhir),
-                    'actionable' => true,
-                ]);
-
-            case TugasAkhir::STATUS_DISETUJUI:
-                return array_merge($base, [
-                    'disetujui_oleh' => optional($tugasAkhir->disetujui_oleh)->name ?? 'Kaprodi',
-                    'tanggal_disetujui' => $tugasAkhir->updated_at->format('d-m-Y'),
-                    'similar' => [], // Tidak perlu cari similar
-                    'actionable' => false,
-                ]);
-
-            case TugasAkhir::STATUS_DITOLAK:
-                return array_merge($base, [
-                    'alasan_penolakan' => $tugasAkhir->alasan_penolakan ?? '-',
-                    'ditolak_oleh' => optional($tugasAkhir->ditolak_oleh)->name ?? 'Kaprodi',
-                    'tanggal_ditolak' => $tugasAkhir->updated_at->format('d-m-Y'),
-                    'similar' => [], // Tidak perlu cari similar
-                    'actionable' => false,
-                ]);
-
-            default:
-                return array_merge($base, [
-                    'keterangan' => 'Status tidak dikenali.',
-                    'similar' => [],
-                    'actionable' => false,
-                ]);
-        }
+        return $details;
     }
 
     /**
-     * Menyetujui sebuah pengajuan tugas akhir.
-     *
-     * @param TugasAkhir $tugasAkhir
-     * @return bool
+     * Menyetujui pengajuan tugas akhir.
      */
     public function approveTugasAkhir(TugasAkhir $tugasAkhir): bool
     {
         return $tugasAkhir->update([
             'status' => TugasAkhir::STATUS_DISETUJUI,
-            'tanggal_persetujuan' => now(), // PERBAIKAN: Catat tanggal disetujui
-            'disetujui_oleh' => Auth::id() // Simpan ID user yang menyetujui
+            'tanggal_persetujuan' => now(),
+            'disetujui_oleh' => Auth::id(),
+            'alasan_penolakan' => null, // Bersihkan alasan penolakan jika ada
         ]);
     }
 
     /**
-     * Menolak pengajuan dan memberikan catatan revisi.
-     *
-     * @param TugasAkhir $tugasAkhir
-     * @param string $catatanRevisi
-     * @return bool
+     * Menolak pengajuan tugas akhir.
      */
-    public function rejectTugasAkhir(TugasAkhir $tugasAkhir, string $catatanRevisi): bool
+    public function rejectTugasAkhir(TugasAkhir $tugasAkhir, string $alasan): bool
     {
-        // Penggunaan DB::transaction sudah sangat baik.
-        return DB::transaction(function () use ($tugasAkhir, $catatanRevisi) {
-            $tugasAkhir->update([
-                'status' => TugasAkhir::STATUS_DITOLAK, // Gunakan status DITOLAK
-                'alasan_penolakan' => $catatanRevisi, // Simpan alasan di kolom komentar utama
-                'ditolak_oleh' => Auth::id(), // Simpan ID user yang menolak
-            ]);
-
-            // Jika Anda ingin sistem revisi formal, logika ini bisa disimpan.
-            // Namun untuk penolakan judul, seringkali cukup dengan komentar.
-            // $tugasAkhir->revisiTa()->create([...]);
-
-            return true;
-        });
+        return $tugasAkhir->update([
+            'status' => TugasAkhir::STATUS_DITOLAK,
+            'alasan_penolakan' => $alasan,
+            'ditolak_oleh' => Auth::id(),
+        ]);
     }
 
     /**
-     * PERBAIKAN: Fungsi private untuk mencari judul yang mirip.
-     * Logika ini sekarang terpusat di dalam service.
-     *
-     * @param TugasAkhir $targetTugasAkhir
-     * @param int $threshold Persentase kemiripan minimum (default 75%)
-     * @return Collection
+     * Mencari judul yang mirip.
      */
-    private function findSimilarTitles(TugasAkhir $targetTugasAkhir, int $threshold = 75): Collection
+    private function findSimilarTitles(TugasAkhir $target, int $threshold = 70): Collection
     {
-        // Ambil semua judul lain yang relevan (sudah ada/disetujui)
-        $existingTitles = TugasAkhir::where('id', '!=', $targetTugasAkhir->id)
-            ->whereIn('status', [TugasAkhir::STATUS_DISETUJUI, TugasAkhir::STATUS_SELESAI])
+        $existingTitles = TugasAkhir::where('id', '!=', $target->id)
+            ->where('status', TugasAkhir::STATUS_DISETUJUI)
             ->pluck('judul');
 
-        $similarTitles = collect();
-        $targetTitle = strtolower($targetTugasAkhir->judul);
-
-        foreach ($existingTitles as $title) {
-            similar_text($targetTitle, strtolower($title), $percentage);
-
-            if ($percentage >= $threshold) {
-                // Tambahkan judul yang mirip beserta persentasenya
-                $similarTitles->push($title . " (" . round($percentage) . "% mirip)");
-            }
-        }
-
-        return $similarTitles;
+        return $existingTitles->mapWithKeys(function ($title) use ($target, $threshold) {
+            similar_text(strtolower($target->judul), strtolower($title), $percentage);
+            return $percentage >= $threshold ? [$title => round($percentage)] : [];
+        })->sortDesc();
     }
 }

@@ -16,8 +16,16 @@ class TawaranTopik extends Model
     protected $guarded = ['id'];
 
     /**
-     * PERBAIKAN: Mengganti relasi ke Dosen menjadi ke User, sesuai permintaan.
-     * Laravel akan mencari kolom 'user_id' di tabel 'tawaran_topik'.
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'kuota' => 'integer', // Memastikan kuota selalu bertipe integer
+    ];
+
+    /**
+     * Relasi ke User yang membuat tawaran topik.
      */
     public function user(): BelongsTo
     {
@@ -25,12 +33,10 @@ class TawaranTopik extends Model
     }
 
     /**
-     * Relasi ini adalah 'shortcut' untuk mendapatkan data Dosen melalui User.
+     * Shortcut untuk mendapatkan data Dosen melalui User.
      */
     public function dosen()
     {
-        // Asumsi: Setiap User yang membuat topik adalah Dosen.
-        // Relasi ini mencari Dosen yang memiliki user_id yang sama dengan user_id topik ini.
         return $this->hasOneThrough(Dosen::class, User::class, 'id', 'user_id', 'user_id', 'id');
     }
 
@@ -44,13 +50,21 @@ class TawaranTopik extends Model
         return $this->hasMany(TugasAkhir::class, 'tawaran_topik_id');
     }
 
+    /**
+     * Scope untuk mengambil topik yang masih tersedia.
+     */
     public function scopeAvailable($query)
     {
-        return $query->where('kuota', '>', 0)->where('status', 'tersedia');
+        return $query->where('kuota', '>', 0);
     }
 
+    /**
+     * Method helper untuk memeriksa apakah sebuah topik tersedia.
+     *
+     * @return bool
+     */
     public function isAvailable(): bool
     {
-        return $this->kuota > 0 && $this->status === 'tersedia';
+        return $this->kuota > 0;
     }
 }
