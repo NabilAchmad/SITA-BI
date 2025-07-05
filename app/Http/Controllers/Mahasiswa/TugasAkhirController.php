@@ -100,7 +100,6 @@ class TugasAkhirController extends Controller
         // Sebaiknya gunakan FormRequest untuk validasi yang lebih bersih
         $validatedData = $request->validate([
             'judul' => 'required|string|max:255',
-            'abstrak' => 'required|string',
         ]);
 
         try {

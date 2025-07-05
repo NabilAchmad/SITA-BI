@@ -90,7 +90,7 @@
                     <li
                         class="nav-item {{ request()->is('mahasiswa/sempro') || request()->is('mahasiswa/sempro/*') ? 'active' : '' }}">
                         <a href="{{ route('dashboard.sempro') }}">
-                            <i class="fas fa-chalkboard-teacher"></i>
+                            <i class="fas fa-address-book"></i>
                             <p>Seminar Proposal</p>
                         </a>
                     </li>

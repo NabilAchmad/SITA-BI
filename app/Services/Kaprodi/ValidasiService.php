@@ -2,104 +2,160 @@
 
 namespace App\Services\Kaprodi;
 
+use App\Models\JudulTugasAkhir;
 use App\Models\TugasAkhir;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class ValidasiService
 {
-    /**
-     * Mengambil semua daftar tugas akhir untuk halaman validasi,
-     * otomatis terfilter berdasarkan prodi Kaprodi yang login.
-     */
     public function getValidationLists(): array
     {
         $user = Auth::user();
-        $programStudi = null;
+        $prodi = $user?->mahasiswa?->prodi;
 
-        if ($user->hasRole('kaprodi-d3')) {
-            $programStudi = 'D3';
-        } elseif ($user->hasRole('kaprodi-d4')) {
-            $programStudi = 'D4';
+        if (!$prodi) {
+            return [
+                'tugasAkhirMenunggu' => collect(),
+                'tugasAkhirDiterima' => collect(),
+                'tugasAkhirDitolak' => collect(),
+            ];
         }
 
-        $baseQuery = TugasAkhir::with('mahasiswa.user');
+        // PERBAIKAN: Menggunakan status 'diajukan' sesuai skema DB Anda
+        $statusMenunggu = 'diajukan';
+        $statusDiterima = 'disetujui';
+        $statusDitolak = 'ditolak';
 
-        if ($programStudi) {
-            $baseQuery->whereHas('mahasiswa', function ($query) use ($programStudi) {
-                $query->where('prodi', $programStudi);
+        $baseQuery = TugasAkhir::query()
+            ->with(['mahasiswa.user'])
+            ->whereHas('mahasiswa', fn($q) => $q->where('prodi', $prodi));
+
+        if ($search = request('search')) {
+            $baseQuery->where(function ($query) use ($search) {
+                $query->where('judul', 'like', "%{$search}%")
+                    ->orWhereHas('mahasiswa', function ($subQuery) use ($search) {
+                        $subQuery->where('nim', 'like', "%{$search}%")
+                            ->orWhereHas('user', fn($userQuery) => $userQuery->where('name', 'like', "%{$search}%"));
+                    });
             });
         }
 
+        $allTugasAkhir = $baseQuery->latest('tanggal_pengajuan')->get();
+
         return [
-            'tugasAkhirMenunggu' => (clone $baseQuery)->where('status', TugasAkhir::STATUS_DIAJUKAN)->latest()->get(),
-            'tugasAkhirDiterima' => (clone $baseQuery)->where('status', TugasAkhir::STATUS_DISETUJUI)->latest()->get(),
-            'tugasAkhirDitolak'  => (clone $baseQuery)->where('status', TugasAkhir::STATUS_DITOLAK)->latest()->get(),
+            'tugasAkhirMenunggu' => $allTugasAkhir->where('status', $statusMenunggu),
+            'tugasAkhirDiterima' => $allTugasAkhir->where('status', $statusDiterima),
+            'tugasAkhirDitolak' => $allTugasAkhir->where('status', $statusDitolak),
         ];
     }
 
-    /**
-     * Mengambil detail yang diperlukan untuk modal.
-     */
     public function getValidationDetails(TugasAkhir $tugasAkhir): array
     {
-        $tugasAkhir->load('mahasiswa.user', 'disetujuiOleh', 'ditolakOleh');
-
-        $details = [
-            'nama' => $tugasAkhir->mahasiswa->user->name,
-            'nim' => $tugasAkhir->mahasiswa->nim,
-            'prodi' => $tugasAkhir->mahasiswa->prodi,
+        // PERBAIKAN: Menggunakan relasi yang benar (approver/rejector)
+        return [
+            'nama' => $tugasAkhir->mahasiswa?->user?->name ?? 'Data Mahasiswa Tidak Ditemukan',
+            'nim' => $tugasAkhir->mahasiswa?->nim ?? '-',
+            'prodi' => $tugasAkhir->mahasiswa?->prodi ? 'D' . $tugasAkhir->mahasiswa->prodi . ' Bahasa Inggris' : 'N/A',
             'judul' => $tugasAkhir->judul,
-            'status_label' => strtoupper($tugasAkhir->status),
-            'actionable' => $tugasAkhir->status === TugasAkhir::STATUS_DIAJUKAN,
-            'similar' => $tugasAkhir->status === TugasAkhir::STATUS_DIAJUKAN ? $this->findSimilarTitles($tugasAkhir) : [],
-            'disetujui_oleh' => optional($tugasAkhir->disetujuiOleh)->name,
-            'tanggal_disetujui' => optional($tugasAkhir->tanggal_persetujuan)->format('d F Y'),
-            'alasan_penolakan' => $tugasAkhir->alasan_penolakan,
-            'ditolak_oleh' => optional($tugasAkhir->ditolakOleh)->name,
-            'tanggal_ditolak' => $tugasAkhir->status === TugasAkhir::STATUS_DITOLAK ? $tugasAkhir->updated_at->format('d F Y') : null,
+            'actionable' => $tugasAkhir->status === 'diajukan', // Status yang bisa divalidasi
+            'disetujui_oleh' => $tugasAkhir->status === 'disetujui' ? ($tugasAkhir->approver?->name ?? 'N/A') : null,
+            'tanggal_disetujui' => $tugasAkhir->status === 'disetujui' ? Carbon::parse($tugasAkhir->updated_at)->translatedFormat('d F Y \p\u\k\u\l H:i') : null,
+            'ditolak_oleh' => $tugasAkhir->status === 'ditolak' ? ($tugasAkhir->rejector?->name ?? 'N/A') : null,
+            'tanggal_ditolak' => $tugasAkhir->status === 'ditolak' ? Carbon::parse($tugasAkhir->updated_at)->translatedFormat('d F Y \p\u\k\u\l H:i') : null,
+            'alasan_penolakan' => $tugasAkhir->status === 'ditolak' ? $tugasAkhir->alasan_penolakan : null,
         ];
-
-        return $details;
     }
 
-    /**
-     * Menyetujui pengajuan tugas akhir.
-     */
-    public function approveTugasAkhir(TugasAkhir $tugasAkhir): bool
+    public function approveTugasAkhir(TugasAkhir $tugasAkhir): void
     {
-        return $tugasAkhir->update([
-            'status' => TugasAkhir::STATUS_DISETUJUI,
-            'tanggal_persetujuan' => now(),
+        // PERBAIKAN: Menggunakan nama kolom yang benar dari skema DB
+        $tugasAkhir->update([
+            'status' => 'disetujui',
             'disetujui_oleh' => Auth::id(),
-            'alasan_penolakan' => null, // Bersihkan alasan penolakan jika ada
+            'alasan_penolakan' => null,
+            'ditolak_oleh' => null,
         ]);
     }
 
-    /**
-     * Menolak pengajuan tugas akhir.
-     */
-    public function rejectTugasAkhir(TugasAkhir $tugasAkhir, string $alasan): bool
+    public function rejectTugasAkhir(TugasAkhir $tugasAkhir, string $alasan): void
     {
-        return $tugasAkhir->update([
-            'status' => TugasAkhir::STATUS_DITOLAK,
-            'alasan_penolakan' => $alasan,
+        // PERBAIKAN: Menggunakan nama kolom yang benar dari skema DB
+        $tugasAkhir->update([
+            'status' => 'ditolak',
             'ditolak_oleh' => Auth::id(),
+            'alasan_penolakan' => $alasan,
+            'disetujui_oleh' => null,
         ]);
     }
 
-    /**
-     * Mencari judul yang mirip.
-     */
-    private function findSimilarTitles(TugasAkhir $target, int $threshold = 70): Collection
+    public function cekKemiripanJudulCerdas(TugasAkhir $tugasAkhir): array
     {
-        $existingTitles = TugasAkhir::where('id', '!=', $target->id)
-            ->where('status', TugasAkhir::STATUS_DISETUJUI)
-            ->pluck('judul');
+        $judulBaruNormal = $this->bersihkanTeks($tugasAkhir->judul);
+        $ambangBatas = 70;
+        $hasilMirip = [];
 
-        return $existingTitles->mapWithKeys(function ($title) use ($target, $threshold) {
-            similar_text(strtolower($target->judul), strtolower($title), $percentage);
-            return $percentage >= $threshold ? [$title => round($percentage)] : [];
-        })->sortDesc();
+        JudulTugasAkhir::query()
+            ->select(['judul', 'nama_mahasiswa', 'tahun_lulus'])
+            ->chunk(200, function ($arsipJudul) use ($judulBaruNormal, $ambangBatas, &$hasilMirip) {
+                foreach ($arsipJudul as $item) {
+                    $judulLamaNormal = $this->bersihkanTeks($item->judul);
+                    if (empty($judulLamaNormal)) continue;
+                    similar_text($judulBaruNormal, $judulLamaNormal, $persentase);
+                    if ($persentase >= $ambangBatas) {
+                        $hasilMirip[] = [
+                            'judul' => $item->judul,
+                            'nama_mahasiswa' => $item->nama_mahasiswa,
+                            'tahun_lulus' => $item->tahun_lulus,
+                            'persentase' => round($persentase, 2)
+                        ];
+                    }
+                }
+            });
+
+        if (!empty($hasilMirip)) {
+            usort($hasilMirip, fn($a, $b) => $b['persentase'] <=> $a['persentase']);
+        }
+
+        return $hasilMirip;
+    }
+
+    private function bersihkanTeks(string $teks): string
+    {
+        $teks = strtolower($teks);
+        $teks = preg_replace('/[^\p{L}\p{N}\s]/u', '', $teks);
+        $stopwords = [
+            'di',
+            'dan',
+            'yang',
+            'untuk',
+            'pada',
+            'ke',
+            'dengan',
+            'sebagai',
+            'dalam',
+            'ini',
+            'analisis',
+            'perancangan',
+            'sistem',
+            'informasi',
+            'implementasi',
+            'studi',
+            'kasus',
+            'pengaruh',
+            'terhadap',
+            'sebuah',
+            'the',
+            'of',
+            'on',
+            'an',
+            'a',
+            'in',
+            'to',
+            'for'
+        ];
+        $kata = explode(' ', $teks);
+        $kataPenting = array_diff($kata, $stopwords);
+        return preg_replace('/\s+/', ' ', trim(implode(' ', $kataPenting)));
     }
 }

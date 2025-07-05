@@ -1,3 +1,5 @@
+{{-- resources/views/dosen/kaprodi/partials/table.blade.php --}}
+
 <div class="table-responsive">
     <table class="table table-striped table-bordered text-center align-middle">
         <thead class="table-dark">
@@ -14,17 +16,22 @@
             @forelse ($tugasAkhirCollection as $ta)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td class="text-start">{{ $ta->mahasiswa->user->name }}</td>
-                    <td>{{ $ta->mahasiswa->nim }}</td>
+                    {{-- == PERBAIKAN DI SINI: Kode lebih aman dari data null == --}}
+                    <td class="text-start">{{ $ta->mahasiswa?->user?->name ?? 'Mahasiswa tidak ditemukan' }}</td>
+                    <td>{{ $ta->mahasiswa?->nim ?? '-' }}</td>
                     <td>
-                        <span class="badge {{ $ta->mahasiswa->prodi === 'D3' ? 'bg-info' : 'bg-primary' }}">
-                            {{ $ta->mahasiswa->prodi === 'D3' ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris' }}
-                        </span>
+                        @if ($ta->mahasiswa)
+                            <span class="badge {{ $ta->mahasiswa->prodi === 'D3' ? 'bg-info' : 'bg-primary' }}">
+                                {{ $ta->mahasiswa->prodi === 'D3' ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris' }}
+                            </span>
+                        @else
+                            <span class="badge bg-secondary">N/A</span>
+                        @endif
                     </td>
                     <td class="text-start">{{ $ta->judul }}</td>
                     <td>
-                        <button type="button" class="btn btn-primary btn-sm" data-id="{{ $ta->id }}"
-                            onclick="showDetail(this)">
+                        {{-- Menghapus `onclick` dan mengandalkan `data-id` untuk JS yang lebih bersih --}}
+                        <button type="button" class="btn btn-primary btn-sm" data-id="{{ $ta->id }}">
                             <i class="bi bi-search"></i> Detail
                         </button>
                     </td>

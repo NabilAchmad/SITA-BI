@@ -9,9 +9,12 @@ use App\Services\Kaprodi\ValidasiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ValidasiController extends Controller
 {
+    use AuthorizesRequests;
     protected ValidasiService $validasiService;
 
     public function __construct(ValidasiService $validasiService)
@@ -19,62 +22,86 @@ class ValidasiController extends Controller
         $this->validasiService = $validasiService;
     }
 
-    /**
-     * Menampilkan halaman validasi dengan data yang sudah difilter
-     * berdasarkan prodi Kaprodi yang login.
-     */
     public function index(): View
     {
-        $data = $this->validasiService->getValidationLists();
-
-        return view('dosen.kaprodi.validasi.index', $data);
+        try {
+            $data = $this->validasiService->getValidationLists();
+            return view('dosen.kaprodi.validasi.index', $data);
+        } catch (\Exception $e) {
+            Log::error('Gagal memuat halaman validasi Kaprodi: ' . $e->getMessage());
+            return view('dosen.kaprodi.validasi.index', [
+                'tugasAkhirMenunggu' => collect(),
+                'tugasAkhirDiterima' => collect(),
+                'tugasAkhirDitolak' => collect(),
+            ])->with('error', 'Gagal memuat data dari server. Silakan hubungi administrator.');
+        }
     }
 
-    /**
-     * Mengambil detail Tugas Akhir untuk ditampilkan di modal.
-     */
     public function getDetail(TugasAkhir $tugasAkhir): JsonResponse
     {
-        // Pastikan Kaprodi hanya bisa melihat detail dari prodinya sendiri
-        $this->authorize('view', $tugasAkhir);
-
-        $details = $this->validasiService->getValidationDetails($tugasAkhir);
-        return response()->json($details);
+        try {
+            $this->authorize('view', $tugasAkhir);
+            $tugasAkhir->load(['mahasiswa.user', 'approver', 'rejector']); // Eager load relasi yang benar
+            $details = $this->validasiService->getValidationDetails($tugasAkhir);
+            return response()->json($details);
+        } catch (\Exception $e) {
+            Log::error("Gagal mengambil detail TA #{$tugasAkhir->id}: " . $e->getMessage());
+            return response()->json(['error' => 'Tidak dapat mengambil detail data. Terjadi kesalahan pada server.'], 500);
+        }
     }
 
-    /**
-     * Menyetujui pengajuan tugas akhir.
-     */
+    public function cekKemiripan(TugasAkhir $tugasAkhir): JsonResponse
+    {
+        try {
+            $this->authorize('view', $tugasAkhir);
+            $hasil = $this->validasiService->cekKemiripanJudulCerdas($tugasAkhir);
+            return response()->json($hasil);
+        } catch (\Exception $e) {
+            Log::error("Gagal cek kemiripan TA #{$tugasAkhir->id}: " . $e->getMessage());
+            return response()->json(['error' => 'Gagal melakukan pengecekan kemiripan. Silakan coba lagi.'], 500);
+        }
+    }
+
     public function terima(TugasAkhir $tugasAkhir): RedirectResponse
     {
-        $this->authorize('update', $tugasAkhir);
-
-        $this->validasiService->approveTugasAkhir($tugasAkhir);
-
-        return redirect()->back()->with('alert', [
-            'type' => 'success',
-            'title' => 'Berhasil!',
-            'message' => 'Tugas akhir telah diterima.'
-        ]);
+        try {
+            $this->authorize('update', $tugasAkhir);
+            $this->validasiService->approveTugasAkhir($tugasAkhir);
+            return redirect()->back()->with('alert', [
+                'type' => 'success',
+                'title' => 'Berhasil!',
+                'message' => 'Tugas akhir telah diterima.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Gagal menyetujui TA #{$tugasAkhir->id}: " . $e->getMessage());
+            return redirect()->back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Gagal!',
+                'message' => 'Terjadi kesalahan saat memproses data.'
+            ]);
+        }
     }
 
-    /**
-     * Menolak pengajuan tugas akhir.
-     */
     public function tolak(RejectTugasAkhirRequest $request, TugasAkhir $tugasAkhir): RedirectResponse
     {
-        // Otorisasi sudah ditangani oleh RejectTugasAkhirRequest dan policy
-        $this->authorize('update', $tugasAkhir);
-
-        $this->validasiService->rejectTugasAkhir(
-            $tugasAkhir,
-            $request->validated()['alasan_penolakan']
-        );
-
-        return redirect()->back()->with('alert', [
-            'type' => 'warning',
-            'title' => 'Ditolak!',
-            'message' => 'Pengajuan tugas akhir telah ditolak.'
-        ]);
+        try {
+            $this->authorize('update', $tugasAkhir);
+            $this->validasiService->rejectTugasAkhir(
+                $tugasAkhir,
+                $request->validated()['alasan_penolakan']
+            );
+            return redirect()->back()->with('alert', [
+                'type' => 'warning',
+                'title' => 'Ditolak!',
+                'message' => 'Pengajuan tugas akhir telah ditolak.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Gagal menolak TA #{$tugasAkhir->id}: " . $e->getMessage());
+            return redirect()->back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Gagal!',
+                'message' => 'Terjadi kesalahan saat memproses data.'
+            ]);
+        }
     }
 }

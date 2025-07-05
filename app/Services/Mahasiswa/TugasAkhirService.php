@@ -59,7 +59,6 @@ class TugasAkhirService
 
         return $this->mahasiswa->tugasAkhir()->create([
             'judul' => $data['judul'],
-            'abstrak' => $data['abstrak'],
             'status' => TugasAkhir::STATUS_DIAJUKAN,
             'tanggal_pengajuan' => now(),
         ]);
