@@ -1,5 +1,3 @@
-{{-- resources/views/dosen/kaprodi/partials/table.blade.php --}}
-
 <div class="table-responsive">
     <table class="table table-striped table-bordered text-center align-middle">
         <thead class="table-dark">
@@ -22,7 +20,7 @@
                     <td>
                         @if ($ta->mahasiswa)
                             <span class="badge {{ $ta->mahasiswa->prodi === 'D3' ? 'bg-info' : 'bg-primary' }}">
-                                {{ $ta->mahasiswa->prodi === 'D3' ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris' }}
+                                {{ strtolower($ta->mahasiswa->prodi) === 'd3' ? 'D3 Bahasa Inggris' : 'D4 Bahasa Inggris' }}
                             </span>
                         @else
                             <span class="badge bg-secondary">N/A</span>

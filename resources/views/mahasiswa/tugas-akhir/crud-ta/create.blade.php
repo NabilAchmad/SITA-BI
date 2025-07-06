@@ -22,13 +22,6 @@
                         placeholder="Masukkan judul tugas akhir" required>
                 </div>
 
-                <!-- Abstrak Field -->
-                <div class="mb-4">
-                    <label for="abstrak" class="form-label fw-semibold text-secondary">Abstrak</label>
-                    <textarea class="form-control" id="abstrak" name="abstrak" rows="5" placeholder="Masukkan abstrak tugas akhir"
-                        required></textarea>
-                </div>
-
                 <!-- Submit Button -->
                 <div class="text-end mt-4">
                     <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">

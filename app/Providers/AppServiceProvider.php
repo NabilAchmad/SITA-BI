@@ -13,9 +13,18 @@ use Illuminate\Support\Facades\View;
 use App\Models\User;
 use App\Models\TawaranTopik;
 use App\Http\Controllers\Controller;
+use App\Models\TugasAkhir;          // <-- Pastikan ada
+use App\Policies\TugasAkhirPolicy; // <-- Pastikan ada
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * The policy mappings for the application.
+     */
+    protected $policies = [
+        TugasAkhir::class => TugasAkhirPolicy::class, // <-- Pastikan baris ini ada
+    ];
+
     /**
      * Register any application services.
      */
@@ -63,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             }
         });
-        
+
         View::composer('*', function ($view) {
             $view->with('loggedInUser', Auth::user());
         });

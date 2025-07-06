@@ -65,10 +65,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
 
-    // public function getProdi(){
-    //     return $this->hasOne(Mahasiswa::class, 'prodi');
-    // }
-
     /**
      * Memeriksa apakah pengguna memiliki peran tertentu.
      *

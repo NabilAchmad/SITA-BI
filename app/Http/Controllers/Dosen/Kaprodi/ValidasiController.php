@@ -41,7 +41,7 @@ class ValidasiController extends Controller
     {
         try {
             $this->authorize('view', $tugasAkhir);
-            $tugasAkhir->load(['mahasiswa.user', 'approver', 'rejector']); // Eager load relasi yang benar
+            $tugasAkhir->load(['mahasiswa.user', 'disetujui_oleh', 'ditolak_oleh']); // Eager load relasi yang benar
             $details = $this->validasiService->getValidationDetails($tugasAkhir);
             return response()->json($details);
         } catch (\Exception $e) {

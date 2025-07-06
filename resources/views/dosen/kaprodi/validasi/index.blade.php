@@ -140,26 +140,42 @@
 
     {{-- Modal Tolak --}}
     <div class="modal fade" id="modalTolak" tabindex="-1" aria-labelledby="modalTolakLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <form method="POST" id="formTolak" action="">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <form method="POST" id="formTolak" action="" class="needs-validation" novalidate>
                 @csrf
-                <div class="modal-content">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title" id="modalTolakLabel">Tolak Judul Tugas Akhir</h5>
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-danger text-white py-3">
+                        <h5 class="modal-title fw-bold" id="modalTolakLabel">
+                            <i class="bi bi-x-circle-fill me-2"></i>Tolak Judul Tugas Akhir
+                        </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body p-4">
+                        <div class="alert alert-warning mb-4">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Perhatian!</strong> Penolakan akan dikirimkan kepada mahasiswa beserta alasan yang Anda
+                            berikan.
+                        </div>
+
                         <div class="mb-3">
-                            <label for="alasan_penolakan" class="form-label">Berikan alasan penolakan:</label>
-                            <textarea name="alasan_penolakan" id="alasan_penolakan" class="form-control" rows="4" required
-                                minlength="10"></textarea>
-                            <div class="invalid-feedback">Alasan penolakan wajib diisi (minimal 10 karakter).</div>
+                            <label for="alasan_penolakan" class="form-label fw-semibold">
+                                Alasan Penolakan <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="alasan_penolakan" id="alasan_penolakan" class="form-control border-2" rows="5"
+                                placeholder="Berikan penjelasan detail alasan penolakan..." required minlength="10"></textarea>
+                            <div class="form-text">Minimal 10 karakter</div>
+                            <div class="invalid-feedback">Harap isi alasan penolakan dengan lengkap (minimal 10 karakter).
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger">Kirim Penolakan</button>
+                    <div class="modal-footer bg-light p-3">
+                        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                            <i class="bi bi-x-lg me-1"></i> Batal
+                        </button>
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="bi bi-send-fill me-1"></i> Kirim Penolakan
+                        </button>
                     </div>
                 </div>
             </form>
@@ -191,7 +207,7 @@
 
             // Menggunakan event delegation: satu event listener untuk semua tombol detail
             document.body.addEventListener('click', function(event) {
-                const detailButton = event.target.closest('button[onclick^="showDetail"]');
+                const detailButton = event.target.closest('button[data-id]');
                 if (detailButton) {
                     const id = detailButton.getAttribute('data-id');
                     showDetail(id);
@@ -259,7 +275,7 @@
                     '<div class="text-center text-muted p-3">Membandingkan judul dengan ribuan data historis...</div>';
 
                 try {
-                    const url = `{{ url('/kaprodi/validasi') }}/${id}/cek-kemiripan`;
+                    const url = `{{ url('/dosen/validasi') }}/${id}/cek-kemiripan`;
                     const response = await fetch(url);
 
                     if (!response.ok) {
@@ -279,10 +295,6 @@
                     btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Coba Lagi';
                 }
             }
-
-            // ===============================================
-            // =========== FUNGSI-FUNGSI PEMBANTU ============
-            // ===============================================
 
             /**
              * Mengisi hasil pengecekan kemiripan ke dalam container.

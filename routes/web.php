@@ -131,7 +131,7 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(functi
     });
 
     Route::prefix('sempro')->group(function () {
-        Route::get('/',[SemproController::class, 'dashboard'])->name('dashboard.sempro');
+        Route::get('/', [SemproController::class, 'dashboard'])->name('dashboard.sempro');
     });
 
     Route::prefix('profile')->group(function () {
@@ -321,6 +321,7 @@ Route::prefix('dosen')->middleware(['auth', 'role:dosen'])->group(function () {
         Route::get('/tugas-akhir', [ValidasiController::class, 'index'])->name('dosen.validasi-tugas-akhir.index');
         Route::post('/terima/{tugasAkhir}', [ValidasiController::class, 'terima'])->name('dosen.validasi-tugas-akhir.validasi');
         Route::get('/detail/{tugasAkhir}', [ValidasiController::class, 'getDetail'])->name('dosen.validasi-tugas-akhir.detail');
+        Route::get('/{tugasAkhir}/cek-kemiripan', [ValidasiController::class, 'cekKemiripan'])->name('dosen.validasi-tugas-akhir.cek-kemiripan');
         Route::post('/tolak/{tugasAkhir}', [ValidasiController::class, 'tolak'])->name('tolak');
     });
 
