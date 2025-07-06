@@ -47,76 +47,89 @@
                 style="font-size: 7rem; right: 1.5rem; bottom: -1rem;"></i>
         </div>
 
-        <!-- Cards -->
         <div class="row g-4">
-            <!-- Ajukan Topik Mandiri -->
-            <div class="col-md-6 col-xl-3">
-                <a href="{{ !$sudahMengajukan ? route('tugas-akhir.ajukan') : '#' }}"
-                    class="text-decoration-none {{ $sudahMengajukan ? 'disabled-link' : '' }} ajukan-link">
-                    <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="icon icon-shape bg-primary text-white rounded-circle me-3">
-                                    <i class="fas fa-lightbulb"></i>
-                                </div>
-                                <h6 class="mb-0 fw-semibold text-dark">Ajukan Topik Mandiri</h6>
-                            </div>
-                            <p class="mb-0 text-muted">Ajukan topik tugas akhir mandiri ke dosen pembimbing.</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
+            @php
+                // Ambil data mahasiswa dari user yang sedang login sekali saja untuk efisiensi.
+                // Penggunaan '?' (null-safe operator) memastikan tidak error jika user tidak punya relasi mahasiswa.
+                $mahasiswa = auth()->user()?->mahasiswa;
+            @endphp
 
-            <!-- Ajukan Topik Dosen -->
-            <div class="col-md-6 col-xl-3">
-                <a href="{{ route('mahasiswa.topik.index') }}" class="text-decoration-none">
-                    <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="icon icon-shape bg-info text-white rounded-circle me-3">
-                                    <i class="fas fa-list-alt"></i>
+            {{-- ======================================================================= --}}
+            {{-- KARTU KHUSUS UNTUK MAHASISWA D3 --}}
+            {{-- ======================================================================= --}}
+            @if (!empty($mahasiswa) && $mahasiswa->prodi === 'd3')
+                <div class="col-md-6 col-xl-3">
+                    <a href="{{ !$sudahMengajukan ? route('tugas-akhir.ajukan') : '#' }}"
+                        class="text-decoration-none {{ $sudahMengajukan ? 'disabled-link' : '' }} ajukan-link">
+                        <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon icon-shape bg-primary text-white rounded-circle me-3">
+                                        <i class="fas fa-lightbulb"></i>
+                                    </div>
+                                    <h6 class="mb-0 fw-semibold text-dark">Ajukan Topik Mandiri</h6>
                                 </div>
-                                <h6 class="mb-0 fw-semibold text-dark">Topik Dosen</h6>
+                                <p class="mb-0 text-muted">Ajukan topik tugas akhir mandiri ke dosen pembimbing.</p>
                             </div>
-                            <p class="mb-0 text-muted">Ajukan topik yang ditawarkan dosen pembimbing.</p>
                         </div>
-                    </div>
-                </a>
-            </div>
+                    </a>
+                </div>
 
-            <!-- Progress TA -->
-            <div class="col-md-6 col-xl-3">
-                <a href="{{ route('tugas-akhir.progress') }}" class="text-decoration-none">
-                    <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="icon icon-shape bg-success text-white rounded-circle me-3">
-                                    <i class="fas fa-tasks"></i>
+                <div class="col-md-6 col-xl-3">
+                    <a href="{{ route('mahasiswa.topik.index') }}" class="text-decoration-none">
+                        <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon icon-shape bg-info text-white rounded-circle me-3">
+                                        <i class="fas fa-list-alt"></i>
+                                    </div>
+                                    <h6 class="mb-0 fw-semibold text-dark">Topik Dosen</h6>
                                 </div>
-                                <h6 class="mb-0 fw-semibold text-dark">Progress TA</h6>
+                                <p class="mb-0 text-muted">Ajukan topik yang ditawarkan dosen pembimbing.</p>
                             </div>
-                            <p class="mb-0 text-muted">Pantau bimbingan dan revisi tugas akhir Anda.</p>
                         </div>
-                    </div>
-                </a>
-            </div>
+                    </a>
+                </div>
 
-            <!-- TA Dibatalkan -->
-            <div class="col-md-6 col-xl-3">
-                <a href="{{ route('tugasAkhir.cancelled') }}" class="text-decoration-none">
-                    <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="icon icon-shape bg-danger text-white rounded-circle me-3">
-                                    <i class="fas fa-times-circle"></i>
+                <div class="col-md-6 col-xl-3">
+                    <a href="{{ route('tugasAkhir.cancelled') }}" class="text-decoration-none">
+                        <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon icon-shape bg-danger text-white rounded-circle me-3">
+                                        <i class="fas fa-times-circle"></i>
+                                    </div>
+                                    <h6 class="mb-0 fw-semibold text-dark">TA Dibatalkan</h6>
                                 </div>
-                                <h6 class="mb-0 fw-semibold text-dark">TA Dibatalkan</h6>
+                                <p class="mb-0 text-muted">Lihat riwayat tugas akhir yang dibatalkan atau ditolak.</p>
                             </div>
-                            <p class="mb-0 text-muted">Lihat riwayat tugas akhir yang dibatalkan atau ditolak.</p>
                         </div>
-                    </div>
-                </a>
-            </div>
+                    </a>
+                </div>
+            @endif {{-- Akhir dari blok khusus D3 --}}
+
+
+            {{-- ======================================================================= --}}
+            {{-- KARTU UNTUK MAHASISWA D3 DAN D4 --}}
+            {{-- ======================================================================= --}}
+            @if (!empty($mahasiswa) && ($mahasiswa->prodi === 'd3' || $mahasiswa->prodi === 'd4'))
+                <div class="col-md-6 col-xl-3">
+                    <a href="{{ route('tugas-akhir.progress') }}" class="text-decoration-none">
+                        <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon icon-shape bg-success text-white rounded-circle me-3">
+                                        <i class="fas fa-tasks"></i>
+                                    </div>
+                                    <h6 class="mb-0 fw-semibold text-dark">Progress TA</h6>
+                                </div>
+                                <p class="mb-0 text-muted">Pantau bimbingan dan revisi tugas akhir Anda.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            @endif {{-- Akhir dari blok D3 dan D4 --}}
+
         </div>
     </div>
 @endsection

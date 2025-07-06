@@ -2,77 +2,62 @@
 
 namespace App\Http\Controllers\Mahasiswa;
 
-use Illuminate\Http\Request;
-use App\Models\Mahasiswa;
-use App\Models\Dosen;
-use App\Models\File;
-use App\Models\TugasAkhir;
-use App\Models\PeranDosenTA;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Mahasiswa\StoreSeminarProposalRequest; // Gunakan Form Request yang baru
+use App\Models\Mahasiswa;
+use App\Services\Mahasiswa\SeminarProposalService; // Gunakan Service yang baru
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log; // Untuk mencatat error
 
 class PendaftaranSidangController extends Controller
 {
-    public function form()
+    // Inject service melalui constructor agar bisa digunakan di semua method.
+    protected $seminarProposalService;
+
+    public function __construct(SeminarProposalService $seminarProposalService)
     {
-        $userId = 2;
-
-        $mahasiswa = Mahasiswa::with(['tugasAkhir.peranDosen.dosen', 'tugasAkhir'])->where('user_id', $userId)->first();
-
-        return view('mahasiswa.Sidang.views.form', compact('mahasiswa'));
+        $this->seminarProposalService = $seminarProposalService;
     }
 
-    public function store(Request $request)
+    /**
+     * Menampilkan halaman form pendaftaran seminar proposal.
+     */
+    public function form()
     {
-        $request->validate([
-            'judul_ta' => 'required|string',
-            'dosen_pembimbing_1' => 'required|exists:dosen,id',
-            'dosen_pembimbing_2' => 'required|exists:dosen,id|different:dosen_pembimbing_1',
-            'jumlah_bimbingan' => 'required|integer|min:0',
-            'file_ta' => 'required|file|mimes:pdf,doc,docx'
-        ]);
+        $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
+        // Nama view bisa disesuaikan, 'create' lebih mengikuti konvensi RESTful
+        return view('mahasiswa.sidang.views.sempro', compact('mahasiswa'));
+    }
 
-        $userId = 35;
-        $mahasiswa = Mahasiswa::where('user_id', $userId)->firstOrFail();
+    /**
+     * Menyimpan data pendaftaran seminar proposal.
+     */
+    public function store(StoreSeminarProposalRequest $request)
+    {
+        try {
+            $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
 
-        // Upload file
-        $filePath = $request->file('file_ta')->store('tugas_akhir', 'public');
+            // Panggil service untuk menjalankan logika bisnis.
+            $this->seminarProposalService->createProposal($request, $mahasiswa);
 
-        // Simpan file ke tabel files
-        $file = File::create([
-            'file_path' => $filePath,
-            'file_type' => $request->file('file_ta')->getClientMimeType(),
-            'uploaded_by' => $userId
-        ]);
+            return redirect()->route('tugas-akhir.progress')
+                ->with('alert', [
+                    'title'   => 'Berhasil Disimpan!',
+                    'message' => 'Draft proposal Anda telah berhasil disimpan. Silakan lanjutkan ke tahap berikutnya.',
+                    'type'    => 'success',
+                ]);
+        } catch (\Exception $e) {
+            // Catat error ke log untuk debugging.
+            Log::error('Gagal menyimpan proposal: ' . $e->getMessage());
 
-        // Simpan data tugas akhir
-        $ta = TugasAkhir::create([
-            'mahasiswa_id' => $mahasiswa->id,
-            'judul' => $request->judul_ta,
-            'status' => 'diajukan',
-            'tanggal_pengajuan' => Carbon::now(),
-            'file_path' => $filePath
-        ]);
-
-        // Simpan dosen pembimbing
-        PeranDosenTA::insert([
-            [
-                'dosen_id' => $request->dosen_pembimbing_1,
-                'tugas_akhir_id' => $ta->id,
-                'peran' => 'pembimbing1',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'dosen_id' => $request->dosen_pembimbing_2,
-                'tugas_akhir_id' => $ta->id,
-                'peran' => 'pembimbing2',
-                'created_at' => now(),
-                'updated_at' => now()
-            ]
-        ]);
-
-        return back()->with('success', 'Pendaftaran sidang berhasil.');
+            // Kembalikan ke halaman sebelumnya dengan pesan error.
+            return redirect()->back()
+                ->with('alert', [
+                    'title'   => 'Gagal!',
+                    'message' => $e->getMessage(), // Tampilkan pesan error dari service
+                    'type'    => 'error',
+                ])
+                ->withInput(); // Kembalikan input sebelumnya ke form
+        }
     }
 }

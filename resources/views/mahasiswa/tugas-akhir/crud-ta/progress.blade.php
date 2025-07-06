@@ -273,40 +273,6 @@
                     @endif
                 </div>
 
-                <!-- Abstrak Section -->
-                <div class="mb-4">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3"
-                            style="width: 45px; height: 45px; background-color: rgba(13, 110, 253, 0.1);">
-                            <i class="fas fa-file-alt text-primary fs-5"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-0">Abstrak</h5>
-                            <small class="text-muted">Ringkasan proposal tugas akhir</small>
-                        </div>
-                    </div>
-
-                    <div class="card border-0 bg-light shadow-sm rounded-3">
-                        <div class="card-body">
-                            <p class="mb-0" id="abstrak-short-{{ $ta->id }}" style="white-space: pre-line;">
-                                {{ $abstrakShort }}{{ $hasMore ? '...' : '' }}
-                            </p>
-
-                            @if ($hasMore)
-                                <p class="mb-0 d-none" id="abstrak-full-{{ $ta->id }}"
-                                    style="white-space: pre-line;">
-                                    {{ $abstrakFull }}
-                                </p>
-                                <button class="btn btn-sm btn-link text-decoration-none text-primary mt-2 ps-0"
-                                    type="button" onclick="toggleAbstrak({{ $ta->id }})"
-                                    id="btn-toggle-{{ $ta->id }}">
-                                    <i class="fas fa-chevron-down me-1"></i> Lihat Selengkapnya
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Action Buttons -->
                 @if ($isMengajukanTA && $ta->status === 'disetujui')
                     <div class="d-flex flex-wrap gap-2 justify-content-center">

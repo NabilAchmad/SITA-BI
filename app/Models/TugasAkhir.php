@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TugasAkhir extends Model
 {
@@ -63,6 +64,17 @@ class TugasAkhir extends Model
         return $this->hasMany(Sidang::class);
     }
 
+    /**
+     * [PERBAIKAN] Mendefinisikan relasi ke satu data sidang yang paling baru.
+     * Ini yang akan menyelesaikan eror Anda.
+     */
+    public function sidangTerakhir(): HasOne
+    {
+        // latestOfMany() akan secara otomatis mengambil record Sidang
+        // dengan 'created_at' atau 'id' terbaru yang berelasi.
+        return $this->hasOne(Sidang::class, 'tugas_akhir_id')->latestOfMany();
+    }
+    
     // --- ACCESSOR ---
     protected function pembimbingSatu(): Attribute
     {

@@ -11,7 +11,6 @@ use App\Http\Controllers\Mahasiswa\TugasAkhirController;
 use App\Http\Controllers\Mahasiswa\PendaftaranSidangController;
 use App\Http\Controllers\Mahasiswa\TopikController;
 use App\Http\Controllers\Mahasiswa\MahasiswaProfileController;
-use App\Http\Controllers\Mahasiswa\SemproController;
 
 // Admin routes
 use App\Http\Controllers\Admin\PengumumanController;
@@ -113,10 +112,8 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(functi
         })->name('dashboard.sidang');
 
         //sempro
-        Route::get('/daftar-sempro', function () {
-            return view('mahasiswa.Sidang.views.sempro');
-        })->name('daftar-sempro');
-
+        Route::get('/daftar-sempro', [PendaftaranSidangController::class, 'form'])->name('daftar-sempro');
+        Route::post('/store', [PendaftaranSidangController::class, 'store'])->name('mahasiswa.sempro.store');
 
         Route::get('/lihat-nilai', function () {
             return view('mahasiswa.sidang.views.nilaiSidang');
@@ -128,10 +125,6 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(functi
 
         Route::get('/daftar-sidang', [PendaftaranSidangController::class, 'form'])->name('pendaftaran_sidang.form');
         Route::post('/daftar-sidang', [PendaftaranSidangController::class, 'store'])->name('pendaftaran_sidang.store');
-    });
-
-    Route::prefix('sempro')->group(function () {
-        Route::get('/', [SemproController::class, 'dashboard'])->name('dashboard.sempro');
     });
 
     Route::prefix('profile')->group(function () {
@@ -233,19 +226,25 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
         Route::prefix('sempro')->group(function () {
             // Daftar mahasiswa yang belum punya jadwal sidang sempro
-            Route::get('/penjadwalan-sidang-sempro', [JadwalSidangSemproController::class, 'SidangSempro'])->name('sidang.kelola.sempro');
+            Route::get('/penjadwalan-sidang-sempro', [JadwalSidangSemproController::class, 'index'])->name('sidang.kelola.sempro');
 
             // Simpan penguji
-            Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangSemproController::class, 'simpanPenguji'])->name('jadwal-sempro.simpanPenguji');
+            Route::post('/simpan-penguji/{tugas_akhir_id}', [JadwalSidangSemproController::class, 'simpanPenguji'])->name('jadwal-sempro.simpanPenguji');
 
             // Simpan data jadwal sidang
             Route::post('/jadwal-sidang', [JadwalSidangSemproController::class, 'store'])->name('jadwal-sempro.store');
+
+            // [BARU] Memperbarui data jadwal yang sudah ada (dari form edit)
+            Route::put('/update-jadwal/{jadwal}', [JadwalSidangSemproController::class, 'update'])
+                ->name('jadwal-sempro.update');
+
+            Route::delete('/hapus/{jadwal}', [JadwalSidangSemproController::class, 'destroy'])->name('jadwal-sempro.destroy');
 
             // Lihat Detail Jadwal Sidang akhir
             Route::get('/detail-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'show'])->name('jadwal-sempro.show');
 
             // Tandai akhir sidang selesai 
-            Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidangSempro'])
+            Route::post('/tandai-sidang/{sidang}', [JadwalSidangSemproController::class, 'updateStatus'])
                 ->name('jadwal-sidang-sempro.mark-done');
         });
 

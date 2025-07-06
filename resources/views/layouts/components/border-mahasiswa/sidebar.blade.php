@@ -79,22 +79,6 @@
                         <p>Sidang</p>
                     </a>
                 </li>
-
-                @php
-                    $mahasiswa = auth()->user()?->mahasiswa;
-                    $isD4 = $mahasiswa && $mahasiswa->prodi === 'd4';
-                @endphp
-
-                @if ($isD4)
-                    <!-- Sempro - Hanya ditampilkan untuk prodi D4 -->
-                    <li
-                        class="nav-item {{ request()->is('mahasiswa/sempro') || request()->is('mahasiswa/sempro/*') ? 'active' : '' }}">
-                        <a href="{{ route('dashboard.sempro') }}">
-                            <i class="fas fa-address-book"></i>
-                            <p>Seminar Proposal</p>
-                        </a>
-                    </li>
-                @endif
             </ul>
         </div>
     </div>
