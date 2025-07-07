@@ -2,135 +2,166 @@
 @section('title', 'Validasi Judul Tugas Akhir')
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid py-3">
         @php
-            // Cek peran user yang sedang login untuk menampilkan judul yang sesuai
             $user = auth()->user();
             $isKaprodiD3 = $user->hasRole('kaprodi-d3');
             $isKaprodiD4 = $user->hasRole('kaprodi-d4');
         @endphp
 
-        <h5 class="fw-bold text-primary mb-3">
-            <i class="bi bi-journal-check me-2"></i>
-            Validasi Pengajuan Judul Tugas Akhir
-            {{-- Menambahkan label prodi yang dikelola oleh Kaprodi --}}
+        {{-- Judul Halaman --}}
+        <div class="mb-4">
+            <h4 class="fw-semibold text-dark mb-2" style="font-size: 1.3rem;">
+                <i class="bi bi-journal-check me-2 text-primary"></i>
+                Validasi Pengajuan Judul Tugas Akhir
+            </h4>
             @if ($isKaprodiD3)
-                <span class="badge bg-info">Program Studi D3</span>
-            @elseif($isKaprodiD4)
-                <span class="badge bg-info">Program Studi D4</span>
+                <span class="badge bg-soft-info text-dark fw-medium px-3 py-2 rounded-pill shadow-sm border">
+                    <i class="bi bi-award me-1"></i> Program Studi D3
+                </span>
+            @elseif ($isKaprodiD4)
+                <span class="badge bg-soft-info text-dark fw-medium px-3 py-2 rounded-pill shadow-sm border">
+                    <i class="bi bi-award me-1"></i> Program Studi D4
+                </span>
             @endif
-        </h5>
+        </div>
 
-        {{-- Search Form --}}
-        <form method="GET" class="mb-3">
-            <div class="input-group">
-                <input type="text" name="search" class="form-control" placeholder="Cari nama atau NIM mahasiswa..."
-                    value="{{ request('search') }}">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Cari</button>
+        {{-- Form Pencarian --}}
+        <form method="GET" class="mb-4">
+            <div class="input-group input-group-md shadow-sm rounded-pill">
+                <span class="input-group-text bg-white border-end-0 ps-4 pe-3">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" name="search" class="form-control border-start-0 border-end-0 py-2 px-3"
+                    placeholder="Cari nama atau NIM mahasiswa..." value="{{ request('search') }}" style="font-size: 1rem;">
+                <button type="submit" class="btn btn-outline-primary px-4 rounded-end-pill border-start-0">
+                    <i class="bi bi-search me-1"></i> Cari
+                </button>
             </div>
         </form>
 
-        {{-- Tab Status --}}
-        <ul class="nav nav-pills nav-fill mb-3" id="statusTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="menunggu-tab" data-bs-toggle="tab" data-bs-target="#menunggu"
-                    type="button" role="tab" aria-controls="menunggu" aria-selected="true">
-                    Menunggu Validasi <span class="badge bg-warning ms-1">{{ $tugasAkhirMenunggu->count() }}</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="diterima-tab" data-bs-toggle="tab" data-bs-target="#diterima" type="button"
-                    role="tab" aria-controls="diterima" aria-selected="false">
-                    Diterima <span class="badge bg-success ms-1">{{ $tugasAkhirDiterima->count() }}</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="ditolak-tab" data-bs-toggle="tab" data-bs-target="#ditolak" type="button"
-                    role="tab" aria-controls="ditolak" aria-selected="false">
-                    Ditolak <span class="badge bg-danger ms-1">{{ $tugasAkhirDitolak->count() }}</span>
-                </button>
-            </li>
-        </ul>
+        {{-- Tab Navigasi --}}
+        <div class="bg-light border shadow-sm rounded-top px-3 pt-3">
+            <ul class="nav nav-tabs border-0" id="statusTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button
+                        class="nav-link @if (request()->tab == null || request()->tab == 'menunggu') active @endif fw-semibold text-dark border-0 bg-transparent me-3"
+                        id="menunggu-tab" data-bs-toggle="tab" data-bs-target="#menunggu" type="button" role="tab"
+                        aria-controls="menunggu" aria-selected="true" style="font-size: 1rem;">
+                        <i class="bi bi-hourglass-split me-1 text-warning"></i> Menunggu
+                        <span class="badge bg-warning-subtle text-dark ms-2">{{ $tugasAkhirMenunggu->count() }}</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button
+                        class="nav-link @if (request()->tab == 'diterima') active @endif fw-semibold text-dark border-0 bg-transparent me-3"
+                        id="diterima-tab" data-bs-toggle="tab" data-bs-target="#diterima" type="button" role="tab"
+                        aria-controls="diterima" aria-selected="false" style="font-size: 1rem;">
+                        <i class="bi bi-check-circle me-1 text-success"></i> Diterima
+                        <span class="badge bg-success-subtle text-success ms-2">{{ $tugasAkhirDiterima->count() }}</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button
+                        class="nav-link @if (request()->tab == 'ditolak') active @endif fw-semibold text-dark border-0 bg-transparent"
+                        id="ditolak-tab" data-bs-toggle="tab" data-bs-target="#ditolak" type="button" role="tab"
+                        aria-controls="ditolak" aria-selected="false" style="font-size: 1rem;">
+                        <i class="bi bi-x-circle me-1 text-danger"></i> Ditolak
+                        <span class="badge bg-danger-subtle text-danger ms-2">{{ $tugasAkhirDitolak->count() }}</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
 
         {{-- Konten Tab --}}
-        <div class="tab-content" id="statusTabContent">
-            <div class="tab-pane fade show active" id="menunggu" role="tabpanel" aria-labelledby="menunggu-tab">
+        <div class="tab-content bg-white shadow-sm rounded-bottom p-3" id="statusTabContent">
+            <div class="tab-pane fade show active position-relative" id="menunggu" role="tabpanel"
+                aria-labelledby="menunggu-tab">
                 @include('dosen.kaprodi.partials.table', ['tugasAkhirCollection' => $tugasAkhirMenunggu])
             </div>
-            <div class="tab-pane fade" id="diterima" role="tabpanel" aria-labelledby="diterima-tab">
+            <div class="tab-pane fade position-relative" id="diterima" role="tabpanel" aria-labelledby="diterima-tab">
                 @include('dosen.kaprodi.partials.table', ['tugasAkhirCollection' => $tugasAkhirDiterima])
             </div>
-            <div class="tab-pane fade" id="ditolak" role="tabpanel" aria-labelledby="ditolak-tab">
+            <div class="tab-pane fade position-relative" id="ditolak" role="tabpanel" aria-labelledby="ditolak-tab">
                 @include('dosen.kaprodi.partials.table', ['tugasAkhirCollection' => $tugasAkhirDitolak])
             </div>
         </div>
     </div>
 
+
     {{-- Modal Detail --}}
     <div class="modal fade" id="modalDetailTA" tabindex="-1" aria-labelledby="modalDetailLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content shadow">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="modalDetailLabel">Detail Pengajuan Judul</h5>
+                    <h5 class="modal-title fw-semibold" id="modalDetailLabel">
+                        <i class="bi bi-info-circle me-2"></i> Detail Pengajuan Judul
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     {{-- Data Mahasiswa --}}
-                    <table class="table table-borderless table-sm mb-3">
-                        <tbody>
-                            <tr>
-                                <td style="width: 150px;"><strong>Nama Mahasiswa</strong></td>
-                                <td style="width: 10px;">:</td>
-                                <td><span id="modalNama"></span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>NIM</strong></td>
-                                <td>:</td>
-                                <td><span id="modalNim"></span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Program Studi</strong></td>
-                                <td>:</td>
-                                <td><span id="modalProdi"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="align-top"><strong>Judul Diajukan</strong></td>
-                                <td class="align-top">:</td>
-                                <td class="align-top"><span id="modalJudul"></span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3 border-bottom pb-2">Informasi Mahasiswa</h6>
+                        <table class="table table-borderless table-sm">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-semibold text-secondary" style="width: 150px;">Nama Mahasiswa</td>
+                                    <td style="width: 10px;">:</td>
+                                    <td><span id="modalNama"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold text-secondary">NIM</td>
+                                    <td>:</td>
+                                    <td><span id="modalNim"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold text-secondary">Program Studi</td>
+                                    <td>:</td>
+                                    <td><span id="modalProdi"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold text-secondary align-top">Judul Diajukan</td>
+                                    <td class="align-top">:</td>
+                                    <td class="align-top"><span id="modalJudul"></span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                    {{-- Informasi Approval/Reject (jika sudah divalidasi) --}}
-                    <div id="wrapDiterima" class="alert alert-success d-none"></div>
-                    <div id="wrapDitolak" class="alert alert-danger d-none"></div>
+                    {{-- Informasi Approval/Reject --}}
+                    <div id="wrapDiterima" class="alert alert-success d-none rounded shadow-sm py-2 px-3"></div>
+                    <div id="wrapDitolak" class="alert alert-danger d-none rounded shadow-sm py-2 px-3"></div>
 
-                    <hr>
-
-                    {{-- Area Pengecekan Kemiripan (Hanya muncul jika bisa divalidasi) --}}
-                    <div id="pengecekan-kemiripan-section" class="d-none">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="fw-bold mb-0">Pengecekan Kemiripan Judul</h6>
-                            {{-- Tombol untuk memicu pengecekan --}}
-                            <button id="btn-cek-kemiripan" class="btn btn-info btn-sm" type="button">
+                    {{-- Area Pengecekan Kemiripan --}}
+                    <div id="pengecekan-kemiripan-section" class="d-none mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold mb-0 text-primary">
+                                <i class="bi bi-search me-2"></i> Pengecekan Kemiripan Judul
+                            </h6>
+                            <button id="btn-cek-kemiripan" class="btn btn-outline-info btn-sm rounded-pill"
+                                type="button">
                                 <i class="bi bi-search"></i> Lakukan Pengecekan
                             </button>
                         </div>
-                        {{-- Area untuk menampilkan hasil pengecekan --}}
-                        <div id="hasil-kemiripan-container" style="display:none;">
-                            {{-- Hasil akan dimuat di sini oleh AJAX --}}
+                        <div id="hasil-kemiripan-container" style="display: none;">
+                            {{-- AJAX load area --}}
                         </div>
                     </div>
-
                 </div>
-                <div class="modal-footer">
+
+                {{-- Footer --}}
+                <div class="modal-footer bg-light">
                     <form method="POST" id="formValidasi" action="" class="w-100">
                         @csrf
-                        {{-- Tombol Aksi (Hanya muncul jika bisa divalidasi) --}}
-                        <div class="d-flex justify-content-end d-none" id="wrapActionButtons">
-                            <button type="button" class="btn btn-danger me-2" id="btnTolak">Tolak</button>
-                            <button type="submit" class="btn btn-success">Setujui</button>
+                        <div class="d-flex justify-content-end gap-2 d-none" id="wrapActionButtons">
+                            <button type="button" class="btn btn-outline-danger" id="btnTolak">
+                                <i class="bi bi-x-circle"></i> Tolak
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Setujui
+                            </button>
                         </div>
                     </form>
                 </div>
