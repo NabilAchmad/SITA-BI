@@ -1,5 +1,4 @@
 <!-- Modal Tambah Akun Dosen -->
-<!-- Modal -->
 <div class="modal fade" id="tambahAkunModal" tabindex="-1" aria-labelledby="tambahAkunModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
         <div class="modal-content">
@@ -10,14 +9,9 @@
             </div>
             <div class="modal-body">
                 {{-- Menampilkan error umum jika ada --}}
-                @if (
-                    $errors->any() &&
-                        !$errors->has('nama') &&
-                        !$errors->has('email') &&
-                        !$errors->has('nidn') &&
-                        !$errors->has('password'))
+                @if ($errors->any())
                     <div class="alert alert-danger">
-                        <ul>
+                        <ul class="mb-0">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -28,11 +22,9 @@
                 <form action="{{ route('akun-dosen.store') }}" method="POST" id="formTambahAkun">
                     @csrf
                     <div class="form-floating mb-3">
-                        {{-- Menambahkan old('nama') untuk menjaga input --}}
                         <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama"
                             name="nama" placeholder="Masukkan nama dosen" value="{{ old('nama') }}" required>
                         <label for="nama">Nama</label>
-                        {{-- Menampilkan error spesifik untuk 'nama' --}}
                         @error('nama')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -56,24 +48,21 @@
                         @enderror
                     </div>
 
-                    {{-- Dropdown Role --}}
+                    {{-- ✅ PERBAIKAN: Dropdown Role sekarang mengirim 'role_name' --}}
                     <div class="form-floating mb-3">
-                        <select class="form-select @error('role_id') is-invalid @enderror" id="role_id"
-                            name="role_id">
+                        <select class="form-select @error('role_name') is-invalid @enderror" id="role_name"
+                            name="role_name">
                             <option value="" selected>Default (Hanya Dosen)</option>
                             @foreach ($roles as $role)
-                                {{-- Kondisi disesuaikan dengan nama role baru --}}
-                                @if (in_array($role->name, ['kaprodi-d3', 'kaprodi-d4', 'kajur']))
-                                    {{-- Menambahkan old() untuk select --}}
-                                    <option value="{{ $role->id }}"
-                                        {{ old('role_id') == $role->id ? 'selected' : '' }}>
-                                        {{ $role->deskripsi }}
-                                    </option>
-                                @endif
+                                <option value="{{ $role->name }}"
+                                    {{ old('role_name') == $role->name ? 'selected' : '' }}>
+                                    {{-- Mengubah nama role menjadi lebih mudah dibaca, contoh: 'kaprodi-d3' -> 'Kaprodi D3' --}}
+                                    {{ ucwords(str_replace('-', ' ', $role->name)) }}
+                                </option>
                             @endforeach
                         </select>
-                        <label for="role_id">Jabatan Tambahan (Opsional)</label>
-                        @error('role_id')
+                        <label for="role_name">Jabatan Tambahan (Opsional)</label>
+                        @error('role_name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -81,7 +70,8 @@
                     {{-- Input password --}}
                     <div class="form-floating mb-3 position-relative">
                         <input type="password" class="form-control @error('password') is-invalid @enderror"
-                            id="password" name="password" placeholder="Masukkan password" required>
+                            id="password" name="password" placeholder="Masukkan password" required
+                            autocomplete="new-password">
                         <label for="password">Password</label>
                         <button type="button"
                             class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
@@ -96,7 +86,8 @@
                     {{-- Input konfirmasi password --}}
                     <div class="form-floating mb-3 position-relative">
                         <input type="password" class="form-control" id="password_confirmation"
-                            name="password_confirmation" placeholder="Konfirmasi password" required>
+                            name="password_confirmation" placeholder="Konfirmasi password" required
+                            autocomplete="new-password">
                         <label for="password_confirmation">Konfirmasi Password</label>
                         <button type="button"
                             class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
@@ -116,27 +107,23 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle untuk password
-            const togglePassword = document.getElementById('togglePassword');
-            const password = document.getElementById('password');
+            // Fungsi untuk menampilkan/menyembunyikan password
+            function togglePasswordVisibility(toggleBtnId, passwordInputId) {
+                const toggleButton = document.getElementById(toggleBtnId);
+                const passwordInput = document.getElementById(passwordInputId);
+                if (toggleButton && passwordInput) {
+                    toggleButton.addEventListener('click', function() {
+                        const type = passwordInput.getAttribute('type') === 'password' ? 'text' :
+                        'password';
+                        passwordInput.setAttribute('type', type);
+                        this.querySelector('i').classList.toggle('bi-eye');
+                        this.querySelector('i').classList.toggle('bi-eye-slash');
+                    });
+                }
+            }
 
-            togglePassword.addEventListener('click', function() {
-                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-                password.setAttribute('type', type);
-                this.querySelector('i').classList.toggle('bi-eye');
-                this.querySelector('i').classList.toggle('bi-eye-slash');
-            });
-
-            // Toggle untuk konfirmasi password
-            const togglePasswordConfirmation = document.getElementById('togglePasswordConfirmation');
-            const passwordConfirmation = document.getElementById('password_confirmation');
-
-            togglePasswordConfirmation.addEventListener('click', function() {
-                const type = passwordConfirmation.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordConfirmation.setAttribute('type', type);
-                this.querySelector('i').classList.toggle('bi-eye');
-                this.querySelector('i').classList.toggle('bi-eye-slash');
-            });
+            togglePasswordVisibility('togglePassword', 'password');
+            togglePasswordVisibility('togglePasswordConfirmation', 'password_confirmation');
         });
     </script>
 @endpush

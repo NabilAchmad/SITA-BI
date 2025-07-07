@@ -1,3 +1,4 @@
+<!-- Modal Edit Akun Dosen -->
 <div class="modal fade" id="editAkunModal" tabindex="-1" aria-labelledby="editAkunModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
         <div class="modal-content">
@@ -13,7 +14,6 @@
                     @method('PUT')
 
                     <div class="form-floating mb-3">
-                        {{-- ID dibuat statis dan value dikosongkan --}}
                         <input type="text" class="form-control" id="editNama" name="nama"
                             placeholder="Masukkan nama dosen" value="" required>
                         <label for="editNama">Nama</label>
@@ -31,31 +31,29 @@
                         <label for="editNidn">NIDN</label>
                     </div>
 
-                    {{-- 
-                        Dropdown Role.
-                        Pastikan tombol edit Anda memiliki atribut 'data-role-id'
-                        Contoh: data-role-id="{{ $dosen->user->roles->where('name', '!=', 'dosen')->first()->id ?? '' }}"
-                    --}}
+                    {{-- ✅ PERBAIKAN: Dropdown Role sekarang mengirim 'role_name' --}}
                     <div class="form-floating mb-3">
-                        <select class="form-select" id="edit_role_id" name="role_id">
+                        <select class="form-select" id="edit_role_name" name="role_name">
                             <option value="">Default (Hanya Dosen)</option>
                             @foreach ($roles as $role)
-                                {{-- Kondisi if dihapus, JavaScript yang akan menangani pemilihan --}}
-                                <option value="{{ $role->id }}">{{ $role->deskripsi }}</option>
+                                {{-- JavaScript yang akan menangani role yang terpilih --}}
+                                <option value="{{ $role->name }}">
+                                    {{ ucwords(str_replace('-', ' ', $role->name)) }}
+                                </option>
                             @endforeach
                         </select>
-                        <label for="edit_role_id">Jabatan Tambahan (Opsional)</label>
+                        <label for="edit_role_name">Jabatan Tambahan (Opsional)</label>
                     </div>
 
                     <div class="form-floating mb-3">
                         <input type="password" class="form-control" name="password"
-                            placeholder="Kosongkan jika tidak ingin ganti password">
+                            placeholder="Kosongkan jika tidak ingin ganti password" autocomplete="new-password">
                         <label>Password Baru (Opsional)</label>
                     </div>
 
                     <div class="form-floating mb-4">
                         <input type="password" class="form-control" name="password_confirmation"
-                            placeholder="Ulangi password baru">
+                            placeholder="Ulangi password baru" autocomplete="new-password">
                         <label>Konfirmasi Password Baru</label>
                     </div>
 

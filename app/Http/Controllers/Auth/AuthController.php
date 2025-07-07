@@ -2,28 +2,33 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
+use App\Mail\VerifyEmail;
+use App\Models\EmailVerificationToken;
+use App\Models\Mahasiswa;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; // <-- Ditambahkan
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Str;
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Mahasiswa;
-use App\Models\EmailVerificationToken;
-use App\Mail\VerifyEmail;
+// Tidak perlu `use Spatie\Permission\Models\Role;` karena kita bisa memanggilnya langsung
 
 class AuthController extends Controller
 {
-    // Show login form
+    /**
+     * Menampilkan form login.
+     */
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    // Handle login request
+    /**
+     * Menangani proses login.
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -34,6 +39,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
+            // Redirect berdasarkan role setelah login berhasil
             return redirect()->intended($this->redirectByRole(Auth::user()));
         }
 
@@ -42,19 +48,24 @@ class AuthController extends Controller
         ]);
     }
 
-    // Show register form
+    /**
+     * Menampilkan form registrasi.
+     */
     public function showRegister()
     {
         return view('auth.register');
     }
 
-    // Handle registration request
+    /**
+     * Menangani proses registrasi.
+     * SUDAH DIPERBAIKI: Menggunakan DB Transaction dan assignRole().
+     */
     public function register(Request $request)
     {
         $validated = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'max:255', 'unique:users'],
-            'nim'      => ['required', 'string', 'max:255', 'unique:mahasiswa'],
+            'nim'      => ['required', 'string', 'max:10', 'unique:mahasiswa'],
             'prodi'    => ['required', 'in:d3,d4'],
             'kelas'    => ['required', function ($attribute, $value, $fail) use ($request) {
                 $allowed = [
@@ -62,7 +73,6 @@ class AuthController extends Controller
                     'd4' => ['a', 'b'],
                 ];
                 $prodi = $request->input('prodi');
-
                 if (!isset($allowed[$prodi]) || !in_array(strtolower($value), $allowed[$prodi])) {
                     $fail('Kelas yang dipilih tidak sesuai dengan program studi.');
                 }
@@ -70,85 +80,57 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
-        $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        try {
+            // Memulai transaksi database
+            DB::beginTransaction();
 
-        // Auto-assign role mahasiswa
-        $mahasiswaRole = \App\Models\Role::where('name', 'mahasiswa')->first();
-        if ($mahasiswaRole) {
-            $user->roles()->attach($mahasiswaRole->id);
+            $user = User::create([
+                'name'     => $validated['name'],
+                'email'    => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            // Memberikan role 'mahasiswa' menggunakan metode dari Spatie
+            $user->assignRole('mahasiswa');
+
+            Mahasiswa::create([
+                'user_id'  => $user->id,
+                'nim'      => $validated['nim'],
+                'prodi'    => $validated['prodi'],
+                'kelas'    => $validated['kelas'],
+                'angkatan' => 2000 + intval(substr($validated['nim'], 0, 2)),
+            ]);
+
+            // Jika semua berhasil, simpan perubahan
+            DB::commit();
+        } catch (\Exception $e) {
+            // Jika ada error, batalkan semua operasi
+            DB::rollBack();
+            // Tampilkan pesan error
+            return back()->with('error', 'Registrasi gagal, terjadi kesalahan pada server. Silakan coba lagi.')->withInput();
         }
-
-        Mahasiswa::create([
-            'user_id'  => $user->id,
-            'nim'      => $validated['nim'],
-            'prodi'    => $validated['prodi'],
-            'kelas'    => $validated['kelas'],
-            'angkatan' => 2000 + intval(substr($validated['nim'], 0, 2)),
-        ]);
 
         $this->sendEmailVerification($user);
 
-        // Store user id in session for OTP verification
         session(['otp_user_id' => $user->id]);
 
         return redirect()->route('auth.otp.verify.form')->with('success', 'Registrasi berhasil. Silakan masukkan kode OTP yang telah dikirim ke email Anda.');
     }
 
-    // Email verification handler
-    public function verifyEmail($token)
-    {
-        $verification = EmailVerificationToken::where('token', $token)->first();
-
-        if (!$verification) {
-            return redirect()->route('login')->with('error', 'Token verifikasi tidak valid atau sudah kadaluarsa.');
-        }
-
-        $user = $verification->user;
-
-        if ($user->email_verified_at) {
-            return redirect()->route('login')->with('info', 'Email sudah diverifikasi sebelumnya.');
-        }
-
-        $user->email_verified_at = now();
-        $user->save();
-
-        $verification->delete();
-
-        $redirectTo = Session::pull('url.intended', route('login'));
-        return redirect($redirectTo)->with('success', 'Verifikasi email berhasil.');
-    }
-
-    // Show OTP verification form
-    public function showOtpVerificationForm()
-    {
-        // Check if user id is in session
-        if (!session()->has('otp_user_id')) {
-            return redirect()->route('login')->with('error', 'Sesi verifikasi OTP tidak ditemukan. Silakan login kembali.');
-        }
-
-        return view('auth.otp_verification');
-    }
-
-    // Handle OTP verification
+    /**
+     * Menangani proses verifikasi OTP.
+     */
     public function verifyOtp(Request $request)
     {
-        $request->validate([
-            'otp_code' => ['required', 'digits:6'],
-        ]);
+        $request->validate(['otp_code' => ['required', 'digits:6']]);
 
         $userId = session('otp_user_id');
         if (!$userId) {
-            return redirect()->route('login')->with('error', 'Sesi verifikasi OTP tidak ditemukan. Silakan login kembali.');
+            return redirect()->route('login')->with('error', 'Sesi verifikasi OTP tidak ditemukan.');
         }
 
-        $otpCode = $request->input('otp_code');
-
         $verification = EmailVerificationToken::where('user_id', $userId)
-            ->where('token', $otpCode)
+            ->where('token', $request->input('otp_code'))
             ->first();
 
         if (!$verification) {
@@ -156,68 +138,70 @@ class AuthController extends Controller
         }
 
         $user = $verification->user;
-
-        if ($user->email_verified_at) {
-            // Already verified, log in user
-            Auth::login($user);
-            session()->forget('otp_user_id');
-            return redirect($this->redirectByRole($user))->with('info', 'Email sudah diverifikasi sebelumnya.');
-        }
-
         $user->email_verified_at = now();
         $user->save();
 
         $verification->delete();
 
-        // Log in user automatically
         Auth::login($user);
         session()->forget('otp_user_id');
 
         return redirect($this->redirectByRole($user))->with('success', 'Verifikasi email berhasil. Anda sudah masuk ke dalam sistem.');
     }
 
-    // Handle logout
+    /**
+     * Menampilkan form verifikasi OTP.
+     */
+    public function showOtpVerificationForm()
+    {
+        if (!session()->has('otp_user_id')) {
+            return redirect()->route('login')->with('error', 'Sesi verifikasi OTP tidak ditemukan.');
+        }
+        return view('auth.otp_verification');
+    }
+
+    /**
+     * Menangani proses logout.
+     */
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect('/');
     }
 
     // ===========================
-    // Private helper methods
+    // Metode Helper Privat
     // ===========================
 
-    private function redirectByRole($user)
+    /**
+     * Mengarahkan user berdasarkan role.
+     * SUDAH DIPERBAIKI: Menggunakan metode hasRole() dari Spatie.
+     */
+    private function redirectByRole(User $user)
     {
-        if (!$user->roles || $user->roles->isEmpty()) {
-            return route('dashboard.mahasiswa');
+        if ($user->hasRole('admin')) {
+            return route('admin.dashboard');
         }
-
-        foreach ($user->roles as $role) {
-            switch ($role->name) {
-                case 'admin':
-                    return route('admin.dashboard');
-                case 'kajur':
-                    return route('kajur.dashboard');
-                case 'kaprodi':
-                    return route('kaprodi.dashboard');
-                case 'dosen':
-                    return route('dosen.dashboard');
-                case 'mahasiswa':
-                    return route('dashboard.mahasiswa');
-            }
+        if ($user->hasRole('kajur')) {
+            return route('kajur.dashboard');
         }
-
-        // Default fallback
+        if ($user->hasRole('kaprodi')) {
+            return route('kaprodi.dashboard');
+        }
+        if ($user->hasRole('dosen')) {
+            return route('dosen.dashboard');
+        }
+        // Fallback untuk mahasiswa atau jika role lain belum terdefinisi
         return route('dashboard.mahasiswa');
     }
 
+    /**
+     * Mengirim email verifikasi berisi kode OTP.
+     */
     private function sendEmailVerification(User $user)
     {
-        // Generate 6-digit numeric OTP code
         $otpCode = random_int(100000, 999999);
 
         EmailVerificationToken::updateOrCreate(
@@ -226,15 +210,5 @@ class AuthController extends Controller
         );
 
         Mail::to($user->email)->send(new VerifyEmail($user, $otpCode));
-    }
-
-    // Optional: Assign role to user (currently commented)
-    private function assignRole(User $user, string $roleName)
-    {
-        $role = \App\Models\Role::where('name', $roleName)->first();
-
-        if ($role) {
-            $user->roles()->attach($role->id);
-        }
     }
 }
