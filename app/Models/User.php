@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Dosen;
 use App\Models\Mahasiswa;
-use App\Models\Role;
+use App\Models\Roles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -62,7 +62,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
+        return $this->belongsToMany(Roles::class, 'user_roles', 'user_id', 'role_id');
     }
 
     /**
