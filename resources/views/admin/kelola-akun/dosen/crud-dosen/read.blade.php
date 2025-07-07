@@ -129,7 +129,7 @@
                             <td>{{ $dosen->user->email }}</td>
                             <td>
                                 @foreach ($dosen->user->roles as $role)
-                                    <span class="badge bg-primary">{{ ucfirst($role->nama_role) }}</span>
+                                    <span class="badge bg-primary">{{ ucfirst($role->name) }}</span>
                                 @endforeach
                             </td>
                             <td>

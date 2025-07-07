@@ -63,7 +63,7 @@
                             <option value="" selected>Default (Hanya Dosen)</option>
                             @foreach ($roles as $role)
                                 {{-- Kondisi disesuaikan dengan nama role baru --}}
-                                @if (in_array($role->nama_role, ['kaprodi-d3', 'kaprodi-d4', 'kajur']))
+                                @if (in_array($role->name, ['kaprodi-d3', 'kaprodi-d4', 'kajur']))
                                     {{-- Menambahkan old() untuk select --}}
                                     <option value="{{ $role->id }}"
                                         {{ old('role_id') == $role->id ? 'selected' : '' }}>

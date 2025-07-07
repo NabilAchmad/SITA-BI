@@ -133,7 +133,7 @@ Route::prefix('mahasiswa')->middleware(['auth', 'role:mahasiswa'])->group(functi
     });
 });
 
-Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'role:admin|kaprodi|kajur'])->group(function () {
 
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');

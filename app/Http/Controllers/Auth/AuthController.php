@@ -77,7 +77,7 @@ class AuthController extends Controller
         ]);
 
         // Auto-assign role mahasiswa
-        $mahasiswaRole = \App\Models\Role::where('nama_role', 'mahasiswa')->first();
+        $mahasiswaRole = \App\Models\Role::where('name', 'mahasiswa')->first();
         if ($mahasiswaRole) {
             $user->roles()->attach($mahasiswaRole->id);
         }
@@ -197,7 +197,7 @@ class AuthController extends Controller
         }
 
         foreach ($user->roles as $role) {
-            switch ($role->nama_role) {
+            switch ($role->name) {
                 case 'admin':
                     return route('admin.dashboard');
                 case 'kajur':
@@ -231,7 +231,7 @@ class AuthController extends Controller
     // Optional: Assign role to user (currently commented)
     private function assignRole(User $user, string $roleName)
     {
-        $role = \App\Models\Role::where('nama_role', $roleName)->first();
+        $role = \App\Models\Role::where('name', $roleName)->first();
 
         if ($role) {
             $user->roles()->attach($role->id);

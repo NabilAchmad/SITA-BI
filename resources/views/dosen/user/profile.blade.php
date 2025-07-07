@@ -63,7 +63,7 @@
                     <i class="fas fa-user-shield me-1 text-primary"></i>Role:
                 </label>
                 <div class="col-sm-10">
-                    <input type="text" id="role" value="{{ $user->roles->first()->nama_role ?? 'Tidak Diketahui' }}"
+                    <input type="text" id="role" value="{{ $user->roles->first()->name ?? 'Tidak Diketahui' }}"
                         class="form-control" disabled>
                 </div>
             </div>

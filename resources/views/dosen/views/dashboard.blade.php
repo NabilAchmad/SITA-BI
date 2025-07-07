@@ -3,8 +3,8 @@
 @php
     $prioritasRole = ['kajur', 'kaprodi', 'dosen', 'tamu'];
 
-    // Ambil semua nama_role dari user
-    $userRoles = $role->pluck('nama_role')->toArray(); // misalnya ['dosen', 'kaprodi']
+    // Ambil semua name dari user
+    $userRoles = $role->pluck('name')->toArray(); // misalnya ['dosen', 'kaprodi']
 
     // Ambil role dengan prioritas tertinggi
     $utama = collect($prioritasRole)->first(fn($r) => in_array($r, $userRoles)) ?? 'dosen';

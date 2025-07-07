@@ -97,14 +97,14 @@
                     if (roles.length > 0) {
                         roles.forEach(role => {
                             let badgeClass = 'bg-secondary';
-                            if (role.nama_role.includes('kaprodi')) badgeClass =
+                            if (role.name.includes('kaprodi')) badgeClass =
                                 'bg-success';
-                            if (role.nama_role.includes('kajur')) badgeClass =
+                            if (role.name.includes('kajur')) badgeClass =
                                 'bg-info text-dark';
-                            if (role.nama_role.includes('dosen')) badgeClass = 'bg-primary';
+                            if (role.name.includes('dosen')) badgeClass = 'bg-primary';
 
                             const badge =
-                                `<span class="badge ${badgeClass}">${role.deskripsi || role.nama_role}</span>`;
+                                `<span class="badge ${badgeClass}">${role.deskripsi || role.name}</span>`;
                             rolesContainer.innerHTML += badge;
                         });
                     } else {

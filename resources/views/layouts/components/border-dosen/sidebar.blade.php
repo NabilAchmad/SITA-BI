@@ -2,7 +2,7 @@
     // Mengambil data user dan role yang sedang login
     $user = auth()->user();
     // Menggunakan collection untuk pengecekan yang lebih mudah dan aman
-    $userRoles = $user?->roles->pluck('nama_role') ?? collect();
+    $userRoles = $user?->roles->pluck('name') ?? collect();
     $dosenRoles = $user?->dosen?->peranDosenTa?->pluck('peran')->unique() ?? collect();
 
     // Membuat variabel boolean untuk menyederhanakan logika @if di bawah
@@ -85,6 +85,15 @@
                         <p>Tawaran Topik</p>
                     </a>
                 </li>
+
+                @if ($isKaprodi || $isKajur)
+                    <li class="nav-item {{ request()->is('dosen/sidang*') ? 'active' : '' }}">
+                        <a href="{{ route('dosen.sidang.index') }}" class="nav-link">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            <p>Sidang Mahasiswa</p>
+                        </a>
+                    </li>
+                @endif
 
                 @if ($isKaprodi || $isKajur || $isPenguji)
                     <li class="nav-item {{ request()->is('dosen/sidang*') ? 'active' : '' }}">

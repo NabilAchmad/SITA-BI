@@ -73,7 +73,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function hasRole(string $roleName): bool
     {
-        return $this->roles()->where('nama_role', $roleName)->exists();
+        return $this->roles()->where('name', $roleName)->exists();
     }
 
     /**
@@ -87,6 +87,6 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function hasAnyRole(array $roles): bool
     {
-        return $this->roles()->whereIn('nama_role', $roles)->exists();
+        return $this->roles()->whereIn('name', $roles)->exists();
     }
 }

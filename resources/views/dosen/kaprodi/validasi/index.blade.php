@@ -337,7 +337,7 @@
 
                 if (hasil && hasil.length > 0) {
                     content +=
-                        `<p class="mb-2 small">💡 Ditemukan <strong>${hasil.length} judul</strong> dengan kemiripan signifikan:</p>`;
+                        `<p class="mb-2 small"><i class="bi bi-lightbulb-fill text-primary"></i>Ditemukan <strong>${hasil.length} judul</strong> dengan kemiripan signifikan:</p>`;
                     content +=
                         '<div class="table-responsive border rounded" style="max-height: 250px; overflow-y: auto;">';
                     content += '<table class="table table-striped table-bordered table-sm small mb-0">';

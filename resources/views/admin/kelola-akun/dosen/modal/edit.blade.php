@@ -34,7 +34,7 @@
                     {{-- 
                         Dropdown Role.
                         Pastikan tombol edit Anda memiliki atribut 'data-role-id'
-                        Contoh: data-role-id="{{ $dosen->user->roles->where('nama_role', '!=', 'dosen')->first()->id ?? '' }}"
+                        Contoh: data-role-id="{{ $dosen->user->roles->where('name', '!=', 'dosen')->first()->id ?? '' }}"
                     --}}
                     <div class="form-floating mb-3">
                         <select class="form-select" id="edit_role_id" name="role_id">

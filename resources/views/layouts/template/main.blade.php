@@ -45,7 +45,7 @@
         <!-- Sidebar -->
         @php
             $user = auth()->user();
-            $role = strtolower($user->roles->first()->nama_role ?? 'guest');
+            $role = strtolower($user->roles->first()->name ?? 'guest');
         @endphp
 
         @includeIf("layouts.components.border-{$role}.sidebar")

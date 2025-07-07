@@ -23,8 +23,8 @@ class ValidasiService
 
         if ($user && $user->roles) {
             foreach ($user->roles as $role) {
-                if (str_contains($role->nama_role, 'kaprodi-')) {
-                    $prodiCode = str_replace('kaprodi-', '', $role->nama_role);
+                if (str_contains($role->name, 'kaprodi-')) {
+                    $prodiCode = str_replace('kaprodi-', '', $role->name);
                     $prodi = strtoupper($prodiCode);
                     break;
                 }

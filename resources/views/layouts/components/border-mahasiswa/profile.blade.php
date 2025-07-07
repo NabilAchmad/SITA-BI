@@ -21,7 +21,7 @@
                     <div class="u-text">
                         <h4>{{ $userProfile->name }}</h4>
                         <p class="text-muted">
-                            {{ ucfirst($userProfile->roles->first()->nama_role ?? 'Mahasiswa') }}
+                            {{ ucfirst($userProfile->roles->first()->name ?? 'Mahasiswa') }}
                         </p>
                         <a href="{{ route('user.profile.mhs') }}" class="btn btn-xs btn-secondary btn-sm">View Profile</a>
                     </div>
