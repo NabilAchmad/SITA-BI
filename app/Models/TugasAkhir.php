@@ -129,7 +129,6 @@ class TugasAkhir extends Model
     public function scopeAwaitingValidation($query)
     {
         return $query->whereIn('status', [self::STATUS_DIAJUKAN]);
-        // Jika revisi judul juga divalidasi di sini, tambahkan:
-        // return $query->whereIn('status', [self::STATUS_DIAJUKAN, self::STATUS_REVISI]);
+       
     }
 }
