@@ -75,14 +75,6 @@
             @php
                 $cards = [
                     [
-                        'title' => 'Kelola Jadwal Seminar Proposal',
-                        'icon' => 'bi-hourglass-split',
-                        'color' => 'primary',
-                        'route' => route('sidang.kelola.sempro'),
-                        'btn' => 'Lihat Detail',
-                        'desc' => 'Mahasiswa yang belum dijadwalkan',
-                    ],
-                    [
                         'title' => 'Kelola Jadwal Sidang Akhir',
                         'icon' => 'bi-hourglass-top',
                         'color' => 'success',

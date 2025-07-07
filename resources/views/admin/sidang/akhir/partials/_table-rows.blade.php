@@ -87,7 +87,7 @@
         @break
 
         {{-- ================================================================= --}}
-        {{-- CASE 4: MAHASISWA SUDAH LULUS SEMPRO --}}
+        {{-- CASE 4: MAHASISWA SUDAH LULUS AKHIR --}}
         {{-- ================================================================= --}}
         @case('lulus-sempro')
             @php
@@ -114,8 +114,9 @@
     @endswitch
     @empty
         <tr>
-            <td colspan="{{ count($headers) }}" class="text-center text-muted py-3">
-                <i class="bi bi-exclamation-circle-fill me-1"></i> Tidak ada data untuk ditampilkan.
+            {{-- ✅ PERBAIKAN: Menggunakan count($columns) untuk colspan --}}
+            <td colspan="{{ count($columns) }}" class="text-center text-muted py-4">
+                <i class="bi bi-exclamation-circle-fill me-2"></i> Tidak ada data yang tersedia.
             </td>
         </tr>
     @endforelse
