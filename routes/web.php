@@ -199,8 +199,8 @@ Route::middleware(['auth'])->group(function () {
 
             Route::prefix('mahasiswa')->group(function () {
                 // Mahasiswa
-                Route::get('/', [MahasiswaController::class, 'listMahasiswa'])->name('akun-mahasiswa.kelola');
-                Route::put('/update/{id}', [MahasiswaController::class, 'update'])->name('akun-mahasiswa.update');
+                Route::get('/', [MahasiswaController::class, 'index'])->name('akun-mahasiswa.kelola');
+                Route::put('/{mahasiswa}', [MahasiswaController::class, 'update'])->name('akun-mahasiswa.update');
                 Route::get('/search', [MahasiswaController::class, 'search'])->name('akun-mahasiswa.search');
             });
         });

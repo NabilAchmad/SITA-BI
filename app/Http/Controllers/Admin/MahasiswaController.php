@@ -2,37 +2,41 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Mahasiswa;
-use App\Models\JadwalSidang;
-use Illuminate\Http\Request;
+use App\Models\Mahasiswa; // ✅ PASTIKAN MODEL DI-IMPORT
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateMahasiswaRequest;
+use App\Services\Admin\MahasiswaService;
+use Illuminate\Http\Request;
 
 class MahasiswaController extends Controller
 {
-    // Tampilkan mahasiswa semua list mahasiswa
-    public function listMahasiswa(Request $request)
+    /**
+     * Menerapkan middleware untuk seluruh controller.
+     * Hanya pengguna dengan izin 'manage user accounts' yang bisa mengakses
+     * semua method di dalam controller ini.
+     */
+    public static function middleware(): array
     {
-        $query = Mahasiswa::with('user');
+        return [
+            'permission:manage user accounts',
+        ];
+    }
 
-        // Filter berdasarkan prodi (D3 / D4) dari prodi
-        if ($request->filled('prodi')) {
-            $prodi = $request->prodi;
-            $query->where('prodi', 'LIKE', $prodi . '%');
-        }
+    /**
+     * ✅ PERBAIKAN: Gunakan constructor property promotion.
+     * Ini cara ringkas untuk mendeklarasikan dan menginisialisasi properti.
+     * Method __construct yang lama bisa dihapus.
+     */
+    public function __construct(protected MahasiswaService $mahasiswaService) {}
 
-        // Pencarian berdasarkan nama atau nim
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('user', function ($q2) use ($search) {
-                    $q2->where('name', 'like', '%' . $search . '%');
-                })->orWhere('nim', 'like', '%' . $search . '%');
-            });
-        }
+    /**
+     * Tampilkan daftar mahasiswa.
+     * (Tidak ada perubahan di sini, sudah bagus)
+     */
+    public function index(Request $request)
+    {
+        $mahasiswa = $this->mahasiswaService->getMahasiswaWithFilters($request);
 
-        $mahasiswa = $query->paginate(10);
-
-        // Jika AJAX request (realtime pencarian)
         if ($request->ajax()) {
             return view('admin.kelola-akun.mahasiswa.crud-mahasiswa.read', compact('mahasiswa'))->render();
         }
@@ -40,33 +44,18 @@ class MahasiswaController extends Controller
         return view('admin.kelola-akun.mahasiswa.views.kelolaMahasiswa', compact('mahasiswa'));
     }
 
-    public function update(Request $request, $id)
+    /**
+     * ✅ PERBAIKAN: Menggunakan Route Model Binding.
+     * Laravel akan secara otomatis mencari Mahasiswa berdasarkan parameter dari route.
+     * Jika tidak ditemukan, otomatis akan menampilkan error 404.
+     */
+    public function update(UpdateMahasiswaRequest $request, Mahasiswa $mahasiswa)
     {
-        $mahasiswa = Mahasiswa::with('user')->findOrFail($id);
+        $this->mahasiswaService->updateMahasiswa($request->validated(), $mahasiswa);
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $mahasiswa->user->id,
-            'nim' => 'required|string|unique:mahasiswa,nim,' . $mahasiswa->id,
-            'prodi' => 'required|string|max:100',
-            'password' => 'nullable|confirmed|min:8',
-        ]);
-
-        // Update user data
-        $mahasiswa->user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            // update password hanya jika ada isian
-            'password' => $request->filled('password') ? bcrypt($request->password) : $mahasiswa->user->password,
-        ]);
-
-        // Update mahasiswa data
-        $mahasiswa->update([
-            'nim' => $request->nim,
-            'prodi' => $request->prodi,
-        ]);
-
-        return redirect()->route('akun-mahasiswa.kelola')->with('success', 'Data mahasiswa berhasil diperbarui.');
+        return redirect()
+            ->route('akun-mahasiswa.kelola')
+            ->with('success', 'Data mahasiswa berhasil diperbarui.');
     }
 
     public function search(Request $request)
