@@ -63,14 +63,6 @@
                         </span>
                         <p class="mb-2"><strong>Tanggal Pengajuan:</strong> {{ $tugasAkhir->tanggal_pengajuan ?? '-' }}
                         </p>
-
-                        <div class="mb-3">
-                            <h6 class="fw-bold">Abstrak</h6>
-                            <div class="bg-light p-3 rounded">
-                                {{ $tugasAkhir->abstrak ?? 'Belum ada abstrak.' }}
-                            </div>
-                        </div>
-
                         <div class="d-flex justify-content-between align-items-center">
                             <h6 class="fw-bold mb-0">Dokumen Proposal</h6>
                             @if ($tugasAkhir->file_path)
@@ -365,13 +357,15 @@
                             </ul>
 
                             <div class="mt-3 d-flex gap-2">
-                                <form action="{{ route('setuju-pembatalan-tugas-akhir', $tugasAkhir->id) }}" method="POST">
+                                <form action="{{ route('setuju-pembatalan-tugas-akhir', $tugasAkhir->id) }}"
+                                    method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-success rounded-pill">
                                         <i class="bi bi-check-circle me-1"></i> Setujui Pembatalan
                                     </button>
                                 </form>
-                                <form action="{{ route('tolak-pembatalan-tugas-akhir', $tugasAkhir->id) }}" method="POST">
+                                <form action="{{ route('tolak-pembatalan-tugas-akhir', $tugasAkhir->id) }}"
+                                    method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-danger rounded-pill">
                                         <i class="bi bi-x-circle me-1"></i> Tolak Pembatalan

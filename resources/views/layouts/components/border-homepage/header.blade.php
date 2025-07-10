@@ -13,6 +13,6 @@
                 <li><a href="#jadwal">Jadwal</a></li>
                 <li><a href="#pengumuman">Pengumuman</a></li>
                 <li><a href="#team">Team</a></li>
-                <a class="btn-getstarted flex-md-shrink-0" href="{{route('login')}}">Login</a>
+                <a class="btn-getstarted flex-md-shrink-0" href="{{route('auth.login')}}">Login</a>
     </div>
 </header>

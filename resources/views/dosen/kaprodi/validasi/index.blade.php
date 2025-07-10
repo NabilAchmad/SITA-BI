@@ -2,6 +2,7 @@
 @section('title', 'Validasi Judul Tugas Akhir')
 
 @section('content')
+    {{-- ... (Seluruh bagian HTML Anda dari atas hingga modal tidak perlu diubah) ... --}}
     <div class="container-fluid py-3">
         @php
             $user = auth()->user();
@@ -217,7 +218,7 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Inisialisasi komponen modal sekali saja untuk efisiensi
+            // ... (kode inisialisasi modal dan event listener lainnya tetap sama) ...
             const modalDetailElement = document.getElementById('modalDetailTA');
             const modalTolakElement = document.getElementById('modalTolak');
             const modalDetailTA = new bootstrap.Modal(modalDetailElement);
@@ -252,36 +253,27 @@
                 setTimeout(() => modalTolakTA.show(), 200);
             });
 
-            /**
-             * Fungsi Utama: Mengambil data, mengisi modal, dan menampilkan detail.
-             * Menggunakan async/await untuk kode yang lebih bersih.
-             * @param {string} id - ID dari Tugas Akhir.
-             */
             async function showDetail(id) {
-                // 1. Reset UI Modal ke kondisi awal setiap kali dibuka
                 resetModalUI();
 
                 try {
-                    // 2. Ambil data detail dari server
-                    const response = await fetch(`{{ url('/dosen/validasi/detail') }}/${id}`);
+                    // ✅ FINAL: Menggunakan route name yang lengkap dan benar
+                    const urlTemplate = "{{ route('jurusan.validasi-judul.detail', ['tugasAkhir' => ':id']) }}";
+                    const url = urlTemplate.replace(':id', id);
+
+                    const response = await fetch(url);
                     if (!response.ok) {
                         throw new Error(`Server merespons dengan status: ${response.status}`);
                     }
                     const data = await response.json();
 
-                    // 3. Isi semua detail ke dalam elemen modal
                     fillModalDetails(data, id);
 
-                    // 4. Tambahkan event listener untuk tombol cek kemiripan (jika ada)
                     const btnCek = document.getElementById('btn-cek-kemiripan');
                     if (btnCek) {
-                        // Hapus event listener lama dan buat baru untuk menghindari duplikasi
                         btnCek.onclick = () => handleCekKemiripan(id);
                     }
-
-                    // 5. Tampilkan modal
                     modalDetailTA.show();
-
                 } catch (error) {
                     console.error('Gagal memuat detail:', error);
                     swal('Gagal Memuat',
@@ -289,15 +281,10 @@
                 }
             }
 
-            /**
-             * Menangani logika saat tombol "Lakukan Pengecekan" diklik.
-             * @param {string} id - ID dari Tugas Akhir.
-             */
             async function handleCekKemiripan(id) {
                 const btn = document.getElementById('btn-cek-kemiripan');
                 const container = document.getElementById('hasil-kemiripan-container');
 
-                // Update UI ke status "loading"
                 btn.disabled = true;
                 btn.innerHTML =
                     '<span class="spinner-border spinner-border-sm" role="status"></span> Mencari...';
@@ -306,32 +293,30 @@
                     '<div class="text-center text-muted p-3">Membandingkan judul dengan ribuan data historis...</div>';
 
                 try {
-                    const url = `{{ url('/dosen/validasi') }}/${id}/cek-kemiripan`;
-                    const response = await fetch(url);
+                    // ✅ FINAL: Menggunakan route name yang lengkap dan benar
+                    const urlTemplate =
+                        "{{ route('jurusan.validasi-judul.cek-kemiripan', ['tugasAkhir' => ':id']) }}";
+                    const url = urlTemplate.replace(':id', id);
 
+                    const response = await fetch(url);
                     if (!response.ok) {
                         const errorData = await response.json();
                         throw new Error(errorData.error || 'Gagal terhubung ke server untuk pengecekan.');
                     }
-
                     const hasil = await response.json();
-                    renderKemiripanResult(hasil); // Tampilkan hasil ke UI
-                    btn.style.display = 'none'; // Sembunyikan tombol setelah pengecekan berhasil
-
+                    renderKemiripanResult(hasil);
+                    btn.style.display = 'none';
                 } catch (error) {
                     console.error('Error saat cek kemiripan:', error);
                     container.innerHTML =
                         `<div class="alert alert-danger py-2 small"><strong><i class="bi bi-exclamation-triangle-fill"></i> Gagal:</strong> ${error.message}</div>`;
-                    btn.disabled = false; // Aktifkan kembali tombol jika gagal
+                    btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Coba Lagi';
                 }
             }
 
-            /**
-             * Mengisi hasil pengecekan kemiripan ke dalam container.
-             * @param {Array} hasil - Array objek hasil dari server.
-             */
             function renderKemiripanResult(hasil) {
+                // ... (Fungsi ini tidak perlu diubah) ...
                 const container = document.getElementById('hasil-kemiripan-container');
                 let content = '';
 
@@ -346,11 +331,11 @@
                     content += '<tbody>';
                     hasil.forEach(item => {
                         content += `<tr>
-                        <td class="text-center align-middle"><span class="badge bg-danger fs-6">${item.persentase}%</span></td>
-                        <td>${item.judul}</td>
-                        <td class="text-nowrap">${item.nama_mahasiswa}</td>
-                        <td class="text-center">${item.tahun_lulus}</td>
-                    </tr>`;
+                            <td class="text-center align-middle"><span class="badge bg-danger fs-6">${item.persentase}%</span></td>
+                            <td>${item.judul}</td>
+                            <td class="text-nowrap">${item.nama_mahasiswa}</td>
+                            <td class="text-center">${item.tahun_lulus}</td>
+                        </tr>`;
                     });
                     content += '</tbody></table></div>';
                 } else {
@@ -360,28 +345,28 @@
                 container.innerHTML = content;
             }
 
-            /**
-             * Mengisi semua data dari server ke elemen-elemen di modal.
-             * @param {object} data - Objek data dari `getDetail`.
-             * @param {string} id - ID Tugas Akhir.
-             */
             function fillModalDetails(data, id) {
-                // Isi detail dasar
                 document.getElementById('modalNama').innerText = data.nama || '-';
                 document.getElementById('modalNim').innerText = data.nim || '-';
                 document.getElementById('modalProdi').innerText = data.prodi || '-';
                 document.getElementById('modalJudul').innerText = data.judul || '-';
 
-                // Atur URL untuk form terima dan tolak
-                document.getElementById('formValidasi').action = `{{ url('/dosen/validasi/terima') }}/${id}`;
-                document.getElementById('formTolak').action = `{{ url('/dosen/validasi/tolak') }}/${id}`;
+                // ✅ FINAL: Menggunakan route name yang lengkap dan benar untuk form actions
+                const terimaUrlTemplate = "{{ route('jurusan.validasi-judul.terima', ['tugasAkhir' => ':id']) }}";
+                const tolakUrlTemplate = "{{ route('jurusan.validasi-judul.tolak', ['tugasAkhir' => ':id']) }}";
 
-                // Tampilkan/sembunyikan elemen berdasarkan status `actionable`
-                const isActionable = data.actionable;
-                document.getElementById('wrapActionButtons').classList.toggle('d-none', !isActionable);
-                document.getElementById('pengecekan-kemiripan-section').classList.toggle('d-none', !isActionable);
+                document.getElementById('formValidasi').action = terimaUrlTemplate.replace(':id', id);
+                document.getElementById('formTolak').action = tolakUrlTemplate.replace(':id', id);
 
-                // Tampilkan info jika sudah disetujui
+                // ✅ PERBAIKAN: Gunakan flag yang benar untuk setiap elemen
+
+                // 1. Tombol Setujui/Tolak tetap menggunakan 'data.actionable'
+                document.getElementById('wrapActionButtons').classList.toggle('d-none', !data.actionable);
+
+                // 2. Bagian Cek Kemiripan sekarang menggunakan flag baru 'data.can_check_similarity'
+                document.getElementById('pengecekan-kemiripan-section').classList.toggle('d-none', !data
+                    .can_check_similarity);
+
                 const wrapDiterima = document.getElementById('wrapDiterima');
                 wrapDiterima.classList.toggle('d-none', !data.disetujui_oleh);
                 if (data.disetujui_oleh) {
@@ -389,7 +374,6 @@
                         `<strong>Telah Disetujui</strong> oleh <strong>${data.disetujui_oleh}</strong> pada ${data.tanggal_disetujui}.`;
                 }
 
-                // Tampilkan info jika sudah ditolak
                 const wrapDitolak = document.getElementById('wrapDitolak');
                 wrapDitolak.classList.toggle('d-none', !data.alasan_penolakan);
                 if (data.alasan_penolakan) {
@@ -398,28 +382,22 @@
                 }
             }
 
-            /**
-             * Membersihkan semua konten dinamis di dalam modal.
-             */
             function resetModalUI() {
-                // Bersihkan hasil pengecekan
+                // ... (Fungsi ini tidak perlu diubah) ...
                 const container = document.getElementById('hasil-kemiripan-container');
                 container.style.display = 'none';
                 container.innerHTML = '';
 
-                // Reset tombol cek kemiripan
                 const btnCek = document.getElementById('btn-cek-kemiripan');
                 btnCek.style.display = 'block';
                 btnCek.disabled = false;
                 btnCek.innerHTML = '<i class="bi bi-search"></i> Lakukan Pengecekan';
 
-                // Kosongkan semua data detail
                 document.getElementById('modalNama').innerText = '';
                 document.getElementById('modalNim').innerText = '';
                 document.getElementById('modalProdi').innerText = '';
                 document.getElementById('modalJudul').innerText = '';
 
-                // Sembunyikan semua wrapper info
                 document.getElementById('wrapDiterima').classList.add('d-none');
                 document.getElementById('wrapDitolak').classList.add('d-none');
             }

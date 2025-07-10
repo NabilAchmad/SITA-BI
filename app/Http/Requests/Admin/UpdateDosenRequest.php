@@ -12,7 +12,7 @@ class UpdateDosenRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Menggunakan permission untuk otorisasi
+        // ✅ OTORISASI TEPAT: Menggunakan permission dari Spatie sebagai lapisan keamanan.
         return $this->user()->can('manage user accounts');
     }
 
@@ -30,15 +30,16 @@ class UpdateDosenRequest extends FormRequest
         return [
             'nama'      => ['required', 'string', 'max:255'],
 
-            // ✅ PERBAIKAN: Aturan unique diberi tahu untuk mengabaikan user ID saat ini
+            // ✅ VALIDASI UNIQUE YANG BENAR: Aturan unique diberi tahu untuk mengabaikan user ID saat ini.
+            // Ini adalah cara yang benar untuk proses update.
             'email'     => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($userId)],
 
             'password'  => ['nullable', 'string', 'min:8', 'confirmed'], // Password boleh kosong saat update
 
-            // ✅ PERBAIKAN: Aturan unique diberi tahu untuk mengabaikan NIDN dosen saat ini
+            // ✅ VALIDASI UNIQUE YANG BENAR: Aturan unique diberi tahu untuk mengabaikan NIDN dosen saat ini.
             'nidn'      => ['required', 'string', 'max:50', Rule::unique('dosen')->ignore($dosen->id)],
 
-            // Validasi nama role
+            // Validasi nama role, memastikan hanya jabatan yang valid yang bisa dipilih.
             'role_name' => [
                 'nullable',
                 'string',
@@ -46,14 +47,13 @@ class UpdateDosenRequest extends FormRequest
                     'kajur',
                     'kaprodi-d3',
                     'kaprodi-d4',
-                    'dosen'
                 ])
             ],
         ];
     }
 
     /**
-     * Sesuaikan nama atribut untuk pesan error.
+     * Sesuaikan nama atribut untuk pesan error agar lebih mudah dibaca.
      */
     public function attributes(): array
     {

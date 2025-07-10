@@ -29,7 +29,7 @@ class BimbinganService
         $tugasAkhir = $mahasiswa->tugasAkhir;
 
         if (!$tugasAkhir) {
-            return redirect()->route('dashboard.mahasiswa')->with('alert', [
+            return redirect()->route('mahasiswa.dashboard')->with('alert', [
                 'type' => 'error',
                 'title' => 'Data Tidak Ditemukan',
                 'text' => 'Data tugas akhir belum tersedia.'

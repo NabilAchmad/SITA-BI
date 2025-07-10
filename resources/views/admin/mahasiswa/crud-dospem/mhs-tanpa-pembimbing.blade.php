@@ -9,7 +9,7 @@
 
     <div class="card-body">
         {{-- Filter & Search --}}
-        <form method="GET" action="{{ route('penugasan-bimbingan.index') }}">
+        <form method="GET" action="{{ route('jurusan.penugasan-pembimbing.index') }}">
             <div class="row g-2 mb-3">
                 <div class="col-md-4">
                     <select name="prodi" class="form-select">

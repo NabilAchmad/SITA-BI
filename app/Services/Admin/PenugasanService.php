@@ -2,72 +2,88 @@
 
 namespace App\Services\Admin;
 
-use App\Models\Dosen;
-use App\Models\Mahasiswa;
-use App\Models\PeranDosenTa;
+use App\Models\PeranDosenTa; // ✅ PENTING: Menggunakan model PeranDosenTa sebagai sumber data utama.
 use App\Models\TugasAkhir;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PenugasanService
 {
     /**
-     * Mengambil daftar mahasiswa yang sudah memiliki pembimbing lengkap.
+     * Mengambil daftar mahasiswa yang SUDAH memiliki pembimbing.
+     * Logika ini sekarang sesuai dengan model TugasAkhir Anda.
      */
     public function getMahasiswaWithPembimbing(Request $request): LengthAwarePaginator
     {
-        // ... (Tidak ada perubahan pada method ini)
-        return TugasAkhir::query()
-            ->with(['mahasiswa.user', 'peranDosenTA.dosen.user'])
-            ->whereHas('peranDosenTA', fn($q) => $q->whereIn('peran', ['pembimbing1', 'pembimbing2']), '>=', 2)
-            ->when($request->filled('prodi'), fn($q) => $q->whereHas('mahasiswa', fn($q2) => $q2->where('prodi', $request->prodi)))
-            ->when($request->filled('search'), fn($q) => $q->whereHas('mahasiswa', fn($q2) => $q2->where('nim', 'like', "%{$request->search}%")->orWhereHas('user', fn($q3) => $q3->where('name', 'like', "%{$request->search}%"))))
-            ->latest('updated_at')
+        // ✅ SESUAI MODEL: Menggunakan whereHas('peranDosenTa') untuk memeriksa
+        // apakah ada entri di tabel `peran_dosen_ta` yang berelasi.
+        // Ini adalah cara yang benar sesuai dengan relasi `peranDosenTa()` di model Anda.
+        return TugasAkhir::with(['mahasiswa.user', 'peranDosenTa.dosen.user']) // Muat semua relasi yang dibutuhkan untuk view
+            ->whereHas('peranDosenTa')
+            ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
     }
 
     /**
-     * Mengambil daftar mahasiswa yang membutuhkan penugasan pembimbing.
+     * Mengambil daftar mahasiswa yang BELUM memiliki pembimbing.
+     * Logika ini juga sudah disesuaikan dengan model TugasAkhir Anda.
      */
     public function getMahasiswaNeedingPembimbing(Request $request): LengthAwarePaginator
     {
-        // ... (Tidak ada perubahan pada method ini)
-        return TugasAkhir::query()
-            ->with(['mahasiswa.user', 'peranDosenTA.dosen.user'])
-            ->where('status', TugasAkhir::STATUS_DISETUJUI)
-            ->withCount(['peranDosenTA as pembimbing_count' => fn($q) => $q->whereIn('peran', ['pembimbing1', 'pembimbing2'])])
-            ->having('pembimbing_count', '<', 2)
-            ->when($request->filled('prodi'), fn($q) => $q->whereHas('mahasiswa', fn($q2) => $q2->where('prodi', $request->prodi)))
-            ->when($request->filled('search'), fn($q) => $q->whereHas('mahasiswa', fn($q2) => $q2->where('nim', 'like', "%{$request->search}%")->orWhereHas('user', fn($q3) => $q3->where('name', 'like', "%{$request->search}%"))))
-            ->latest('updated_at')
+        // Query ini sekarang akan mengambil Tugas Akhir yang:
+        // 1. Statusnya 'disetujui' (sesuai konstanta di model TugasAkhir).
+        // 2. Belum memiliki entri sama sekali di tabel `peran_dosen_ta`.
+        return TugasAkhir::with('mahasiswa.user')
+            ->where('status', TugasAkhir::STATUS_DISETUJUI) // <-- Filter status ditambahkan di sini
+            ->whereDoesntHave('peranDosenTa')
+            ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
     }
 
     /**
-     * Menetapkan atau memperbarui pembimbing untuk sebuah Tugas Akhir.
-     * Method ini sudah cukup fleksibel untuk menangani semua skenario.
+     * ✅ LOGIKA INTI YANG SUDAH DISESUAIKAN:
+     * Menetapkan atau memperbarui pembimbing dengan memanipulasi tabel `peran_dosen_ta`.
+     * Ini adalah metode yang benar berdasarkan struktur model Anda.
+     *
+     * @param TugasAkhir $tugasAkhir Objek Tugas Akhir yang akan diatur.
+     * @param array $validatedData Data dari Form Request, berisi 'pembimbing_1_id' dan 'pembimbing_2_id'.
      */
     public function assignOrUpdatePembimbing(TugasAkhir $tugasAkhir, array $validatedData): void
     {
         DB::transaction(function () use ($tugasAkhir, $validatedData) {
-            $isFromTawaranTopik = !is_null($tugasAkhir->tawaran_topik_id);
 
-            // Update pembimbing 1 HANYA jika BUKAN dari tawaran topik
-            if (!$isFromTawaranTopik) {
+            // --- Proses Pembimbing 1 ---
+            // Menggunakan updateOrCreate pada model PeranDosenTa.
+            // Metode ini akan:
+            // 1. MENCARI baris dengan tugas_akhir_id dan peran 'pembimbing1'.
+            // 2. JIKA DITEMUKAN, akan meng-UPDATE dosen_id nya.
+            // 3. JIKA TIDAK DITEMUKAN, akan MEMBUAT baris baru.
+            PeranDosenTa::updateOrCreate(
+                [
+                    'tugas_akhir_id' => $tugasAkhir->id,
+                    'peran'          => PeranDosenTa::PERAN_PEMBIMBING_1, // Menggunakan konstanta dari model
+                ],
+                [
+                    'dosen_id'       => $validatedData['pembimbing_1_id'],
+                ]
+            );
+
+            // --- Proses Pembimbing 2 ---
+            // Pastikan pembimbing_2_id ada dan tidak kosong sebelum diproses
+            if (!empty($validatedData['pembimbing_2_id'])) {
                 PeranDosenTa::updateOrCreate(
-                    ['tugas_akhir_id' => $tugasAkhir->id, 'peran' => PeranDosenTa::PERAN_PEMBIMBING_1],
-                    ['dosen_id' => $validatedData['pembimbing1']]
+                    [
+                        'tugas_akhir_id' => $tugasAkhir->id,
+                        'peran'          => PeranDosenTa::PERAN_PEMBIMBING_2, // Menggunakan konstanta dari model
+                    ],
+                    [
+                        'dosen_id'       => $validatedData['pembimbing_2_id'],
+                    ]
                 );
             }
-
-            // Pembimbing 2 SELALU bisa di-update
-            PeranDosenTa::updateOrCreate(
-                ['tugas_akhir_id' => $tugasAkhir->id, 'peran' => PeranDosenTa::PERAN_PEMBIMBING_2],
-                ['dosen_id' => $validatedData['pembimbing2']]
-            );
         });
     }
 }

@@ -93,7 +93,7 @@
     </div>
 
     <div class="card-body">
-        <form method="GET" action="{{ route('akun-dosen.kelola') }}" class="row g-2 mb-3 justify-content-end">
+        <form method="GET" action="{{ route('admin.akun.dosen.index') }}" class="row g-2 mb-3 justify-content-end">
             <div class="col-auto">
                 <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari nama dosen"
                     value="{{ request('search') }}">
@@ -135,7 +135,7 @@
                             <td>
                                 {{-- Tombol Edit --}}
                                 <button class="btn-edit btn btn-warning btn-xs me-1" data-id="{{ $dosen->id }}"
-                                    data-url="{{ url('admin/kelola-akun/dosen/update/' . $dosen->id) }}"
+                                    data-url="{{ route('admin.akun.dosen.update', ['dosen' => $dosen->id]) }}"
                                     data-nama="{{ $dosen->user->name }}" data-email="{{ $dosen->user->email }}"
                                     data-nidn="{{ $dosen->nidn }}" data-bs-toggle="modal"
                                     data-bs-target="#editAkunModal">
@@ -152,9 +152,9 @@
                                 </button>
 
                                 <!-- Tombol hapus -->
-                                <button type="button" class="btn btn-danger btn-xs btn-hapus"
-                                    data-id="{{ $dosen->id }}">
-                                    <i class="bi bi-trash-fill"></i>
+                                <button class="btn-hapus btn btn-danger btn-xs"
+                                    data-url="{{ route('admin.akun.dosen.destroy', ['dosen' => $dosen->id]) }}">
+                                    <i class="bi bi-trash"></i> Hapus
                                 </button>
                             </td>
                         </tr>

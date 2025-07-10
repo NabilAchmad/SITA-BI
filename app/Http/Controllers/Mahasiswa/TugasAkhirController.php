@@ -4,140 +4,81 @@ namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\TugasAkhir;
-use App\Services\Mahasiswa\TugasAkhirService;
+use App\Services\Mahasiswa\TugasAkhirService; // ✅ Menggunakan Service baru
+use App\Http\Requests\Mahasiswa\CreateTugasAkhirRequest; // ✅ Menggunakan Request baru untuk 'store'
+use App\Http\Requests\Mahasiswa\UploadFileRequest;
 use Illuminate\Http\Request;
-use App\Http\Requests\Mahasiswa\UploadProposalRequest;
 
 class TugasAkhirController extends Controller
 {
-    protected TugasAkhirService $tugasAkhirService;
-
-    // Service di-inject secara otomatis oleh Laravel (Dependency Injection)
-    public function __construct(TugasAkhirService $tugasAkhirService)
-    {
-        $this->tugasAkhirService = $tugasAkhirService;
-    }
+    // Gunakan constructor property promotion untuk kode yang lebih ringkas
+    public function __construct(protected TugasAkhirService $tugasAkhirService) {}
 
     public function dashboard()
     {
-        // Logika dashboard bisa saja berbeda, tapi idealnya juga memanggil service
-        $tugasAkhir = $this->tugasAkhirService->getActiveTugasAkhirForProgressPage();
-        $sudahMengajukan = (bool)$tugasAkhir;
-
-        return view('mahasiswa.tugas-akhir.dashboard.dashboard', compact('tugasAkhir', 'sudahMengajukan'));
+        $data = $this->tugasAkhirService->getDashboardData();
+        return view('mahasiswa.tugas-akhir.dashboard.dashboard', $data);
     }
 
     public function progress()
     {
-        // 1. Panggil service untuk mendapatkan data TA yang aktif
-        $tugasAkhir = $this->tugasAkhirService->getActiveTugasAkhirForProgressPage();
-
-        // 2. Inisialisasi variabel pembimbingList sebagai collection kosong
-        //    Ini adalah kunci perbaikannya.
-        $pembimbingList = collect();
-
-        // 3. Jika tugas akhir ada, isi pembimbingList menggunakan accessor yang sudah kita buat
-        if ($tugasAkhir) {
-            // Kita tidak perlu lagi melakukan query, cukup akses atribut virtual!
-            if ($tugasAkhir->pembimbing_satu) {
-                $pembimbingList->push($tugasAkhir->pembimbing_satu);
-            }
-            if ($tugasAkhir->pembimbing_dua) {
-                $pembimbingList->push($tugasAkhir->pembimbing_dua);
-            }
-        }
-
-        // 4. Kirim semua data yang diperlukan ke view
-        return view('mahasiswa.tugas-akhir.crud-ta.progress', [
-            'tugasAkhir'      => $tugasAkhir,
-            'isMengajukanTA'  => (bool)$tugasAkhir,
-            'progress'        => $tugasAkhir?->progress_percentage ?? 0,
-            'pembimbingList'  => $pembimbingList, // <- Variabel ini sekarang selalu ada (exist)
-
-            // Variabel lain seperti revisi, bimbingan, dokumen, dll.,
-            // dapat diakses langsung dari $tugasAkhir di dalam view karena sudah di-load oleh service.
-            // Contoh di Blade: $tugasAkhir?->revisiTa
-        ]);
+        $data = $this->tugasAkhirService->getProgressPageData();
+        return view('mahasiswa.tugas-akhir.crud-ta.progress', $data);
     }
 
     /**
-     * Mengunggah atau memperbarui file proposal tugas akhir.
-     *
-     * @param  UploadProposalRequest $request
-     * @param  int  $id ID dari TugasAkhir
-     * @return \Illuminate\Http\RedirectResponse
+     * Menampilkan form untuk mengajukan TA mandiri.
      */
-    public function uploadProposal(UploadProposalRequest $request, $id)
-    {
-        // Validasi & Otorisasi sudah ditangani oleh UploadProposalRequest
-
-        // Temukan model TugasAkhir (sudah dipastikan ada oleh authorize() di request)
-        $tugasAkhir = TugasAkhir::findOrFail($id);
-
-        // Ambil file dari request
-        $file = $request->file('file_proposal');
-
-        // Panggil service untuk melakukan tugasnya
-        $this->tugasAkhirService->handleUploadProposal($tugasAkhir, $file);
-
-        // Redirect dengan pesan sukses
-        return redirect()->route('tugas-akhir.progress')
-            ->with('alert', [
-                'title' => 'Berhasil!',
-                'message' => 'File proposal tugas akhir Anda telah berhasil diunggah.',
-                'type' => 'success'
-            ]);
-    }
-
     public function ajukanForm()
     {
-        // View ini tidak butuh data kompleks, jadi bisa langsung
         return view('mahasiswa.tugas-akhir.crud-ta.create');
     }
 
-    public function store(Request $request)
+    /**
+     * Menyimpan pengajuan TA mandiri baru.
+     */
+    public function store(CreateTugasAkhirRequest $request)
     {
-        // Sebaiknya gunakan FormRequest untuk validasi yang lebih bersih
-        $validatedData = $request->validate([
-            'judul' => 'required|string|max:255',
-        ]);
-
         try {
-            $this->tugasAkhirService->createTugasAkhir($validatedData);
-            return redirect()->route('tugas-akhir.dashboard')->with('success', 'Tugas Akhir berhasil diajukan!');
+            $this->tugasAkhirService->createTugasAkhir($request->validated());
+            return redirect()->route('mahasiswa.tugas-akhir.dashboard')->with('success', 'Tugas Akhir berhasil diajukan!');
         } catch (\Exception $e) {
-            // Tangkap error dari service dan tampilkan ke user
             return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();
         }
     }
 
+    /**
+     * Mengunggah file tugas akhir.
+     */
+    public function uploadFile(UploadFileRequest $request, TugasAkhir $tugasAkhir)
+    {
+        // Asumsi jenis dokumen dikirim dari form, atau default 'lainnya'
+        $jenisDokumen = $request->input('jenis_dokumen', 'lainnya');
+
+        $this->tugasAkhirService->handleUploadFile($tugasAkhir, $request->file('file'), $jenisDokumen);
+
+        return redirect()->route('mahasiswa.tugas-akhir.progress')->with('success', 'File tugas akhir Anda telah berhasil diunggah.');
+    }
+
+    /**
+     * Mengajukan pembatalan Tugas Akhir.
+     */
     public function cancel(Request $request, TugasAkhir $tugasAkhir)
     {
-        // Laravel's Route-Model Binding akan otomatis menemukan TA berdasarkan ID
         try {
             $this->tugasAkhirService->requestCancellation($tugasAkhir, $request->input('alasan'));
-
-            return redirect()->route('tugas-akhir.progress')->with('alert', [
-                'type' => 'success',
-                'title' => 'Berhasil!',
-                'text' => 'Pengajuan pembatalan Tugas Akhir telah dikirim.'
-            ]);
+            return redirect()->route('mahasiswa.tugas-akhir.progress')->with('success', 'Pengajuan pembatalan Tugas Akhir telah dikirim.');
         } catch (\Exception $e) {
-            return back()->with('alert', [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'text' => $e->getMessage()
-            ]);
+            return back()->with('error', $e->getMessage());
         }
     }
 
+    /**
+     * Menampilkan halaman riwayat TA yang dibatalkan.
+     */
     public function showCancelled()
     {
-        // Mengambil semua Tugas Akhir yang sudah dibatalkan
         $tugasAkhirDibatalkan = $this->tugasAkhirService->getCancelledTugasAkhir();
-
-        return view('mahasiswa.tugas-akhir.crud-ta.cancel', [
-            'tugasAkhirDibatalkan' => $tugasAkhirDibatalkan,
-        ]);
+        return view('mahasiswa.tugas-akhir.crud-ta.cancel', compact('tugasAkhirDibatalkan'));
     }
 }

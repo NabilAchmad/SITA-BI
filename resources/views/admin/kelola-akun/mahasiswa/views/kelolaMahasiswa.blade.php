@@ -17,20 +17,20 @@
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item">
                     <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
-                        href="{{ route('akun-mahasiswa.kelola') }}">All</a>
+                        href="{{ route('admin.akun.mahasiswa.index') }}">All</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}"
-                        href="{{ route('akun-mahasiswa.kelola', ['prodi' => 'D4']) }}">D4</a>
+                        href="{{ route('admin.akun.mahasiswa.index', ['prodi' => 'D4']) }}">D4</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}"
-                        href="{{ route('akun-mahasiswa.kelola', ['prodi' => 'D3']) }}">D3</a>
+                        href="{{ route('admin.akun.mahasiswa.index', ['prodi' => 'D3']) }}">D3</a>
                 </li>
             </ul>
 
             <!-- Search Form -->
-            <form method="GET" action="{{ route('akun-mahasiswa.kelola') }}" id="searchForm"
+            <form method="GET" action="{{ route('admin.akun.mahasiswa.index') }}" id="searchForm"
                 class="row g-2 mb-3 justify-content-end">
                 <input type="hidden" name="prodi" id="prodiInput" value="{{ request('prodi', 'D4') }}">
                 <div class="col-auto">

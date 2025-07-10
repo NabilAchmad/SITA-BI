@@ -3,7 +3,7 @@
         {{-- Breadcrumbs --}}
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{{ route('pengumuman.read') }}">Daftar Pengumuman</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.pengumuman.index') }}">Daftar Pengumuman</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Pengumuman Terhapus</li>
             </ol>
         </nav>
@@ -42,7 +42,7 @@
                             <td>{{ $item->deleted_at->format('d M Y, H:i:s') }}</td>
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
-                                    <form action="{{ route('pengumuman.restore', $item->id) }}" method="POST"
+                                    <form action="{{ route('admin.pengumuman.restore', $item->id) }}" method="POST"
                                         class="d-inline">
                                         @csrf
                                         <button type="submit" class="btn btn-success btn-sm">
@@ -103,7 +103,7 @@
 <div class="modal fade" id="modalForceDeleteAll" tabindex="-1" aria-labelledby="modalForceDeleteAllLabel"
     aria-hidden="true">
     <div class="modal-dialog">
-        <form method="POST" action="{{ route('pengumuman.force-delete-all') }}">
+        <form method="POST" action="{{ route('admin.pengumuman.force-delete-all') }}">
             @csrf
             @method('DELETE')
             <div class="modal-content">

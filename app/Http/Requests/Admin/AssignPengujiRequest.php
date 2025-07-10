@@ -7,15 +7,20 @@ use Illuminate\Foundation\Http\FormRequest;
 class AssignPengujiRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Tentukan apakah pengguna diizinkan untuk membuat permintaan ini.
      */
     public function authorize(): bool
     {
-        return true; // Otorisasi ditangani oleh middleware di route
+        /**
+         * ✅ PERBAIKAN KRITIS: Tambahkan otorisasi di sini.
+         * Ini adalah lapisan keamanan kedua setelah middleware di route.
+         * Hanya pengguna dengan peran yang tepat yang bisa melanjutkan.
+         */
+        return $this->user()->hasAnyRole(['admin', 'kajur', 'kaprodi-d3', 'kaprodi-d4']);
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Dapatkan aturan validasi yang berlaku untuk permintaan ini.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -23,18 +28,26 @@ class AssignPengujiRequest extends FormRequest
     {
         return [
             'penguji' => 'required|array|min:1|max:4',
-            'penguji.*' => 'required|exists:dosen,id',
+
+            /**
+             * ✅ PENINGKATAN: Tambahkan aturan 'distinct'.
+             * Ini memastikan setiap ID dosen di dalam array harus unik.
+             */
+            'penguji.*' => 'required|distinct|exists:dosen,id',
         ];
     }
 
     /**
-     * Get custom messages for validator errors.
+     * Dapatkan pesan kustom untuk error validator.
      */
     public function messages(): array
     {
         return [
             'penguji.required' => 'Setidaknya satu dosen penguji harus dipilih.',
             'penguji.*.exists' => 'Dosen yang dipilih tidak valid.',
+
+            // ✅ PENINGKATAN: Tambahkan pesan untuk aturan 'distinct'.
+            'penguji.*.distinct' => 'Dosen yang sama tidak boleh dipilih lebih dari satu kali.',
         ];
     }
 }

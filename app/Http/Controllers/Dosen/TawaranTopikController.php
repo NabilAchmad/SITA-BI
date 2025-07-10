@@ -26,11 +26,10 @@ class TawaranTopikController extends Controller
     }
 
     /**
-     * Menampilkan halaman utama dengan dua tab:
-     * 1. Daftar topik yang ditawarkan oleh dosen.
-     * 2. Daftar mahasiswa yang mengajukan topik tersebut.
+     * ✅ PERBAIKAN: Nama metode diubah dari 'read' menjadi 'index'.
+     * Ini agar sesuai dengan konvensi Route::resource Laravel.
      */
-    public function read(Request $request)
+    public function index(Request $request)
     {
         // Data untuk Tab 1: Daftar topik yang ditawarkan
         $tawaranTopiks = $this->tawaranTopikService->getActiveTopics();
@@ -81,6 +80,7 @@ class TawaranTopikController extends Controller
      */
     public function destroy(TawaranTopik $tawaranTopik): RedirectResponse
     {
+        // Otorisasi sebaiknya dilakukan di dalam FormRequest atau Policy
         if ($tawaranTopik->user_id !== Auth::id()) {
             return redirect()->back()->with('alert', [
                 'type' => 'error',
@@ -98,18 +98,14 @@ class TawaranTopikController extends Controller
         ]);
     }
 
-    /**
-     * Menampilkan daftar topik yang sudah di-soft delete.
-     */
+    // ... (Sisa method seperti trashed, restore, dll. tidak perlu diubah)
+
     public function trashed()
     {
         $tawaranTopiks = $this->tawaranTopikService->getTrashedTopics();
         return view('dosen.tawaran-topik.crud-TawaranTopik.trashed', ['tawaranTopiks' => $tawaranTopiks]);
     }
 
-    /**
-     * Mengembalikan topik dari soft delete.
-     */
     public function restore($id): RedirectResponse
     {
         $this->tawaranTopikService->restoreTopic($id);
@@ -120,9 +116,6 @@ class TawaranTopikController extends Controller
         ]);
     }
 
-    /**
-     * Menghapus topik secara permanen dari database.
-     */
     public function forceDelete($id): RedirectResponse
     {
         $this->tawaranTopikService->forceDeleteTopic($id);
@@ -143,9 +136,6 @@ class TawaranTopikController extends Controller
         ]);
     }
 
-    /**
-     * Menyetujui pengajuan topik dari mahasiswa.
-     */
     public function approveApplication(HistoryTopikMahasiswa $application): RedirectResponse
     {
         try {
@@ -164,9 +154,6 @@ class TawaranTopikController extends Controller
         }
     }
 
-    /**
-     * Menolak pengajuan topik dari mahasiswa.
-     */
     public function rejectApplication(HistoryTopikMahasiswa $application): RedirectResponse
     {
         $this->topikPengajuanService->rejectApplication($application);

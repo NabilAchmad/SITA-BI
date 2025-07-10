@@ -35,7 +35,7 @@
                                     </ul>
                                 </div>
                             @endif
-                            <form method="POST" action="{{ route('login') }}">
+                            <form method="POST" action="{{ route('auth.login') }}">
                                 @csrf
                                 <div class="mb-4">
                                     <label for="email" class="form-label fw-semibold">Email Address</label>
@@ -67,7 +67,7 @@
                         <div class="card-footer text-center bg-white border-0 rounded-bottom-4 py-4">
                             <p class="mb-0">
                                 New to our platform?
-                                <a href="{{ route('register') }}" class="text-decoration-none fw-bold">Create an account</a>
+                                <a href="{{ route('auth.register') }}" class="text-decoration-none fw-bold">Create an account</a>
                             </p>
                         </div>
                     </div>

@@ -13,14 +13,14 @@
             </div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('tugas-akhir.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('mahasiswa.tugas-akhir.dashboard') }}">Dashboard</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Topik TA</li>
                 </ol>
             </nav>
         </div>
 
         <!-- Search Box -->
-        <form method="GET" action="{{ route('mahasiswa.topik.index') }}">
+        <form method="GET" action="{{ route('mahasiswa.tugas-akhir.topik.index') }}">
             <div class="input-group mb-4">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                 <input type="text" name="search" class="form-control" placeholder="Cari topik atau deskripsi..."

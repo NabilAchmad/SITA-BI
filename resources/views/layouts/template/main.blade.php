@@ -42,18 +42,19 @@
 
 <body>
     <div class="wrapper sidebar_minimize">
-        <!-- Sidebar -->
-        @php
-            $user = auth()->user();
-            $role = strtolower($user->roles->first()->name ?? 'guest');
-        @endphp
 
-        @includeIf("layouts.components.border-{$role}.sidebar")
+        <!-- Sidebar -->
+        {{-- ✅ PERBAIKAN: Cukup sertakan sidebar. 
+             Sidebar yang kita buat sebelumnya sudah pintar dan mandiri. --}}
+        @include('layouts.template._sidebar')
         <!-- End Sidebar -->
 
         <!-- Main Panel -->
         <div class="main-panel">
-            @includeIf("layouts.components.border-{$role}.header")
+
+            {{-- ✅ PERBAIKAN: Header dinamis berdasarkan peran.
+                 Ini lebih aman dan lebih mudah dirawat daripada include dengan nama variabel. --}}
+            @include('layouts.components.header._header')
 
             <div class="container">
                 <div class="page-inner">
@@ -62,9 +63,7 @@
             </div>
 
             <!-- Footer -->
-            @includeIf("layouts.components.border-{$role}.footer")
-            <!-- End Footer -->
-
+            @include('layouts.components.footer._footer')
         </div>
     </div>
 

@@ -31,7 +31,7 @@
                     </td>
                     <td>
                         <button class="btn-edit-mahasiswa btn btn-warning btn-xs me-1" data-id="{{ $mhs->id }}"
-                            data-url="{{route('akun-mahasiswa.update', ['mahasiswa' => $mhs->id]) }}"
+                            data-url="{{route('admin.akun.mahasiswa.update', ['mahasiswa' => $mhs->id]) }}"
                             data-nama="{{ $mhs->user->name }}" data-email="{{ $mhs->user->email }}"
                             data-nim="{{ $mhs->nim }}" data-prodi="{{ $mhs->prodi }}" data-bs-toggle="modal"
                             data-bs-target="#editAkunMahasiswaModal">

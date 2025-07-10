@@ -6,10 +6,40 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pengumuman;
 use App\Http\Controllers\Controller;
-Use App\Models\User;
+use App\Models\User;
 
 class PengumumanController extends Controller
 {
+
+    /**
+     * ✅ PERBAIKAN: Nama metode diubah dari 'read' menjadi 'index'.
+     * Ini agar sesuai dengan konvensi Route::resource Laravel.
+     */
+    public function index(Request $request)
+    {
+        $query = Pengumuman::orderBy('tanggal_dibuat', 'desc');
+
+        $audiens = $request->input('audiens');
+        $validAudiens = ['registered_users', 'dosen', 'mahasiswa', 'guest', 'all_users'];
+
+        if (in_array($audiens, $validAudiens)) {
+            if ($audiens === 'registered_users') {
+                $query->whereIn('audiens', ['dosen', 'mahasiswa']);
+            } elseif ($audiens === 'all_users') {
+                // Tidak perlu filter
+            } else {
+                $query->where(function ($q) use ($audiens) {
+                    $q->where('audiens', $audiens)
+                        ->orWhere('audiens', 'all_users');
+                });
+            }
+        }
+
+        $pengumuman = $query->paginate(10)->appends($request->query());
+
+        return view('admin.pengumuman.views.readPengumuman', compact('pengumuman'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -84,7 +114,7 @@ class PengumumanController extends Controller
         ]);
 
         // Redirect dengan pesan sukses setelah update
-        return redirect()->route('pengumuman.read')->with('success', 'Pengumuman berhasil diperbarui.');
+        return redirect()->route('admin.pengumuman.index')->with('success', 'Pengumuman berhasil diperbarui.');
     }
 
     public function edit($id)

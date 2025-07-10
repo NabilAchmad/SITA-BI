@@ -1,30 +1,32 @@
 <!-- CSS Ringan -->
-<style>
-    .table td,
-    .table th {
-        vertical-align: middle;
-    }
+@push('styles')
+    <style>
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
 
-    .table th {
-        font-weight: bold;
-    }
+        .table th {
+            font-weight: bold;
+        }
 
-    .btn-hapus {
-        min-width: 60px;
-    }
+        .btn-hapus {
+            min-width: 60px;
+        }
 
-    .truncate {
-        max-width: 300px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-</style>
+        .truncate {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+@endpush
 
 <div class="card shadow-sm mb-4">
     <div class="card-header">
         <div class="mb-2">
-            <a href="{{ route('pengumuman.trashed') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ route('admin.pengumuman.trashed') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-trash"></i> Pengumuman Terhapus
             </a>
         </div>
@@ -50,7 +52,7 @@
             @foreach ($audiensList as $key => $label)
                 <li class="nav-item">
                     <a class="nav-link {{ request('audiens') === $key ? 'active' : '' }}"
-                        href="{{ route('pengumuman.read', ['audiens' => $key]) }}">{{ $label }}</a>
+                        href="{{ route('admin.pengumuman.index', ['audiens' => $key]) }}">{{ $label }}</a>
                 </li>
             @endforeach
         </ul>
@@ -64,7 +66,7 @@
         </div>
 
         {{-- Search --}}
-        <form method="GET" action="{{ route('pengumuman.read') }}" class="row g-2 mb-3 justify-content-end">
+        <form method="GET" action="{{ route('admin.pengumuman.index') }}" class="row g-2 mb-3 justify-content-end">
             <input type="hidden" name="audiens" value="{{ request('audiens') }}">
             <div class="col-auto">
                 <input type="text" name="search" class="form-control form-control-sm"
@@ -113,15 +115,16 @@
                             </td>
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
-                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#editPengumumanModal" data-id="{{ $item->id }}"
+                                    <button type="button" class="btn btn-warning btn-edit"
+                                        data-url="{{ route('admin.pengumuman.update', $item->id) }}"
                                         data-judul="{{ $item->judul }}" data-isi="{{ $item->isi }}"
-                                        data-audiens="{{ $item->audiens }}">
+                                        data-audiens="{{ $item->audiens }}" data-bs-toggle="modal"
+                                        data-bs-target="#editPengumumanModal">
                                         Edit
                                     </button>
 
-                                    <button type="button" class="btn btn-danger btn-sm btn-hapus"
-                                        data-id="{{ $item->id }}">
+                                    <button type="button" class="btn btn-danger btn-hapus"
+                                        data-url="{{ route('admin.pengumuman.destroy', $item->id) }}">
                                         Hapus
                                     </button>
                                 </div>
@@ -147,15 +150,26 @@
 @include('admin.pengumuman.modal.edit')
 
 @push('scripts')
+    {{-- 
+        ======================================================================
+        PERBAIKAN SCRIPT UNTUK PENGUMUMAN
+        ======================================================================
+        - URL tidak lagi di-hardcode. Sekarang diambil dari atribut 'data-url' pada tombol.
+        - Beberapa blok $(document).ready() digabung menjadi satu agar lebih efisien.
+    --}}
     <script>
         $(document).ready(function() {
+
+            // --- SCRIPT UNTUK HAPUS DATA (SOFT DELETE) ---
             $(document).on("click", ".btn-hapus", function(e) {
                 e.preventDefault();
-                const id = $(this).data("id");
+
+                // ✅ PERBAIKAN: Ambil URL dari atribut data-url pada tombol hapus
+                const url = $(this).data("url");
 
                 swal({
                     title: "Apakah Anda yakin?",
-                    text: "Pengumuman yang dihapus tidak dapat dikembalikan!",
+                    text: "Pengumuman akan dipindahkan ke folder sampah.",
                     icon: "warning",
                     buttons: {
                         cancel: {
@@ -171,7 +185,7 @@
                 }).then((willDelete) => {
                     if (willDelete) {
                         $.ajax({
-                            url: "/admin/pengumuman/" + id +"/soft-delete",
+                            url: url, // ✅ Menggunakan URL dinamis
                             type: "DELETE",
                             headers: {
                                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
@@ -209,21 +223,28 @@
                 });
             });
 
+            // --- SCRIPT UNTUK MENAMPILKAN MODAL EDIT ---
             $('#editPengumumanModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
-                var id = button.data('id');
+
+                // ✅ PERBAIKAN: Ambil URL dari atribut data-url pada tombol edit
+                var url = button.data('url');
                 var judul = button.data('judul');
                 var isi = button.data('isi');
                 var audiens = button.data('audiens');
 
                 var modal = $(this);
-                modal.find('form').attr('action', '/admin/pengumuman/' + id + '/update');
-                modal.find('#edit_id_pengumuman').val(id);
+
+                // ✅ Mengatur action form dengan URL dinamis
+                modal.find('form').attr('action', url);
+
+                // Isi input form modal
                 modal.find('#edit_judul').val(judul);
                 modal.find('#edit_isi').val(isi);
                 modal.find('#edit_audiens').val(audiens);
             });
 
+            // --- SCRIPT UNTUK MENAMPILKAN ALERT DARI SESSION ---
             @if (session('success'))
                 swal({
                     title: "Berhasil!",

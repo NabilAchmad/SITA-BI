@@ -1,7 +1,7 @@
 <!-- Modal Tambah -->
 <div class="modal fade" id="tambahPengumumanModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <form method="POST" action="{{ route('pengumuman.create') }}">
+        <form method="POST" action="{{ route('admin.pengumuman.store') }}">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">

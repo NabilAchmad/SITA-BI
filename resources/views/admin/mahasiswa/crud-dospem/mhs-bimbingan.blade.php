@@ -17,20 +17,20 @@
                 <li class="nav-item">
                     {{-- Asumsi route name adalah 'penugasan-pembimbing.list' --}}
                     <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
-                        href="{{ route('list-mahasiswa') }}">All</a>
+                        href="{{ route('jurusan.penugasan-pembimbing.sudah') }}">All</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}"
-                        href="{{ route('list-mahasiswa', ['prodi' => 'D4']) }}">D4</a>
+                        href="{{ route('jurusan.penugasan-pembimbing.sudah', ['prodi' => 'D4']) }}">D4</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}"
-                        href="{{ route('list-mahasiswa', ['prodi' => 'D3']) }}">D3</a>
+                        href="{{ route('jurusan.penugasan-pembimbing.sudah', ['prodi' => 'D3']) }}">D3</a>
                 </li>
             </ul>
 
             <!-- Search -->
-            <form method="GET" action="{{ route('list-mahasiswa') }}" class="row g-2 mb-3 justify-content-end">
+            <form method="GET" action="{{ route('jurusan.penugasan-pembimbing.sudah') }}" class="row g-2 mb-3 justify-content-end">
                 <input type="hidden" name="prodi" value="{{ request('prodi') }}">
                 <div class="col-auto">
                     <input type="text" name="search" class="form-control form-control-sm"

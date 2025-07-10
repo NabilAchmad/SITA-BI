@@ -1,6 +1,6 @@
 <!-- Template Modal Jadwal Sidang -->
 <template id="template-modal-jadwal-sidang">
-    <form action="{{ route('jadwal-sidang.store') }}" method="POST" id="form-jadwal-sidang">
+    <form action="{{ route('jurusan.penjadwalan-sidang.store') }}" method="POST" id="form-jadwal-sidang">
         @csrf
         <input type="hidden" name="sidang_id" id="jadwal-sidang_id" value="">
         <div class="modal fade" tabindex="-1" role="dialog" id="modalJadwalSidang">

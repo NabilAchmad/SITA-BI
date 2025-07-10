@@ -12,7 +12,7 @@
             </div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard-sidang') }}">Dashboard Sidang</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('jurusan.penjadwalan-sidang.index') }}">Dashboard Sidang</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Kelola Jadwal Akhir</li>
                 </ol>
             </nav>
@@ -218,7 +218,7 @@
                                 }
                             }).then(() => {
                                 window.location.href =
-                                    "{{ route('sidang.kelola.akhir') }}";
+                                    "{{ route('jurusan.penjadwalan-sidang.detail') }}";
                             });
                         } else {
                             swal("Gagal", result.message || 'Gagal menyimpan jadwal.', "error");

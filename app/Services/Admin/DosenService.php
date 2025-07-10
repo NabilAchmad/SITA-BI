@@ -13,9 +13,6 @@ class DosenService
 {
     /**
      * Mengambil data dosen dengan filter dan paginasi.
-     *
-     * @param Request $request
-     * @return LengthAwarePaginator
      */
     public function getDosenWithFilters(Request $request): LengthAwarePaginator
     {
@@ -32,10 +29,6 @@ class DosenService
 
     /**
      * Membuat data dosen baru beserta user dan rolenya.
-     * ✅ SUDAH DIPERBAIKI: Menggunakan nama role, bukan ID.
-     *
-     * @param array $validatedData Data dari StoreDosenRequest
-     * @return Dosen
      */
     public function createDosen(array $validatedData): Dosen
     {
@@ -47,16 +40,21 @@ class DosenService
                 'password' => Hash::make($validatedData['password']),
             ]);
 
-            // 2. Siapkan dan berikan Roles berdasarkan NAMA
-            $rolesToAssign = ['dosen']; // Setiap dosen pasti punya role 'dosen'
+            // 2. Siapkan dan berikan Roles
+            $rolesToAssign = ['dosen'];
             if (!empty($validatedData['role_name'])) {
-                // Tambahkan role jabatan jika ada (misal: 'kajur', 'kaprodi-d3')
                 $rolesToAssign[] = $validatedData['role_name'];
             }
-            // Gunakan metode assignRole() dari Spatie yang bisa menerima array nama role
             $user->assignRole(array_unique($rolesToAssign));
 
-            // 3. Buat data Dosen yang berelasi dengan User
+            /**
+             * ✅ PERBAIKAN KRITIS: Hapus cache peran setelah peran baru diberikan.
+             * Ini memastikan aplikasi akan membaca data peran yang baru saat
+             * pengguna tersebut login atau saat datanya diakses lagi.
+             */
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+            // 3. Buat data Dosen yang berelasi
             return $user->dosen()->create([
                 'nidn' => $validatedData['nidn'],
             ]);
@@ -65,11 +63,6 @@ class DosenService
 
     /**
      * Memperbarui data dosen, user, dan rolenya.
-     * ✅ SUDAH DIPERBAIKI: Menggunakan nama role, bukan ID.
-     *
-     * @param Dosen $dosen
-     * @param array $validatedData Data dari UpdateDosenRequest
-     * @return bool
      */
     public function updateDosen(Dosen $dosen, array $validatedData): bool
     {
@@ -84,14 +77,18 @@ class DosenService
             }
             $dosen->user->update($userData);
 
-            // 2. Sinkronkan Roles berdasarkan NAMA
-            $rolesToSync = ['dosen']; // Role 'dosen' adalah wajib
+            // 2. Sinkronkan Roles
+            $rolesToSync = ['dosen'];
             if (!empty($validatedData['role_name'])) {
-                // Tambahkan role jabatan jika ada
                 $rolesToSync[] = $validatedData['role_name'];
             }
-            // Gunakan syncRoles() dari Spatie, yang akan menghapus role lama dan menerapkan yang baru
             $dosen->user->syncRoles(array_unique($rolesToSync));
+
+            /**
+             * ✅ PERBAIKAN KRITIS: Hapus cache peran setelah peran diubah.
+             * Ini sangat penting agar perubahan peran langsung terlihat di seluruh aplikasi.
+             */
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
             // 3. Update data pada tabel Dosen
             return $dosen->update(['nidn' => $validatedData['nidn']]);
@@ -100,9 +97,6 @@ class DosenService
 
     /**
      * Menghapus data dosen beserta user dan relasi rolenya.
-     *
-     * @param Dosen $dosen
-     * @return bool
      */
     public function deleteDosen(Dosen $dosen): bool
     {
@@ -112,6 +106,11 @@ class DosenService
             // Hapus relasi role dan user
             $user->roles()->detach();
             $dosen->delete();
+
+            /**
+             * ✅ PENINGKATAN: Hapus cache setelah menghapus user.
+             */
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
             return $user->delete();
         });

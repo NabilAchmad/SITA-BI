@@ -78,7 +78,7 @@
                         'title' => 'Kelola Jadwal Sidang Akhir',
                         'icon' => 'bi-hourglass-top',
                         'color' => 'success',
-                        'route' => route('sidang.kelola.akhir'),
+                        'route' => route('jurusan.penjadwalan-sidang.detail'),
                         'btn' => 'Lihat Detail',
                         'desc' => 'Mahasiswa menunggu sidang akhir',
                     ],

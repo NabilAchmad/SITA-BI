@@ -44,7 +44,7 @@
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <a href="{{ route('tugas-akhir.dashboard') }}" class="text-decoration-none">
+                <a href="{{ route('mahasiswa.tugas-akhir.dashboard') }}" class="text-decoration-none">
                     <i class="fas fa-home me-1"></i>Dashboard
                 </a>
             </li>
@@ -60,11 +60,12 @@
         </div>
     </div>
 
-    @if ($pembimbingList->count())
-        <!-- Dosen Pembimbing -->
+    {{-- ✅ KODE PERBAIKAN FINAL --}}
+
+    {{-- Cek apakah tugas akhir ada DAN relasi peranDosenTa (pembimbing yg ditugaskan) tidak kosong --}}
+    @if ($tugasAkhir && $tugasAkhir->peranDosenTa->isNotEmpty())
         <div class="card border-0 shadow-sm mb-4 card-hover">
             <div class="card-body">
-                <!-- Header -->
                 <div class="d-flex align-items-center mb-4">
                     <div class="me-3">
                         <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm"
@@ -78,9 +79,9 @@
                     </div>
                 </div>
 
-                <!-- List Pembimbing -->
                 <div class="row g-3">
-                    @foreach ($pembimbingList as $pembimbing)
+                    {{-- Lakukan looping pada variabel yang benar: $tugasAkhir->peranDosenTa --}}
+                    @foreach ($tugasAkhir->peranDosenTa as $peranDosen)
                         <div class="col-md-6">
                             <div class="card border-0 bg-light h-100 shadow-sm rounded-3">
                                 <div class="card-body d-flex align-items-center gap-3">
@@ -89,9 +90,11 @@
                                         <i class="fas fa-user-check"></i>
                                     </div>
                                     <div>
-                                        <span class="badge bg-primary mb-1 text-capitalize">{{ $pembimbing->peran }}</span>
-                                        <h6 class="mb-0 fw-semibold">{{ $pembimbing->dosen->user->name ?? '-' }}</h6>
-                                        <small class="text-muted d-block">Dosen {{ ucfirst($pembimbing->peran) }}</small>
+                                        {{-- Tampilkan peran dosen (contoh: 'pembimbing') --}}
+                                        <span class="badge bg-primary mb-1 text-capitalize">{{ $peranDosen->peran }}</span>
+                                        {{-- Tampilkan nama dosen dari relasi yang benar --}}
+                                        <h6 class="mb-0 fw-semibold">{{ $peranDosen->dosen->user->name ?? '-' }}</h6>
+                                        <small class="text-muted d-block">Dosen {{ ucfirst($peranDosen->peran) }}</small>
                                     </div>
                                 </div>
                             </div>
@@ -100,18 +103,19 @@
                 </div>
             </div>
         </div>
-    @elseif($tugasAkhir && $pembimbingList->isEmpty() && $tugasAkhir->status !== 'dibatalkan')
+        {{-- Cek jika tugas akhir ada, TAPI pembimbing belum ditugaskan --}}
+    @elseif($tugasAkhir && $tugasAkhir->peranDosenTa->isEmpty() && $tugasAkhir->status !== 'dibatalkan')
         <div class="alert alert-warning d-flex align-items-center gap-2 shadow-sm border-0 rounded-3">
             <i class="bi bi-exclamation-circle-fill fs-5 text-warning"></i>
             <div>
                 <strong>Belum Ada Pembimbing</strong><br>
-                Menunggu penunjukan dosen pembimbing oleh admin.
+                Menunggu penunjukan dosen pembimbing oleh admin atau pimpinan jurusan.
             </div>
         </div>
     @endif
 
     <!-- Main Content -->
-    @if (!$tugasAkhir || $tugasAkhir->status === "dibatalkan")
+    @if (!$tugasAkhir || $tugasAkhir->status === 'dibatalkan')
         <!-- No Data State -->
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
@@ -125,11 +129,11 @@
                         <p class="text-muted mb-4">Anda belum mengajukan atau belum memiliki data Tugas Akhir saat ini.
                             Mulai perjalanan akademik Anda sekarang!</p>
                         <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
-                            <a href="{{ route('tugas-akhir.ajukan') }}"
+                            <a href="{{ route('mahasiswa.tugas-akhir.ajukan') }}"
                                 class="btn btn-primary btn-lg rounded-pill shadow-sm px-4 d-flex align-items-center">
                                 <i class="fas fa-file-upload me-2"></i> Ajukan Tugas Akhir
                             </a>
-                            <a href="{{ route('mahasiswa.topik.index') }}"
+                            <a href="{{ route('mahasiswa.tugas-akhir.topik.index') }}"
                                 class="btn btn-outline-primary btn-lg rounded-pill shadow-sm px-4 d-flex align-items-center">
                                 <i class="fas fa-lightbulb me-2"></i> Ambil Tawaran Topik
                             </a>
@@ -167,11 +171,6 @@
                 'ditolak' => 'danger',
                 default => 'secondary',
             };
-            $abstrakLimit = 300;
-            $abstrakFull = $ta->abstrak;
-            $abstrakShort =
-                strlen($abstrakFull) > $abstrakLimit ? substr($abstrakFull, 0, $abstrakLimit) : $abstrakFull;
-            $hasMore = strlen($abstrakFull) > $abstrakLimit;
         @endphp
 
         <!-- Header Card -->
@@ -324,7 +323,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                     </div>
-                    <form action="{{ route('tugas-akhir.uploadProposal', $ta->id) }}" method="POST"
+                    <form action="{{ route('mahasiswa.tugas-akhir.upload-file', $ta->id) }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body py-4">
@@ -373,7 +372,7 @@
                             </div>
                         </div>
 
-                        <form action="{{ route('tugasAkhir.cancelTA', $ta->id) }}" method="POST">
+                        <form action="{{ route('mahasiswa.tugas-akhir.cancel', $ta->id) }}" method="POST">
                             @csrf
                             <div class="mb-4">
                                 <label for="alasan" class="form-label fw-semibold">Alasan Pembatalan</label>
@@ -395,74 +394,6 @@
                 </div>
             </div>
         @endif
-
-        <!-- Modal Revisi -->
-        @if ($isMengajukanTA && $ta->status === 'disetujui')
-            <div class="modal fade" id="revisiModal{{ $ta->id }}" tabindex="-1"
-                aria-labelledby="revisiModalLabel{{ $ta->id }}" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content rounded-4 overflow-hidden">
-                        <form action="{{ route('tugas-akhir.revisi', $ta->id) }}" method="POST"
-                            enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
-
-                            <!-- Modal Header -->
-                            <div class="modal-header gradient-primary text-white">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center me-3"
-                                        style="width: 45px; height: 45px;">
-                                        <i class="fas fa-edit text-primary fs-5"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="modal-title fw-bold mb-0" id="revisiModalLabel{{ $ta->id }}">
-                                            Revisi Proposal
-                                        </h5>
-                                        <small class="opacity-75">Upload file revisi dan catatan perubahan</small>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-close btn-close-white"
-                                    data-bs-dismiss="modal"></button>
-                            </div>
-
-                            <!-- Modal Body -->
-                            <div class="modal-body px-4 py-3">
-                                <div class="mb-3">
-                                    <label for="file_revisi" class="form-label fw-semibold">
-                                        <i class="fas fa-cloud-upload-alt text-primary me-1"></i>File Revisi
-                                    </label>
-                                    <input type="file" class="form-control" id="file_revisi" name="file_revisi"
-                                        accept=".pdf,.doc,.docx" required>
-                                    <div class="form-text">
-                                        <i class="fas fa-info-circle me-1"></i>Format: PDF, DOC, DOCX (maksimal 5MB)
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label for="point_revisi" class="form-label fw-semibold">
-                                        <i class="fas fa-list-ul text-primary me-1"></i>Point Revisi
-                                    </label>
-                                    <textarea class="form-control" id="point_revisi" name="point_revisi" rows="5"
-                                        placeholder="Jelaskan poin-poin revisi yang telah dilakukan..." required></textarea>
-                                </div>
-                            </div>
-
-                            <!-- Modal Footer -->
-                            <div class="modal-footer bg-light border-top-0">
-                                <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
-                                    data-bs-dismiss="modal">
-                                    <i class="fas fa-times me-1"></i>Tutup
-                                </button>
-                                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
-                                    <i class="fas fa-check me-1"></i>Simpan Revisi
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        @endif
-
     @endif
 @endsection
 
