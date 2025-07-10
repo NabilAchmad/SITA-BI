@@ -52,12 +52,19 @@ class TugasAkhirController extends Controller
      */
     public function uploadFile(UploadFileRequest $request, TugasAkhir $tugasAkhir)
     {
-        // Asumsi jenis dokumen dikirim dari form, atau default 'lainnya'
-        $jenisDokumen = $request->input('jenis_dokumen', 'lainnya');
+        // Validasi sudah ditangani oleh UploadFileRequest
+        $this->tugasAkhirService->handleUploadFile(
+            $tugasAkhir,
+            $request->file('file'),
+            $request->input('jenis_dokumen')
+        );
 
-        $this->tugasAkhirService->handleUploadFile($tugasAkhir, $request->file('file'), $jenisDokumen);
-
-        return redirect()->route('mahasiswa.tugas-akhir.progress')->with('success', 'File tugas akhir Anda telah berhasil diunggah.');
+        // DIUBAH: Menggunakan format notifikasi baru
+        return redirect()->route('mahasiswa.tugas-akhir.progress')->with('alert', [
+            'type' => 'success',
+            'title' => 'Berhasil!',
+            'message' => 'File tugas akhir Anda telah berhasil diunggah.'
+        ]);
     }
 
     /**
@@ -67,7 +74,13 @@ class TugasAkhirController extends Controller
     {
         try {
             $this->tugasAkhirService->requestCancellation($tugasAkhir, $request->input('alasan'));
-            return redirect()->route('mahasiswa.tugas-akhir.progress')->with('success', 'Pengajuan pembatalan Tugas Akhir telah dikirim.');
+
+            // DIUBAH: Menggunakan format notifikasi baru
+            return redirect()->route('mahasiswa.tugas-akhir.progress')->with('alert', [
+                'type' => 'success',
+                'title' => 'Berhasil!',
+                'message' => 'Pengajuan pembatalan Tugas Akhir telah dikirim.'
+            ]);
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Dosen; // Jangan lupa import
 
 class TugasAkhir extends Model
 {
@@ -56,7 +57,7 @@ class TugasAkhir extends Model
 
     public function dokumenTa(): HasMany
     {
-        return $this->hasMany(DokumenTa::class);
+        return $this->hasMany(DokumenTa::class, 'tugas_akhir_id');
     }
 
     public function sidang(): HasMany
@@ -74,30 +75,20 @@ class TugasAkhir extends Model
         // dengan 'created_at' atau 'id' terbaru yang berelasi.
         return $this->hasOne(Sidang::class, 'tugas_akhir_id')->latestOfMany();
     }
-    
+
     // --- ACCESSOR ---
+    // Hapus pengecekan dan ->load()
     protected function pembimbingSatu(): Attribute
     {
         return Attribute::make(
-            get: function () {
-                // Pastikan relasi sudah dimuat untuk efisiensi
-                if (! $this->relationLoaded('peranDosenTa')) {
-                    $this->load('peranDosenTa');
-                }
-                return $this->peranDosenTa->firstWhere('peran', PeranDosenTa::PERAN_PEMBIMBING_1);
-            }
+            get: fn() => $this->peranDosenTa->firstWhere('peran', PeranDosenTa::PERAN_PEMBIMBING_1)
         );
     }
 
     protected function pembimbingDua(): Attribute
     {
         return Attribute::make(
-            get: function () {
-                if (! $this->relationLoaded('peranDosenTa')) {
-                    $this->load('peranDosenTa');
-                }
-                return $this->peranDosenTa->firstWhere('peran', PeranDosenTa::PERAN_PEMBIMBING_2);
-            }
+            get: fn() => $this->peranDosenTa->firstWhere('peran', PeranDosenTa::PERAN_PEMBIMBING_2)
         );
     }
 
@@ -129,6 +120,12 @@ class TugasAkhir extends Model
     public function scopeAwaitingValidation($query)
     {
         return $query->whereIn('status', [self::STATUS_DIAJUKAN]);
-       
+    }
+
+    public function dosenPembimbing()
+    {
+        return $this->belongsToMany(Dosen::class, 'peran_dosen_ta', 'tugas_akhir_id', 'dosen_id')
+            ->withPivot('peran') // Ambil juga kolom 'peran' dari tabel pivot
+            ->withTimestamps();
     }
 }

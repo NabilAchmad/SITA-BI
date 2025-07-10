@@ -1,11 +1,9 @@
 <?php
 
-// --- File: app/Http/Requests/Mahasiswa/UploadFileRequest.php ---
-// Berfungsi untuk memvalidasi file yang diunggah oleh mahasiswa.
-
 namespace App\Http\Requests\Mahasiswa;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule; // <-- Import Rule
 
 class UploadFileRequest extends FormRequest
 {
@@ -17,10 +15,6 @@ class UploadFileRequest extends FormRequest
         /** @var \App\Models\TugasAkhir|null $tugasAkhir */
         $tugasAkhir = $this->route('tugasAkhir');
 
-        // Otorisasi berlapis untuk keamanan:
-        // 1. Pastikan pengguna adalah seorang mahasiswa.
-        // 2. Pastikan data Tugas Akhir ditemukan dari URL.
-        // 3. Pastikan Tugas Akhir ini benar-benar milik mahasiswa yang sedang login.
         return $this->user()->hasRole('mahasiswa') &&
             $tugasAkhir &&
             $tugasAkhir->mahasiswa_id === $this->user()->mahasiswa->id;
@@ -33,7 +27,14 @@ class UploadFileRequest extends FormRequest
     {
         return [
             'file' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:25600'], // Batas 25MB
-            'jenis_dokumen' => ['nullable', 'string', 'max:50'], // Input opsional dari form
+
+            // Validasi diperketat untuk memastikan integritas data
+            'jenis_dokumen' => [
+                'required',
+                'string',
+                // Hanya izinkan nilai yang ada di ENUM database
+                Rule::in(['proposal', 'draft', 'final', 'lainnya']),
+            ],
         ];
     }
 
@@ -46,6 +47,8 @@ class UploadFileRequest extends FormRequest
             'file.required' => 'Anda harus memilih sebuah file untuk diunggah.',
             'file.mimes'    => 'Format file yang diizinkan hanya PDF, DOC, atau DOCX.',
             'file.max'      => 'Ukuran file tidak boleh melebihi 25MB.',
+            'jenis_dokumen.required' => 'Anda harus menentukan jenis dokumen.',
+            'jenis_dokumen.in' => 'Jenis dokumen yang dipilih tidak valid.',
         ];
     }
 }

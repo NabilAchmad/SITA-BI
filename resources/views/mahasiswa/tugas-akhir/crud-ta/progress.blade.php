@@ -40,7 +40,6 @@
 @endpush
 
 @section('content')
-    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -52,383 +51,99 @@
         </ol>
     </nav>
 
-    <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
             <h1 class="h2 fw-bold text-dark">Progress Tugas Akhir</h1>
-            <p class="text-muted">Pantau perkembangan dan status tugas akhir Anda</p>
+            <p class="text-muted">Pantau perkembangan dan status tugas akhir Anda.</p>
         </div>
     </div>
 
-    {{-- ✅ KODE PERBAIKAN FINAL --}}
-
-    {{-- Cek apakah tugas akhir ada DAN relasi peranDosenTa (pembimbing yg ditugaskan) tidak kosong --}}
-    @if ($tugasAkhir && $tugasAkhir->peranDosenTa->isNotEmpty())
-        <div class="card border-0 shadow-sm mb-4 card-hover">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="me-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm"
-                            style="width: 48px; height: 48px; background-color: rgba(13,110,253,0.1);">
-                            <i class="bi bi-people-fill text-primary fs-5"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold mb-0 text-dark">Dosen Pembimbing</h5>
-                        <small class="text-muted">Tim pembimbing tugas akhir Anda</small>
-                    </div>
-                </div>
-
-                <div class="row g-3">
-                    {{-- Lakukan looping pada variabel yang benar: $tugasAkhir->peranDosenTa --}}
-                    @foreach ($tugasAkhir->peranDosenTa as $peranDosen)
-                        <div class="col-md-6">
-                            <div class="card border-0 bg-light h-100 shadow-sm rounded-3">
-                                <div class="card-body d-flex align-items-center gap-3">
-                                    <div class="d-flex align-items-center justify-content-center bg-primary text-white rounded-circle"
-                                        style="width: 40px; height: 40px;">
-                                        <i class="fas fa-user-check"></i>
-                                    </div>
-                                    <div>
-                                        {{-- Tampilkan peran dosen (contoh: 'pembimbing') --}}
-                                        <span class="badge bg-primary mb-1 text-capitalize">{{ $peranDosen->peran }}</span>
-                                        {{-- Tampilkan nama dosen dari relasi yang benar --}}
-                                        <h6 class="mb-0 fw-semibold">{{ $peranDosen->dosen->user->name ?? '-' }}</h6>
-                                        <small class="text-muted d-block">Dosen {{ ucfirst($peranDosen->peran) }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        {{-- Cek jika tugas akhir ada, TAPI pembimbing belum ditugaskan --}}
-    @elseif($tugasAkhir && $tugasAkhir->peranDosenTa->isEmpty() && $tugasAkhir->status !== 'dibatalkan')
-        <div class="alert alert-warning d-flex align-items-center gap-2 shadow-sm border-0 rounded-3">
-            <i class="bi bi-exclamation-circle-fill fs-5 text-warning"></i>
-            <div>
-                <strong>Belum Ada Pembimbing</strong><br>
-                Menunggu penunjukan dosen pembimbing oleh admin atau pimpinan jurusan.
-            </div>
-        </div>
-    @endif
-
-    <!-- Main Content -->
+    {{-- ====================================================================== --}}
+    {{-- KONDISI 1: Mahasiswa BELUM memiliki data Tugas Akhir yang aktif --}}
+    {{-- ====================================================================== --}}
     @if (!$tugasAkhir || $tugasAkhir->status === 'dibatalkan')
-        <!-- No Data State -->
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
                 <div class="card border-0 shadow-lg card-hover">
                     <div class="card-body text-center p-5">
                         <div
                             class="icon-box mx-auto mb-4 bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
-                            <i class="fas fa-file-alt text-white fa-2x"></i>
+                            <i class="fas fa-file-alt text-primary fa-2x"></i>
                         </div>
                         <h3 class="fw-bold mb-3">Belum Ada Data Tugas Akhir</h3>
-                        <p class="text-muted mb-4">Anda belum mengajukan atau belum memiliki data Tugas Akhir saat ini.
-                            Mulai perjalanan akademik Anda sekarang!</p>
+                        <p class="text-muted mb-4">Anda belum memiliki data Tugas Akhir yang aktif. Mulai perjalanan
+                            akademik Anda sekarang!</p>
                         <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
                             <a href="{{ route('mahasiswa.tugas-akhir.ajukan') }}"
                                 class="btn btn-primary btn-lg rounded-pill shadow-sm px-4 d-flex align-items-center">
                                 <i class="fas fa-file-upload me-2"></i> Ajukan Tugas Akhir
                             </a>
-                            <a href="{{ route('mahasiswa.tugas-akhir.topik.index') }}"
+                            <a href="#"
                                 class="btn btn-outline-primary btn-lg rounded-pill shadow-sm px-4 d-flex align-items-center">
                                 <i class="fas fa-lightbulb me-2"></i> Ambil Tawaran Topik
                             </a>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
+
+        {{-- ====================================================================== --}}
+        {{-- KONDISI 2: Mahasiswa SUDAH memiliki data Tugas Akhir yang aktif --}}
+        {{-- ====================================================================== --}}
     @else
         @php
-            $ta = $tugasAkhir;
-            $statusMap = [
-                'diajukan' => 'Dalam Proses',
-                'draft' => 'Draft',
-                'revisi' => 'Revisi',
-                'disetujui' => 'Disetujui',
-                'lulus_tanpa_revisi' => 'Lulus Tanpa Revisi',
-                'lulus_dengan_revisi' => 'Lulus Dengan Revisi',
-                'ditolak' => 'Ditolak',
-                'dibatalkan' => 'Dibatalkan',
-                'menunggu_pembatalan' => 'Menunggu Persetujuan Pembatalan',
-            ];
-            $progress = match ($ta->status) {
-                'ditolak' => 0,
-                'diajukan' => 5,
-                'disetujui' => 10,
-                'selesai', 'lulus_tanpa_revisi', 'lulus_dengan_revisi' => 100,
-                default => 10,
-            };
-            $progressColor = match ($ta->status) {
-                'diajukan' => 'warning',
-                'disetujui' => 'info',
-                'selesai', 'lulus_tanpa_revisi', 'lulus_dengan_revisi' => 'success',
-                'ditolak' => 'danger',
-                default => 'secondary',
-            };
+            $ta = $tugasAkhir; // Alias untuk kemudahan
         @endphp
 
-        <!-- Header Card -->
-        <div class="card border-0 shadow-lg mb-4 card-hover">
-            <div class="card-header gradient-primary text-white border-0 rounded-top-3">
-                <div class="row align-items-center">
-                    <div class="col-lg-8">
-                        <h2 class="fw-bold mb-2">{{ $ta->judul }}</h2>
-                        <p class="mb-0 opacity-75">
-                            <i class="bi bi-calendar text-white"></i>
-                            Diajukan pada {{ \Carbon\Carbon::parse($ta->tanggal_pengajuan)->format('d F Y') }}
-                        </p>
-                    </div>
-                    <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                        <span class="badge bg-white text-primary fs-6 px-3 py-2">
-                            <i class="fas fa-flag me-1"></i>{{ $statusMap[$ta->status] ?? 'Tidak Diketahui' }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-body p-4">
-                <!-- Progress Section -->
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="fw-bold mb-0">Progress Tugas Akhir</h5>
-                        <span class="badge bg-primary fs-6">{{ $progress }}%</span>
-                    </div>
-                    <div class="progress" style="height: 10px;">
-                        <div class="progress-bar bg-{{ $progressColor }} progress-animated" role="progressbar"
-                            style="width: {{ $progress }}%" aria-valuenow="{{ $progress }}" aria-valuemin="0"
-                            aria-valuemax="100">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats Cards -->
-                <div class="row g-3 mb-4">
-                    {{-- Card Tanggal Pengajuan --}}
-                    <div class="col-md-4">
-                        <div class="card border-0 bg-light h-100 shadow-sm">
-                            <div class="card-body text-center d-flex flex-column justify-content-center">
-                                <div
-                                    class="icon-box mx-auto mb-2 bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-calendar-check text-white"></i>
-                                </div>
-                                <h6 class="fw-bold mb-1">Tanggal Pengajuan</h6>
-                                <p class="text-muted mb-0 small">
-                                    {{ \Carbon\Carbon::parse($ta->tanggal_pengajuan)->format('d M Y') }}
-                                </p>
+        @if ($ta->peranDosenTa->isNotEmpty())
+            <div class="card border-0 shadow-sm mb-4 card-hover">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                style="width: 48px; height: 48px; background-color: rgba(13,110,253,0.1);">
+                                <i class="bi bi-people-fill text-primary fs-5"></i>
                             </div>
                         </div>
-                    </div>
-
-                    {{-- Card Status Saat Ini --}}
-                    <div class="col-md-4">
-                        <div class="card border-0 bg-light h-100 shadow-sm">
-                            <div class="card-body text-center d-flex flex-column justify-content-center">
-                                <div
-                                    class="icon-box mx-auto mb-2 bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-flag text-white"></i>
-                                </div>
-                                <h6 class="fw-bold mb-1">Status Saat Ini</h6>
-                                <p class="text-muted mb-0 small">{{ $statusMap[$ta->status] ?? 'Tidak Diketahui' }}</p>
-                            </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">Dosen Pembimbing</h5>
+                            <small class="text-muted">Tim pembimbing tugas akhir Anda</small>
                         </div>
                     </div>
-
-                    {{-- Card Progress --}}
-                    <div class="col-md-4">
-                        <div class="card border-0 bg-light h-100 shadow-sm">
-                            <div class="card-body text-center d-flex flex-column justify-content-center">
-                                <div
-                                    class="icon-box mx-auto mb-2 bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-tachometer-alt text-white"></i>
-                                </div>
-                                <h6 class="fw-bold mb-1">Progress</h6>
-                                <p class="text-muted mb-0 small">{{ $progress }}% Selesai</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- PERBAIKAN: Card ini hanya muncul jika status TA adalah 'ditolak' --}}
-                    @if ($ta->status === 'ditolak')
-                        <div class="col-md-12 mt-4"> {{-- Ambil lebar penuh untuk visibilitas --}}
-                            <div class="card border-0 bg-light h-100 shadow-sm">
-                                <div class="card-body text-center">
-                                    <div
-                                        class="icon-box mx-auto mb-2 bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="fas fa-exclamation-triangle text-white"></i>
+                    <div class="row g-3">
+                        @foreach ($ta->peranDosenTa as $peranDosen)
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light h-100 shadow-sm rounded-3">
+                                    <div class="card-body d-flex align-items-center gap-3">
+                                        <div>
+                                            <span
+                                                class="badge bg-primary mb-1 text-capitalize">{{ str_replace('_', ' ', $peranDosen->peran) }}</span>
+                                            <h6 class="mb-0 fw-semibold">{{ $peranDosen->dosen->user->name ?? '-' }}</h6>
+                                        </div>
                                     </div>
-                                    <h6 class="fw-bold mb-1 text-danger">Alasan Penolakan</h6>
-                                    <p class="text-muted mb-0 small fst-italic">
-                                        "{{ $ta->alasan_penolakan ?? 'Tidak ada komentar penolakan yang diberikan.' }}"
-                                    </p>
                                 </div>
                             </div>
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Action Buttons -->
-                @if ($isMengajukanTA && $ta->status === 'disetujui')
-                    <div class="d-flex flex-wrap gap-2 justify-content-center">
-                        @if ($ta->peranDosenTa->count() > 0)
-                            @if ($ta->file_path)
-                                {{-- Sudah upload file --}}
-                                <a href="{{ asset('storage/' . $ta->file_path) }}" target="_blank"
-                                    class="btn btn-outline-primary rounded-pill px-4">
-                                    <i class="fas fa-file-pdf me-2"></i>Lihat Proposal
-                                </a>
-                                <button type="button" class="btn btn-outline-warning rounded-pill px-4"
-                                    data-bs-toggle="modal" data-bs-target="#revisiModal{{ $ta->id }}">
-                                    <i class="fas fa-edit me-2"></i>Revisi Proposal
-                                </button>
-                            @else
-                                {{-- Belum upload file --}}
-                                <button type="button" class="btn btn-outline-success rounded-pill px-4"
-                                    data-bs-toggle="modal" data-bs-target="#uploadFileModal{{ $ta->id }}">
-                                    <i class="fas fa-upload me-2"></i>Upload Proposal
-                                </button>
-                            @endif
-
-                            {{-- Selalu boleh batalkan jika sudah ada pembimbing --}}
-                            <button type="button" class="btn btn-outline-danger rounded-pill px-4"
-                                data-bs-toggle="collapse" data-bs-target="#cancelForm{{ $ta->id }}">
-                                <i class="fas fa-times-circle me-2"></i>Batalkan TA
-                            </button>
-                        @else
-                            {{-- Tidak ada pembimbing --}}
-                            <div class="alert alert-info mt-3 text-center w-100">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Menunggu penugasan dosen pembimbing oleh admin.
-                            </div>
-                        @endif
+                        @endforeach
                     </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Modal Upload File Proposal -->
-        <div class="modal fade" id="uploadFileModal{{ $ta->id }}" tabindex="-1"
-            aria-labelledby="uploadFileModalLabel{{ $ta->id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg">
-                    <div class="modal-header bg-primary text-white py-3">
-                        <h5 class="modal-title fw-bold mb-0" id="uploadFileModalLabel{{ $ta->id }}">
-                            <i class="fas fa-cloud-upload-alt me-2"></i> Upload Proposal Tugas Akhir
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <form action="{{ route('mahasiswa.tugas-akhir.upload-file', $ta->id) }}" method="POST"
-                        enctype="multipart/form-data">
-                        @csrf
-                        <div class="modal-body py-4">
-                            <div class="mb-4">
-                                <label for="file_proposal_{{ $ta->id }}" class="form-label fw-semibold mb-2">
-                                    <i class="fas fa-file-alt me-1"></i> Pilih File Proposal
-                                </label>
-                                <input type="file" name="file_proposal" id="file_proposal_{{ $ta->id }}"
-                                    class="form-control form-control-lg" accept=".pdf,.doc,.docx" required>
-                                <div class="form-text mt-1">
-                                    <small>
-                                        <i class="fas fa-info-circle me-1"></i> Format file: PDF, DOC, atau DOCX (Maksimal
-                                        25MB)
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer bg-light">
-                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
-                                data-bs-dismiss="modal">
-                                <i class="fas fa-times me-1"></i> Batal
-                            </button>
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
-                                <i class="fas fa-upload me-2"></i> Upload Proposal
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
-        </div>
-
-        <!-- Form Pembatalan -->
-        @if ($isMengajukanTA && $ta->status === 'disetujui')
-            <div class="collapse" id="cancelForm{{ $ta->id }}">
-                <div class="card border-0 shadow-sm mb-4 rounded-4">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center mb-4">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center bg-danger bg-opacity-10 me-3"
-                                style="width: 45px; height: 45px;">
-                                <i class="fas fa-exclamation-triangle text-white fs-5"></i>
-                            </div>
-                            <div>
-                                <h5 class="fw-bold text-danger mb-1">Form Pembatalan</h5>
-                                <small class="text-muted">Silakan isi alasan pembatalan tugas akhir Anda secara
-                                    lengkap</small>
-                            </div>
-                        </div>
-
-                        <form action="{{ route('mahasiswa.tugas-akhir.cancel', $ta->id) }}" method="POST">
-                            @csrf
-                            <div class="mb-4">
-                                <label for="alasan" class="form-label fw-semibold">Alasan Pembatalan</label>
-                                <textarea class="form-control rounded-3" id="alasan" name="alasan" rows="4"
-                                    placeholder="Jelaskan alasan pembatalan tugas akhir Anda..." required></textarea>
-                            </div>
-
-                            <div class="d-flex justify-content-end gap-2">
-                                <button type="button" class="btn btn-outline-secondary rounded-pill px-4 py-2"
-                                    data-bs-toggle="collapse" data-bs-target="#cancelForm{{ $ta->id }}">
-                                    <i class="fas fa-arrow-left me-2"></i> Batal
-                                </button>
-                                <button type="submit" class="btn btn-danger rounded-pill px-4 py-2 shadow-sm">
-                                    <i class="fas fa-paper-plane me-2"></i> Kirim Pembatalan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+        @else
+            <div class="alert alert-warning d-flex align-items-center gap-2 shadow-sm border-0 rounded-3">
+                <i class="bi bi-exclamation-circle-fill fs-5 text-warning"></i>
+                <div>
+                    <strong>Belum Ada Pembimbing.</strong> Menunggu penunjukan oleh admin.
                 </div>
             </div>
         @endif
+
+        @include('mahasiswa.tugas-akhir.partials.progress-card', ['tugasAkhir' => $ta])
+
+        @include('mahasiswa.tugas-akhir.partials.upload-modal', ['tugasAkhir' => $ta])
+
+        @if ($ta->status === 'disetujui' || $ta->status === 'revisi')
+            @include('mahasiswa.tugas-akhir.partials.cancel-form', ['tugasAkhir' => $ta])
+        @endif
+
     @endif
 @endsection
-
-@push('scripts')
-    <script>
-        function toggleAbstrak(id) {
-            const shortEl = document.getElementById(`abstrak-short-${id}`);
-            const fullEl = document.getElementById(`abstrak-full-${id}`);
-            const btn = document.getElementById(`btn-toggle-${id}`);
-
-            if (fullEl.classList.contains('d-none')) {
-                fullEl.classList.remove('d-none');
-                shortEl.classList.add('d-none');
-                btn.innerHTML = '<i class="fas fa-chevron-up me-1"></i>Tutup';
-            } else {
-                fullEl.classList.add('d-none');
-                shortEl.classList.remove('d-none');
-                btn.innerHTML = '<i class="fas fa-chevron-down me-1"></i>Lihat Selengkapnya';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            @if (session('alert'))
-                swal({
-                    title: "{{ session('alert.title') }}",
-                    text: "{{ session('alert.message') }}",
-                    icon: "{{ session('alert.type') }}",
-                    buttons: {
-                        confirm: {
-                            text: "OK",
-                            className: "btn btn-{{ session('alert.type') === 'error' ? 'danger' : (session('alert.type') === 'warning' ? 'warning' : 'primary') }}"
-                        }
-                    }
-                });
-            @endif
-        });
-    </script>
-@endpush

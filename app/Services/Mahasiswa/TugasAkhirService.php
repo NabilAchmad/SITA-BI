@@ -49,19 +49,24 @@ class TugasAkhirService
     /**
      * Menangani logika upload file dan menyimpannya ke database.
      *
-     * @param TugasAkhir $tugasAkhir
-     * @param UploadedFile $file
-     * @param string $jenisDokumen
-     * @return DokumenTa
+     * @param TugasAkhir $tugasAkhir Instance model TugasAkhir.
+     * @param UploadedFile $file File yang di-upload dari request.
+     * @param string $tipeDokumen Tipe dokumen ('proposal', 'draft', 'final', 'lainnya').
+     * @return DokumenTa Instance DokumenTa yang baru dibuat.
      */
-    public function handleUploadFile(TugasAkhir $tugasAkhir, UploadedFile $file, string $jenisDokumen): DokumenTa
+    public function handleUploadFile(TugasAkhir $tugasAkhir, UploadedFile $file, string $tipeDokumen): DokumenTa
     {
+        // Menyimpan file dan mendapatkan path-nya
         $filePath = $file->store("dokumen_ta/{$tugasAkhir->id}", 'public');
 
+        // ✅ LANGKAH 1: Perbarui kolom file_path di tabel tugas_akhir
+        // Ini akan mengisi kolom yang kosong tersebut.
+        $tugasAkhir->update(['file_path' => $filePath]);
+
+        // LANGKAH 2: Buat record di tabel dokumen_ta seperti sebelumnya
         return $tugasAkhir->dokumenTa()->create([
-            'nama_file' => $file->getClientOriginalName(),
-            'path_file' => $filePath,
-            'jenis_dokumen' => $jenisDokumen,
+            'tipe_dokumen' => $tipeDokumen,
+            'file_path'    => $filePath,
         ]);
     }
 

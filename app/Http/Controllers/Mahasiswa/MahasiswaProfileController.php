@@ -2,176 +2,101 @@
 
 namespace App\Http\Controllers\Mahasiswa;
 
+use App\Http\Controllers\Controller;
+use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use App\Models\User;
-use App\Models\Mahasiswa;
-use App\Http\Controllers\Controller;
 
 class MahasiswaProfileController extends Controller
 {
     /**
-     * Tampilkan halaman profil mahasiswa
+     * Menampilkan halaman profil mahasiswa yang sedang login.
+     * Menggunakan konvensi 'show' untuk menampilkan satu resource.
      */
-    public function profile()
+    public function show()
     {
-        $user = User::find(Auth::id()); // atau Auth::user();
-        $mahasiswa = $user->mahasiswa;
+        // Ambil ID user yang sedang login
+        $userId = Auth::id();
 
-        // Ambil prodi unik dari tabel mahasiswa (misalnya D3, D4)
-        $daftarProdi = Mahasiswa::select('prodi')->distinct()->orderBy('prodi')->pluck('prodi');
+        // Cari data mahasiswa berdasarkan user_id.
+        // Muat relasi 'user' secara bersamaan (Eager Loading) untuk efisiensi query.
+        // firstOrFail() akan otomatis menampilkan halaman 404 jika data tidak ditemukan.
+        $mahasiswa = Mahasiswa::where('user_id', $userId)->with('user')->firstOrFail();
 
-        return view('mahasiswa.user.profile', compact('user', 'mahasiswa', 'daftarProdi'));
+        // Kirim data mahasiswa (yang sudah berisi relasi user) ke view.
+        return view('mahasiswa.user.profile', ['mahasiswa' => $mahasiswa]);
     }
 
     /**
-     * Update data profil mahasiswa
+     * Mengupdate data profil mahasiswa.
      */
     public function update(Request $request)
     {
-        $user = User::find(Auth::id()); // atau Auth::user();
+        // Ambil user yang sedang terautentikasi
+        $user = Auth::user();
         $mahasiswa = $user->mahasiswa;
 
+        // Jika data mahasiswa tidak ditemukan, kembalikan dengan pesan error.
         if (!$mahasiswa) {
             return back()->with('error', 'Data mahasiswa tidak ditemukan.');
         }
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'nim' => [
-                'required',
-                'string',
-                'max:20',
-                Rule::unique('mahasiswa', 'nim')->ignore($mahasiswa->id),
-            ],
+        // Tentukan aturan validasi untuk kelas berdasarkan prodi yang diinput.
+        $kelasRules = ['required', 'string', 'max:1'];
+        if ($request->input('prodi') === 'D3') {
+            $kelasRules[] = Rule::in(['a', 'b', 'c']);
+        } else {
+            $kelasRules[] = Rule::in(['a', 'b']);
+        }
+
+        // Validasi semua input dari form
+        $validatedData = $request->validate([
+            'name'    => 'required|string|max:255',
+            'email'   => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'photo'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Diubah dari 'avatar' ke 'photo'
+            'nim'     => ['required', 'string', 'max:20', Rule::unique('mahasiswa', 'nim')->ignore($mahasiswa->id)],
             'angkatan' => 'required|integer|min:2000|max:' . date('Y'),
-            'prodi' => 'required|in:D3,D4',
-            'kelas' => 'required|in:a,b,c',
+            'prodi'   => 'required|string|in:D3,D4',
+            'kelas'   => $kelasRules,
         ]);
 
-        $user->name = $request->name;
-        $user->email = $request->email;
+        try {
+            // Gunakan transaksi database untuk memastikan integritas data.
+            // Jika salah satu query gagal, semua perubahan akan dibatalkan (rollback).
+            DB::transaction(function () use ($validatedData, $request, $user, $mahasiswa) {
+                // 1. Update data di tabel 'users'
+                $user->name = $validatedData['name'];
+                $user->email = $validatedData['email'];
 
-        if ($request->hasFile('avatar')) {
-            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
-                Storage::disk('public')->delete($user->photo);
-            }
-            $user->photo = $request->file('avatar')->store('avatars', 'public');
+                // Cek jika ada file foto baru yang diunggah
+                if ($request->hasFile('photo')) {
+                    // Hapus foto lama jika ada
+                    if ($user->photo && Storage::disk('public')->exists('avatars/' . $user->photo)) {
+                        Storage::disk('public')->delete('avatars/' . $user->photo);
+                    }
+                    // Simpan foto baru dan dapatkan path-nya
+                    $path = $request->file('photo')->store('avatars', 'public');
+                    // Simpan hanya nama filenya saja, bukan path lengkap
+                    $user->photo = basename($path);
+                }
+                $user->save();
+
+                // 2. Update data di tabel 'mahasiswa'
+                $mahasiswa->nim = $validatedData['nim'];
+                $mahasiswa->angkatan = $validatedData['angkatan'];
+                $mahasiswa->prodi = strtoupper($validatedData['prodi']);
+                $mahasiswa->kelas = strtolower($validatedData['kelas']);
+                $mahasiswa->save();
+            });
+        } catch (\Exception $e) {
+            // Jika terjadi error selama transaksi, kembalikan dengan pesan error.
+            return back()->with('error', 'Gagal memperbarui profil. Silakan coba lagi.');
         }
 
-        $user->save();
-
-        $mahasiswa->nim = $request->nim;
-        $mahasiswa->angkatan = $request->angkatan;
-        $mahasiswa->prodi = strtoupper($request->prodi);
-        $mahasiswa->kelas = strtolower($request->kelas); // ← disimpan dalam huruf kecil
-        $mahasiswa->save();
-        $mahasiswa->refresh(); // ← Tambahkan ini
-
-        return redirect()->route('user.profile.mhs')->with('success', 'Profil berhasil diperbarui.');
-    }
-
-    public function apiIndex()
-    {
-        $mahasiswa = Mahasiswa::with('user')->get();
-        return response()->json($mahasiswa);
-    }
-
-    public function apiShow($id)
-    {
-        $mahasiswa = Mahasiswa::with('user')->find($id);
-        if (!$mahasiswa) {
-            return response()->json(['message' => 'Mahasiswa not found'], 404);
-        }
-        return response()->json($mahasiswa);
-    }
-
-    public function apiStore(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'nim' => 'required|string|unique:mahasiswa,nim',
-            'address' => 'nullable|string',
-            'prodi' => 'nullable|string',
-            'angkatan' => 'nullable|string',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        // Create user
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
-
-        // Create mahasiswa
-        $mahasiswa = Mahasiswa::create([
-            'user_id' => $user->id,
-            'nim' => $request->nim,
-            'address' => $request->address,
-            'prodi' => $request->prodi,
-            'angkatan' => $request->angkatan,
-        ]);
-
-        return response()->json($mahasiswa, 201);
-    }
-
-    public function apiUpdate(Request $request, $id)
-    {
-        $mahasiswa = Mahasiswa::with('user')->find($id);
-        if (!$mahasiswa) {
-            return response()->json(['message' => 'Mahasiswa not found'], 404);
-        }
-
-        $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:users,email,' . $mahasiswa->user->id,
-            'nim' => 'sometimes|required|string|unique:mahasiswa,nim,' . $mahasiswa->id,
-            'address' => 'nullable|string',
-            'prodi' => 'nullable|string',
-            'angkatan' => 'nullable|string',
-            'password' => 'nullable|string|min:8|confirmed',
-        ]);
-
-        // Update user
-        if ($request->has('name') || $request->has('email') || $request->filled('password')) {
-            $mahasiswa->user->update([
-                'name' => $request->name ?? $mahasiswa->user->name,
-                'email' => $request->email ?? $mahasiswa->user->email,
-                'password' => $request->filled('password') ? bcrypt($request->password) : $mahasiswa->user->password,
-            ]);
-        }
-
-        // Update mahasiswa
-        $mahasiswa->update([
-            'nim' => $request->nim ?? $mahasiswa->nim,
-            'address' => $request->address ?? $mahasiswa->address,
-            'prodi' => $request->prodi ?? $mahasiswa->prodi,
-            'angkatan' => $request->angkatan ?? $mahasiswa->angkatan,
-        ]);
-
-        return response()->json($mahasiswa);
-    }
-
-    public function apiDestroy($id)
-    {
-        $mahasiswa = Mahasiswa::find($id);
-        if (!$mahasiswa) {
-            return response()->json(['message' => 'Mahasiswa not found'], 404);
-        }
-
-        // Delete related user first
-        $user = $mahasiswa->user;
-        $mahasiswa->delete();
-        if ($user) {
-            $user->delete();
-        }
-
-        return response()->json(['message' => 'Mahasiswa deleted successfully']);
+        // Redirect kembali ke halaman profil dengan pesan sukses.
+        return redirect()->route('mahasiswa.profile')->with('success', 'Profil berhasil diperbarui.');
     }
 }

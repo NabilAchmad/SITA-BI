@@ -69,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
     //------------------------------------------------------------------
     Route::prefix('mahasiswa')->middleware('role:mahasiswa')->name('mahasiswa.')->group(function () {
         Route::get('/dashboard', [MahasiswaDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/profile', [MahasiswaProfileController::class, 'profile'])->name('profile');
+        Route::get('/profile', [MahasiswaProfileController::class, 'show'])->name('profile');
         Route::put('/profile/update', [MahasiswaProfileController::class, 'update'])->name('profile.update');
 
         Route::prefix('tugas-akhir')->name('tugas-akhir.')->group(function () {
