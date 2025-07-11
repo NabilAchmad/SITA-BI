@@ -9,12 +9,11 @@ use App\Models\Mahasiswa;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; // <-- Ditambahkan
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
-// Tidak perlu `use Spatie\Permission\Models\Role;` karena kita bisa memanggilnya langsung
+use Carbon\Carbon; // <-- PENTING: Tambahkan use statement ini di atas
 
 class AuthController extends Controller
 {
@@ -39,8 +38,14 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // Redirect berdasarkan role setelah login berhasil
-            return redirect()->intended($this->redirectByRole(Auth::user()));
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+
+            // Membersihkan cache peran Spatie dan memuat ulang relasi
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+            $user->load('roles');
+
+            return redirect()->intended($this->redirectByRole($user));
         }
 
         throw ValidationException::withMessages([
@@ -58,7 +63,6 @@ class AuthController extends Controller
 
     /**
      * Menangani proses registrasi.
-     * SUDAH DIPERBAIKI: Menggunakan DB Transaction dan assignRole().
      */
     public function register(Request $request)
     {
@@ -67,21 +71,11 @@ class AuthController extends Controller
             'email'    => ['required', 'email', 'max:255', 'unique:users'],
             'nim'      => ['required', 'string', 'max:10', 'unique:mahasiswa'],
             'prodi'    => ['required', 'in:d3,d4'],
-            'kelas'    => ['required', function ($attribute, $value, $fail) use ($request) {
-                $allowed = [
-                    'd3' => ['a', 'b', 'c'],
-                    'd4' => ['a', 'b'],
-                ];
-                $prodi = $request->input('prodi');
-                if (!isset($allowed[$prodi]) || !in_array(strtolower($value), $allowed[$prodi])) {
-                    $fail('Kelas yang dipilih tidak sesuai dengan program studi.');
-                }
-            }],
+            'kelas'    => ['required', 'string', 'max:1'],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
         try {
-            // Memulai transaksi database
             DB::beginTransaction();
 
             $user = User::create([
@@ -90,7 +84,6 @@ class AuthController extends Controller
                 'password' => Hash::make($validated['password']),
             ]);
 
-            // Memberikan role 'mahasiswa' menggunakan metode dari Spatie
             $user->assignRole('mahasiswa');
 
             Mahasiswa::create([
@@ -101,24 +94,19 @@ class AuthController extends Controller
                 'angkatan' => 2000 + intval(substr($validated['nim'], 0, 2)),
             ]);
 
-            // Jika semua berhasil, simpan perubahan
             DB::commit();
         } catch (\Exception $e) {
-            // Jika ada error, batalkan semua operasi
             DB::rollBack();
-            // Tampilkan pesan error
-            return back()->with('error', 'Registrasi gagal, terjadi kesalahan pada server. Silakan coba lagi.')->withInput();
+            return back()->with('error', 'Registrasi gagal, terjadi kesalahan.')->withInput();
         }
 
         $this->sendEmailVerification($user);
-
         session(['otp_user_id' => $user->id]);
-
-        return redirect()->route('auth.otp.verify.form')->with('success', 'Registrasi berhasil. Silakan masukkan kode OTP yang telah dikirim ke email Anda.');
+        return redirect()->route('auth.otp.verify.form')->with('success', 'Registrasi berhasil. Silakan periksa email Anda untuk kode OTP.');
     }
 
     /**
-     * Menangani proses verifikasi OTP.
+     * Menangani verifikasi OTP.
      */
     public function verifyOtp(Request $request)
     {
@@ -126,7 +114,7 @@ class AuthController extends Controller
 
         $userId = session('otp_user_id');
         if (!$userId) {
-            return redirect()->route('login')->with('error', 'Sesi verifikasi OTP tidak ditemukan.');
+            return redirect()->route('auth.login')->with('error', 'Sesi verifikasi OTP tidak ditemukan.');
         }
 
         $verification = EmailVerificationToken::where('user_id', $userId)
@@ -155,9 +143,43 @@ class AuthController extends Controller
     public function showOtpVerificationForm()
     {
         if (!session()->has('otp_user_id')) {
-            return redirect()->route('login')->with('error', 'Sesi verifikasi OTP tidak ditemukan.');
+            return redirect()->route('auth.login')->with('error', 'Sesi verifikasi OTP tidak ditemukan.');
         }
         return view('auth.otp_verification');
+    }
+
+    /**
+     * Menangani permintaan kirim ulang OTP.
+     */
+    public function resendOtp(Request $request)
+    {
+        $userId = session('otp_user_id');
+        if (!$userId) {
+            return redirect()->route('auth.login')->with('error', 'Sesi verifikasi OTP tidak ditemukan atau sudah kadaluarsa.');
+        }
+
+        $user = User::find($userId);
+        if (!$user) {
+            return redirect()->route('auth.login')->with('error', 'Pengguna tidak ditemukan.');
+        }
+
+        $token = EmailVerificationToken::where('user_id', $user->id)->first();
+
+        // =================================================================
+        // PERBAIKAN ADA DI SINI
+        // Kita gunakan Carbon::parse() untuk memastikan $token->created_at
+        // adalah objek Carbon sebelum memanggil addSeconds().
+        // =================================================================
+        if ($token && Carbon::parse($token->created_at)->addSeconds(60)->isFuture()) {
+            $secondsLeft = now()->diffInSeconds(Carbon::parse($token->created_at)->addSeconds(60));
+            return back()->withErrors(['otp_code' => "Harap tunggu {$secondsLeft} detik lagi sebelum meminta kode baru."]);
+        }
+
+        // Kirim email verifikasi baru
+        $this->sendEmailVerification($user);
+
+        return redirect()->route('auth.otp.verify.form')
+            ->with('success', 'Kode OTP baru telah berhasil dikirim ke email Anda.');
     }
 
     /**
@@ -176,39 +198,31 @@ class AuthController extends Controller
     // ===========================
 
     /**
-     * Mengarahkan user berdasarkan role.
-     * SUDAH DIPERBAIKI: Menggunakan metode hasRole() dari Spatie.
+     * Mengarahkan user berdasarkan peran.
      */
     private function redirectByRole(User $user)
     {
         if ($user->hasRole('admin')) {
             return route('admin.dashboard');
         }
-        if ($user->hasRole('kajur')) {
-            return route('kajur.dashboard');
-        }
-        if ($user->hasRole('kaprodi')) {
-            return route('kaprodi.dashboard');
-        }
-        if ($user->hasRole('dosen')) {
+
+        if ($user->hasAnyRole(['kajur', 'kaprodi-d3', 'kaprodi-d4', 'dosen'])) {
             return route('dosen.dashboard');
         }
-        // Fallback untuk mahasiswa atau jika role lain belum terdefinisi
-        return route('dashboard.mahasiswa');
+
+        return route('mahasiswa.dashboard');
     }
 
     /**
-     * Mengirim email verifikasi berisi kode OTP.
+     * Membuat dan mengirim token verifikasi email.
      */
     private function sendEmailVerification(User $user)
     {
         $otpCode = random_int(100000, 999999);
-
         EmailVerificationToken::updateOrCreate(
             ['user_id' => $user->id],
             ['token' => $otpCode, 'created_at' => now()]
         );
-
         Mail::to($user->email)->send(new VerifyEmail($user, $otpCode));
     }
 }

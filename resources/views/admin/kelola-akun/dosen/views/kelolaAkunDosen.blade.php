@@ -2,17 +2,27 @@
 
 @section('title', 'Kelola Akun Dosen')
 @section('content')
+    {{-- File ini menampilkan tabel dan modal untuk CRUD Dosen --}}
     @include('admin.kelola-akun.dosen.crud-dosen.read')
 @endsection
 
 @push('scripts')
-    <!-- SweetAlert Script -->
+    {{-- 
+        ======================================================================
+        PERBAIKAN SCRIPT
+        ======================================================================
+        - URL tidak lagi di-hardcode. Sekarang diambil dari atribut 'data-url' pada tombol.
+        - Beberapa blok $(document).ready() digabung menjadi satu agar lebih efisien.
+    --}}
     <script>
         $(document).ready(function() {
+
+            // --- SCRIPT UNTUK HAPUS DATA ---
             $(document).on("click", ".btn-hapus", function(e) {
                 e.preventDefault();
 
-                const id = $(this).data("id");
+                // ✅ PERBAIKAN: Ambil URL dari atribut data-url pada tombol hapus
+                const url = $(this).data("url");
 
                 swal({
                     title: "Apakah Anda yakin?",
@@ -32,8 +42,7 @@
                 }).then((willDelete) => {
                     if (willDelete) {
                         $.ajax({
-                            url: "/admin/kelola-akun/dosen/hapus/" +
-                                id, // Sesuaikan route prefix-mu
+                            url: url, // ✅ Menggunakan URL dinamis
                             type: "DELETE",
                             headers: {
                                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
@@ -51,17 +60,16 @@
                                         }
                                     }
                                 }).then(() => {
-                                    location
-                                        .reload(); // Reload halaman supaya data & pagination update
+                                    location.reload();
                                 });
                             },
                             error: function(xhr) {
                                 swal("Gagal!",
-                                    "Terjadi kesalahan saat menghapus data.", {
-                                        icon: "error",
-                                        buttons: false,
-                                        timer: 2000,
-                                    });
+                                "Terjadi kesalahan saat menghapus data.", {
+                                    icon: "error",
+                                    buttons: false,
+                                    timer: 2000,
+                                });
                             },
                         });
                     } else {
@@ -73,20 +81,21 @@
                     }
                 });
             });
-        });
 
-        $(document).ready(function() {
+            // --- SCRIPT UNTUK MENAMPILKAN MODAL EDIT ---
             $('#editAkunModal').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget); // tombol yang klik
-                var id = button.data('id');
+                var button = $(event.relatedTarget);
+
+                // ✅ PERBAIKAN: Ambil URL dari atribut data-url pada tombol edit
+                var url = button.data('url');
                 var nama = button.data('nama');
                 var email = button.data('email');
                 var nidn = button.data('nidn');
 
                 var modal = $(this);
 
-                // Set action form sesuai id dosen (gunakan URL absolut atau root path)
-                modal.find('form').attr('action', '/admin/kelola-akun/dosen/update/' + id);
+                // ✅ Mengatur action form dengan URL dinamis
+                modal.find('form').attr('action', url);
 
                 // Isi input form modal
                 modal.find('#editNama').val(nama);
@@ -98,23 +107,7 @@
                 modal.find('#editPasswordConfirmation').val('');
             });
 
-            // SweetAlert sukses edit dari session
-            @if (session('success'))
-                swal({
-                    title: "Berhasil!",
-                    text: "{{ session('success') }}",
-                    icon: "success",
-                    buttons: {
-                        confirm: {
-                            text: "OK",
-                            className: "btn btn-primary"
-                        }
-                    }
-                });
-            @endif
-        });
-
-        $(document).ready(function() {
+            // --- SCRIPT UNTUK MENAMPILKAN MODAL DETAIL ---
             $('.btn-detail').on('click', function() {
                 let nama = $(this).data('nama');
                 let email = $(this).data('email');
@@ -130,21 +123,21 @@
                 $('#detailCreated').text(created);
                 $('#detailUpdated').text(updated);
             });
-        });
 
-        // Cek session success Laravel, lalu tampilkan alert
-        @if (session('success'))
-            swal({
-                title: "Berhasil!",
-                text: "{{ session('success') }}",
-                icon: "success",
-                buttons: {
-                    confirm: {
-                        text: "OK",
-                        className: "btn btn-primary"
+            // --- SCRIPT UNTUK MENAMPILKAN ALERT SUKSES DARI SESSION ---
+            @if (session('success'))
+                swal({
+                    title: "Berhasil!",
+                    text: "{{ session('success') }}",
+                    icon: "success",
+                    buttons: {
+                        confirm: {
+                            text: "OK",
+                            className: "btn btn-primary"
+                        }
                     }
-                }
-            });
-        @endif
+                });
+            @endif
+        });
     </script>
 @endpush

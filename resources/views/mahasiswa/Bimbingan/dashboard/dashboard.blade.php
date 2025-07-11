@@ -38,7 +38,7 @@
                         <h3 class="mb-0 text-primary fw-bold">
                             <i class="bi bi-calendar-check me-2"></i> Jadwal Bimbingan Saya
                         </h3>
-                        <a href="{{ route('bimbingan.ajukanJadwal') }}" class="btn btn-sm btn-primary">
+                        <a href="{{ route('mahasiswa.bimbingan.ajukanJadwal') }}" class="btn btn-sm btn-primary">
                             <i class="bi bi-plus-circle me-1"></i> Ajukan Baru
                         </a>
                     </div>
@@ -176,7 +176,7 @@
                                         <h5 class="text-muted mb-3">Belum ada jadwal bimbingan</h5>
                                         <p class="text-muted mb-4">Anda belum mengajukan jadwal bimbingan dengan dosen
                                             pembimbing</p>
-                                        <a href="{{ route('bimbingan.ajukanJadwal') }}" class="btn btn-primary px-4">
+                                        <a href="{{ route('mahasiswa.bimbingan.ajukanJadwal') }}" class="btn btn-primary px-4">
                                             <i class="bi bi-plus-circle me-2"></i> Ajukan Jadwal
                                         </a>
                                     </div>

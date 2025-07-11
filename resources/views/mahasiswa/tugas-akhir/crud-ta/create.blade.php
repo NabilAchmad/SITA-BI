@@ -4,7 +4,7 @@
     <!-- Page Header with Back Button -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary fw-bold">Ajukan Tugas Akhir</h2>
-        <a href="{{ route('tugas-akhir.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+        <a href="{{ route('mahasiswa.tugas-akhir.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
             <i class="bi bi-arrow-left me-1"></i> Kembali
         </a>
     </div>
@@ -12,8 +12,8 @@
     <!-- Form Container -->
     <div class="card border-0 shadow-sm rounded-3">
         <div class="card-body p-4">
-            <form action="{{ route('tugasAkhir.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
+            <form action="{{ route('mahasiswa.tugas-akhir.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
 
                 <!-- Judul Field -->
                 <div class="mb-3">

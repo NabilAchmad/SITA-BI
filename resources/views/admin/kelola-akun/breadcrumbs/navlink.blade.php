@@ -3,18 +3,18 @@
         <li class="breadcrumb-item">Kelola Akun</li>
 
         <li class="breadcrumb-item">
-            @if (request()->routeIs('akun-dosen.kelola'))
+            @if (request()->routeIs('admin.akun.dosen.index'))
                 <span class="text-primary">Dosen</span>
             @else
-                <a href="{{ route('akun-dosen.kelola') }}" class="text-dark">Dosen</a>
+                <a href="{{ route('admin.akun.dosen.index') }}" class="text-dark">Dosen</a>
             @endif
         </li>
 
         <li class="breadcrumb-item">
-            @if (request()->routeIs('akun-mahasiswa.kelola'))
+            @if (request()->routeIs('admin.akun.mahasiswa.index'))
                 <span class="text-primary">Mahasiswa</span>
             @else
-                <a href="{{ route('akun-mahasiswa.kelola') }}" class="text-dark">Mahasiswa</a>
+                <a href="{{ route('admin.akun.mahasiswa.index') }}" class="text-dark">Mahasiswa</a>
             @endif
         </li>
     </ol>

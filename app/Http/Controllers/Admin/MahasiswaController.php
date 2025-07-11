@@ -54,7 +54,7 @@ class MahasiswaController extends Controller
         $this->mahasiswaService->updateMahasiswa($request->validated(), $mahasiswa);
 
         return redirect()
-            ->route('akun-mahasiswa.kelola')
+            ->route('admin.akun.mahasiswa.index')
             ->with('success', 'Data mahasiswa berhasil diperbarui.');
     }
 

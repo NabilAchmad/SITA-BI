@@ -1,25 +1,25 @@
 @php
     // Cek apakah tugas akhir ini sudah memiliki pembimbing 1 dari alur tawaran topik
-    $pembimbing1 = $tugasAkhir->peranDosenTA->where('peran', 'pembimbing1')->first();
+    $pembimbing1 = $tugasAkhir->peranDosenTa->where('peran', 'pembimbing1')->first();
 @endphp
 
 <div class="modal fade" id="modalTetapkanPembimbing-{{ $tugasAkhir->id }}" tabindex="-1"
     aria-labelledby="modalLabel-{{ $tugasAkhir->id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content shadow-lg border-0"> {{-- Added shadow and border-0 for modern look --}}
-            <div class="modal-header bg-primary text-white border-bottom-0 rounded-top"> {{-- Rounded top corners --}}
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-primary text-white border-bottom-0 rounded-top">
                 <h5 class="modal-title" id="modalLabel-{{ $tugasAkhir->id }}">
                     <i class="bi bi-person-lines-fill me-2"></i> Tetapkan Pembimbing Tugas Akhir
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
-            <form action="{{ route('penugasan-bimbingan.store', $tugasAkhir->id) }}" method="POST"
+            <form action="{{ route('jurusan.penugasan-pembimbing.store', $tugasAkhir->id) }}" method="POST"
                 class="form-assign-pembimbing">
                 @csrf
                 @method('PUT')
-                <div class="modal-body p-4"> {{-- Increased padding --}}
-                    <div class="card mb-4 border-info bg-light"> {{-- Card for student and title info --}}
+                <div class="modal-body p-4">
+                    <div class="card mb-4 border-info bg-light">
                         <div class="card-body">
                             <h6 class="card-title text-info mb-3"><i class="bi bi-info-circle me-2"></i> Informasi Tugas
                                 Akhir</h6>
@@ -36,7 +36,7 @@
                                 <i class="bi bi-person-check-fill me-2"></i> Pembimbing 1
                             </h6>
                             @if ($pembimbing1)
-                                <div class="card bg-light-subtle border-success shadow-sm"> {{-- Subtle success card for fixed P1 --}}
+                                <div class="card bg-light-subtle border-success shadow-sm">
                                     <div class="card-body py-3 px-4 d-flex align-items-center">
                                         <i class="bi bi-lock-fill text-success me-3 fs-5"></i>
                                         <div>
@@ -45,27 +45,20 @@
                                         </div>
                                     </div>
                                 </div>
-                                <input type="hidden" name="pembimbing1" value="{{ $pembimbing1->dosen->id }}">
+                                {{-- ✅ PERBAIKAN: Nama input disesuaikan --}}
+                                <input type="hidden" name="pembimbing_1_id" value="{{ $pembimbing1->dosen->id }}">
                             @else
                                 <div class="mb-2">
                                     <input type="text" class="form-control live-search-dosen-input"
-                                        data-target-container="dosen-list-pembimbing1-{{ $tugasAkhir->id }}"
+                                        data-pembimbing-role="pembimbing1"
                                         placeholder="Cari nama dosen Pembimbing 1...">
                                 </div>
-                                <div id="dosen-list-pembimbing1-{{ $tugasAkhir->id }}"
-                                    class="dosen-selection-container" data-pembimbing-role="pembimbing1">
-                                    {{-- Dosen cards will be populated here by JS --}}
-                                    @foreach ($dosenList as $dosen)
-                                        <div class="card dosen-card mb-2" data-dosen-id="{{ $dosen->id }}">
-                                            <div class="card-body p-3">
-                                                <i class="bi bi-person-circle me-2 text-muted"></i>
-                                                {{ $dosen->user->name }}
-                                            </div>
-                                        </div>
-                                    @endforeach
+                                {{-- ✅ PERBAIKAN: Menggunakan kelas, bukan ID --}}
+                                <div class="dosen-selection-container" data-pembimbing-role="pembimbing1">
+                                    {{-- Dosen cards akan di-render oleh JS --}}
                                 </div>
-                                <input type="hidden" name="pembimbing1"
-                                    id="selected-pembimbing1-{{ $tugasAkhir->id }}" required>
+                                {{-- ✅ PERBAIKAN: Nama input disesuaikan --}}
+                                <input type="hidden" name="pembimbing_1_id" class="selected-pembimbing-input" required>
                                 <div class="invalid-feedback">Silakan pilih Pembimbing 1.</div>
                             @endif
                         </div>
@@ -77,34 +70,28 @@
                             </h6>
                             <div class="mb-2">
                                 <input type="text" class="form-control live-search-dosen-input"
-                                    data-target-container="dosen-list-pembimbing2-{{ $tugasAkhir->id }}"
-                                    placeholder="Cari nama dosen Pembimbing 2...">
+                                    data-pembimbing-role="pembimbing2" placeholder="Cari nama dosen Pembimbing 2...">
                             </div>
-                            <div id="dosen-list-pembimbing2-{{ $tugasAkhir->id }}" class="dosen-selection-container"
-                                data-pembimbing-role="pembimbing2">
-                                {{-- Dosen cards will be populated here by JS --}}
-                                @foreach ($dosenList as $dosen)
-                                    <div class="card dosen-card mb-2" data-dosen-id="{{ $dosen->id }}">
-                                        <div class="card-body p-3">
-                                            <i class="bi bi-person-circle me-2 text-muted"></i>
-                                            {{ $dosen->user->name }}
-                                        </div>
-                                    </div>
-                                @endforeach
+                            {{-- ✅ PERBAIKAN: Menggunakan kelas, bukan ID --}}
+                            <div class="dosen-selection-container" data-pembimbing-role="pembimbing2">
+                                {{-- Dosen cards akan di-render oleh JS --}}
                             </div>
-                            <input type="hidden" name="pembimbing2" id="selected-pembimbing2-{{ $tugasAkhir->id }}"
-                                required>
+                            {{-- ✅ PERBAIKAN: Nama input disesuaikan dan tidak required --}}
+                            <input type="hidden" name="pembimbing_2_id" class="selected-pembimbing-input">
                             <div class="invalid-feedback">Silakan pilih Pembimbing 2.</div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer d-flex justify-content-end border-top-0 pt-3"> {{-- Aligned buttons to end, no top border --}}
+                <div class="modal-footer d-flex justify-content-end border-top-0 pt-3">
                     <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
                         <i class="bi bi-x-circle me-1"></i> Batal
                     </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save me-1"></i> Simpan Pembimbing
-                    </button>
+                    {{-- ✅ PERBAIKAN: Tombol simpan hanya muncul jika pengguna berhak --}}
+                    @can('full access penugasan pembimbing', $tugasAkhir)
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i> Simpan Pembimbing
+                        </button>
+                    @endcan
                 </div>
             </form>
         </div>
@@ -114,85 +101,75 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const modals = document.querySelectorAll('.modal[id^="modalTetapkanPembimbing-"]');
+            // Ambil daftar lengkap dosen SEKALI saja saat halaman dimuat
+            const allDosenList = @json($dosenList->map(fn($d) => ['id' => (string) $d->id, 'name' => $d->user->name]));
 
-            modals.forEach(modal => {
-                const p1SearchInput = modal.querySelector('input[data-target-container*="pembimbing1"]');
-                const p2SearchInput = modal.querySelector('input[data-target-container*="pembimbing2"]');
-                const p1Container = modal.querySelector('#dosen-list-pembimbing1-{{ $tugasAkhir->id }}');
-                const p2Container = modal.querySelector('#dosen-list-pembimbing2-{{ $tugasAkhir->id }}');
-                const hiddenInputP1 = modal.querySelector('input[name="pembimbing1"]');
-                const hiddenInputP2 = modal.querySelector('input[name="pembimbing2"]');
-
-                // Ambil daftar lengkap dosen dari elemen yang sudah ada saat halaman dimuat
-                const allDosenList = @json($dosenList->map(fn($d) => ['id' => (string) $d->id, 'name' => $d->user->name]));
+            // Inisialisasi setiap modal penugasan
+            document.querySelectorAll('.modal[id^="modalTetapkanPembimbing-"]').forEach(modal => {
+                const form = modal.querySelector('form');
+                const searchInputs = modal.querySelectorAll('.live-search-dosen-input');
+                const containers = {
+                    pembimbing1: modal.querySelector(
+                        '.dosen-selection-container[data-pembimbing-role="pembimbing1"]'),
+                    pembimbing2: modal.querySelector(
+                        '.dosen-selection-container[data-pembimbing-role="pembimbing2"]')
+                };
+                const hiddenInputs = {
+                    pembimbing1: modal.querySelector('input[name="pembimbing_1_id"]'),
+                    pembimbing2: modal.querySelector('input[name="pembimbing_2_id"]')
+                };
 
                 const updateUI = () => {
-                    const selectedP1Id = hiddenInputP1.value;
-                    const selectedP2Id = hiddenInputP2.value;
+                    const selectedP1Id = hiddenInputs.pembimbing1.value;
+                    const selectedP2Id = hiddenInputs.pembimbing2.value;
 
-                    // --- Render list untuk Pembimbing 1 (jika ada) ---
-                    if (p1Container) {
-                        const searchTerm = p1SearchInput.value.toLowerCase();
+                    // Render list untuk Pembimbing 1
+                    if (containers.pembimbing1) {
+                        const searchTerm = modal.querySelector(
+                                '.live-search-dosen-input[data-pembimbing-role="pembimbing1"]').value
+                            .toLowerCase();
                         const filteredDosen = allDosenList.filter(d =>
                             d.name.toLowerCase().includes(searchTerm) && d.id !== selectedP2Id
                         );
-                        renderDosenList(p1Container, filteredDosen, selectedP1Id, 'pembimbing1');
+                        renderDosenList(containers.pembimbing1, filteredDosen, selectedP1Id,
+                            'pembimbing1');
                     }
 
-                    // --- Render list untuk Pembimbing 2 ---
-                    if (p2Container) {
-                        const searchTerm = p2SearchInput.value.toLowerCase();
+                    // Render list untuk Pembimbing 2
+                    if (containers.pembimbing2) {
+                        const searchTerm = modal.querySelector(
+                                '.live-search-dosen-input[data-pembimbing-role="pembimbing2"]').value
+                            .toLowerCase();
                         const filteredDosen = allDosenList.filter(d =>
                             d.name.toLowerCase().includes(searchTerm) && d.id !== selectedP1Id
                         );
-                        renderDosenList(p2Container, filteredDosen, selectedP2Id, 'pembimbing2');
+                        renderDosenList(containers.pembimbing2, filteredDosen, selectedP2Id,
+                            'pembimbing2');
                     }
                 };
 
                 const renderDosenList = (container, dosenArray, selectedId, role) => {
-                    container.innerHTML = ''; // Kosongkan daftar saat ini
-
+                    container.innerHTML = '';
                     dosenArray.forEach(dosen => {
                         const card = document.createElement('div');
-                        card.className = 'card dosen-card mb-2';
+                        card.className =
+                            `card dosen-card mb-2 ${dosen.id === selectedId ? 'active' : ''}`;
                         card.dataset.dosenId = dosen.id;
                         card.innerHTML =
                             `<div class="card-body p-3"><i class="bi bi-person-circle me-2 text-muted"></i> ${dosen.name}</div>`;
 
-                        if (dosen.id === selectedId) {
-                            card.classList.add('active');
-                        }
-
                         card.addEventListener('click', () => {
-                            const clickedId = card.dataset.dosenId;
-                            if (role === 'pembimbing1') {
-                                hiddenInputP1.value = clickedId;
-                            } else {
-                                hiddenInputP2.value = clickedId;
-                            }
-                            // Setelah memilih, panggil updateUI untuk me-render ulang kedua list
+                            hiddenInputs[role].value = card.dataset.dosenId;
                             updateUI();
                         });
-
                         container.appendChild(card);
                     });
                 };
 
-                // --- Tambahkan Event Listeners untuk Pencarian ---
-                if (p1SearchInput) {
-                    p1SearchInput.addEventListener('keyup', updateUI);
-                }
-                if (p2SearchInput) {
-                    p2SearchInput.addEventListener('keyup', updateUI);
-                }
+                searchInputs.forEach(input => input.addEventListener('keyup', updateUI));
 
-                // --- Inisialisasi saat Modal dibuka ---
                 modal.addEventListener('show.bs.modal', () => {
-                    // Reset input pencarian
-                    if (p1SearchInput) p1SearchInput.value = '';
-                    if (p2SearchInput) p2SearchInput.value = '';
-                    // Render UI sesuai state awal
+                    searchInputs.forEach(input => input.value = '');
                     updateUI();
                 });
             });
@@ -200,75 +177,77 @@
     </script>
 @endpush
 
-<style>
-    /* General Modal Enhancements */
-    .modal-content {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    }
+@push('styles')
+    <style>
+        /* General Modal Enhancements */
+        .modal-content {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
 
-    .modal-header {
-        border-bottom: none;
-        border-top-left-radius: 0.5rem;
-        border-top-right-radius: 0.5rem;
-    }
+        .modal-header {
+            border-bottom: none;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
 
-    /* Supervisor Selection Containers */
-    .dosen-selection-container {
-        max-height: 250px;
-        /* Adjust height as needed */
-        overflow-y: auto;
-        border: 1px solid #e0e0e0;
-        /* Lighter border */
-        border-radius: 0.5rem;
-        /* Smoother corners */
-        padding: 10px;
-        background-color: #fcfcfc;
-        /* Slightly off-white background */
-    }
+        /* Supervisor Selection Containers */
+        .dosen-selection-container {
+            max-height: 250px;
+            /* Adjust height as needed */
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            /* Lighter border */
+            border-radius: 0.5rem;
+            /* Smoother corners */
+            padding: 10px;
+            background-color: #fcfcfc;
+            /* Slightly off-white background */
+        }
 
-    /* Individual Dosen Cards */
-    .dosen-card {
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-        border: 1px solid #e9ecef;
-        /* Light gray border */
-        border-radius: 0.4rem;
-        /* Match container border-radius */
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.03);
-        /* Subtle shadow */
-    }
+        /* Individual Dosen Cards */
+        .dosen-card {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #e9ecef;
+            /* Light gray border */
+            border-radius: 0.4rem;
+            /* Match container border-radius */
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.03);
+            /* Subtle shadow */
+        }
 
-    .dosen-card:hover {
-        background-color: #e2f0ff;
-        /* Light blue on hover */
-        border-color: #007bff;
-        /* Primary color border on hover */
-        transform: translateY(-2px);
-        /* Slight lift effect */
-        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.08);
-        /* More prominent shadow */
-    }
+        .dosen-card:hover {
+            background-color: #e2f0ff;
+            /* Light blue on hover */
+            border-color: #007bff;
+            /* Primary color border on hover */
+            transform: translateY(-2px);
+            /* Slight lift effect */
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.08);
+            /* More prominent shadow */
+        }
 
-    .dosen-card.active {
-        background-color: #007bff;
-        /* Primary color when active */
-        color: white;
-        border-color: #007bff;
-        box-shadow: 0 0.25rem 0.5rem rgba(0, 123, 255, 0.25);
-        /* Stronger shadow for active */
-    }
+        .dosen-card.active {
+            background-color: #007bff;
+            /* Primary color when active */
+            color: white;
+            border-color: #007bff;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 123, 255, 0.25);
+            /* Stronger shadow for active */
+        }
 
-    .dosen-card.active .bi-person-circle,
-    .dosen-card.active .text-muted {
-        color: white !important;
-        /* Ensure icons and muted text are white when active */
-    }
+        .dosen-card.active .bi-person-circle,
+        .dosen-card.active .text-muted {
+            color: white !important;
+            /* Ensure icons and muted text are white when active */
+        }
 
-    /* Fixed Pembimbing 1 Card Styling */
-    .card.bg-light-subtle.border-success {
-        background-color: #eaf7ed !important;
-        /* A light green tint */
-        border-color: #28a745 !important;
-        /* Green border */
-    }
-</style>
+        /* Fixed Pembimbing 1 Card Styling */
+        .card.bg-light-subtle.border-success {
+            background-color: #eaf7ed !important;
+            /* A light green tint */
+            border-color: #28a745 !important;
+            /* Green border */
+        }
+    </style>
+@endpush

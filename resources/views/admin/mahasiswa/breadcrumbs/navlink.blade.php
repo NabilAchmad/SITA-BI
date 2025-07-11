@@ -2,19 +2,20 @@
     <ol class="breadcrumb mb-2">
         <li class="breadcrumb-item">Penugasan Bimbingan</li>
 
-        <li class="breadcrumb-item {{ request()->routeIs('penugasan-bimbingan.index') ? 'active' : '' }}">
-            @if(request()->routeIs('penugasan-bimbingan.index'))
+        <li class="breadcrumb-item {{ request()->routeIs('jurusan.penugasan-pembimbing.index') ? 'active' : '' }}">
+            @if (request()->routeIs('jurusan.penugasan-pembimbing.index'))
                 <span class="text-primary">Mahasiswa Belum Punya Pembimbing</span>
             @else
-                <a href="{{ route('penugasan-bimbingan.index') }}" class="text-dark">Mahasiswa Belum Punya Pembimbing</a>
+                <a href="{{ route('jurusan.penugasan-pembimbing.index') }}" class="text-dark">Mahasiswa Belum Punya
+                    Pembimbing</a>
             @endif
         </li>
 
-        <li class="breadcrumb-item {{ request()->routeIs('list-mahasiswa') ? 'active' : '' }}">
-            @if(request()->routeIs('list-mahasiswa'))
+        <li class="breadcrumb-item {{ request()->routeIs('jurusan.penugasan-pembimbing.sudah') ? 'active' : '' }}">
+            @if (request()->routeIs('jurusan.penugasan-pembimbing.sudah'))
                 <span class="text-primary">Mahasiswa Sudah Punya Pembimbing</span>
             @else
-                <a href="{{ route('list-mahasiswa') }}" class="text-dark">Mahasiswa Sudah Punya Pembimbing</a>
+                <a href="{{ route('jurusan.penugasan-pembimbing.sudah') }}" class="text-dark">Mahasiswa Sudah Punya Pembimbing</a>
             @endif
         </li>
     </ol>

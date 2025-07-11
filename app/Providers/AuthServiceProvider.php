@@ -15,8 +15,8 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @var array<class-string, class-string>
      */
+    // Di dalam AuthServiceProvider.php
     protected $policies = [
-        // Daftarkan policy Anda di sini
         TugasAkhir::class => TugasAkhirPolicy::class,
     ];
 

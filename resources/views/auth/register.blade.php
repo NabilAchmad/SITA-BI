@@ -21,7 +21,7 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('register.post') }}" class="needs-validation">
+                        <form method="POST" action="{{ route('auth.register.post') }}" class="needs-validation">
                             @csrf
 
                             <div class="mb-3 form-floating">
@@ -92,7 +92,7 @@
                     <div class="card-footer text-center bg-white border-0 py-3">
                         <small>
                             Sudah punya akun?
-                            <a href="{{ route('login') }}" class="text-decoration-none fw-bold">Login di sini</a>
+                            <a href="{{ route('auth.login') }}" class="text-decoration-none fw-bold">Login di sini</a>
                         </small>
                     </div>
                 </div>

@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container mt-4">
-        <form action="{{ route('user.profile.update.dosen') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('dosen.profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 

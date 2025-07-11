@@ -2,7 +2,7 @@
 <!-- Modal Tambah -->
 <div class="modal fade" id="tambahTawaranTopikModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <form method="POST" action="{{ route('tawaran-topik.create') }}">
+        <form method="POST" action="{{ route('dosen.tawaran-topik.store') }}">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">

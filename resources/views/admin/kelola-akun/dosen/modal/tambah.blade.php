@@ -19,7 +19,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('akun-dosen.store') }}" method="POST" id="formTambahAkun">
+                <form action="{{ route('admin.akun.dosen.store') }}" method="POST" id="formTambahAkun">
                     @csrf
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama"

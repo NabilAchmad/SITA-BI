@@ -12,7 +12,7 @@
                 </h2>
                 <p class="text-muted mb-0">Riwayat pengajuan Tugas Akhir yang dibatalkan oleh Anda.</p>
             </div>
-            <a href="{{ route('tugas-akhir.dashboard') }}" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
+            <a href="{{ route('mahasiswa.tugas-akhir.dashboard') }}" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
                 <i class="bi bi-arrow-left me-2"></i> Kembali ke Dashboard TA
             </a>
         </div>

@@ -1,88 +1,63 @@
 <?php
 
+// --- File: app/Http/Controllers/Dosen/DosenProfileController.php ---
+// ✅ PERBAIKAN: Controller sekarang sangat ramping dan bersih.
+
 namespace App\Http\Controllers\Dosen;
 
-use App\Models\Dosen;
-use App\Models\Mahasiswa;
-use App\Models\Pengumuman;
-use App\Models\TugasAkhir;
-use Illuminate\Http\Request;
-use App\Models\PeranDosenTA;
-use App\Models\Log;
-use App\Models\User;
-use App\Models\TawaranTopik;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Services\Dosen\DashboardService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class DosenProfileController extends Controller
 {
+    // Gunakan constructor property promotion untuk service yang lebih ringkas.
+    public function __construct(protected DashboardService $service) {}
 
-
-    public function index_dosen(DashboardService $service)
+    /**
+     * Menampilkan halaman dashboard untuk semua jenis dosen.
+     */
+    public function index_dosen()
     {
-        $pengumumans = Pengumuman::with('pembuat')->latest()->get();
-        $riwayatTA = TugasAkhir::latest()->get();
+        // 1. Ambil pengguna yang sedang login.
+        $user = Auth::user();
 
-        $tawaranTopik = TawaranTopik::with(['tugasAkhir.mahasiswa.user'])
-            ->where('user_id', Auth::id())->get();
+        // 2. Panggil SATU method dari service untuk menyiapkan SEMUA data.
+        $dashboardData = $this->service->getDataForDashboard($user);
 
-        $card1 = $service->card1Data();
-        $card2 = $service->card2Data();
-        $card3 = $service->card3Data();
-        $card4 = $service->card4Data();
-        $peranDosen = $service->getPeranDosen();
-        $role = Auth::user()->dosen->user->roles;
-        $jadwalBimbingan = $service->jadwalBimbinganTerdekat();
-        $jadwalSidang = $service->jadwalSidangTerdekat();
-
-        return view('dosen.views.dashboard', compact(
-            'pengumumans',
-            'riwayatTA',
-            'tawaranTopik',
-            'card1',
-            'card2',
-            'card3',
-            'card4',
-            'peranDosen',
-            'role',
-            'jadwalBimbingan',
-            'jadwalSidang'
-        ));
+        // 3. Kirim data yang sudah siap pakai ke view.
+        return view('dosen.views.dashboard', $dashboardData);
     }
 
     public function profile()
     {
-        $user = User::find(Auth::id());
-        return view('dosen.user.profile', compact('user'));
+        return view('dosen.user.profile', ['user' => Auth::user()]);
     }
 
     public function update(Request $request)
     {
+        // Sebaiknya pindahkan validasi ini ke dalam Form Request terpisah.
         $user = User::find(Auth::id());
-
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
-        $user->name = $request->name;
-        $user->email = $request->email;
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
 
         if ($request->hasFile('avatar')) {
-            // Hapus foto lama jika ada
             if ($user->photo && Storage::disk('public')->exists($user->photo)) {
                 Storage::disk('public')->delete($user->photo);
             }
-
-            // Simpan foto baru
             $user->photo = $request->file('avatar')->store('avatars', 'public');
         }
 
         $user->save();
-
         return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
     }
 }

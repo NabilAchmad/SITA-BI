@@ -34,7 +34,6 @@
 @section('content')
     <div class="container-fluid py-4">
 
-        <!-- Header -->
         <div class="position-relative overflow-hidden rounded-3 mb-4 p-4"
             style="background: linear-gradient(135deg, #e3f2fd, #f1f8ff); border-left: 5px solid #0d6efd;">
             <div class="position-relative z-1">
@@ -55,11 +54,12 @@
             @endphp
 
             {{-- ======================================================================= --}}
-            {{-- KARTU KHUSUS UNTUK MAHASISWA D3 --}}
+            {{-- KARTU UNTUK MAHASISWA (D3 & D4) --}}
             {{-- ======================================================================= --}}
-            @if (!empty($mahasiswa) && $mahasiswa->prodi === 'd3')
+            @if (!empty($mahasiswa) && in_array($mahasiswa->prodi, ['d3', 'd4']))
+                {{-- Kartu Ajukan Topik Mandiri --}}
                 <div class="col-md-6 col-xl-3">
-                    <a href="{{ !$sudahMengajukan ? route('tugas-akhir.ajukan') : '#' }}"
+                    <a href="{{ !$sudahMengajukan ? route('mahasiswa.tugas-akhir.ajukan') : '#' }}"
                         class="text-decoration-none {{ $sudahMengajukan ? 'disabled-link' : '' }} ajukan-link">
                         <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                             <div class="card-body">
@@ -75,8 +75,9 @@
                     </a>
                 </div>
 
+                {{-- Kartu Topik Dosen --}}
                 <div class="col-md-6 col-xl-3">
-                    <a href="{{ route('mahasiswa.topik.index') }}" class="text-decoration-none">
+                    <a href="{{ route('mahasiswa.tugas-akhir.topik.index') }}" class="text-decoration-none">
                         <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-3">
@@ -91,30 +92,26 @@
                     </a>
                 </div>
 
+                {{-- Kartu TA Dibatalkan --}}
                 <div class="col-md-6 col-xl-3">
-                    <a href="{{ route('tugasAkhir.cancelled') }}" class="text-decoration-none">
+                    <a href="{{ route('mahasiswa.tugas-akhir.show.cancel') }}" class="text-decoration-none">
                         <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="icon icon-shape bg-danger text-white rounded-circle me-3">
                                         <i class="fas fa-times-circle"></i>
                                     </div>
-                                    <h6 class="mb-0 fw-semibold text-dark">TA Dibatalkan</h6>
+                                    <h6 class="mb-0 fw-semibold text-dark">Riwayat Ditolak dan Dibatalkan</h6>
                                 </div>
                                 <p class="mb-0 text-muted">Lihat riwayat tugas akhir yang dibatalkan atau ditolak.</p>
                             </div>
                         </div>
                     </a>
                 </div>
-            @endif {{-- Akhir dari blok khusus D3 --}}
 
-
-            {{-- ======================================================================= --}}
-            {{-- KARTU UNTUK MAHASISWA D3 DAN D4 --}}
-            {{-- ======================================================================= --}}
-            @if (!empty($mahasiswa) && ($mahasiswa->prodi === 'd3' || $mahasiswa->prodi === 'd4'))
+                {{-- Kartu Progress TA --}}
                 <div class="col-md-6 col-xl-3">
-                    <a href="{{ route('tugas-akhir.progress') }}" class="text-decoration-none">
+                    <a href="{{ route('mahasiswa.tugas-akhir.progress') }}" class="text-decoration-none">
                         <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-3">
@@ -128,7 +125,7 @@
                         </div>
                     </a>
                 </div>
-            @endif {{-- Akhir dari blok D3 dan D4 --}}
+            @endif {{-- Akhir dari blok mahasiswa --}}
 
         </div>
     </div>
@@ -146,7 +143,7 @@
                         e.preventDefault();
                         swal({
                             title: "Tidak Bisa!",
-                            text: "Tidak dapat mengajukan lagi.",
+                            text: "Anda sudah mengajukan topik dan sedang dalam proses atau sudah disetujui.",
                             icon: "error",
                             buttons: {
                                 confirm: {

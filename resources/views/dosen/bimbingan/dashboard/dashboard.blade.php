@@ -79,7 +79,7 @@
                                 </span>
                             </td>
                             <td>
-                                <a class="btn btn-primary btn-xs" href="{{ route('bimbingan.detail', $mhs->id) }}">
+                                <a class="btn btn-primary btn-xs" href="{{ route('dosen.bimbingan.detail', $mhs->id) }}">
                                     <i class="bi bi-info-circle"></i>Detail
                                 </a>
                             </td>

@@ -11,11 +11,11 @@
                     track, and achieve your academic goals with ease.</p>
                 <div class="d-flex gap-4">
                     <div class="d-flex flex-column flex-md-row" data-aos="fade-up" data-aos-delay="200">
-                        <a href="{{route('login')}}" class="btn btn-primary text-white px-4 py-2 rounded">Login<i
+                        <a href="{{route('auth.login')}}" class="btn btn-primary text-white px-4 py-2 rounded">Login<i
                                 class=""></i></a>
                     </div>
                     <div class="d-flex flex-column flex-md-row" data-aos="fade-up" data-aos-delay="200">
-                        <a href="{{route('register')}}" class="btn btn-outline-primary px-4 py-2 rounded">Register<i
+                        <a href="{{route('auth.register')}}" class="btn btn-outline-primary px-4 py-2 rounded">Register<i
                                 class=""></i></a>
                     </div>
                 </div>

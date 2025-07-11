@@ -5,6 +5,7 @@ namespace App\Services\Kaprodi;
 use App\Models\JudulTugasAkhir;
 use App\Models\TugasAkhir;
 use App\Services\PorterStemmer; // Pastikan path ini benar
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -12,41 +13,30 @@ use Illuminate\Support\Facades\Log; // Opsional, untuk mencatat log error
 
 class ValidasiService
 {
-    // ====================================================================
-    // BAGIAN LOGIKA VALIDASI KAPRODI (TIDAK BERUBAH)
-    // ====================================================================
-
+    /**
+     * ✅ PERBAIKAN: Mengambil daftar TA untuk halaman validasi, difilter berdasarkan peran.
+     * Logika ini sekarang menangani semua peran staf (Admin, Kajur, Kaprodi, Dosen) dengan benar.
+     */
+    /**
+     * ✅ PERBAIKAN: Mengambil daftar TA untuk halaman validasi, difilter berdasarkan peran.
+     * Metode ini tidak lagi memerlukan parameter Request dan menggunakan helper global.
+     */
     public function getValidationLists(): array
     {
         $user = Auth::user();
-        $prodi = null;
 
-        if ($user && $user->roles) {
-            foreach ($user->roles as $role) {
-                if (str_contains($role->name, 'kaprodi-')) {
-                    $prodiCode = str_replace('kaprodi-', '', $role->name);
-                    $prodi = strtoupper($prodiCode);
-                    break;
-                }
-            }
+        // Mulai dengan query dasar yang memuat relasi yang dibutuhkan.
+        $baseQuery = TugasAkhir::query()->with(['mahasiswa.user']);
+
+        // Terapkan filter prodi HANYA untuk Kaprodi.
+        // Kajur, Admin, dan Dosen Biasa akan melewati kondisi ini dan melihat semua prodi.
+        if ($user->hasRole('kaprodi-d4')) {
+            $baseQuery->whereHas('mahasiswa', fn($q) => $q->where('prodi', 'd4'));
+        } elseif ($user->hasRole('kaprodi-d3')) {
+            $baseQuery->whereHas('mahasiswa', fn($q) => $q->where('prodi', 'd3'));
         }
 
-        if (!$prodi) {
-            return [
-                'tugasAkhirMenunggu' => collect(),
-                'tugasAkhirDiterima' => collect(),
-                'tugasAkhirDitolak' => collect(),
-            ];
-        }
-
-        $statusMenunggu = 'diajukan';
-        $statusDiterima = 'disetujui';
-        $statusDitolak = 'ditolak';
-
-        $baseQuery = TugasAkhir::query()
-            ->with(['mahasiswa.user'])
-            ->whereHas('mahasiswa', fn($q) => $q->where('prodi', $prodi));
-
+        // Terapkan filter pencarian jika ada, menggunakan helper global 'request()'.
         if ($search = request('search')) {
             $baseQuery->where(function ($query) use ($search) {
                 $query->where('judul', 'like', "%{$search}%")
@@ -57,13 +47,22 @@ class ValidasiService
             });
         }
 
+        // Ambil semua data yang relevan dalam satu query.
+        $allTugasAkhir = $baseQuery->latest('tanggal_pengajuan')->get();
+
+        // Pisahkan data berdasarkan status menggunakan metode collection yang efisien.
         return [
-            'tugasAkhirMenunggu' => (clone $baseQuery)->where('status', $statusMenunggu)->latest('tanggal_pengajuan')->get(),
-            'tugasAkhirDiterima' => (clone $baseQuery)->where('status', $statusDiterima)->latest('tanggal_pengajuan')->get(),
-            'tugasAkhirDitolak'  => (clone $baseQuery)->where('status', $statusDitolak)->latest('tanggal_pengajuan')->get(),
+            'tugasAkhirMenunggu' => $allTugasAkhir->where('status', TugasAkhir::STATUS_DIAJUKAN),
+            'tugasAkhirDiterima' => $allTugasAkhir->where('status', TugasAkhir::STATUS_DISETUJUI),
+            'tugasAkhirDitolak'  => $allTugasAkhir->whereIn('status', [TugasAkhir::STATUS_DITOLAK, TugasAkhir::STATUS_REVISI]),
         ];
     }
 
+    /**
+     * Mengambil detail untuk ditampilkan di modal.
+     * Logika 'actionable' telah dihapus dari sini. Tanggung jawab ini sekarang
+     * berada di Controller yang akan memanggil Policy.
+     */
     public function getValidationDetails(TugasAkhir $tugasAkhir): array
     {
         return [
@@ -71,35 +70,42 @@ class ValidasiService
             'nim' => $tugasAkhir->mahasiswa?->nim ?? '-',
             'prodi' => $tugasAkhir->mahasiswa?->prodi ? strtoupper($tugasAkhir->mahasiswa->prodi) . ' Bahasa Inggris' : 'N/A',
             'judul' => $tugasAkhir->judul,
-            'actionable' => $tugasAkhir->status === 'diajukan',
-            'disetujui_oleh' => $tugasAkhir->status === 'disetujui' ? ($tugasAkhir->approver?->name ?? 'N/A') : null,
+            'actionable' => $tugasAkhir->status === 'diajukan' && auth()->user()->hasAnyRole(['kaprodi-d3', 'kaprodi-d4']),
+
+            // ✅ PERBAIKAN: Panggil relasi 'disetujui_oleh' dan 'ditolak_oleh'.
+            'disetujui_oleh' => $tugasAkhir->status === 'disetujui' ? ($tugasAkhir->disetujui_oleh?->name ?? 'N/A') : null,
             'tanggal_disetujui' => $tugasAkhir->status === 'disetujui' ? Carbon::parse($tugasAkhir->updated_at)->translatedFormat('d F Y \p\u\k\u\l H:i') : null,
-            'ditolak_oleh' => $tugasAkhir->status === 'ditolak' ? ($tugasAkhir->rejector?->name ?? 'N/A') : null,
+            'ditolak_oleh' => $tugasAkhir->status === 'ditolak' ? ($tugasAkhir->ditolak_oleh?->name ?? 'N/A') : null,
             'tanggal_ditolak' => $tugasAkhir->status === 'ditolak' ? Carbon::parse($tugasAkhir->updated_at)->translatedFormat('d F Y \p\u\k\u\l H:i') : null,
             'alasan_penolakan' => $tugasAkhir->status === 'ditolak' ? $tugasAkhir->alasan_penolakan : null,
         ];
     }
 
+    /**
+     * Menyetujui pengajuan tugas akhir.
+     */
     public function approveTugasAkhir(TugasAkhir $tugasAkhir): void
     {
         $tugasAkhir->update([
-            'status' => 'disetujui',
+            'status' => TugasAkhir::STATUS_DISETUJUI,
             'disetujui_oleh' => Auth::id(),
             'alasan_penolakan' => null,
             'ditolak_oleh' => null,
         ]);
     }
 
+    /**
+     * Menolak pengajuan tugas akhir.
+     */
     public function rejectTugasAkhir(TugasAkhir $tugasAkhir, string $alasan): void
     {
         $tugasAkhir->update([
-            'status' => 'ditolak',
+            'status' => TugasAkhir::STATUS_DITOLAK,
             'ditolak_oleh' => Auth::id(),
             'alasan_penolakan' => $alasan,
             'disetujui_oleh' => null,
         ]);
     }
-
 
     // ====================================================================
     // BAGIAN PENGECEKAN KEMIRIPAN JUDUL DENGAN AI (HIBRIDA) - VERSI FINAL
