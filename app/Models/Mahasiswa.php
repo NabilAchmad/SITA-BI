@@ -3,43 +3,67 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphMany; // <-- Pastikan ini di-import
 
 class Mahasiswa extends Model
 {
-    protected $table = 'mahasiswa'; // nama tabel sesuai DB
+    use HasFactory;
+
+    protected $table = 'mahasiswa';
 
     protected $fillable = ['user_id', 'nim', 'prodi', 'angkatan', 'kelas'];
 
-    public function user()
+    /**
+     * Relasi ke model User (Kunci Utama).
+     * Ini sudah benar dan sangat penting.
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function tugasAkhir()
+    /**
+     * Relasi ke Tugas Akhir yang aktif.
+     */
+    public function tugasAkhir(): HasOne
     {
-        return $this->hasOne(TugasAkhir::class, 'mahasiswa_id'); // ✔️ Ini yang benar jika hanya 1 TA per mahasiswa
+        return $this->hasOne(TugasAkhir::class, 'mahasiswa_id');
     }
 
-    // Jika ingin akses langsung peran dosen lewat mahasiswa
-    public function peranDosenTA()
+    /**
+     * ✅ [PERBAIKAN FINAL] Menambahkan relasi polimorfik ke CatatanBimbingan.
+     * Ini memberitahu sistem bahwa seorang Mahasiswa bisa menjadi 'author'
+     * dari banyak catatan bimbingan.
+     */
+    public function catatanBimbingan(): MorphMany
+    {
+        return $this->morphMany(CatatanBimbingan::class, 'author');
+    }
+
+    // --- Relasi-relasi Anda yang lain (sudah benar) ---
+
+    public function peranDosenTA(): HasManyThrough
     {
         return $this->hasManyThrough(
             PeranDosenTA::class,
             TugasAkhir::class,
-            'mahasiswa_id',
-            'tugas_akhir_id',
-            'id',
-            'id'
+            'mahasiswa_id',     // Foreign key di TugasAkhir
+            'tugas_akhir_id', // Foreign key di PeranDosenTA
+            'id',             // Local key di Mahasiswa
+            'id'              // Local key di TugasAkhir
         );
     }
 
-    public function historyTopik()
+    public function historyTopik(): HasMany
     {
         return $this->hasMany(HistoryTopikMahasiswa::class);
     }
+
 
     public function notifikasi()
     {

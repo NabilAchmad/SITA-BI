@@ -56,7 +56,8 @@ class TugasAkhirController extends Controller
         $this->tugasAkhirService->handleUploadFile(
             $tugasAkhir,
             $request->file('file'),
-            $request->input('jenis_dokumen')
+            $request->input('jenis_dokumen'),
+            $request->input('catatan') // ✅ Tambahkan parameter catatan
         );
 
         // DIUBAH: Menggunakan format notifikasi baru

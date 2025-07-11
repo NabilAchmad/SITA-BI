@@ -8,6 +8,7 @@ use App\Models\User; // ✅ PERBAIKAN: Import model User
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\UploadedFile;
 use App\Models\DokumenTa;
+use Illuminate\Support\Facades\DB; // <-- 1. Pastikan DB di-import
 
 class TugasAkhirService
 {
@@ -47,27 +48,61 @@ class TugasAkhirService
     }
 
     /**
-     * Menangani logika upload file dan menyimpannya ke database.
-     *
      * @param TugasAkhir $tugasAkhir Instance model TugasAkhir.
      * @param UploadedFile $file File yang di-upload dari request.
-     * @param string $tipeDokumen Tipe dokumen ('proposal', 'draft', 'final', 'lainnya').
+     * @param string $tipeDokumen Tipe dokumen.
+     * @param string|null $catatan Catatan opsional dari mahasiswa.
      * @return DokumenTa Instance DokumenTa yang baru dibuat.
      */
-    public function handleUploadFile(TugasAkhir $tugasAkhir, UploadedFile $file, string $tipeDokumen): DokumenTa
+    /**
+     * [PERBAIKAN TOTAL] Menangani upload file dan membuat JEJAK di log
+     * menggunakan ID Dokumen, bukan nama file.
+     */
+    public function handleUploadFile(TugasAkhir $tugasAkhir, UploadedFile $file, string $tipeDokumen, ?string $catatan = null): DokumenTa
     {
-        // Menyimpan file dan mendapatkan path-nya
-        $filePath = $file->store("dokumen_ta/{$tugasAkhir->id}", 'public');
+        return DB::transaction(function () use ($tugasAkhir, $file, $tipeDokumen, $catatan) {
 
-        // ✅ LANGKAH 1: Perbarui kolom file_path di tabel tugas_akhir
-        // Ini akan mengisi kolom yang kosong tersebut.
-        $tugasAkhir->update(['file_path' => $filePath]);
+            // --- Langkah 1: Simpan File & Dokumen (Tidak berubah) ---
+            $filePath = $file->store("dokumen_ta/{$tugasAkhir->id}", 'public');
+            $tugasAkhir->update(['file_path' => $filePath]);
 
-        // LANGKAH 2: Buat record di tabel dokumen_ta seperti sebelumnya
-        return $tugasAkhir->dokumenTa()->create([
-            'tipe_dokumen' => $tipeDokumen,
-            'file_path'    => $filePath,
-        ]);
+            $dokumen = $tugasAkhir->dokumenTa()->create([
+                'tipe_dokumen' => $tipeDokumen,
+                'file_path'    => $filePath,
+            ]);
+
+            // --- Langkah 2: Buat Jejak di Log ---
+            $sesiBimbingan = $tugasAkhir->bimbinganTa()->where('status_bimbingan', '!=', 'selesai')->latest()->first();
+            if (!$sesiBimbingan) {
+                $sesiBimbingan = $tugasAkhir->bimbinganTa()->create([
+                    'dosen_id' => $tugasAkhir->pembimbingSatu->dosen_id,
+                    'peran' => 'pembimbing1',
+                    'tanggal_bimbingan' => now(),
+                    'status_bimbingan' => 'diajukan', // Gunakan status yang ada di ENUM
+                    'sesi_ke' => 1
+                ]);
+            }
+
+            // ✅ PERBAIKAN UTAMA: Ambil ID dari relasi mahasiswa, bukan user
+            $mahasiswaId = Auth::user()->mahasiswa->id;
+
+            // Buat catatan "UPLOAD" otomatis
+            $sesiBimbingan->catatan()->create([
+                'catatan'     => "UPLOAD_ID:" . $dokumen->id,
+                'author_type' => \App\Models\Mahasiswa::class,
+                'author_id'   => $mahasiswaId, // Gunakan ID mahasiswa yang benar
+            ]);
+
+            if (!empty($catatan)) {
+                $sesiBimbingan->catatan()->create([
+                    'catatan'     => $catatan,
+                    'author_type' => \App\Models\Mahasiswa::class,
+                    'author_id'   => $mahasiswaId, // Gunakan ID mahasiswa yang benar
+                ]);
+            }
+
+            return $dokumen;
+        });
     }
 
     /**
