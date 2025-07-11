@@ -22,7 +22,12 @@ class MahasiswaMenungguSidangAkhirSeeder extends Seeder
             $nim = $nimPrefix . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
             $namaDepan = 'Mahasiswa';
-            $namaBelakang = Str::random(5);
+            // Generate random string of letters only for last name
+            $letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $namaBelakang = '';
+            for ($j = 0; $j < 5; $j++) {
+                $namaBelakang .= $letters[rand(0, strlen($letters) - 1)];
+            }
             $namaLengkap = "$namaDepan $namaBelakang";
             $email = Str::slug($namaLengkap, '') . "@student.ac.id";
 

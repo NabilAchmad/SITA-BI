@@ -10,16 +10,16 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::table('files', function (Blueprint $table) {
-            $table->string('file_type', 100)->change();
-        });
+        // Schema::table('files', function (Blueprint $table) {
+        //     $table->string('file_type', 100)->change();
+        // });
     }
 
     public function down()
     {
-        Schema::table('files', function (Blueprint $table) {
-            $table->string('file_type', 50)->change(); // sesuaikan default awal
-        });
+        // Schema::table('files', function (Blueprint $table) {
+        //     $table->string('file_type', 50)->change(); // sesuaikan default awal
+        // });
     }
 
 };

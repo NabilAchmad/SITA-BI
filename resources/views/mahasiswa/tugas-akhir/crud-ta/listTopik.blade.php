@@ -58,7 +58,7 @@
                                     <td class="text-center">{{ $topik->kuota }}</td>
                                     @if (!$mahasiswaSudahPunyaTA)
                                         <td class="text-center">
-                                            <form action="{{ route('mahasiswa.topik.ambil', $topik->id) }}" method="POST">
+                                            <form action="{{ route('mahasiswa.tugas-akhir.topik.ambil', $topik->id) }}" method="POST"> 
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-success px-4">
                                                     <i class="bi bi-check-circle me-1"></i> Ambil Topik

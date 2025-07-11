@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('dosen');
             $table->text('catatan');
             $table->enum('status_revisi', ['diperlukan', 'tidak perlu']);
-            $table->foreignId('file_id')->constrained('files');
+            $table->unsignedBigInteger('file_id');
             $table->timestamps();
         });
     }

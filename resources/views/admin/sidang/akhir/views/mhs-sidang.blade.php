@@ -59,13 +59,13 @@
                 {{-- Konten Tabs --}}
                 <div class="tab-content" id="jadwalTabContent">
                     <x-admin.sidang.tab-pane id="menunggu-pane" labelledby="menunggu-tab" :isActive="true"
-                        :columns="$headersMahasiswa" :tableData="$mahasiswaMenunggu" partial="admin.sidang.akhir.partials._table-rows" />
+                        :columns="$headersMahasiswa" :tableData="$mahasiswaMenunggu" partial="admin.sidang.akhir.partials._table-rows" :type="'menunggu'" />
                     <x-admin.sidang.tab-pane id="dijadwalkan-pane" labelledby="dijadwalkan-tab" :columns="$headersJadwal"
-                        :tableData="$jadwalMahasiswa" partial="admin.sidang.akhir.partials._table-rows" />
+                        :tableData="$jadwalMahasiswa" partial="admin.sidang.akhir.partials._table-rows" :type="'dijadwalkan'" />
                     <x-admin.sidang.tab-pane id="tidak-lulus-pane" labelledby="tidak-lulus-tab" :columns="$headersMahasiswa"
-                        :tableData="$mahasiswaTidakLulus" partial="admin.sidang.akhir.partials._table-rows" />
+                        :tableData="$mahasiswaTidakLulus" partial="admin.sidang.akhir.partials._table-rows" :type="'tidak-lulus'" />
                     <x-admin.sidang.tab-pane id="lulus-pane" labelledby="lulus-tab" :columns="$headersMahasiswa" :tableData="$mahasiswaLulus"
-                        partial="admin.sidang.akhir.partials._table-rows" />
+                        partial="admin.sidang.akhir.partials._table-rows" :type="'lulus-sempro'" />
                 </div>
             </div>
         </div>

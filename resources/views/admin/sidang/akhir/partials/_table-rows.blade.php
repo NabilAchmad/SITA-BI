@@ -1,9 +1,5 @@
 @props(['collection', 'type', 'headers'])
 
-@php
-    $type = $type ?? 'menunggu';
-@endphp
-
 @forelse($collection as $item)
     @switch($type)
         {{-- ================================================================= --}}
@@ -28,13 +24,12 @@
                 <td>{{ $item->tugasAkhir->judul ?? '-' }}</td>
                 <td class="text-center"><span class="badge bg-secondary">Draft</span></td>
                 <td class="text-center">
-                    <button type="button" class="btn btn-primary btn-sm btn-jadwalkan"
-                        data-tugas-akhir-id="{{ $item->tugasAkhir->id }}" data-nama="{{ $item->user->name ?? '-' }}"
-                        data-nim="{{ $item->nim ?? '-' }}" data-judul="{{ $item->tugasAkhir->judul ?? '-' }}"
-                        data-url-penguji="{{ route('jadwal-sidang.simpanPenguji', ['sidang_id' => $item->tugasAkhir->sidangTerakhir->id ?? 0]) }}">
-                        Jadwalkan
-                    </button>
-
+                        <button type="button" class="btn btn-primary btn-sm btn-jadwalkan"
+                            data-tugas-akhir-id="{{ $item->tugasAkhir->id }}" data-nama="{{ $item->user->name ?? '-' }}"
+                            data-nim="{{ $item->nim ?? '-' }}" data-judul="{{ $item->tugasAkhir->judul ?? '-' }}"
+                            data-url-penguji="{{ route('jurusan.penjadwalan-sidang.simpan-penguji', ['sidang' => $item->tugasAkhir->id]) }}">
+                            Jadwalkan
+                        </button>
                 </td>
             </tr>
         @break
@@ -64,7 +59,7 @@
                     {{ \Carbon\Carbon::parse($item->waktu_selesai)->format('H:i') }}</td>
                 <td>{{ $item->ruangan->nama_ruangan ?? '-' }}</td>
                 <td class="text-center">
-                    <a href="{{ route('jadwal-sempro.show', ['sidang_id' => $item->sidang_id]) }}" class="btn btn-info btn-sm">
+                    <a href="{{ route('jurusan.penjadwalan-sidang.show', ['sidang' => $item->sidang_id]) }}" class="btn btn-info btn-sm">
                         Detail
                     </a>
                 </td>

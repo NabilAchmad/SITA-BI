@@ -215,7 +215,6 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/force-delete-all', [PengumumanController::class, 'forceDeleteAll'])->name('force-delete-all');
         });
 
-<<<<<<< HEAD
         // ROUTE SIDANG
         Route::prefix('sidang')->group(function () {
             Route::get('dashboard-sidang', [JadwalSidangAkhirController::class, 'dashboard'])->name('dosen.sidang.index');
@@ -244,13 +243,11 @@ Route::middleware(['auth'])->group(function () {
                 Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
             });
         });
-=======
         Route::resource('pengumuman', PengumumanController::class);
         // Rute tambahan untuk pengumuman (trash, restore, dll.) bisa ditambahkan di sini
         // Tambahkan grup ini untuk semua rute kustom terkait pengumuman
 
         Route::get('/laporan', [LaporanController::class, 'show'])->name('laporan.index');
         Route::get('/log-aktivitas', [LogController::class, 'index'])->name('log.index');
->>>>>>> edd5cb081ca92bf93df55e693e7f4265540d66be
     });
 });

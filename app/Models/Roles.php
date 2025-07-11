@@ -6,7 +6,7 @@ namespace App\Models;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 // Buat class Roles Anda mewarisi (extends) model Spatie
-class Role extends SpatieRole
+class Roles extends SpatieRole
 {
     // Kosongkan saja isinya untuk saat ini
 }
