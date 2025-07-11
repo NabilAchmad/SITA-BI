@@ -191,7 +191,7 @@ class TugasAkhirService
     {
         return $this->mahasiswa->tugasAkhir()
             ->active()
-            ->with(['peranDosenTa.dosen.user', 'revisiTa', 'dokumenTa', 'bimbinganTa'])
+            ->with(['peranDosenTa.dosen.user', 'dokumenTa', 'bimbinganTa'])
             ->first();
     }
 }

@@ -1,20 +1,24 @@
 {{-- Log Bimbingan Terpusat (Versi Final Anti-Error & Informatif) --}}
+{{-- Log Bimbingan Terpusat (Hanya Menampilkan 1 Aktivitas Terbaru) --}}
 <div class="mb-4">
-    @forelse ($catatanList as $catatan)
+    @php
+        // Mengambil hanya satu item terakhir dari koleksi catatanList
+        $latestCatatan = $catatanList->last();
+    @endphp
+
+    @if ($latestCatatan)
+        {{-- Variabel $catatan di-set agar bisa menggunakan blok HTML yang sama --}}
         @php
-            // STYLE: Menentukan apakah penulis adalah Dosen untuk styling kondisional
+            $catatan = $latestCatatan;
             $isDosen = $catatan->author_type === 'App\Models\Dosen';
         @endphp
-        <div class="mb-4">
-            {{-- Card Utama --}}
-            {{-- STYLE: Menambahkan class untuk alignment berbeda antara dosen dan mahasiswa --}}
-            <div class="card shadow-sm border-0 overflow-hidden {{ $isDosen ? 'dosen-post' : 'mahasiswa-post' }}">
 
+        {{-- Card Utama untuk menampilkan satu log --}}
+        <div class="mb-4">
+            <div class="card shadow-sm border-0 overflow-hidden {{ $isDosen ? 'dosen-post' : 'mahasiswa-post' }}">
                 {{-- Header dengan Avatar dan Info User --}}
-                {{-- STYLE: Menggunakan flex-row-reverse untuk Dosen agar avatar di kanan --}}
                 <div class="card-header bg-white border-0 py-3">
                     <div class="d-flex align-items-center gap-3 {{ $isDosen ? 'flex-row-reverse' : '' }}">
-
                         {{-- Avatar --}}
                         <div class="flex-shrink-0">
                             @if ($catatan->author?->user)
@@ -35,84 +39,56 @@
                                 </div>
                             @endif
                         </div>
-
                         {{-- Info User --}}
-                        {{-- STYLE: Menyesuaikan alignment teks untuk Dosen --}}
                         <div class="flex-grow-1 {{ $isDosen ? 'text-end' : '' }}">
                             <div
                                 class="d-flex align-items-center gap-2 mb-1 {{ $isDosen ? 'justify-content-end' : '' }}">
                                 <h6 class="mb-0 fw-bold text-dark">
-                                    {{ $catatan->author?->user?->name ?? 'Pengguna tidak ditemukan' }}
-                                </h6>
+                                    {{ $catatan->author?->user?->name ?? 'Pengguna tidak ditemukan' }}</h6>
                                 @if ($isDosen)
-                                    <span class="badge bg-primary-subtle text-primary px-2 py-1 rounded-pill">
-                                        <i class="bi bi-mortarboard me-1"></i>Dosen
-                                    </span>
+                                    <span class="badge bg-primary-subtle text-primary px-2 py-1 rounded-pill"><i
+                                            class="bi bi-mortarboard me-1"></i>Dosen</span>
                                 @else
-                                    <span class="badge bg-info-subtle text-info px-2 py-1 rounded-pill">
-                                        <i class="bi bi-person-badge me-1"></i>Mahasiswa
-                                    </span>
+                                    <span class="badge bg-info-subtle text-info px-2 py-1 rounded-pill"><i
+                                            class="bi bi-person-badge me-1"></i>Mahasiswa</span>
                                 @endif
                             </div>
-                            <small class="text-muted">
-                                <i class="bi bi-clock me-1"></i>{{ $catatan->created_at->diffForHumans() }}
-                            </small>
+                            <small class="text-muted"><i
+                                    class="bi bi-clock me-1"></i>{{ $catatan->created_at->diffForHumans() }}</small>
                         </div>
-
-                        {{-- Error Badge jika ada masalah, diposisikan di ujung --}}
-                        @if (!$catatan->author?->user)
-                            <div class="flex-shrink-0 ms-auto">
-                                <span class="badge bg-danger-subtle text-danger px-2 py-1">
-                                    <i class="bi bi-exclamation-triangle me-1"></i>
-                                    Error: {{ Str::afterLast($catatan->author_type, '\\') }} ID:
-                                    {{ $catatan->author_id }}
-                                </span>
-                            </div>
-                        @endif
                     </div>
                 </div>
-
                 {{-- Body dengan Konten --}}
                 <div class="card-body p-4">
-                    {{-- FIX: Logika if/else yang benar untuk memisahkan tampilan file dan teks --}}
                     @if (str_starts_with($catatan->catatan, 'UPLOAD_ID:'))
                         @php
                             $dokumenId = Str::after($catatan->catatan, 'UPLOAD_ID:');
                             $dokumen = \App\Models\DokumenTa::find($dokumenId);
                         @endphp
-                        {{-- File Upload Content --}}
                         <div class="upload-content">
                             <div class="row align-items-center g-3">
                                 <div class="col-auto">
-                                    <div class="upload-icon">
-                                        <i class="bi bi-file-earmark-arrow-up-fill"></i>
-                                    </div>
+                                    <div class="upload-icon"><i class="bi bi-file-earmark-arrow-up-fill"></i></div>
                                 </div>
                                 <div class="col">
-                                    <h6 class="mb-1 fw-semibold text-success">
-                                        <i class="bi bi-check-circle-fill me-2"></i>File Baru Diunggah
-                                    </h6>
-                                    <p class="text-muted mb-2 small">
-                                        Mahasiswa telah mengunggah dokumen baru untuk ditinjau.
-                                    </p>
+                                    <h6 class="mb-1 fw-semibold text-success"><i
+                                            class="bi bi-check-circle-fill me-2"></i>File Baru Diunggah</h6>
+                                    <p class="text-muted mb-2 small">Mahasiswa telah mengunggah dokumen baru untuk
+                                        ditinjau.</p>
                                     @if ($dokumen)
                                         <a href="{{ asset('storage/' . $dokumen->file_path) }}" target="_blank"
                                             class="btn btn-outline-success btn-sm rounded-pill">
                                             <i class="bi bi-download me-1"></i> Unduh File
-                                            ({{ \Illuminate\Support\Str::limit($dokumen->nama_file, 20) }})
                                         </a>
                                     @else
-                                        <span class="badge bg-danger-subtle text-danger px-2 py-1">
-                                            <i class="bi bi-exclamation-triangle me-1"></i>File tidak ditemukan
-                                        </span>
+                                        <span class="badge bg-danger-subtle text-danger px-2 py-1"><i
+                                                class="bi bi-exclamation-triangle me-1"></i>File tidak ditemukan</span>
                                     @endif
                                 </div>
                             </div>
                         </div>
                     @else
-                        {{-- Text Content --}}
                         <div class="text-content">
-                            {{-- STYLE: Message bubble menyesuaikan dengan pengirim (Dosen/Mahasiswa) --}}
                             <div class="message-bubble {{ $isDosen ? 'dosen-bubble' : 'mahasiswa-bubble' }}">
                                 <p class="mb-0 lh-base" style="white-space: pre-wrap;">{{ $catatan->catatan }}</p>
                             </div>
@@ -121,18 +97,25 @@
                 </div>
             </div>
         </div>
-    @empty
-        {{-- Empty State --}}
+
+        {{-- Tombol untuk melihat semua riwayat (jika ada lebih dari 1) --}}
+        @if ($catatanList->count() > 1)
+            <div class="text-center mt-3">
+                <a href="#" class="btn btn-outline-secondary btn-sm rounded-pill">
+                    <i class="bi bi-collection me-1"></i> Lihat Semua {{ $catatanList->count() }} Aktivitas
+                </a>
+            </div>
+        @endif
+    @else
+        {{-- Tampilan jika log benar-benar kosong --}}
         <div class="text-center py-5">
             <div class="empty-state">
-                <div class="empty-icon mb-3">
-                    <i class="bi bi-chat-square-dots"></i>
-                </div>
+                <div class="empty-icon mb-3"><i class="bi bi-chat-square-dots"></i></div>
                 <h6 class="text-muted mb-2">Belum ada aktivitas bimbingan</h6>
                 <p class="text-muted small mb-0">Mulai diskusi dengan menulis catatan pertama.</p>
             </div>
         </div>
-    @endforelse
+    @endif
 </div>
 
 <hr class="my-4">

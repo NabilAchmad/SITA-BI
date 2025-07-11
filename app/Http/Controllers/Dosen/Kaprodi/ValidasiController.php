@@ -11,20 +11,16 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request; // <-- Jangan lupa tambahkan ini jika belum ada
+use Illuminate\Http\Request;
 
 class ValidasiController extends Controller
 {
     use AuthorizesRequests;
 
-    public function __construct(protected ValidasiService $validasiService)
-    {
-        // Konstruktor dibiarkan kosong, otorisasi ditangani per-metode.
-    }
+    public function __construct(protected ValidasiService $validasiService) {}
 
     public function index(): View
     {
-        // ✅ PERBAIKAN: Tambahkan otorisasi untuk melihat halaman utama.
         $this->authorize('viewAny', TugasAkhir::class);
 
         try {
@@ -40,29 +36,50 @@ class ValidasiController extends Controller
         }
     }
 
-
-
+    /**
+     * [PERBAIKAN UTAMA DI SINI]
+     * Mengambil detail Tugas Akhir dan mempersiapkan data untuk ditampilkan di frontend.
+     */
+     /**
+     * [PERBAIKAN KUNCI DI SINI]
+     * Menghapus pemanggilan ke service dan membangun array JSON langsung di controller.
+     */
     public function getDetail(Request $request, TugasAkhir $tugasAkhir): JsonResponse
     {
         try {
             $this->authorize('view', $tugasAkhir);
 
-            $tugasAkhir->load(['mahasiswa.user', 'disetujui_oleh', 'ditolak_oleh']);
+            // 1. Eager load semua relasi yang dibutuhkan dengan benar.
+            $tugasAkhir->load(['mahasiswa.user', 'approver', 'rejecter']);
 
-            // 1. Ambil data mentah dari service
-            $details = $this->validasiService->getValidationDetails($tugasAkhir);
+            // 2. [DIHAPUS] Tidak perlu lagi memanggil service untuk detail.
+            // $details = $this->validasiService->getValidationDetails($tugasAkhir);
 
-            // 2. ✅ Tentukan hak akses secara terpisah
-            // 'actionable' HANYA untuk tombol Setujui/Tolak (berdasarkan policy 'update')
-            $details['actionable'] = $tugasAkhir->status === 'diajukan' && $request->user()->can('update', $tugasAkhir);
+            // 3. [BARU] Buat array response langsung di sini. Ini menjadi satu-satunya sumber kebenaran.
+            $details = [
+                'nama' => $tugasAkhir->mahasiswa?->user?->name ?? 'N/A',
+                'nim' => $tugasAkhir->mahasiswa?->nim ?? '-',
+                'prodi' => $tugasAkhir->mahasiswa?->prodi ?? 'N/A',
+                'judul' => $tugasAkhir->judul,
 
-            // 'can_check_similarity' untuk tombol Cek Kemiripan (berdasarkan policy 'cekKemiripan')
-            $details['can_check_similarity'] = $request->user()->can('cekKemiripan', $tugasAkhir);
+                // Gunakan relasi yang sudah benar ('approver' dan 'rejecter')
+                'approver_name' => $tugasAkhir->approver?->name,
+                'rejecter_name' => $tugasAkhir->rejecter?->name,
+                
+                // Format tanggal
+                'formatted_approval_date' => $tugasAkhir->tanggal_disetujui?->translatedFormat('d F Y'),
+                'formatted_rejection_date' => $tugasAkhir->tanggal_ditolak?->translatedFormat('d F Y'),
+                'alasan_penolakan' => $tugasAkhir->alasan_penolakan,
 
-            // 3. Kirim data lengkap ke front-end
+                // Tentukan hak akses
+                'actionable' => $tugasAkhir->status === 'diajukan' && $request->user()->can('update', $tugasAkhir),
+                'can_check_similarity' => $request->user()->can('cekKemiripan', $tugasAkhir),
+            ];
+
             return response()->json($details);
+
         } catch (\Exception $e) {
-            Log::error("Gagal mengambil detail TA #{$tugasAkhir->id}: " . $e->getMessage());
+            Log::error("Gagal mengambil detail TA #{$tugasAkhir->id}: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
             return response()->json(['error' => 'Tidak dapat mengambil detail data. Terjadi kesalahan pada server.'], 500);
         }
     }
@@ -70,9 +87,7 @@ class ValidasiController extends Controller
     public function cekKemiripan(TugasAkhir $tugasAkhir): JsonResponse
     {
         try {
-            // ✅ PERBAIKAN: Panggil metode policy 'cekKemiripan' yang sudah dibuat.
             $this->authorize('cekKemiripan', $tugasAkhir);
-
             $hasil = $this->validasiService->cekKemiripanJudulCerdas($tugasAkhir);
             return response()->json($hasil);
         } catch (\Exception $e) {
@@ -84,9 +99,7 @@ class ValidasiController extends Controller
     public function terima(TugasAkhir $tugasAkhir): RedirectResponse
     {
         try {
-            // Otorisasi ini sudah benar.
             $this->authorize('update', $tugasAkhir);
-
             $this->validasiService->approveTugasAkhir($tugasAkhir);
             return redirect()->back()->with('alert', [
                 'type' => 'success',
@@ -106,9 +119,7 @@ class ValidasiController extends Controller
     public function tolak(RejectTugasAkhirRequest $request, TugasAkhir $tugasAkhir): RedirectResponse
     {
         try {
-            // Otorisasi ini sudah benar.
             $this->authorize('update', $tugasAkhir);
-
             $this->validasiService->rejectTugasAkhir(
                 $tugasAkhir,
                 $request->validated()['alasan_penolakan']
