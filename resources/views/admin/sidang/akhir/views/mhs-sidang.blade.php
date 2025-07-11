@@ -89,11 +89,11 @@
                 const jadwalBtn = e.target.closest('.btn-jadwalkan');
                 if (jadwalBtn) {
                     const data = {
-                        sidangId: jadwalBtn.dataset.sidangId,
+                        sidangId: jadwalBtn.dataset.tugasAkhirId,
                         nama: jadwalBtn.dataset.nama,
                         nim: jadwalBtn.dataset.nim,
                         judul: jadwalBtn.dataset.judul,
-                        urlPenguji: jadwalBtn.dataset.url
+                        urlPenguji: jadwalBtn.dataset.urlPenguji
                     };
                     openPengujiModal(data);
                 }

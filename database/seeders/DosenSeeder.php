@@ -76,13 +76,11 @@ class DosenSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
-            // 3. Berikan role dosen
-            DB::table('user_roles')->insert([
-                'user_id' => $userId,
-                'role_id' => 4,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // 3. Berikan role dosen menggunakan Spatie assignRole
+            $user = \App\Models\User::find($userId);
+            if ($user) {
+                $user->assignRole('dosen');
+            }
 
             // 50% kemungkinan dosen mengajukan topik penelitian
             if ($index % 2 === 0) {

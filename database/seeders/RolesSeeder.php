@@ -4,20 +4,45 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolesSeeder extends Seeder
 {
     public function run(): void
     {
         // Reset cache roles dan permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Buat permissions
+        $permissions = [
+            'manage sidang',
+            'manage user accounts',
+            'view laporan',
+            'manage pengumuman',
+            'manage tugas akhir',
+            'manage bimbingan',
+            'manage penilaian',
+            // Add other permissions as needed
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
 
         // Buat roles
-        Role::create(['name' => 'admin']);
-        Role::create(['name' => 'kaprodi-d3']);
-        Role::create(['name' => 'kaprodi-d4']);
-        Role::create(['name' => 'kajur']);
-        Role::create(['name' => 'dosen']);
-        Role::create(['name' => 'mahasiswa']);
+        $roles = [
+            'admin' => ['manage sidang', 'manage user accounts', 'view laporan', 'manage pengumuman', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
+            'kaprodi-d3' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
+            'kaprodi-d4' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
+            'kajur' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
+            'dosen' => ['manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
+            'mahasiswa' => [],
+        ];
+
+        foreach ($roles as $roleName => $rolePermissions) {
+            $role = Role::firstOrCreate(['name' => $roleName]);
+            $role->syncPermissions($rolePermissions);
+        }
     }
 }

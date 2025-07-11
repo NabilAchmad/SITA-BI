@@ -1,5 +1,9 @@
 @props(['collection', 'type', 'headers'])
 
+@php
+    $type = $type ?? 'menunggu';
+@endphp
+
 @forelse($collection as $item)
     @switch($type)
         {{-- ================================================================= --}}
@@ -24,12 +28,13 @@
                 <td>{{ $item->tugasAkhir->judul ?? '-' }}</td>
                 <td class="text-center"><span class="badge bg-secondary">Draft</span></td>
                 <td class="text-center">
-                    <button type="button" class="btn btn-primary btn-sm btn-workflow-jadwal"
+                    <button type="button" class="btn btn-primary btn-sm btn-jadwalkan"
                         data-tugas-akhir-id="{{ $item->tugasAkhir->id }}" data-nama="{{ $item->user->name ?? '-' }}"
                         data-nim="{{ $item->nim ?? '-' }}" data-judul="{{ $item->tugasAkhir->judul ?? '-' }}"
-                        data-url-penguji="{{ route('jadwal-sempro.simpanPenguji', ['tugas_akhir_id' => $item->tugasAkhir->id]) }}">
+                        data-url-penguji="{{ route('jadwal-sidang.simpanPenguji', ['sidang_id' => $item->tugasAkhir->sidangTerakhir->id ?? 0]) }}">
                         Jadwalkan
                     </button>
+
                 </td>
             </tr>
         @break

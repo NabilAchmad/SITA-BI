@@ -6,9 +6,8 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\User;
-use App\Models\Role;
-use App\Models\UserRole;
 use App\Models\Mahasiswa;
+use Spatie\Permission\Models\Role;
 use Faker\Factory as Faker;
 
 class MahasiswaSeeder extends Seeder
@@ -28,11 +27,8 @@ class MahasiswaSeeder extends Seeder
             'password' => Hash::make('password'), // Ganti jika perlu
         ]);
 
-        // Relasi user-role
-        UserRole::create([
-            'user_id' => $user->id,
-            'role_id' => $mahasiswaRole->id,
-        ]);
+        // Assign role mahasiswa menggunakan Spatie
+        $user->assignRole('mahasiswa');
 
         // Masukkan data ke tabel mahasiswa
         Mahasiswa::create([
