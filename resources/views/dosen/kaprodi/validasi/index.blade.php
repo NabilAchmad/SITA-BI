@@ -255,24 +255,21 @@
 
             async function showDetail(id) {
                 resetModalUI();
-
                 try {
-                    // ✅ FINAL: Menggunakan route name yang lengkap dan benar
                     const urlTemplate = "{{ route('jurusan.validasi-judul.detail', ['tugasAkhir' => ':id']) }}";
                     const url = urlTemplate.replace(':id', id);
-
                     const response = await fetch(url);
                     if (!response.ok) {
                         throw new Error(`Server merespons dengan status: ${response.status}`);
                     }
                     const data = await response.json();
-
                     fillModalDetails(data, id);
-
                     const btnCek = document.getElementById('btn-cek-kemiripan');
                     if (btnCek) {
                         btnCek.onclick = () => handleCekKemiripan(id);
                     }
+                    // Inisialisasi modal di sini jika belum
+                    const modalDetailTA = new bootstrap.Modal(document.getElementById('modalDetailTA'));
                     modalDetailTA.show();
                 } catch (error) {
                     console.error('Gagal memuat detail:', error);
@@ -346,42 +343,51 @@
             }
 
             function fillModalDetails(data, id) {
-                document.getElementById('modalNama').innerText = data.nama || '-';
-                document.getElementById('modalNim').innerText = data.nim || '-';
-                document.getElementById('modalProdi').innerText = data.prodi || '-';
-                document.getElementById('modalJudul').innerText = data.judul || '-';
+    document.getElementById('modalNama').innerText = data.nama || '-';
+    document.getElementById('modalNim').innerText = data.nim || '-';
 
-                // ✅ FINAL: Menggunakan route name yang lengkap dan benar untuk form actions
-                const terimaUrlTemplate = "{{ route('jurusan.validasi-judul.terima', ['tugasAkhir' => ':id']) }}";
-                const tolakUrlTemplate = "{{ route('jurusan.validasi-judul.tolak', ['tugasAkhir' => ':id']) }}";
+    // [PERBAIKAN] Menambahkan logika untuk menampilkan nama prodi secara lengkap.
+    const prodiElement = document.getElementById('modalProdi');
+    if (data.prodi && data.prodi.toLowerCase() === 'd4') {
+        prodiElement.innerText = 'D4 Bahasa Inggris';
+    } else if (data.prodi && data.prodi.toLowerCase() === 'd3') {
+        prodiElement.innerText = 'D3 Bahasa Inggris';
+    } else {
+        // Fallback jika data tidak cocok atau kosong
+        prodiElement.innerText = data.prodi || '-';
+    }
 
-                document.getElementById('formValidasi').action = terimaUrlTemplate.replace(':id', id);
-                document.getElementById('formTolak').action = tolakUrlTemplate.replace(':id', id);
+    document.getElementById('modalJudul').innerText = data.judul || '-';
 
-                // ✅ PERBAIKAN: Gunakan flag yang benar untuk setiap elemen
+    const terimaUrlTemplate = "{{ route('jurusan.validasi-judul.terima', ['tugasAkhir' => ':id']) }}";
+    const tolakUrlTemplate = "{{ route('jurusan.validasi-judul.tolak', ['tugasAkhir' => ':id']) }}";
 
-                // 1. Tombol Setujui/Tolak tetap menggunakan 'data.actionable'
-                document.getElementById('wrapActionButtons').classList.toggle('d-none', !data.actionable);
+    document.getElementById('formValidasi').action = terimaUrlTemplate.replace(':id', id);
+    document.getElementById('formTolak').action = tolakUrlTemplate.replace(':id', id);
 
-                // 2. Bagian Cek Kemiripan sekarang menggunakan flag baru 'data.can_check_similarity'
-                document.getElementById('pengecekan-kemiripan-section').classList.toggle('d-none', !data
-                    .can_check_similarity);
+    document.getElementById('wrapActionButtons').classList.toggle('d-none', !data.actionable);
+    document.getElementById('pengecekan-kemiripan-section').classList.toggle('d-none', !data
+        .can_check_similarity);
 
-                const wrapDiterima = document.getElementById('wrapDiterima');
-                wrapDiterima.classList.toggle('d-none', !data.disetujui_oleh);
-                if (data.disetujui_oleh) {
-                    wrapDiterima.innerHTML =
-                        `<strong>Telah Disetujui</strong> oleh <strong>${data.disetujui_oleh}</strong> pada ${data.tanggal_disetujui}.`;
-                }
+    // Menggunakan key baru dari JSON response yang dikirim controller.
+    const wrapDiterima = document.getElementById('wrapDiterima');
+    // Tampilkan info jika 'approver_name' ada isinya.
+    wrapDiterima.classList.toggle('d-none', !data.approver_name);
+    if (data.approver_name) {
+        // Gunakan 'approver_name' dan 'formatted_approval_date' untuk ditampilkan.
+        wrapDiterima.innerHTML =
+            `<strong>Telah Disetujui</strong> oleh <strong>${data.approver_name}</strong>`;
+    }
 
-                const wrapDitolak = document.getElementById('wrapDitolak');
-                wrapDitolak.classList.toggle('d-none', !data.alasan_penolakan);
-                if (data.alasan_penolakan) {
-                    wrapDitolak.innerHTML =
-                        `<strong>Telah Ditolak</strong> oleh <strong>${data.ditolak_oleh}</strong> pada ${data.tanggal_ditolak}.<br><strong>Alasan:</strong> ${data.alasan_penolakan}`;
-                }
-            }
-
+    const wrapDitolak = document.getElementById('wrapDitolak');
+    // Tampilkan info jika 'alasan_penolakan' ada isinya.
+    wrapDitolak.classList.toggle('d-none', !data.alasan_penolakan);
+    if (data.alasan_penolakan) {
+        // Gunakan 'rejecter_name' dan 'formatted_rejection_date'.
+        wrapDitolak.innerHTML =
+            `<strong>Telah Ditolak</strong> oleh <strong>${data.rejecter_name}</strong> pada ${data.formatted_rejection_date}.<br><strong>Alasan:</strong> ${data.alasan_penolakan}`;
+    }
+}
             function resetModalUI() {
                 // ... (Fungsi ini tidak perlu diubah) ...
                 const container = document.getElementById('hasil-kemiripan-container');

@@ -14,7 +14,6 @@
                 @csrf
                 <div class="modal-body py-4">
 
-                    {{-- ✅ PERBAIKAN: Tambahkan dropdown untuk memilih jenis dokumen --}}
                     <div class="mb-4">
                         <label for="jenis_dokumen_{{ $tugasAkhir->id }}" class="form-label fw-semibold">Jenis
                             Dokumen</label>
@@ -28,7 +27,7 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="file_upload_{{ $tugasAkhir->id }}" class="form-label fw-semibold">
                             <i class="fas fa-file-alt me-1"></i> Pilih File
                         </label>
@@ -38,6 +37,15 @@
                             <small><i class="fas fa-info-circle me-1"></i> Format: PDF, DOC, DOCX (Maks: 25MB)</small>
                         </div>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="catatan_upload_{{ $tugasAkhir->id }}" class="form-label fw-semibold">
+                            <i class="bi bi-chat-left-text me-1"></i> Catatan (Opsional)
+                        </label>
+                        <textarea name="catatan" id="catatan_upload_{{ $tugasAkhir->id }}" class="form-control" rows="3"
+                            placeholder="Tinggalkan pesan singkat untuk dosen jika perlu..."></textarea>
+                    </div>
+
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">

@@ -64,7 +64,7 @@
 
                 {{-- Dashboard Utama --}}
                 <li
-                    class="nav-item {{ request()->is(str_replace(url('/'), '', $dashboardRoute) . '*') ? 'active' : '' }}">
+                    class="nav-item {{ Route::currentRouteName() === \Illuminate\Support\Facades\Route::getRoutes()->match(Request::create($dashboardRoute))->getName() ? 'active' : '' }}">
                     <a href="{{ $dashboardRoute }}"><i class="fas fa-home"></i>
                         <p>Dashboard</p>
                     </a>

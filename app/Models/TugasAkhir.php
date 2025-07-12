@@ -29,9 +29,11 @@ class TugasAkhir extends Model
     protected $table = 'tugas_akhir';
     protected $guarded = ['id'];
     protected $casts = [
-        'tanggal_pengajuan' => 'date',
-        'tanggal_mulai' => 'date',
-        'tanggal_selesai' => 'date',
+        'tanggal_pengajuan' => 'datetime',
+        'tanggal_mulai' => 'datetime',
+        'tanggal_selesai' => 'datetime',
+        'tanggal_disetujui' => 'datetime', // <-- Ditambahkan
+        'tanggal_ditolak' => 'datetime',   // <-- Ditambahkan
     ];
 
     // --- RELASI DASAR ---
@@ -43,11 +45,6 @@ class TugasAkhir extends Model
     public function peranDosenTa(): HasMany
     {
         return $this->hasMany(PeranDosenTa::class);
-    }
-
-    public function revisiTa(): HasMany
-    {
-        return $this->hasMany(RevisiTa::class);
     }
 
     public function bimbinganTa(): HasMany
@@ -92,12 +89,12 @@ class TugasAkhir extends Model
         );
     }
 
-    public function disetujui_oleh()
+    public function approver()
     {
         return $this->belongsTo(User::class, 'disetujui_oleh');
     }
 
-    public function ditolak_oleh()
+    public function rejecter()
     {
         return $this->belongsTo(User::class, 'ditolak_oleh');
     }

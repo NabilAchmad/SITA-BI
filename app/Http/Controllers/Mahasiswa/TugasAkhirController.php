@@ -22,8 +22,23 @@ class TugasAkhirController extends Controller
 
     public function progress()
     {
+        // Service akan mengambil semua data yang dibutuhkan
         $data = $this->tugasAkhirService->getProgressPageData();
-        return view('mahasiswa.tugas-akhir.crud-ta.progress', $data);
+
+        // Jika tidak ada data TA aktif, tampilkan view khusus untuk itu
+        if (!$data['tugasAkhir']) {
+            return view('mahasiswa.tugas-akhir.partials._progress_empty');
+        }
+
+        // Kirim semua data yang sudah disiapkan oleh Service ke satu view progress yang utama
+        return view('mahasiswa.tugas-akhir.crud-ta.progress', [
+            'tugasAkhir'       => $data['tugasAkhir'],
+            'catatanList'      => $data['catatanList'],
+            'bimbinganCountP1' => $data['bimbinganCountP1'],
+            'bimbinganCountP2' => $data['bimbinganCountP2'],
+            'pembimbing1'      => $data['pembimbing1'],
+            'pembimbing2'      => $data['pembimbing2'],
+        ]);
     }
 
     /**
@@ -56,7 +71,8 @@ class TugasAkhirController extends Controller
         $this->tugasAkhirService->handleUploadFile(
             $tugasAkhir,
             $request->file('file'),
-            $request->input('jenis_dokumen')
+            $request->input('jenis_dokumen'),
+            $request->input('catatan') // ✅ Tambahkan parameter catatan
         );
 
         // DIUBAH: Menggunakan format notifikasi baru

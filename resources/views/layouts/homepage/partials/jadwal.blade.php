@@ -42,38 +42,6 @@
                         @endforelse
                     </div>
                 </div>
-
-                <!-- SEMINAR -->
-                <div id="seminar" class="tab-content d-none">
-                    <div class="row row-cols-1 row-cols-md-2 g-4">
-                        <div class="col">
-                            <div class="card border-success shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title text-success">Dinda Rahmawati</h5>
-                                    <p class="card-text">
-                                        <strong>Topik:</strong> Game Edukasi untuk Anak Usia Dini<br>
-                                        <strong>Waktu:</strong> Kamis, 25 April 2025 - 13:00 WIB<br>
-                                        <strong>Ruang:</strong> B102<br>
-                                        <strong>Dosen:</strong> Dr. Andi Nugroho, M.Pd
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="card border-success shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title text-success">Rahmat Aditya</h5>
-                                    <p class="card-text">
-                                        <strong>Topik:</strong> UI/UX Design untuk Mobile Banking<br>
-                                        <strong>Waktu:</strong> Jumat, 26 April 2025 - 09:00 WIB<br>
-                                        <strong>Ruang:</strong> B103<br>
-                                        <strong>Dosen:</strong> Dr. Sinta Marlina
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 

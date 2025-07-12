@@ -2,32 +2,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class CatatanBimbingan extends Model
 {
+    use HasFactory;
+
     protected $table = 'catatan_bimbingan';
 
-    protected $fillable = [
-        'bimbingan_ta_id',
-        'author_type',
-        'author_id',
-        'catatan',
-    ];
+    protected $guarded = ['id'];
 
-    // Relasi ke bimbingan
-    public function bimbinganTa()
+    /**
+     * Relasi ke sesi bimbingan (induknya).
+     */
+    public function bimbinganTa(): BelongsTo
     {
-        return $this->belongsTo(BimbinganTa::class, 'bimbingan_ta_id');
+        return $this->belongsTo(BimbinganTA::class, 'bimbingan_ta_id');
     }
 
-    // Opsional: relasi ke mahasiswa/dosen (polimorfik manual)
-    public function author()
+    /**
+     * ✅ [PERBAIKAN FINAL DAN KUNCI]
+     * Definisikan relasi polimorfik 'author' dengan benar menggunakan morphTo().
+     * Ini akan secara otomatis menemukan Dosen atau Mahasiswa berdasarkan
+     * isi kolom 'author_type' dan 'author_id'.
+     */
+    public function author(): MorphTo
     {
-        if ($this->author_type === 'mahasiswa') {
-            return $this->belongsTo(Mahasiswa::class, 'author_id');
-        } else {
-            return $this->belongsTo(Dosen::class, 'author_id');
-        }
+        return $this->morphTo();
     }
 }

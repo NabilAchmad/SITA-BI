@@ -21,6 +21,8 @@ use App\Http\Controllers\Dosen\BimbinganMahasiswaController;
 use App\Http\Controllers\Dosen\DosenProfileController;
 use App\Http\Controllers\Dosen\PenilaianSidangController;
 use App\Http\Controllers\Dosen\TawaranTopikController;
+use App\Http\Controllers\Dosen\JadwalBimbinganController;
+use App\Http\Controllers\Dosen\CatatanBimbinganController;
 // Panel Mahasiswa
 use App\Http\Controllers\Mahasiswa\BimbinganController;
 use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboardController;
@@ -28,6 +30,7 @@ use App\Http\Controllers\Mahasiswa\MahasiswaProfileController;
 use App\Http\Controllers\Mahasiswa\PendaftaranSidangController;
 use App\Http\Controllers\Mahasiswa\TopikController;
 use App\Http\Controllers\Mahasiswa\TugasAkhirController;
+use App\Http\Controllers\Mahasiswa\CatatanBimbinganController as MahasiswaCatatanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +61,8 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('/otp-resend', [AuthController::class, 'resendOtp'])->name('otp.resend');
 });
 
+// Tambahkan alias route "login" default Laravel
+Route::get('/login', fn() => redirect()->route('auth.login'))->name('login');
 
 //======================================================================
 // RUTE YANG MEMBUTUHKAN AUTENTIKASI
@@ -77,13 +82,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('progress');
             Route::get('/ajukan-mandiri', [TugasAkhirController::class, 'ajukanForm'])->name('ajukan');
             Route::post('/ajukan-mandiri', [TugasAkhirController::class, 'store'])->name('store');
-
-            /**
-             * ✅ PENAMBAHAN: Rute untuk upload file.
-             * Menggunakan metode POST dan menyertakan {tugasAkhir} untuk menunjukkan
-             * file ini di-upload untuk tugas akhir yang mana.
-             * Nama rutenya adalah 'mahasiswa.tugas-akhir.upload-file'.
-             */
             Route::post('/{tugasAkhir}/upload-file', [TugasAkhirController::class, 'uploadFile'])->name('upload-file');
 
             // Rute untuk MELIHAT halaman riwayat tugas akhir yang dibatalkan.
@@ -93,6 +91,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/ambil-topik/{topik}', [TopikController::class, 'apply'])->name('topik.ambil');
             Route::get('/cancel', [TugasAkhirController::class, 'showCancelled'])->name('show.cancel');
             Route::post('/{tugasAkhir}/cancel', [TugasAkhirController::class, 'cancel'])->name('cancel');
+
+            Route::post('tugas-akhir/{tugasAkhir}/catatan', [MahasiswaCatatanController::class, 'store'])->name('catatan.store');
         });
 
         Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
@@ -120,32 +120,39 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/profile', [DosenProfileController::class, 'profile'])->name('profile');
         Route::put('/profile/update', [DosenProfileController::class, 'update'])->name('profile.update');
 
+        // Grup untuk halaman utama bimbingan
         Route::prefix('bimbingan-mahasiswa')->name('bimbingan.')->group(function () {
-            Route::get('/', [BimbinganMahasiswaController::class, 'dashboard'])->name('index');
-            Route::get('/detail/{id}', [BimbinganMahasiswaController::class, 'showDetail'])->name('detail');
-            Route::post('/setujui/{bimbingan}', [BimbinganMahasiswaController::class, 'setujui'])->name('setujui');
-            Route::post('/tolak/{bimbingan}', [BimbinganMahasiswaController::class, 'tolakBimbingan'])->name('tolak');
+            // Halaman dasbor menampilkan daftar mahasiswa
+            Route::get('/', [BimbinganMahasiswaController::class, 'index'])->name('index');
+
+            // Halaman detail/pusat komando untuk satu mahasiswa
+            Route::get('/show/{tugasAkhir}', [BimbinganMahasiswaController::class, 'show'])->name('show');
+        });
+
+        // Grup untuk aksi-aksi spesifik terkait bimbingan
+        Route::prefix('tugas-akhir/{tugasAkhir}')->group(function () {
+            Route::post('/jadwal', [JadwalBimbinganController::class, 'store'])->name('jadwal.store');
+
+            // Route untuk menambah catatan/feedback baru
+            Route::post('/catatan', [CatatanBimbinganController::class, 'store'])->name('catatan.store');
+
+            // routes/web.php
+            Route::post('/bimbingan/{bimbingan}/selesai', [JadwalBimbinganController::class, 'selesaikan'])->name('jadwal.selesai');
+            // routes/web.php
+
+            // ✅ PERBAIKAN: Route untuk membatalkan sesi. Perhatikan {bimbingan} bukan {tugasAkhir}
+            Route::post('/bimbingan/{bimbingan}/cancel', [JadwalBimbinganController::class, 'cancel'])->name('jadwal.cancel');
+
+            // (Nantinya route untuk persetujuan sidang bisa ditambahkan di sini)
+            // Route::post('/setujui-sidang', [PersetujuanSidangController::class, 'store'])->name('sidang.approve');
         });
 
         Route::prefix('tawaran-topik')->name('tawaran-topik.')->group(function () {
-
-            // Rute untuk menampilkan halaman data yang sudah di-soft delete (sampah)
             Route::get('/trash', [TawaranTopikController::class, 'trashed'])->name('trashed');
-
-            // Rute untuk mengembalikan satu data dari sampah
-            // Menggunakan POST karena ini adalah sebuah aksi yang mengubah state data.
             Route::post('/{id}/restore', [TawaranTopikController::class, 'restore'])->name('restore');
-
-            // Rute untuk menghapus satu data secara permanen dari sampah
             Route::delete('/{id}/force-delete', [TawaranTopikController::class, 'forceDelete'])->name('force-delete');
-
-            // Rute untuk menghapus semua data di dalam sampah secara permanen
             Route::delete('/force-delete-all', [TawaranTopikController::class, 'forceDeleteAll'])->name('force-delete-all');
-
-            // Rute untuk menyetujui pengajuan topik dari mahasiswa
             Route::post('/approve/{application}', [TawaranTopikController::class, 'approveApplication'])->name('approveApplication');
-
-            // Rute untuk menolak pengajuan topik dari mahasiswa
             Route::post('/reject/{application}', [TawaranTopikController::class, 'rejectApplication'])->name('rejectApplication');
         });
 

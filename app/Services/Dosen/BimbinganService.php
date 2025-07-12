@@ -3,13 +3,12 @@
 namespace App\Services\Dosen;
 
 use App\Models\BimbinganTA;
+use App\Models\CatatanBimbingan;
 use App\Models\Dosen;
-use App\Models\HistoryPerubahanJadwal;
 use App\Models\PeranDosenTa;
 use App\Models\TugasAkhir;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\UnauthorizedException;
 
 class BimbinganService
@@ -18,264 +17,141 @@ class BimbinganService
 
     public function __construct()
     {
-        // Mengambil model Dosen dari user yang sedang login saat service diinisialisasi.
-        // Ini adalah praktik yang baik untuk menghindari query berulang.
-        $this->dosen = Auth::user()->dosen;
+        if (Auth::check() && Auth::user()->hasRole('dosen')) {
+            $this->dosen = Auth::user()->dosen;
+        }
     }
 
     /**
-     * Mengambil daftar mahasiswa bimbingan dengan filter pencarian & prodi.
+     * Mengambil daftar mahasiswa bimbingan untuk dasbor dosen.
      */
     public function getFilteredMahasiswaBimbingan(Request $request): \Illuminate\Database\Eloquent\Collection
     {
-        $query = PeranDosenTa::query()
+        return PeranDosenTa::query()
             ->where('dosen_id', $this->dosen->id)
-            ->whereIn('peran', [PeranDosenTa::PERAN_PEMBIMBING_1, PeranDosenTa::PERAN_PEMBIMBING_2])
-            ->whereHas('tugasAkhir', function ($q) {
-                $q->active();
-            });
-
-        if ($request->filled('prodi')) {
-            $query->whereHas('tugasAkhir.mahasiswa', function ($q) use ($request) {
-                $q->where('prodi', $request->prodi);
-            });
-        }
-
-        if ($request->filled('search')) {
-            $query->whereHas('tugasAkhir.mahasiswa.user', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        return $query->with([
-            'tugasAkhir.mahasiswa.user'
-        ])
+            ->whereHas('tugasAkhir', fn($q) => $q->active())
+            ->with(['tugasAkhir.mahasiswa.user'])
             ->latest()
             ->get();
     }
 
     /**
-     * Mengambil data detail Tugas Akhir berdasarkan ID Mahasiswa.
+     * [DISEMPURNAKAN] Menyiapkan semua data untuk halaman detail bimbingan.
      */
-    public function getTugasAkhirDetailForMahasiswa(int $mahasiswaId): TugasAkhir
+    public function getDataForBimbinganDetailPage(TugasAkhir $tugasAkhir): array
     {
-        $tugasAkhir = TugasAkhir::where('mahasiswa_id', $mahasiswaId)
-            ->active()
-            ->latest()
-            ->firstOrFail();
-
         $this->authorizeDosenIsPembimbing($tugasAkhir);
 
-        return $tugasAkhir->load([
-            'mahasiswa.user',
-            'revisiTa',
-            // Memuat bimbingan khusus untuk dosen yang login, beserta catatannya.
-            'bimbinganTa' => fn($q) => $q->where('dosen_id', $this->dosen->id)->with('catatanBimbingan')->latest()
+        // ✅ PERBAIKAN: Eager load relasi 'peranDosenTa' untuk mencegah N+1 query
+        // saat memanggil accessor pembimbingSatu/pembimbingDua.
+        $tugasAkhir->load('peranDosenTa.dosen.user');
+
+        $catatanList = CatatanBimbingan::whereIn('bimbingan_ta_id', $tugasAkhir->bimbinganTa()->pluck('id'))
+            ->with('author.user')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // Logika penghitungan bimbingan per dosen
+        $pembimbing1 = $tugasAkhir->pembimbingSatu;
+        $pembimbing2 = $tugasAkhir->pembimbingDua;
+
+        $bimbinganCountP1 = $pembimbing1
+            ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count()
+            : 0;
+
+        $bimbinganCountP2 = $pembimbing2
+            ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count()
+            : 0;
+
+        return [
+            'catatanList' => $catatanList,
+            'bimbinganCountP1' => $bimbinganCountP1,
+            'bimbinganCountP2' => $bimbinganCountP2,
+            'pembimbing1' => $pembimbing1,
+            'pembimbing2' => $pembimbing2,
+        ];
+    }
+
+    /**
+     * [DISEMPURNAKAN] Membuat jadwal bimbingan baru dengan aturan "Satu Sesi Aktif".
+     */
+    public function createJadwal(TugasAkhir $tugasAkhir, array $data): BimbinganTA
+    {
+        $this->authorizeDosenIsPembimbing($tugasAkhir);
+
+        // ✅ ATURAN BARU: Cek apakah sudah ada jadwal lain yang aktif.
+        $jadwalAktifExists = $tugasAkhir->bimbinganTa()->where('status_bimbingan', 'dijadwalkan')->exists();
+
+        if ($jadwalAktifExists) {
+            throw new \Exception('Gagal membuat jadwal. Masih ada sesi bimbingan lain yang aktif dan belum selesai.');
+        }
+
+        return $tugasAkhir->bimbinganTa()->create([
+            'dosen_id' => $this->dosen->id,
+            'peran' => $this->getDosenRole($tugasAkhir)->peran,
+            'tanggal_bimbingan' => $data['tanggal_bimbingan'],
+            'jam_bimbingan' => $data['jam_bimbingan'],
+            'status_bimbingan' => 'dijadwalkan',
+            'sesi_ke' => ($tugasAkhir->bimbinganTa()->max('sesi_ke') ?? 0) + 1
         ]);
     }
 
     /**
-     * Menyetujui atau menolak sebuah sesi bimbingan.
+     * Menyimpan catatan baru dari dosen ke log bimbingan.
      */
-    public function updateBimbinganStatus(BimbinganTA $bimbingan, string $status, ?string $catatan = null): BimbinganTA
-    {
-        $this->authorizeDosenForBimbingan($bimbingan);
-
-        $bimbingan->status_bimbingan = $status;
-        $bimbingan->save();
-
-        // Logika ini sudah benar: catatan hanya dibuat saat statusnya DITOLAK.
-        if ($status === BimbinganTA::STATUS_DITOLAK && $catatan) {
-            $bimbingan->catatanBimbingan()->create([
-                'catatan'     => $catatan,
-                'author_type' => 'dosen',
-                'author_id'   => Auth::id(),
-            ]);
-        }
-        return $bimbingan;
-    }
-
-    /**
-     * Menandai sesi bimbingan sebagai selesai dan mencatat nomor sesinya.
-     * FUNGSI INI TELAH DIPERBAIKI SECARA SIGNIFIKAN.
-     */
-    public function selesaikanBimbingan(BimbinganTA $bimbingan): BimbinganTA
-    {
-        $this->authorizeDosenForBimbingan($bimbingan);
-
-        // Validasi: Hanya bimbingan yang sudah disetujui yang bisa diselesaikan.
-        if ($bimbingan->status_bimbingan !== BimbinganTA::STATUS_DISETUJUI) {
-            throw new \Exception('Hanya bimbingan yang sudah disetujui yang dapat ditandai selesai.');
-        }
-
-        // Gunakan Transaction untuk memastikan konsistensi data.
-        return DB::transaction(function () use ($bimbingan) {
-            // 1. Hitung nilai 'sesi_ke' berikutnya.
-            //    Cari nilai 'sesi_ke' tertinggi untuk tugas akhir ini yang sudah selesai.
-            $maxSesi = BimbinganTA::where('tugas_akhir_id', $bimbingan->tugas_akhir_id)
-                ->where('status_bimbingan', BimbinganTA::STATUS_SELESAI)
-                ->max('sesi_ke');
-
-            // 2. Update status bimbingan menjadi 'selesai' dan set nilai 'sesi_ke'.
-            //    Jika belum ada sesi yang selesai (maxSesi = null), maka ini adalah sesi ke-1.
-            $bimbingan->sesi_ke = ($maxSesi ?? 0) + 1;
-            $bimbingan->status_bimbingan = BimbinganTA::STATUS_SELESAI;
-            $bimbingan->save();
-
-            return $bimbingan;
-        });
-    }
-
-    /**
-     * Menyetujui perubahan jadwal.
-     */
-    public function approveScheduleChange(HistoryPerubahanJadwal $perubahan): void
-    {
-        // Pengecekan ini penting untuk mencegah error jika relasi bimbingan null.
-        if (!$perubahan->bimbingan) {
-            throw new \Exception('Data histori perubahan jadwal ini tidak terhubung dengan bimbingan manapun.');
-        }
-
-        $this->authorizeDosenForBimbingan($perubahan->bimbingan);
-
-        DB::transaction(function () use ($perubahan) {
-            // Update status histori
-            $perubahan->update(['status' => 'disetujui']);
-
-            // Update data bimbingan utama
-            $perubahan->bimbingan()->update([
-                'tanggal_bimbingan' => $perubahan->tanggal_baru,
-                'jam_bimbingan'     => $perubahan->jam_baru,
-            ]);
-
-            // Batalkan permintaan lain yang tertunda untuk bimbingan yang sama.
-            HistoryPerubahanJadwal::where('bimbingan_ta_id', $perubahan->bimbingan_ta_id)
-                ->where('id', '!=', $perubahan->id)
-                ->where('status', 'menunggu')
-                ->update(['status' => 'dibatalkan']);
-        });
-    }
-
-    /**
-     * Menolak perubahan jadwal.
-     */
-    public function rejectScheduleChange(HistoryPerubahanJadwal $perubahan, string $catatan): void
-    {
-        if (!$perubahan->bimbingan) {
-            throw new \Exception('Data histori perubahan jadwal ini tidak terhubung dengan bimbingan manapun.');
-        }
-
-        $this->authorizeDosenForBimbingan($perubahan->bimbingan);
-
-        // Menggunakan transaction untuk konsistensi, meskipun hanya satu aksi.
-        DB::transaction(function () use ($perubahan, $catatan) {
-            $perubahan->update([
-                'status' => 'ditolak',
-                'alasan_perubahan' => $catatan // Pastikan kolom ini ada di $fillable model HistoryPerubahanJadwal
-            ]);
-        });
-    }
-
-    /**
-     * Menyetujui permintaan pembatalan Tugas Akhir.
-     */
-    public function approveThesisCancellation(TugasAkhir $tugasAkhir): string
+    public function createCatatan(TugasAkhir $tugasAkhir, array $data): CatatanBimbingan
     {
         $this->authorizeDosenIsPembimbing($tugasAkhir);
 
-        if ($tugasAkhir->status !== TugasAkhir::STATUS_MENUNGGU_PEMBATALAN) {
-            throw new \Exception('Status TA tidak valid untuk aksi ini.');
+        $sesiBimbingan = $tugasAkhir->bimbinganTa()->where('status_bimbingan', '!=', 'selesai')->latest()->first();
+
+        if (!$sesiBimbingan) {
+            throw new \Exception('Tidak ada sesi bimbingan aktif untuk menambahkan catatan. Silakan jadwalkan sesi baru terlebih dahulu.');
         }
 
-        $peran = $this->getDosenRole($tugasAkhir);
-        $peran->update(['setuju_pembatalan' => 'ya', 'tanggal_verifikasi' => now()]);
-
-        $tugasAkhir->refresh();
-        $pembimbingRoles = $tugasAkhir->peranDosenTa->whereIn('peran', ['pembimbing1', 'pembimbing2']);
-
-        // Jika semua pembimbing sudah setuju
-        if ($pembimbingRoles->every(fn($p) => $p->setuju_pembatalan === 'ya')) {
-            DB::transaction(function () use ($tugasAkhir, $pembimbingRoles) {
-                $tugasAkhir->update(['status' => TugasAkhir::STATUS_DIBATALKAN]);
-                // Hapus peran pembimbing dari TA yang dibatalkan
-                $pembimbingRoles->each->delete();
-            });
-            return 'dibatalkan';
-        }
-
-        return 'menunggu_pembimbing_lain';
+        return $sesiBimbingan->catatan()->create([
+            'catatan'     => $data['catatan'],
+            'author_type' => Dosen::class,
+            'author_id'   => $this->dosen->id,
+        ]);
     }
 
     /**
-     * Menolak permintaan pembatalan Tugas Akhir.
+     * Menandai sesi bimbingan sebagai 'selesai'.
      */
-    public function rejectThesisCancellation(TugasAkhir $tugasAkhir, string $catatanPenolakan): void
+    public function selesaikanSesi(BimbinganTA $bimbingan): void
     {
-        $this->authorizeDosenIsPembimbing($tugasAkhir);
-
-        if ($tugasAkhir->status !== TugasAkhir::STATUS_MENUNGGU_PEMBATALAN) {
-            throw new \Exception('Status TA tidak valid untuk aksi ini.');
+        $this->authorizeDosenIsPembimbing($bimbingan->tugasAkhir);
+        if ($bimbingan->status_bimbingan !== 'dijadwalkan') {
+            throw new \Exception('Hanya bimbingan yang dijadwalkan yang bisa diselesaikan.');
         }
-
-        DB::transaction(function () use ($tugasAkhir, $catatanPenolakan) {
-            // Kembalikan status TA ke disetujui dan hapus alasan pembatalan
-            $tugasAkhir->update(['status' => TugasAkhir::STATUS_DISETUJUI, 'alasan_pembatalan' => null]);
-
-            // Reset status persetujuan pembatalan dari semua pembimbing
-            $tugasAkhir->peranDosenTa()
-                ->whereIn('peran', ['pembimbing1', 'pembimbing2'])
-                ->update([
-                    'setuju_pembatalan'  => null,
-                    'tanggal_verifikasi' => null,
-                    'catatan_verifikasi' => $catatanPenolakan, // Simpan catatan penolakan
-                ]);
-        });
+        $bimbingan->update(['status_bimbingan' => 'selesai']);
     }
-
-    // --- FUNGSI HELPER UNTUK OTORISASI ---
 
     /**
-     * PERBAIKAN FINAL DI SINI:
-     * Secara eksplisit mencari Tugas Akhir untuk memastikan data yang valid.
+     * Membatalkan sesi bimbingan yang sudah dijadwalkan.
      */
-    private function authorizeDosenForBimbingan(BimbinganTA $bimbingan): void
+    public function cancelBimbingan(BimbinganTA $bimbingan): void
     {
-        $bimbingan->refresh();
-
-        if (empty($bimbingan->tugas_akhir_id)) {
-            throw new \Exception('Otorisasi gagal: Kolom tugas_akhir_id kosong pada bimbingan ID: ' . $bimbingan->id);
+        if (Auth::user()->dosen->id !== $bimbingan->dosen_id) {
+            throw new UnauthorizedException('Anda tidak berwenang membatalkan jadwal ini.');
         }
-
-        $tugasAkhir = TugasAkhir::find($bimbingan->tugas_akhir_id);
-
-        if (!$tugasAkhir) {
-            throw new \Exception(
-                'Otorisasi gagal: Data bimbingan ini merujuk ke Tugas Akhir yang tidak dapat ditemukan (ID: ' . $bimbingan->tugas_akhir_id . ').'
-            );
+        if ($bimbingan->status_bimbingan !== 'dijadwalkan') {
+            throw new \Exception('Hanya bimbingan yang dijadwalkan yang bisa dibatalkan.');
         }
-
-        $this->authorizeDosenIsPembimbing($tugasAkhir);
+        $bimbingan->update(['status_bimbingan' => 'dibatalkan']);
     }
 
+    // --- FUNGSI HELPER OTORISASI ---
     private function authorizeDosenIsPembimbing(TugasAkhir $tugasAkhir): void
     {
-        $isPembimbing = $tugasAkhir->peranDosenTa()
-            ->where('dosen_id', $this->dosen->id)
-            ->whereIn('peran', [PeranDosenTa::PERAN_PEMBIMBING_1, PeranDosenTa::PERAN_PEMBIMBING_2])
-            ->exists();
-
-        if (!$isPembimbing) {
-            // Pesan error diubah agar lebih sesuai dengan konteks pengecekan
+        if (!$tugasAkhir->peranDosenTa()->where('dosen_id', $this->dosen->id)->exists()) {
             throw new UnauthorizedException('Anda bukan pembimbing untuk tugas akhir ini.');
         }
     }
 
     private function getDosenRole(TugasAkhir $tugasAkhir): PeranDosenTa
     {
-        $peran = $tugasAkhir->peranDosenTa->where('dosen_id', $this->dosen->id)->first();
-        if (!$peran) {
-            throw new \Exception('Peran Dosen tidak ditemukan.');
-        }
-        return $peran;
+        return $tugasAkhir->peranDosenTa->where('dosen_id', $this->dosen->id)->firstOrFail();
     }
 }
