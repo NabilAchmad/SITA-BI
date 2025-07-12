@@ -23,29 +23,34 @@
                 <!-- SIDANG -->
                 <div id="sidang" class="tab-content">
                     <div class="row row-cols-1 row-cols-md-2 g-4">
-                        @forelse ($jadwalSidangAkhir as $jadwal)
-                            <div class="col">
-                                <div class="card border-primary shadow-sm">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-primary">{{ $jadwal->sidang->mahasiswa->nama ?? 'Nama Mahasiswa' }}</h5>
-                                        <p class="card-text">
-                                            <strong>Topik:</strong> {{ $jadwal->sidang->judul ?? 'Judul Sidang' }}<br>
-                                            <strong>Waktu:</strong> {{ \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('l, d F Y') }} - {{ \Carbon\Carbon::parse($jadwal->waktu_mulai)->format('H:i') }} WIB<br>
-                                            <strong>Ruang:</strong> {{ $jadwal->ruangan->nama ?? 'Ruang' }}<br>
-                                            <strong>Dosen:</strong> {{ $jadwal->sidang->dosen_pembimbing->nama ?? 'Dosen Pembimbing' }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <p class="text-center">Belum ada jadwal sidang yang dijadwalkan.</p>
-                        @endforelse
+@forelse ($jadwalSidangAkhir as $jadwal)
+    <div class="col">
+        <div class="card border-primary shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-primary">{{ $jadwal->sidang->tugasAkhir->mahasiswa->nama ?? 'Nama Mahasiswa' }}</h5>
+                <p class="card-text">
+                    <strong>Topik:</strong> {{ $jadwal->sidang->tugasAkhir->judul ?? 'Judul Tugas Akhir' }}<br>
+                    <strong>Waktu:</strong> {{ \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('l, d F Y') }} - {{ \Carbon\Carbon::parse($jadwal->waktu_mulai)->format('H:i') }} WIB<br>
+                    <strong>Ruang:</strong> {{ $jadwal->ruangan->nama ?? 'Ruang' }}<br>
+                    <strong>Dosen:</strong>
+                    @if($jadwal->sidang->tugasAkhir->dosenPembimbing && $jadwal->sidang->tugasAkhir->dosenPembimbing->count() > 0)
+                        {{ $jadwal->sidang->tugasAkhir->dosenPembimbing->pluck('nama')->join(', ') }}
+                    @else
+                        Dosen Pembimbing
+                    @endif
+                </p>
+            </div>
+        </div>
+    </div>
+@empty
+    <p class="text-center">Belum ada jadwal sidang yang dijadwalkan.</p>
+@endforelse
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Script untuk tab -->
+        {{-- <!-- Script untuk tab -->
         <script>
             function showContent(event, id) {
                 event.preventDefault();
@@ -62,7 +67,7 @@
                 document.getElementById(id).classList.remove('d-none');
                 document.getElementById(id + '-tab').classList.add('active');
             }
-        </script>
+        </script> --}}
 
     </div>
 
