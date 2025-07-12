@@ -80,7 +80,7 @@ class BimbinganService
             ->first();
 
         if (!$tugasAkhir) {
-            return redirect()->route('dashboard.bimbingan')->with('alert', [
+            return redirect()->route('mahasiswa.bimbingan.dashboard')->with('alert', [
                 'type' => 'error',
                 'title' => 'Pengajuan Gagal',
                 'text' => 'Data tugas akhir belum tersedia.'
@@ -90,7 +90,7 @@ class BimbinganService
         $this->abortJikaTADibatalkan($tugasAkhir);
 
         if (!in_array($tugasAkhir->status, ['disetujui', 'revisi', 'menunggu_pembatalan'])) {
-            return redirect()->route('dashboard.bimbingan')->with('alert', [
+            return redirect()->route('mahasiswa.bimbingan.dashboard')->with('alert', [
                 'type' => 'error',
                 'title' => 'Pengajuan Ditolak',
                 'text' => 'Status tugas akhir Anda tidak memenuhi syarat untuk bimbingan.'
@@ -98,7 +98,7 @@ class BimbinganService
         }
 
         if (empty($tugasAkhir->file_path)) {
-            return redirect()->route('dashboard.bimbingan')->with('alert', [
+            return redirect()->route('mahasiswa.bimbingan.dashboard')->with('alert', [
                 'type' => 'error',
                 'title' => 'Pengajuan Ditolak',
                 'text' => 'Upload file proposal sebelum bimbingan!'

@@ -64,7 +64,9 @@ class DummyMahasiswaSeeder extends Seeder
         for ($i = 1; $i <= $jumlahMahasiswa; $i++) {
             // Random Prodi
             $prodi = array_rand($prodiPrefix);
-            $nim = $prodiPrefix[$prodi] . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            do {
+                $nim = $prodiPrefix[$prodi] . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            } while (Mahasiswa::where('nim', $nim)->exists());
 
             // Random nama dan email
             $namaDepan = $namaList[array_rand($namaList)];
@@ -81,11 +83,9 @@ class DummyMahasiswaSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
-            // Assign role mahasiswa
-            UserRole::create([
-                'user_id' => $user->id,
-                'role_id' => 5, // role mahasiswa
-            ]);
+
+            // Assign role mahasiswa menggunakan Spatie
+            $user->assignRole('mahasiswa');
 
             // Insert ke tabel mahasiswa
             $mahasiswa = Mahasiswa::create([
@@ -101,7 +101,7 @@ class DummyMahasiswaSeeder extends Seeder
             $ta = TugasAkhir::create([
                 'mahasiswa_id' => $mahasiswa->id,
                 'judul' => $judulList[array_rand($judulList)],
-                'abstrak' => 'Abstrak tugas akhir ini dibuat secara otomatis untuk dummy data.',
+                // 'abstrak' => 'Abstrak tugas akhir ini dibuat secara otomatis untuk dummy data.',
                 'status' => 'disetujui',
                 'tanggal_pengajuan' => now()->subDays(rand(5, 60)),
                 'created_at' => now(),

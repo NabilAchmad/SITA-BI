@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Homepage;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengumuman;
+use App\Models\JadwalSidang;
 use Illuminate\Http\Request;
 
 class HomepageController extends Controller
@@ -15,6 +16,15 @@ class HomepageController extends Controller
             ->take(10)
             ->get();
 
-        return view('home.homepage', compact('pengumuman'));
+        // Fetch jadwal sidang akhir scheduled by Admin
+        $jadwalSidangAkhir = JadwalSidang::with('sidang', 'ruangan')
+            ->whereHas('sidang', function ($query) {
+                $query->where('jenis_sidang', 'akhir');
+            })
+            ->orderBy('tanggal')
+            ->orderBy('waktu_mulai')
+            ->get();
+
+        return view('home.homepage', compact('pengumuman', 'jadwalSidangAkhir'));
     }
 }

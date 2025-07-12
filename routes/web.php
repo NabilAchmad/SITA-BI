@@ -222,6 +222,34 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/force-delete-all', [PengumumanController::class, 'forceDeleteAll'])->name('force-delete-all');
         });
 
+        // ROUTE SIDANG
+        Route::prefix('sidang')->group(function () {
+            Route::get('dashboard-sidang', [JadwalSidangAkhirController::class, 'dashboard'])->name('dosen.sidang.index');
+            // Route::prefix('sempro')->group(function () {
+            //     Route::get('/jadwal-sidang-sempro', [JadwalSidangSemproController::class, 'SidangSempro'])->name('dosen.sidang.kelola.sempro');
+            //     Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangSemproController::class, 'simpanPenguji'])->name('dosen.jadwal-sempro.simpanPenguji');
+            //     Route::post('/jadwal-sidang', [JadwalSidangSemproController::class, 'store'])->name('dosen.jadwal-sempro.store');
+            //     Route::get('/detail-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'show'])->name('dosen.jadwal-sempro.show');
+            //     Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidangSempro'])->name('dosen.jadwal-sidang-sempro.mark-done');
+            // });
+            Route::prefix('akhir')->group(function () {
+                Route::get('/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'sidangAkhir'])->name('dosen.jadwal.sidang.akhir');
+                Route::get('/menunggu', [JadwalSidangAkhirController::class, 'sidangAkhir'])->name('dosen.sidang.menunggu.penjadwalan.akhir');
+                Route::post('/jadwal-sidang', [JadwalSidangAkhirController::class, 'store'])->name('dosen.jadwal-sidang.store');
+                Route::get('/detail-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'show'])->name('dosen.jadwal-sidang.show');
+                Route::put('/update-jadwal/{id}', [JadwalSidangAkhirController::class, 'update'])->name('dosen.jadwal-sidang.update');
+                Route::delete('/delete-jadwal/{id}', [JadwalSidangAkhirController::class, 'destroy'])->name('dosen.jadwal-sidang.destroy');
+                Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('dosen.jadwal-sidang.simpanPenguji');
+                Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'tandaiSidang'])->name('dosen.jadwal-sidang.mark-done');
+                Route::prefix('penilaian')->group(function () {
+                    Route::get('/sidang', [PenilaianSidangController::class, 'index'])->name('penilaian.sidang.index');
+                    Route::get('/sidang/{id}/form', [PenilaianSidangController::class, 'form'])->name('penilaian.sidang.form');
+                    Route::post('/sidang/{id}/simpan', [PenilaianSidangController::class, 'simpan'])->name('penilaian.sidang.simpan');
+                });
+                Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangAkhirController::class, 'tandaiSidang'])->name('jadwal-sidang.mark-done');
+                Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangAkhirController::class, 'simpanPenguji'])->name('jadwal-sidang.simpanPenguji');
+            });
+        });
         Route::resource('pengumuman', PengumumanController::class);
         // Rute tambahan untuk pengumuman (trash, restore, dll.) bisa ditambahkan di sini
         // Tambahkan grup ini untuk semua rute kustom terkait pengumuman

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Models\User;
 
 class MahasiswaProfileController extends Controller
 {
@@ -33,10 +34,15 @@ class MahasiswaProfileController extends Controller
     /**
      * Mengupdate data profil mahasiswa.
      */
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(Request $request)
     {
-        // Ambil user yang sedang terautentikasi
+        /** @var \App\Models\User $user */
         $user = Auth::user();
+        /** @var \App\Models\Mahasiswa $mahasiswa */
         $mahasiswa = $user->mahasiswa;
 
         // Jika data mahasiswa tidak ditemukan, kembalikan dengan pesan error.

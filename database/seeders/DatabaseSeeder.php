@@ -12,6 +12,7 @@ use Database\Seeders\MahasiswaTanpaPembimbingSeeder;
 use Database\Seeders\TugasAkhirSeeder;
 use Database\Seeders\SidangSeeder;
 use Database\Seeders\RuanganSeeder;
+use Database\Seeders\MahasiswaMenungguSidangAkhirSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,11 +23,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class,
+            RolesSeeder::class,
             MahasiswaSeeder::class,
             DosenSeeder::class,
             RuanganSeeder::class,
             DummyMahasiswaSeeder::class,
+            MahasiswaMenungguSidangAkhirSeeder::class,
         ]);
     }
 }
