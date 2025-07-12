@@ -52,29 +52,24 @@ class JadwalBimbinganController extends Controller
     /**
      * [BARU] Menangani aksi pembatalan sesi bimbingan oleh dosen.
      */
-    public function cancel(BimbinganTA $bimbingan)
+    public function cancel(TugasAkhir $tugasAkhir, BimbinganTA $bimbingan)
     {
         try {
             $this->bimbinganService->cancelBimbingan($bimbingan);
-            return redirect()->back()->with('alert', [
-                'type' => 'warning',
-                'title' => 'Dibatalkan!',
-                'message' => 'Sesi bimbingan telah berhasil dibatalkan.'
-            ]);
+            return back()->with('alert', ['type' => 'success', 'title' => 'Berhasil!', 'message' => 'Jadwal bimbingan telah dibatalkan.']);
         } catch (\Exception $e) {
-            return redirect()->back()->with('alert', [
-                'type' => 'error',
-                'title' => 'Gagal!',
-                'message' => $e->getMessage()
-            ]);
+            return back()->with('alert', ['type' => 'error', 'title' => 'Gagal!', 'message' => $e->getMessage()]);
         }
     }
 
     // app/Http/Controllers/Dosen/JadwalBimbinganController.php
-    public function selesaikan(BimbinganTA $bimbingan)
+    public function selesaikan(TugasAkhir $tugasAkhir, BimbinganTA $bimbingan)
     {
-        // Otorisasi sederhana bisa ditambahkan di service
-        $this->bimbinganService->selesaikanSesi($bimbingan);
-        return redirect()->back()->with('alert', ['type' => 'success', 'message' => 'Sesi bimbingan telah ditandai selesai.']);
+        try {
+            $this->bimbinganService->selesaikanSesi($bimbingan);
+            return back()->with('alert', ['type' => 'success', 'title' => 'Berhasil!', 'message' => 'Sesi bimbingan telah ditandai selesai.']);
+        } catch (\Exception $e) {
+            return back()->with('alert', ['type' => 'error', 'title' => 'Gagal!', 'message' => $e->getMessage()]);
+        }
     }
 }

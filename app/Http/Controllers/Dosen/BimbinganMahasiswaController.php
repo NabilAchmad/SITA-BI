@@ -55,6 +55,8 @@ class BimbinganMahasiswaController extends Controller
             'catatanList'      => $data['catatanList'],
             'bimbinganCountP1' => $data['bimbinganCountP1'],
             'bimbinganCountP2' => $data['bimbinganCountP2'],
+            'dokumenTerbaru'   => $data['dokumenTerbaru'], // <-- Variabel yang hilang sekarang ditambahkan
+            'riwayatDokumen'   => $data['riwayatDokumen'], // <-- PASTIKAN BARIS INI ADA
             'pembimbing1'      => $data['pembimbing1'],
             'pembimbing2'      => $data['pembimbing2'],
         ]);

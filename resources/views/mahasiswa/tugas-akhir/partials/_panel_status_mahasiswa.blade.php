@@ -39,18 +39,44 @@
 
 {{-- Panel Jadwal Aktif --}}
 @php
-    $jadwalAktif = $tugasAkhir->bimbinganTa()->where('status_bimbingan', 'dijadwalkan')->latest()->first();
+    $jadwalBimbingan = $tugasAkhir->bimbinganTa()->latest()->get();
 @endphp
-@if ($jadwalAktif)
+
+@forelse ($jadwalBimbingan as $jadwal)
     <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-body">
-            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar-event me-2 text-success"></i>Jadwal Berikutnya
+            <h5 class="fw-bold text-dark mb-3">
+                <i
+                    class="bi bi-calendar-event me-2 
+                    @if ($jadwal->status_bimbingan == 'dijadwalkan') text-success
+                    @elseif($jadwal->status_bimbingan == 'diajukan') text-warning @endif"></i>
+                Jadwal Bimbingan {{ $loop->iteration }} -
+                <span class="text-capitalize">{{ $jadwal->status_bimbingan }}</span>
             </h5>
-            <p class="mb-1"><strong>Tanggal:</strong> {{ $jadwalAktif->tanggal_bimbingan->format('d F Y') }}</p>
-            <p class="mb-1"><strong>Jam:</strong>
-                {{ \Carbon\Carbon::parse($jadwalAktif->jam_bimbingan)->format('H:i') }} WIB</p>
-            <p><strong>Oleh:</strong> {{ $jadwalAktif->dosen->user->name }}</p>
-            <a href="#" class="btn btn-sm btn-outline-warning rounded-pill w-100 mt-2">Ajukan Perubahan Jadwal</a>
+
+            <p class="mb-1"><strong>Dosen:</strong> {{ $jadwal->dosen->user->name }} ({{ $jadwal->peran }})</p>
+
+            @if ($jadwal->tanggal_bimbingan)
+                <p class="mb-1"><strong>Tanggal:</strong> {{ $jadwal->tanggal_bimbingan->format('d F Y') }}</p>
+            @else
+                <p class="mb-1"><strong>Tanggal:</strong> Belum dijadwalkan</p>
+            @endif
+
+            @if ($jadwal->jam_bimbingan)
+                <p class="mb-1"><strong>Jam:</strong>
+                    {{ \Carbon\Carbon::parse($jadwal->jam_bimbingan)->format('H:i') }} WIB</p>
+            @else
+                <p class="mb-1"><strong>Jam:</strong> Belum ditentukan</p>
+            @endif
+
+            @if ($jadwal->status_bimbingan == 'dijadwalkan')
+                <a href="#" class="btn btn-sm btn-outline-warning rounded-pill w-100 mt-2">Ajukan Perubahan
+                    Jadwal</a>
+            @endif
         </div>
     </div>
-@endif
+@empty
+    <div class="alert alert-info">
+        Belum ada jadwal bimbingan yang tersedia.
+    </div>
+@endforelse

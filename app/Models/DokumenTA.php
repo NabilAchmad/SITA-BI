@@ -29,6 +29,7 @@ class DokumenTa extends Model
         'tipe_dokumen',
         'file_path',
         'version',
+        'nama_file_asli',
         'status_validasi',
         'divalidasi_oleh',
         'catatan_reviewer',

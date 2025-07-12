@@ -30,6 +30,8 @@ class TugasAkhirController extends Controller
 
         return view('mahasiswa.tugas-akhir.crud-ta.progress', [
             'tugasAkhir'       => $data['tugasAkhir'],
+            'riwayatDokumen'   => $data['riwayatDokumen'], // <-- Variabel yang hilang ditambahkan
+            'dokumenTerbaru'   => $data['dokumenTerbaru'], // <-- Variabel yang hilang ditambahkan
             'catatanList'      => $data['catatanList'],
             'bimbinganCountP1' => $data['bimbinganCountP1'],
             'bimbinganCountP2' => $data['bimbinganCountP2'],

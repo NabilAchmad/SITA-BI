@@ -8,8 +8,8 @@ use Illuminate\Validation\Rule;
 class UploadFileRequest extends FormRequest
 {
     /**
-     * Tentukan apakah pengguna diizinkan untuk membuat permintaan ini.
-     * Logika ini sudah benar, tidak perlu diubah.
+     * Determine if the user is authorized to make this request.
+     * Logika ini memastikan hanya mahasiswa pemilik tugas akhir yang bisa mengupload.
      */
     public function authorize(): bool
     {
@@ -22,28 +22,31 @@ class UploadFileRequest extends FormRequest
     }
 
     /**
-     * Dapatkan aturan validasi yang berlaku untuk permintaan ini.
+     * Get the validation rules that apply to the request.
+     * Aturan ini disesuaikan dengan input yang diharapkan oleh Service.
      */
     public function rules(): array
     {
         return [
-            // ✅ PERBAIKAN 1: Mengubah nama field dari 'file' menjadi 'file_bimbingan'
+            // Validasi untuk file yang diunggah.
+            // Nama field 'file_bimbingan' harus sama dengan atribut 'name' di form HTML.
             'file_bimbingan' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:25600'], // Batas 25MB
 
-            // ✅ PERBAIKAN 2: Mengubah nama field dari 'jenis_dokumen' menjadi 'tipe_dokumen'
+            // Validasi untuk tipe dokumen.
+            // Nama field 'tipe_dokumen' harus sama dengan atribut 'name' di form HTML.
             'tipe_dokumen' => [
                 'required',
                 'string',
                 Rule::in(['proposal', 'draft', 'final', 'lainnya']),
             ],
 
-            // Menambahkan validasi untuk catatan (opsional)
+            // Validasi untuk catatan (opsional).
             'catatan' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
     /**
-     * Pesan error kustom untuk validasi.
+     * Pesan error kustom dalam Bahasa Indonesia.
      */
     public function messages(): array
     {
