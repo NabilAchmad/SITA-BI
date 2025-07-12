@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Dosen;
 
+use App\Models\BimbinganTA;
+use App\Models\HistoryPerubahanJadwal;
 use App\Http\Controllers\Controller;
 use App\Models\TugasAkhir;
 use App\Services\Dosen\BimbinganService;
