@@ -30,6 +30,7 @@ use App\Http\Controllers\Mahasiswa\MahasiswaProfileController;
 use App\Http\Controllers\Mahasiswa\PendaftaranSidangController;
 use App\Http\Controllers\Mahasiswa\TopikController;
 use App\Http\Controllers\Mahasiswa\TugasAkhirController;
+use App\Http\Controllers\Mahasiswa\CatatanBimbinganController as MahasiswaCatatanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -90,6 +91,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/ambil-topik/{topik}', [TopikController::class, 'apply'])->name('topik.ambil');
             Route::get('/cancel', [TugasAkhirController::class, 'showCancelled'])->name('show.cancel');
             Route::post('/{tugasAkhir}/cancel', [TugasAkhirController::class, 'cancel'])->name('cancel');
+
+            Route::post('tugas-akhir/{tugasAkhir}/catatan', [MahasiswaCatatanController::class, 'store'])->name('catatan.store');
         });
 
         Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
@@ -135,30 +138,21 @@ Route::middleware(['auth'])->group(function () {
 
             // routes/web.php
             Route::post('/bimbingan/{bimbingan}/selesai', [JadwalBimbinganController::class, 'selesaikan'])->name('jadwal.selesai');
+            // routes/web.php
+
+            // ✅ PERBAIKAN: Route untuk membatalkan sesi. Perhatikan {bimbingan} bukan {tugasAkhir}
+            Route::post('/bimbingan/{bimbingan}/cancel', [JadwalBimbinganController::class, 'cancel'])->name('jadwal.cancel');
 
             // (Nantinya route untuk persetujuan sidang bisa ditambahkan di sini)
             // Route::post('/setujui-sidang', [PersetujuanSidangController::class, 'store'])->name('sidang.approve');
         });
 
         Route::prefix('tawaran-topik')->name('tawaran-topik.')->group(function () {
-
-            // Rute untuk menampilkan halaman data yang sudah di-soft delete (sampah)
             Route::get('/trash', [TawaranTopikController::class, 'trashed'])->name('trashed');
-
-            // Rute untuk mengembalikan satu data dari sampah
-            // Menggunakan POST karena ini adalah sebuah aksi yang mengubah state data.
             Route::post('/{id}/restore', [TawaranTopikController::class, 'restore'])->name('restore');
-
-            // Rute untuk menghapus satu data secara permanen dari sampah
             Route::delete('/{id}/force-delete', [TawaranTopikController::class, 'forceDelete'])->name('force-delete');
-
-            // Rute untuk menghapus semua data di dalam sampah secara permanen
             Route::delete('/force-delete-all', [TawaranTopikController::class, 'forceDeleteAll'])->name('force-delete-all');
-
-            // Rute untuk menyetujui pengajuan topik dari mahasiswa
             Route::post('/approve/{application}', [TawaranTopikController::class, 'approveApplication'])->name('approveApplication');
-
-            // Rute untuk menolak pengajuan topik dari mahasiswa
             Route::post('/reject/{application}', [TawaranTopikController::class, 'rejectApplication'])->name('rejectApplication');
         });
 

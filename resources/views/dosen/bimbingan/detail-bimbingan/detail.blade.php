@@ -4,6 +4,7 @@
 
 @section('content')
     <div class="container-fluid px-4">
+        {{-- Header Halaman --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold text-gradient">
@@ -15,6 +16,7 @@
             </a>
         </div>
 
+        {{-- Kartu Informasi Mahasiswa & TA --}}
         <div class="card shadow-sm border-0 rounded-4 mb-4">
             <div class="card-body">
                 <div class="row g-4 align-items-center">
@@ -26,14 +28,22 @@
                     <div class="col-md-10">
                         <h4 class="fw-bold mb-1">{{ $mahasiswa->user->name }} ({{ $mahasiswa->nim }})</h4>
                         <p class="text-muted mb-2">
-                            {{ strtoupper($mahasiswa->prodi) }} Angkatan {{ $mahasiswa->angkatan }}
+                            @if ($mahasiswa->prodi === 'd4')
+                                D4 Bahasa Inggris
+                            @elseif ($mahasiswa->prodi === 'd3')
+                                D3 Bahasa Inggris
+                            @else
+                                {{ strtoupper($mahasiswa->prodi) }}
+                            @endif
+                            Angkatan {{ $mahasiswa->angkatan }}
                         </p>
-                        <h5 class="fw-semibold mt-3">"{{ $tugasAkhir->judul ?? 'Judul Belum Ditentukan' }}"</h5>
+                        <h5 class="fw-semibold mt-3"><span class="text-muted">Judul Tugas Akhir:</span> "{{ $tugasAkhir->judul ?? 'Judul Belum Ditentukan' }}"</h5>
                     </div>
                 </div>
             </div>
         </div>
 
+        {{-- Konten Utama: Log Bimbingan dan Panel Aksi --}}
         <div class="row g-4">
             {{-- Kolom Kiri: Log Bimbingan Terpusat --}}
             <div class="col-lg-8">
@@ -44,9 +54,9 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        {{-- Di sini kita akan memuat partial untuk log --}}
-                        @include('dosen.bimbingan._log_bimbingan', [
-                            'catatanList' => $catatanList, // Anda perlu mengirimkan variabel ini dari controller
+                        {{-- Memuat partial untuk log --}}
+                        @include('dosen.bimbingan.partials._log_bimbingan', [
+                            'catatanList' => $catatanList,
                             'tugasAkhir' => $tugasAkhir,
                         ])
                     </div>
@@ -55,22 +65,23 @@
 
             {{-- Kolom Kanan: Panel Status & Aksi --}}
             <div class="col-lg-4">
-                {{-- Di sini kita akan memuat partial untuk panel aksi --}}
-                @include('dosen.bimbingan._panel_aksi', [
+                {{-- ✅ PERBAIKAN: Mengirim semua variabel baru ke partial _panel_aksi --}}
+                @include('dosen.bimbingan.partials._panel_aksi', [
                     'tugasAkhir' => $tugasAkhir,
-                    'bimbinganCount' => $bimbinganCount, // Anda perlu mengirimkan variabel ini dari controller
+                    'bimbinganCountP1' => $bimbinganCountP1,
+                    'bimbinganCountP2' => $bimbinganCountP2,
+                    'pembimbing1' => $pembimbing1,
+                    'pembimbing2' => $pembimbing2,
                 ])
             </div>
         </div>
     </div>
 
-    {{-- ✅ PERBAIKAN: Panggil partial modal di sini --}}
+    {{-- Memuat partial untuk modal penjadwalan --}}
     @include('dosen.bimbingan.partials._modal_jadwal', [
         'tugasAkhir' => $tugasAkhir,
         'mahasiswa' => $mahasiswa,
     ])
-
-
 @endsection
 
 @push('styles')
@@ -80,24 +91,6 @@
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        .log-item {
-            position: relative;
-            padding-left: 30px;
-            border-left: 2px solid #e9ecef;
-        }
-
-        .log-icon {
-            position: absolute;
-            left: -13px;
-            top: 0;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
     </style>
 @endpush

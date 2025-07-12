@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\TugasAkhir;
 use App\Services\Dosen\BimbinganService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\UnauthorizedException;
 
 class BimbinganMahasiswaController extends Controller
 {
@@ -18,24 +19,26 @@ class BimbinganMahasiswaController extends Controller
 
     /**
      * Menampilkan dasbor daftar mahasiswa bimbingan.
+     * Metode ini sudah benar.
      */
     public function index(Request $request)
     {
         $mahasiswaList = $this->bimbinganService->getFilteredMahasiswaBimbingan($request);
 
-        // Pastikan path view ini benar
+        // Pastikan path view ini benar sesuai struktur folder Anda
         return view('dosen.bimbingan.dashboard.dashboard', compact('mahasiswaList'));
     }
 
     /**
-     * Menampilkan halaman "Pusat Komando Bimbingan" untuk satu tugas akhir.
+     * [PERBAIKAN UTAMA] Menampilkan halaman "Pusat Komando Bimbingan".
+     * Metode ini sekarang menerima objek TugasAkhir secara langsung.
      */
     public function show(TugasAkhir $tugasAkhir)
     {
         try {
-            // Service akan menangani otorisasi dan pengambilan data
+            // Service akan menangani otorisasi dan pengambilan semua data yang dibutuhkan
             $data = $this->bimbinganService->getDataForBimbinganDetailPage($tugasAkhir);
-        } catch (\Illuminate\Validation\UnauthorizedException $e) {
+        } catch (UnauthorizedException $e) {
             return redirect()->route('dosen.bimbingan.index')->with('alert', [
                 'type' => 'error',
                 'title' => 'Akses Ditolak',
@@ -43,12 +46,16 @@ class BimbinganMahasiswaController extends Controller
             ]);
         }
 
-        // Mengirim semua data yang dibutuhkan oleh view baru
-        return view('dosen.bimbingan.detail-bimbingan.detail', [
+        // Mengirim semua data yang dibutuhkan oleh view baru yang telah kita rancang.
+        // Pastikan path view ini benar.
+        return view('dosen.bimbingan.show', [
             'mahasiswa' => $tugasAkhir->mahasiswa,
             'tugasAkhir' => $tugasAkhir,
             'catatanList' => $data['catatanList'],
-            'bimbinganCount' => $data['bimbinganCount'],
+            'bimbinganCountP1' => $data['bimbinganCountP1'],
+            'bimbinganCountP2' => $data['bimbinganCountP2'],
+            'pembimbing1' => $data['pembimbing1'],
+            'pembimbing2' => $data['pembimbing2'],
         ]);
     }
 }

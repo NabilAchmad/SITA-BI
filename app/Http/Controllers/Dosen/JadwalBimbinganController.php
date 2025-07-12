@@ -44,6 +44,27 @@ class JadwalBimbinganController extends Controller
         }
     }
 
+    /**
+     * [BARU] Menangani aksi pembatalan sesi bimbingan oleh dosen.
+     */
+    public function cancel(BimbinganTA $bimbingan)
+    {
+        try {
+            $this->bimbinganService->cancelBimbingan($bimbingan);
+            return redirect()->back()->with('alert', [
+                'type' => 'warning',
+                'title' => 'Dibatalkan!',
+                'message' => 'Sesi bimbingan telah berhasil dibatalkan.'
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('alert', [
+                'type' => 'error',
+                'title' => 'Gagal!',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     // app/Http/Controllers/Dosen/JadwalBimbinganController.php
     public function selesaikan(BimbinganTA $bimbingan)
     {
