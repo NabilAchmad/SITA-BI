@@ -38,7 +38,6 @@ class BimbinganMahasiswaController extends Controller
     public function show(TugasAkhir $tugasAkhir)
     {
         try {
-            // Service akan menangani otorisasi dan pengambilan semua data yang dibutuhkan
             $data = $this->bimbinganService->getDataForBimbinganDetailPage($tugasAkhir);
         } catch (UnauthorizedException $e) {
             return redirect()->route('dosen.bimbingan.index')->with('alert', [
@@ -48,16 +47,16 @@ class BimbinganMahasiswaController extends Controller
             ]);
         }
 
-        // Mengirim semua data yang dibutuhkan oleh view baru yang telah kita rancang.
-        // Pastikan path view ini benar.
+        // ✅ PERBAIKAN: Memastikan semua data dari service diteruskan ke view.
         return view('dosen.bimbingan.detail-bimbingan.detail', [
-            'mahasiswa' => $tugasAkhir->mahasiswa,
-            'tugasAkhir' => $tugasAkhir,
-            'catatanList' => $data['catatanList'],
+            'mahasiswa'        => $tugasAkhir->mahasiswa,
+            'tugasAkhir'       => $data['tugasAkhir'],
+            'sesiAktif'        => $data['sesiAktif'],
+            'catatanList'      => $data['catatanList'],
             'bimbinganCountP1' => $data['bimbinganCountP1'],
             'bimbinganCountP2' => $data['bimbinganCountP2'],
-            'pembimbing1' => $data['pembimbing1'],
-            'pembimbing2' => $data['pembimbing2'],
+            'pembimbing1'      => $data['pembimbing1'],
+            'pembimbing2'      => $data['pembimbing2'],
         ]);
     }
 }

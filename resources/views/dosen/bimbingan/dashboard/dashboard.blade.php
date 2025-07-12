@@ -107,7 +107,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($mahasiswaList as $peran)
+                                    {{-- ✅ PERBAIKAN: Loop melalui $mahasiswaList, di mana setiap item adalah objek $tugasAkhir --}}
+                                    @forelse ($mahasiswaList as $tugasAkhir)
                                         <tr class="border-bottom">
                                             <td class="px-4 py-3">
                                                 <div class="d-flex align-items-center justify-content-center">
@@ -125,7 +126,8 @@
                                                     </div>
                                                     <div>
                                                         <div class="fw-semibold">
-                                                            {{ $peran->tugasAkhir?->mahasiswa?->user?->name ?? 'Data tidak lengkap' }}
+                                                            {{-- ✅ PERBAIKAN: Mengakses data langsung dari $tugasAkhir --}}
+                                                            {{ $tugasAkhir->mahasiswa->user->name ?? 'Data tidak lengkap' }}
                                                         </div>
                                                         <small class="text-muted">Mahasiswa Aktif</small>
                                                     </div>
@@ -134,29 +136,40 @@
                                             <td class="py-3">
                                                 <span
                                                     class="badge bg-secondary bg-opacity-10 text-white border border-secondary border-opacity-25 px-3 py-2">
-                                                    {{ $peran->tugasAkhir?->mahasiswa?->nim ?? '-' }}
+                                                    {{-- ✅ PERBAIKAN: Mengakses data langsung dari $tugasAkhir --}}
+                                                    {{ $tugasAkhir->mahasiswa->nim ?? '-' }}
                                                 </span>
                                             </td>
                                             <td class="py-3">
                                                 <div class="text-wrap" style="max-width: 300px;">
                                                     <p class="mb-0 lh-sm">
-                                                        {{ Str::limit($peran->tugasAkhir?->judul ?? '-', 60) }}
+                                                        {{-- ✅ PERBAIKAN: Mengakses data langsung dari $tugasAkhir --}}
+                                                        {{ Str::limit($tugasAkhir->judul ?? '-', 60) }}
                                                     </p>
-                                                    @if (strlen($peran->tugasAkhir?->judul ?? '') > 60)
+                                                    @if (strlen($tugasAkhir->judul ?? '') > 60)
                                                         <small class="text-muted">...</small>
                                                     @endif
                                                 </div>
                                             </td>
                                             <td class="text-center py-3">
-                                                <span
-                                                    class="badge {{ $peran->peran === 'pembimbing1' ? 'bg-primary' : 'bg-info' }} rounded-pill px-3 py-2">
-                                                    <i class="bi bi-person-badge me-1"></i>
-                                                    {{ $peran->peran === 'pembimbing1' ? 'Pembimbing 1' : 'Pembimbing 2' }}
-                                                </span>
+                                                {{-- ✅ PERBAIKAN: Mencari peran dosen yang sedang login dari relasi --}}
+                                                @php
+                                                    $peranDosenIni = $tugasAkhir->peranDosenTa
+                                                        ->where('dosen_id', auth()->user()->dosen->id)
+                                                        ->first();
+                                                @endphp
+                                                @if ($peranDosenIni)
+                                                    <span
+                                                        class="badge {{ $peranDosenIni->peran === 'pembimbing1' ? 'bg-primary' : 'bg-info' }} rounded-pill px-3 py-2">
+                                                        <i class="bi bi-person-badge me-1"></i>
+                                                        {{ $peranDosenIni->peran === 'pembimbing1' ? 'Pembimbing 1' : 'Pembimbing 2' }}
+                                                    </span>
+                                                @endif
                                             </td>
                                             <td class="text-center py-3 pe-4">
                                                 <div class="d-flex justify-content-center gap-1">
-                                                    <a href="{{ route('dosen.bimbingan.show', $peran->tugas_akhir_id) }}"
+                                                    {{-- ✅ PERBAIKAN: Meneruskan objek $tugasAkhir ke route --}}
+                                                    <a href="{{ route('dosen.bimbingan.show', $tugasAkhir) }}"
                                                         class="btn btn-sm btn-outline-primary rounded-pill px-3"
                                                         data-bs-toggle="tooltip" data-bs-placement="top"
                                                         title="Lihat detail bimbingan">

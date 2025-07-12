@@ -46,23 +46,35 @@ class BimbinganService
         $this->authorizeDosenIsPembimbing($tugasAkhir);
         $tugasAkhir->load('peranDosenTa.dosen.user', 'mahasiswa.user');
 
-        // Ambil sesi bimbingan yang sedang aktif (diajukan atau dijadwalkan)
         $sesiAktif = $tugasAkhir->bimbinganTa()
             ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
-            ->first(); // Hanya akan ada satu sesi aktif pada satu waktu
+            ->first();
 
-        // Ambil semua catatan dari semua sesi untuk tugas akhir ini
         $catatanList = CatatanBimbingan::whereIn('bimbingan_ta_id', $tugasAkhir->bimbinganTa()->pluck('id'))
             ->with('author.user')
             ->orderBy('created_at', 'asc')
             ->get();
 
+        // ✅ PERBAIKAN: Menambahkan kembali logika penghitungan bimbingan yang selesai.
+        $pembimbing1 = $tugasAkhir->pembimbingSatu;
+        $pembimbing2 = $tugasAkhir->pembimbingDua;
+
+        $bimbinganCountP1 = $pembimbing1
+            ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count()
+            : 0;
+
+        $bimbinganCountP2 = $pembimbing2
+            ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count()
+            : 0;
+
         return [
             'tugasAkhir' => $tugasAkhir,
             'sesiAktif' => $sesiAktif,
             'catatanList' => $catatanList,
-            'pembimbing1' => $tugasAkhir->pembimbingSatu,
-            'pembimbing2' => $tugasAkhir->pembimbingDua,
+            'pembimbing1' => $pembimbing1,
+            'pembimbing2' => $pembimbing2,
+            'bimbinganCountP1' => $bimbinganCountP1, // <-- Key sekarang ada
+            'bimbinganCountP2' => $bimbinganCountP2, // <-- Key sekarang ada
         ];
     }
 
