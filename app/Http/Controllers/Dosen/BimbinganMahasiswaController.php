@@ -23,7 +23,7 @@ class BimbinganMahasiswaController extends Controller
      */
     public function index(Request $request)
     {
-        $mahasiswaList = $this->bimbinganService->getFilteredMahasiswaBimbingan($request);
+        $mahasiswaList = $this->bimbinganService->getPengajuanBimbingan($request);
 
         // Pastikan path view ini benar sesuai struktur folder Anda
         return view('dosen.bimbingan.dashboard.dashboard', compact('mahasiswaList'));
@@ -48,7 +48,7 @@ class BimbinganMahasiswaController extends Controller
 
         // Mengirim semua data yang dibutuhkan oleh view baru yang telah kita rancang.
         // Pastikan path view ini benar.
-        return view('dosen.bimbingan.show', [
+        return view('dosen.bimbingan.detail-bimbingan.detail', [
             'mahasiswa' => $tugasAkhir->mahasiswa,
             'tugasAkhir' => $tugasAkhir,
             'catatanList' => $data['catatanList'],

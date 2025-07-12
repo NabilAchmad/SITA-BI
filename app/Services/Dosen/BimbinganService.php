@@ -5,9 +5,7 @@ namespace App\Services\Dosen;
 use App\Models\BimbinganTA;
 use App\Models\CatatanBimbingan;
 use App\Models\Dosen;
-use App\Models\PeranDosenTa;
 use App\Models\TugasAkhir;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\UnauthorizedException;
 
@@ -23,93 +21,99 @@ class BimbinganService
     }
 
     /**
-     * Mengambil daftar mahasiswa bimbingan untuk dasbor dosen.
+     * [DIREVISI] Mengambil daftar mahasiswa yang mengajukan bimbingan.
+     * Logika ini akan menjadi dasar untuk dashboard dosen.
      */
-    public function getFilteredMahasiswaBimbingan(Request $request): \Illuminate\Database\Eloquent\Collection
+    public function getPengajuanBimbingan()
     {
-        return PeranDosenTa::query()
-            ->where('dosen_id', $this->dosen->id)
-            ->whereHas('tugasAkhir', fn($q) => $q->active())
-            ->with(['tugasAkhir.mahasiswa.user'])
-            ->latest()
+        // 1. Ambil semua ID Tugas Akhir yang dibimbing oleh dosen ini.
+        $tugasAkhirIds = $this->dosen->peranDosenTa()->pluck('tugas_akhir_id');
+
+        // 2. Cari semua Tugas Akhir tersebut yang memiliki sesi bimbingan dengan status 'diajukan'.
+        return TugasAkhir::whereIn('id', $tugasAkhirIds)
+            ->whereHas('bimbinganTa', function ($query) {
+                $query->where('status_bimbingan', 'diajukan');
+            })
+            ->with('mahasiswa.user')
             ->get();
     }
 
     /**
-     * [DISEMPURNAKAN] Menyiapkan semua data untuk halaman detail bimbingan.
+     * [DIREVISI] Menyiapkan semua data untuk halaman detail bimbingan.
      */
     public function getDataForBimbinganDetailPage(TugasAkhir $tugasAkhir): array
     {
         $this->authorizeDosenIsPembimbing($tugasAkhir);
+        $tugasAkhir->load('peranDosenTa.dosen.user', 'mahasiswa.user');
 
-        // ✅ PERBAIKAN: Eager load relasi 'peranDosenTa' untuk mencegah N+1 query
-        // saat memanggil accessor pembimbingSatu/pembimbingDua.
-        $tugasAkhir->load('peranDosenTa.dosen.user');
+        // Ambil sesi bimbingan yang sedang aktif (diajukan atau dijadwalkan)
+        $sesiAktif = $tugasAkhir->bimbinganTa()
+            ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
+            ->first(); // Hanya akan ada satu sesi aktif pada satu waktu
 
+        // Ambil semua catatan dari semua sesi untuk tugas akhir ini
         $catatanList = CatatanBimbingan::whereIn('bimbingan_ta_id', $tugasAkhir->bimbinganTa()->pluck('id'))
             ->with('author.user')
             ->orderBy('created_at', 'asc')
             ->get();
 
-        // Logika penghitungan bimbingan per dosen
-        $pembimbing1 = $tugasAkhir->pembimbingSatu;
-        $pembimbing2 = $tugasAkhir->pembimbingDua;
-
-        $bimbinganCountP1 = $pembimbing1
-            ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count()
-            : 0;
-
-        $bimbinganCountP2 = $pembimbing2
-            ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count()
-            : 0;
-
         return [
+            'tugasAkhir' => $tugasAkhir,
+            'sesiAktif' => $sesiAktif,
             'catatanList' => $catatanList,
-            'bimbinganCountP1' => $bimbinganCountP1,
-            'bimbinganCountP2' => $bimbinganCountP2,
-            'pembimbing1' => $pembimbing1,
-            'pembimbing2' => $pembimbing2,
+            'pembimbing1' => $tugasAkhir->pembimbingSatu,
+            'pembimbing2' => $tugasAkhir->pembimbingDua,
         ];
     }
 
     /**
-     * [DISEMPURNAKAN] Membuat jadwal bimbingan baru dengan aturan "Satu Sesi Aktif".
+     * [FUNGSI BARU] Mengatur jadwal untuk sesi bimbingan yang diajukan mahasiswa.
+     * Fungsi ini akan meng-update record yang sudah ada, bukan membuat baru.
      */
-    public function createJadwal(TugasAkhir $tugasAkhir, array $data): BimbinganTA
+    public function setJadwal(TugasAkhir $tugasAkhir, array $data): void
     {
         $this->authorizeDosenIsPembimbing($tugasAkhir);
 
-        // ✅ ATURAN BARU: Cek apakah sudah ada jadwal lain yang aktif.
-        $jadwalAktifExists = $tugasAkhir->bimbinganTa()->where('status_bimbingan', 'dijadwalkan')->exists();
-
-        if ($jadwalAktifExists) {
-            throw new \Exception('Gagal membuat jadwal. Masih ada sesi bimbingan lain yang aktif dan belum selesai.');
+        // 1. Validasi: Pastikan tidak ada jadwal lain yang sudah aktif.
+        if ($tugasAkhir->bimbinganTa()->where('status_bimbingan', 'dijadwalkan')->exists()) {
+            throw new \Exception('Gagal mengatur jadwal. Jadwal sudah ditentukan oleh pembimbing lain.');
         }
 
-        return $tugasAkhir->bimbinganTa()->create([
-            'dosen_id' => $this->dosen->id,
-            'peran' => $this->getDosenRole($tugasAkhir)->peran,
+        // 2. Cari semua sesi yang 'diajukan' untuk TA ini (seharusnya ada 2, satu per dosen).
+        $pengajuanBimbingan = $tugasAkhir->bimbinganTa()->where('status_bimbingan', 'diajukan');
+
+        if ($pengajuanBimbingan->count() === 0) {
+            throw new \Exception('Tidak ada pengajuan bimbingan yang aktif dari mahasiswa.');
+        }
+
+        // 3. Update semua record yang 'diajukan' menjadi 'dijadwalkan' dengan tanggal & jam baru.
+        $pengajuanBimbingan->update([
             'tanggal_bimbingan' => $data['tanggal_bimbingan'],
-            'jam_bimbingan' => $data['jam_bimbingan'],
-            'status_bimbingan' => 'dijadwalkan',
-            'sesi_ke' => ($tugasAkhir->bimbinganTa()->max('sesi_ke') ?? 0) + 1
+            'jam_bimbingan'     => $data['jam_bimbingan'],
+            'status_bimbingan'  => 'dijadwalkan',
         ]);
     }
 
     /**
-     * Menyimpan catatan baru dari dosen ke log bimbingan.
+     * [DIREVISI] Menyimpan catatan baru dari dosen ke sesi bimbingan yang relevan.
      */
     public function createCatatan(TugasAkhir $tugasAkhir, array $data): CatatanBimbingan
     {
         $this->authorizeDosenIsPembimbing($tugasAkhir);
 
-        $sesiBimbingan = $tugasAkhir->bimbinganTa()->where('status_bimbingan', '!=', 'selesai')->latest()->first();
+        // 1. Cari sesi bimbingan yang aktif (diajukan/dijadwalkan) untuk dosen yang sedang login.
+        $sesiBimbinganDosen = $tugasAkhir->bimbinganTa()
+            ->where('dosen_id', $this->dosen->id)
+            ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
+            ->latest()
+            ->first();
 
-        if (!$sesiBimbingan) {
-            throw new \Exception('Tidak ada sesi bimbingan aktif untuk menambahkan catatan. Silakan jadwalkan sesi baru terlebih dahulu.');
+        if (!$sesiBimbinganDosen) {
+            throw new \Exception('Tidak ada sesi bimbingan aktif untuk menambahkan catatan.');
         }
 
-        return $sesiBimbingan->catatan()->create([
+        // 2. Simpan catatan ke sesi tersebut.
+        return $sesiBimbinganDosen->catatan()->create([
             'catatan'     => $data['catatan'],
             'author_type' => Dosen::class,
             'author_id'   => $this->dosen->id,
@@ -117,41 +121,49 @@ class BimbinganService
     }
 
     /**
-     * Menandai sesi bimbingan sebagai 'selesai'.
+     * [DIREVISI] Menandai sesi bimbingan sebagai 'selesai' hanya untuk dosen yang login.
      */
     public function selesaikanSesi(BimbinganTA $bimbingan): void
     {
-        $this->authorizeDosenIsPembimbing($bimbingan->tugasAkhir);
+        // Otorisasi: Pastikan dosen yang login adalah pemilik record bimbingan ini.
+        if ($bimbingan->dosen_id !== $this->dosen->id) {
+            throw new UnauthorizedException('Anda tidak berwenang menyelesaikan sesi bimbingan ini.');
+        }
         if ($bimbingan->status_bimbingan !== 'dijadwalkan') {
             throw new \Exception('Hanya bimbingan yang dijadwalkan yang bisa diselesaikan.');
         }
+
+        // Update status hanya untuk record milik dosen ini.
         $bimbingan->update(['status_bimbingan' => 'selesai']);
     }
 
     /**
-     * Membatalkan sesi bimbingan yang sudah dijadwalkan.
+     * [DIREVISI] Membatalkan sesi bimbingan untuk kedua dosen.
      */
     public function cancelBimbingan(BimbinganTA $bimbingan): void
     {
-        if (Auth::user()->dosen->id !== $bimbingan->dosen_id) {
-            throw new UnauthorizedException('Anda tidak berwenang membatalkan jadwal ini.');
+        $this->authorizeDosenIsPembimbing($bimbingan->tugasAkhir);
+
+        // 1. Cari semua sesi yang dijadwalkan dengan nomor sesi yang sama.
+        $sesiTerkait = $bimbingan->tugasAkhir->bimbinganTa()
+            ->where('sesi_ke', $bimbingan->sesi_ke)
+            ->where('status_bimbingan', 'dijadwalkan');
+
+        if ($sesiTerkait->count() === 0) {
+            throw new \Exception('Tidak ada jadwal aktif untuk dibatalkan.');
         }
-        if ($bimbingan->status_bimbingan !== 'dijadwalkan') {
-            throw new \Exception('Hanya bimbingan yang dijadwalkan yang bisa dibatalkan.');
-        }
-        $bimbingan->update(['status_bimbingan' => 'dibatalkan']);
+
+        // 2. Batalkan semua sesi terkait (untuk kedua dosen).
+        $sesiTerkait->update(['status_bimbingan' => 'dibatalkan']);
     }
 
-    // --- FUNGSI HELPER OTORISASI ---
+    /**
+     * Helper untuk otorisasi.
+     */
     private function authorizeDosenIsPembimbing(TugasAkhir $tugasAkhir): void
     {
         if (!$tugasAkhir->peranDosenTa()->where('dosen_id', $this->dosen->id)->exists()) {
             throw new UnauthorizedException('Anda bukan pembimbing untuk tugas akhir ini.');
         }
-    }
-
-    private function getDosenRole(TugasAkhir $tugasAkhir): PeranDosenTa
-    {
-        return $tugasAkhir->peranDosenTa->where('dosen_id', $this->dosen->id)->firstOrFail();
     }
 }

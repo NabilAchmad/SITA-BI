@@ -28,7 +28,11 @@ class DokumenTa extends Model
         'tugas_akhir_id',
         'tipe_dokumen',
         'file_path',
-        'catatan_reviewer', // Tambahkan kolom lain yang mungkin diisi massal
+        'version',
+        'status_validasi',
+        'divalidasi_oleh',
+        'catatan_reviewer',
+        // 'bimbingan_ta_id' // <-- Jika Anda mengikuti rekomendasi saya sebelumnya untuk menambah kolom ini
     ];
 
     /**

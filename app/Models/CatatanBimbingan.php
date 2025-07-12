@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class CatatanBimbingan extends Model
 {
@@ -13,23 +11,31 @@ class CatatanBimbingan extends Model
 
     protected $table = 'catatan_bimbingan';
 
-    protected $guarded = ['id'];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    // ✅ PERBAIKAN: Menambahkan semua kolom yang dibutuhkan oleh service
+    protected $fillable = [
+        'bimbingan_ta_id',
+        'catatan',
+        'author_type',
+        'author_id',
+    ];
 
     /**
-     * Relasi ke sesi bimbingan (induknya).
+     * Get the parent bimbingan model.
      */
-    public function bimbinganTa(): BelongsTo
+    public function bimbinganTa()
     {
-        return $this->belongsTo(BimbinganTA::class, 'bimbingan_ta_id');
+        return $this->belongsTo(BimbinganTA::class);
     }
 
     /**
-     * ✅ [PERBAIKAN FINAL DAN KUNCI]
-     * Definisikan relasi polimorfik 'author' dengan benar menggunakan morphTo().
-     * Ini akan secara otomatis menemukan Dosen atau Mahasiswa berdasarkan
-     * isi kolom 'author_type' dan 'author_id'.
+     * Get the owning author model (can be Mahasiswa or Dosen).
      */
-    public function author(): MorphTo
+    public function author()
     {
         return $this->morphTo();
     }

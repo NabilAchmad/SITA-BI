@@ -22,20 +22,25 @@ class JadwalBimbinganController extends Controller
      */
     public function store(Request $request, TugasAkhir $tugasAkhir)
     {
+        // 1. Validasi input dari form dosen
         $data = $request->validate([
             'tanggal_bimbingan' => 'required|date|after_or_equal:today',
             'jam_bimbingan' => 'required|date_format:H:i',
         ]);
 
         try {
-            $this->bimbinganService->createJadwal($tugasAkhir, $data);
+            // 2. Panggil fungsi 'setJadwal' dari service yang ada di Canvas
+            $this->bimbinganService->setJadwal($tugasAkhir, $data);
 
+            // 3. Redirect kembali ke halaman detail dengan pesan sukses
             return redirect()->route('dosen.bimbingan.show', $tugasAkhir->id)->with('alert', [
                 'type' => 'success',
                 'title' => 'Berhasil!',
-                'message' => 'Jadwal bimbingan baru telah berhasil dibuat.'
+                'message' => 'Jadwal bimbingan telah berhasil ditetapkan.'
             ]);
         } catch (\Exception $e) {
+            // 4. Jika service melempar error (misal: jadwal sudah diatur),
+            //    tangkap dan tampilkan pesannya.
             return redirect()->back()->with('alert', [
                 'type' => 'error',
                 'title' => 'Gagal!',

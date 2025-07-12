@@ -1,8 +1,4 @@
 <?php
-// ===================================================================================
-// 1. BUAT FILE CONTROLLER BARU INI
-// Lokasi: app/Http/Controllers/Mahasiswa/CatatanBimbinganController.php
-// ===================================================================================
 
 namespace App\Http\Controllers\Mahasiswa;
 

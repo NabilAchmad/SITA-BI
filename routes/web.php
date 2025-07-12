@@ -82,7 +82,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/progress', [TugasAkhirController::class, 'progress'])->name('progress');
             Route::get('/ajukan-mandiri', [TugasAkhirController::class, 'ajukanForm'])->name('ajukan');
             Route::post('/ajukan-mandiri', [TugasAkhirController::class, 'store'])->name('store');
-            Route::post('/{tugasAkhir}/upload-file', [TugasAkhirController::class, 'uploadFile'])->name('upload-file');
+            Route::post('/{tugasAkhir}/upload-file', [TugasAkhirController::class, 'ajukanBimbingan'])->name('upload-file');
 
             // Rute untuk MELIHAT halaman riwayat tugas akhir yang dibatalkan.
             Route::get('/riwayat-pembatalan', [TugasAkhirController::class, 'showCancelled'])->name('show-cancelled');

@@ -2,46 +2,152 @@
 
 namespace App\Services\Mahasiswa;
 
+use App\Models\BimbinganTA;
+use App\Models\DokumenTa;
 use App\Models\Mahasiswa;
 use App\Models\TugasAkhir;
-use App\Models\User; // ✅ PERBAIKAN: Import model User
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\UploadedFile;
-use App\Models\DokumenTa;
-use Illuminate\Support\Facades\DB; // <-- 1. Pastikan DB di-import
-use App\Models\CatatanBimbingan;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\UnauthorizedException;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
+/**
+ * Service ini mengelola semua logika bisnis terkait Tugas Akhir dari sisi Mahasiswa.
+ */
 class TugasAkhirService
 {
     protected ?Mahasiswa $mahasiswa;
 
-    /**
-     * Service ini selalu bekerja dalam konteks mahasiswa yang sedang login.
-     */
     public function __construct()
     {
-        // Konstruktor yang aman untuk memastikan service hanya bekerja untuk mahasiswa.
         if (Auth::check() && Auth::user()->hasRole('mahasiswa')) {
             $this->mahasiswa = Auth::user()->mahasiswa;
         } else {
-            // Jika bukan mahasiswa, properti akan null, dan metode akan gagal dengan aman.
             $this->mahasiswa = null;
         }
     }
 
     /**
-     * Membuat data Tugas Akhir baru jika belum ada yang aktif.
-     *
-     * @param array $validatedData Data judul dari request.
-     * @return TugasAkhir
-     * @throws \Exception
+     * [DIREVISI FINAL] Menangani upload file.
+     * - Membuat DUA record bimbingan, satu untuk setiap pembimbing.
+     * - Memastikan tanggal bimbingan NULL saat dibuat.
+     * - Mengizinkan penggantian file jika sesi masih 'diajukan'.
+     */
+    public function ajukanBimbinganDenganFile(TugasAkhir $tugasAkhir, UploadedFile $file, string $tipeDokumen, ?string $catatan = null): void
+    {
+        if (optional($this->mahasiswa)->id !== $tugasAkhir->mahasiswa_id) {
+            throw new UnauthorizedException('Anda tidak berwenang untuk tugas akhir ini.');
+        }
+
+        if ($tugasAkhir->bimbinganTa()->where('status_bimbingan', 'dijadwalkan')->exists()) {
+            throw new \Exception('Gagal mengunggah file baru. Sesi bimbingan sudah dijadwalkan oleh dosen.');
+        }
+
+        $pembimbing1 = $tugasAkhir->pembimbingSatu;
+        $pembimbing2 = $tugasAkhir->pembimbingDua;
+
+        if (!$pembimbing1 || !$pembimbing2) {
+            throw new \Exception('Tidak dapat mengajukan bimbingan. Dosen Pembimbing 1 dan 2 harus ditetapkan terlebih dahulu.');
+        }
+
+        $mahasiswaId = $tugasAkhir->mahasiswa_id;
+
+        DB::transaction(function () use ($tugasAkhir, $file, $tipeDokumen, $catatan, $pembimbing1, $pembimbing2, $mahasiswaId) {
+
+            // ✅ PERBAIKAN: Logika diubah untuk memastikan kedua sesi bimbingan selalu ada.
+
+            $sesiKe = ($tugasAkhir->bimbinganTa()->where('status_bimbingan', 'selesai')->distinct('sesi_ke')->count()) + 1;
+
+            $dataBimbingan = [
+                'sesi_ke'           => $sesiKe,
+                'status_bimbingan'  => 'diajukan',
+                'tanggal_bimbingan' => null,
+                'jam_bimbingan'     => null,
+            ];
+
+            // Cari atau buat sesi untuk Pembimbing 1
+            $sesiBimbinganP1 = $tugasAkhir->bimbinganTa()->firstOrCreate(
+                ['dosen_id' => $pembimbing1->dosen_id, 'status_bimbingan' => 'diajukan'],
+                array_merge($dataBimbingan, ['peran' => $pembimbing1->peran])
+            );
+
+            // Cari atau buat sesi untuk Pembimbing 2
+            $sesiBimbinganP2 = $tugasAkhir->bimbinganTa()->firstOrCreate(
+                ['dosen_id' => $pembimbing2->dosen_id, 'status_bimbingan' => 'diajukan'],
+                array_merge($dataBimbingan, ['peran' => $pembimbing2->peran])
+            );
+
+            // Hapus dokumen lama yang terkait dengan tugas akhir ini jika ada.
+            $dokumenLama = $tugasAkhir->dokumenTa()->latest()->first();
+            if ($dokumenLama) {
+                Storage::disk('public')->delete($dokumenLama->file_path);
+                $dokumenLama->forceDelete();
+            }
+
+            // Simpan file dan buat record dokumen yang BARU.
+            $latestVersion = ($tugasAkhir->dokumenTa()->where('tipe_dokumen', $tipeDokumen)->max('version') ?? 0) + 1;
+            // Gunakan nomor sesi sebagai referensi folder.
+            $filePath = $file->store("dokumen_ta/{$tugasAkhir->id}/sesi_{$sesiBimbinganP1->sesi_ke}", 'public');
+            $tugasAkhir->dokumenTa()->create([
+                'tipe_dokumen'   => $tipeDokumen,
+                'file_path'      => $filePath,
+                'version'        => $latestVersion,
+            ]);
+
+            // Simpan catatan baru jika ada.
+            // Dengan logika firstOrCreate, $sesiBimbinganP1 dan $sesiBimbinganP2 dijamin tidak akan null.
+            if (!empty($catatan)) {
+                $dataCatatan = [
+                    'catatan'     => $catatan,
+                    'author_type' => Mahasiswa::class,
+                    'author_id'   => $mahasiswaId,
+                ];
+                $sesiBimbinganP1->catatan()->create($dataCatatan);
+                $sesiBimbinganP2->catatan()->create($dataCatatan);
+            }
+        });
+    }
+
+    // revisi bagian model
+    public function createCatatanForMahasiswa(TugasAkhir $tugasAkhir, array $data)
+    {
+        // 1. Otorisasi: Pastikan mahasiswa yang login adalah pemilik TA ini.
+        if (optional($this->mahasiswa)->id !== $tugasAkhir->mahasiswa_id) {
+            throw new UnauthorizedException('Anda tidak berwenang untuk tugas akhir ini.');
+        }
+
+        // 2. Cari Sesi Aktif: Temukan sesi bimbingan terakhir yang statusnya masih 'diajukan' atau 'dijadwalkan'.
+        // Catatan hanya bisa ditambahkan ke sesi yang sedang berjalan.
+        $sesiBimbingan = $tugasAkhir->bimbinganTa()
+            ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
+            ->latest()
+            ->first();
+
+        // 3. Validasi: Jika tidak ada sesi aktif, lemparkan error yang jelas.
+        if (!$sesiBimbingan) {
+            throw new \Exception('Tidak bisa mengirim catatan. Tidak ada sesi bimbingan yang sedang aktif menunggu jadwal dari dosen.');
+        }
+
+        // 4. Simpan ke Model yang Benar: Membuat record baru pada relasi 'catatan()' 
+        //    yang ada di model BimbinganTA.
+        return $sesiBimbingan->catatan()->create([
+            'catatan'     => $data['catatan'],
+            // Menggunakan polymorphic relationship untuk mencatat siapa pengirimnya.
+            'author_type' => Mahasiswa::class,
+            'author_id'   => $this->mahasiswa->id,
+        ]);
+    }
+
+    /**
+     * Membuat data Tugas Akhir baru.
      */
     public function createTugasAkhir(array $validatedData): TugasAkhir
     {
         if ($this->mahasiswa->tugasAkhir()->active()->exists()) {
             throw new \Exception('Anda sudah memiliki Tugas Akhir yang aktif.');
         }
-
         return $this->mahasiswa->tugasAkhir()->create([
             'judul' => $validatedData['judul'],
             'status' => TugasAkhir::STATUS_DIAJUKAN,
@@ -50,80 +156,7 @@ class TugasAkhirService
     }
 
     /**
-     * @param TugasAkhir $tugasAkhir Instance model TugasAkhir.
-     * @param UploadedFile $file File yang di-upload dari request.
-     * @param string $tipeDokumen Tipe dokumen.
-     * @param string|null $catatan Catatan opsional dari mahasiswa.
-     * @return DokumenTa Instance DokumenTa yang baru dibuat.
-     */
-    /**
-     * [PERBAIKAN TOTAL] Menangani upload file dan membuat JEJAK di log
-     * menggunakan ID Dokumen, bukan nama file.
-     */
-    public function handleUploadFile(TugasAkhir $tugasAkhir, UploadedFile $file, string $tipeDokumen, ?string $catatan = null): DokumenTa
-    {
-        return DB::transaction(function () use ($tugasAkhir, $file, $tipeDokumen, $catatan) {
-
-            // Langkah 1: Simpan File & Dokumen.
-            $filePath = $file->store("dokumen_ta/{$tugasAkhir->id}", 'public');
-            $tugasAkhir->update(['file_path' => $filePath]);
-
-            $dokumen = $tugasAkhir->dokumenTa()->create([
-                'tipe_dokumen' => $tipeDokumen,
-                'file_path'    => $filePath,
-            ]);
-
-            // Langkah 2: Buat "Jejak" di Log Bimbingan.
-            $sesiBimbingan = $tugasAkhir->bimbinganTa()->latest()->first();
-
-            if (!$sesiBimbingan) {
-                throw new \Exception('Tidak bisa mengunggah file. Belum ada sesi bimbingan yang dibuat oleh dosen.');
-            }
-
-            // Buat catatan "UPLOAD" otomatis.
-            $sesiBimbingan->catatan()->create([
-                'catatan'     => "UPLOAD_ID:" . $dokumen->id,
-                'author_type' => Mahasiswa::class,
-                'author_id'   => $this->mahasiswa->id,
-            ]);
-
-            // Jika ada catatan manual, simpan juga sebagai entri terpisah.
-            if (!empty($catatan)) {
-                $sesiBimbingan->catatan()->create([
-                    'catatan'     => $catatan,
-                    'author_type' => Mahasiswa::class,
-                    'author_id'   => $this->mahasiswa->id,
-                ]);
-            }
-
-            return $dokumen;
-        });
-    }
-
-    /**
-     * Mengajukan pembatalan Tugas Akhir.
-     *
-     * @param TugasAkhir $tugasAkhir
-     * @param string|null $alasan
-     * @return void
-     * @throws \Exception
-     */
-    public function requestCancellation(TugasAkhir $tugasAkhir, ?string $alasan): void
-    {
-        if ($tugasAkhir->mahasiswa_id !== $this->mahasiswa->id) {
-            throw new \Exception('Anda tidak berhak mengakses tugas akhir ini.');
-        }
-
-        $tugasAkhir->update([
-            'status' => TugasAkhir::STATUS_MENUNGGU_PEMBATALAN,
-            'alasan_pembatalan' => $alasan,
-        ]);
-    }
-
-    /**
-     * Mengambil data untuk halaman dashboard mahasiswa.
-     *
-     * @return array
+     * [FUNGSI DITAMBAHKAN KEMBALI] Mengambil data untuk halaman dashboard mahasiswa.
      */
     public function getDashboardData(): array
     {
@@ -135,9 +168,7 @@ class TugasAkhirService
     }
 
     /**
-     * Mengambil data untuk halaman progress tugas akhir mahasiswa.
-     *
-     * @return array
+     * Mengambil data untuk halaman progress tugas akhir.
      */
     public function getProgressPageData(): array
     {
@@ -145,45 +176,42 @@ class TugasAkhirService
             return $this->getEmptyProgressData();
         }
 
-        // Cari tugas akhir yang aktif milik mahasiswa yang login dengan semua relasi penting.
-        $tugasAkhir = $this->mahasiswa->tugasAkhir()
-            ->active()
-            // ✅ PERBAIKAN: Memuat relasi 'peranDosenTa' yang sebenarnya, bukan accessor.
-            // Ini akan menyelesaikan error "undefined relationship" dan mencegah N+1 query.
-            ->with(['mahasiswa.user', 'peranDosenTa.dosen.user'])
-            ->latest()
-            ->first();
+        $tugasAkhir = $this->getActiveTugasAkhirForProgressPage();
 
-        // Jika tidak ada TA aktif, kembalikan struktur data kosong.
         if (!$tugasAkhir) {
             return $this->getEmptyProgressData();
         }
 
-        // Ambil semua catatan untuk log bimbingan.
-        $catatanList = CatatanBimbingan::whereIn(
-            'bimbingan_ta_id',
-            $tugasAkhir->bimbinganTa()->pluck('id')
-        )
-            ->with('author.user')
-            ->orderBy('created_at', 'asc')
-            ->get();
+        // ✅ PERBAIKAN: Ambil sesi bimbingan yang paling baru.
+        // Prioritaskan yang statusnya masih aktif (diajukan/dijadwalkan).
+        $sesiBimbinganTerbaru = $tugasAkhir->bimbinganTa()
+            ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
+            ->latest()
+            ->first();
 
-        // Hitung jumlah bimbingan yang selesai untuk setiap pembimbing.
-        // Kode ini sekarang akan berjalan efisien karena 'peranDosenTa' sudah di-eager load.
+        // Jika tidak ada yang aktif, ambil saja yang terakhir dibuat (misal: sudah selesai).
+        if (!$sesiBimbinganTerbaru) {
+            $sesiBimbinganTerbaru = $tugasAkhir->bimbinganTa()->latest()->first();
+        }
+
+        // ✅ PERBAIKAN: Ambil catatan HANYA dari sesi terbaru tersebut.
+        $catatanList = $sesiBimbinganTerbaru
+            ? $sesiBimbinganTerbaru->catatan()->with('author.user')->orderBy('created_at', 'asc')->get()
+            : collect();
+
+        // ✅ BARU: Ambil dokumen yang paling terakhir diunggah secara terpisah.
+        $dokumenTerbaru = $tugasAkhir->dokumenTa()->latest()->first();
+
+        // Penghitungan jumlah bimbingan tetap sama.
         $pembimbing1 = $tugasAkhir->pembimbingSatu;
         $pembimbing2 = $tugasAkhir->pembimbingDua;
-
-        $bimbinganCountP1 = $pembimbing1
-            ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count()
-            : 0;
-
-        $bimbinganCountP2 = $pembimbing2
-            ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count()
-            : 0;
+        $bimbinganCountP1 = $pembimbing1 ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
+        $bimbinganCountP2 = $pembimbing2 ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
 
         return [
             'tugasAkhir'       => $tugasAkhir,
-            'catatanList'      => $catatanList,
+            'dokumenTerbaru'   => $dokumenTerbaru, // Kirim data dokumen terbaru ke view
+            'catatanList'      => $catatanList,    // Kirim catatan dari sesi terakhir
             'bimbinganCountP1' => $bimbinganCountP1,
             'bimbinganCountP2' => $bimbinganCountP2,
             'pembimbing1'      => $pembimbing1,
@@ -192,9 +220,21 @@ class TugasAkhirService
     }
 
     /**
-     * Mengambil daftar TA yang sudah dibatalkan milik mahasiswa.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Mengajukan pembatalan Tugas Akhir.
+     */
+    public function requestCancellation(TugasAkhir $tugasAkhir, ?string $alasan): void
+    {
+        if ($tugasAkhir->mahasiswa_id !== $this->mahasiswa->id) {
+            throw new \Exception('Anda tidak berhak mengakses tugas akhir ini.');
+        }
+        $tugasAkhir->update([
+            'status' => TugasAkhir::STATUS_MENUNGGU_PEMBATALAN,
+            'alasan_pembatalan' => $alasan,
+        ]);
+    }
+
+    /**
+     * [FUNGSI DITAMBAHKAN KEMBALI] Mengambil daftar TA yang sudah dibatalkan milik mahasiswa.
      */
     public function getCancelledTugasAkhir()
     {
@@ -205,40 +245,7 @@ class TugasAkhirService
     }
 
     /**
-     * [BARU] Menyimpan catatan dari mahasiswa.
-     *
-     * @param TugasAkhir $tugasAkhir
-     * @param array $data
-     * @return CatatanBimbingan
-     * @throws \Exception
-     */
-    public function createCatatanForMahasiswa(TugasAkhir $tugasAkhir, array $data): CatatanBimbingan
-    {
-        // Pastikan mahasiswa yang login adalah pemilik TA ini
-        if (Auth::user()->mahasiswa->id !== $tugasAkhir->mahasiswa_id) {
-            throw new \Illuminate\Validation\UnauthorizedException('Anda tidak berwenang untuk tugas akhir ini.');
-        }
-
-        // Cari sesi bimbingan terakhir yang aktif untuk menampung catatan ini
-        $sesiBimbingan = $tugasAkhir->bimbinganTa()->where('status_bimbingan', '!=', 'selesai')->latest()->first();
-
-        // Jika tidak ada sesi aktif, berikan error yang jelas
-        if (!$sesiBimbingan) {
-            throw new \Exception('Tidak bisa mengirim catatan. Belum ada sesi bimbingan yang dijadwalkan oleh dosen.');
-        }
-
-        // Simpan catatan dengan author adalah mahasiswa yang sedang login
-        return $sesiBimbingan->catatan()->create([
-            'catatan'     => $data['catatan'],
-            'author_type' => Mahasiswa::class,
-            'author_id'   => Auth::user()->mahasiswa->id,
-        ]);
-    }
-
-    /**
      * Helper untuk mengambil TA aktif milik mahasiswa.
-     *
-     * @return TugasAkhir|null
      */
     protected function getActiveTugasAkhir(): ?TugasAkhir
     {
@@ -246,9 +253,7 @@ class TugasAkhirService
     }
 
     /**
-     * Helper untuk mengambil TA aktif dengan semua relasi yang dibutuhkan di halaman progress.
-     *
-     * @return TugasAkhir|null
+     * Helper untuk mengambil TA aktif dengan semua relasi yang dibutuhkan.
      */
     protected function getActiveTugasAkhirForProgressPage(): ?TugasAkhir
     {
@@ -258,15 +263,18 @@ class TugasAkhirService
             ->first();
     }
 
+    /**
+     * Helper untuk data kosong.
+     */
     private function getEmptyProgressData(): array
     {
         return [
-            'tugasAkhir' => null,
-            'catatanList' => collect(),
+            'tugasAkhir'       => null,
+            'catatanList'      => collect(),
             'bimbinganCountP1' => 0,
             'bimbinganCountP2' => 0,
-            'pembimbing1' => null,
-            'pembimbing2' => null,
+            'pembimbing1'      => null,
+            'pembimbing2'      => null,
         ];
     }
 }

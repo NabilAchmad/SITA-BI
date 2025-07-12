@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\TugasAkhir;
-use App\Services\Mahasiswa\TugasAkhirService; // ✅ Menggunakan Service baru
-use App\Http\Requests\Mahasiswa\CreateTugasAkhirRequest; // ✅ Menggunakan Request baru untuk 'store'
+use App\Services\Mahasiswa\TugasAkhirService;
+use App\Http\Requests\Mahasiswa\CreateTugasAkhirRequest;
 use App\Http\Requests\Mahasiswa\UploadFileRequest;
 use Illuminate\Http\Request;
 
 class TugasAkhirController extends Controller
 {
-    // Gunakan constructor property promotion untuk kode yang lebih ringkas
+    // Menggunakan constructor property promotion untuk kode yang lebih ringkas.
     public function __construct(protected TugasAkhirService $tugasAkhirService) {}
 
     public function dashboard()
@@ -22,15 +22,12 @@ class TugasAkhirController extends Controller
 
     public function progress()
     {
-        // Service akan mengambil semua data yang dibutuhkan
         $data = $this->tugasAkhirService->getProgressPageData();
 
-        // Jika tidak ada data TA aktif, tampilkan view khusus untuk itu
         if (!$data['tugasAkhir']) {
             return view('mahasiswa.tugas-akhir.partials._progress_empty');
         }
 
-        // Kirim semua data yang sudah disiapkan oleh Service ke satu view progress yang utama
         return view('mahasiswa.tugas-akhir.crud-ta.progress', [
             'tugasAkhir'       => $data['tugasAkhir'],
             'catatanList'      => $data['catatanList'],
@@ -63,24 +60,34 @@ class TugasAkhirController extends Controller
     }
 
     /**
-     * Mengunggah file tugas akhir.
+     * [DIREVISI DENGAN DEBUGGING] Mengunggah file revisi sekaligus mengajukan sesi bimbingan baru.
      */
-    public function uploadFile(UploadFileRequest $request, TugasAkhir $tugasAkhir)
+    public function ajukanBimbingan(UploadFileRequest $request, TugasAkhir $tugasAkhir)
     {
-        // Validasi sudah ditangani oleh UploadFileRequest
-        $this->tugasAkhirService->handleUploadFile(
-            $tugasAkhir,
-            $request->file('file'),
-            $request->input('jenis_dokumen'),
-            $request->input('catatan') // ✅ Tambahkan parameter catatan
-        );
+        try {
+            $this->tugasAkhirService->ajukanBimbinganDenganFile(
+                $tugasAkhir,
+                $request->file('file_bimbingan'),
+                $request->input('tipe_dokumen'),
+                $request->input('catatan')
+            );
 
-        // DIUBAH: Menggunakan format notifikasi baru
-        return redirect()->route('mahasiswa.tugas-akhir.progress')->with('alert', [
-            'type' => 'success',
-            'title' => 'Berhasil!',
-            'message' => 'File tugas akhir Anda telah berhasil diunggah.'
-        ]);
+            return redirect()->route('mahasiswa.tugas-akhir.progress')->with('alert', [
+                'type' => 'success',
+                'title' => 'Berhasil!',
+                'message' => 'File revisi telah diunggah dan pengajuan bimbingan terkirim.'
+            ]);
+        } catch (\Throwable $e) { // Menggunakan \Throwable untuk menangkap semua jenis error
+
+            // ✅ PERBAIKAN UTAMA: Tampilkan error yang sebenarnya terjadi di Service sebagai JSON.
+            // Ini akan menghentikan redirect dan memaksa browser menampilkan pesan error.
+            return response()->json([
+                'error' => 'Terjadi kesalahan internal pada server.',
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ], 500);
+        }
     }
 
     /**
@@ -91,7 +98,6 @@ class TugasAkhirController extends Controller
         try {
             $this->tugasAkhirService->requestCancellation($tugasAkhir, $request->input('alasan'));
 
-            // DIUBAH: Menggunakan format notifikasi baru
             return redirect()->route('mahasiswa.tugas-akhir.progress')->with('alert', [
                 'type' => 'success',
                 'title' => 'Berhasil!',
