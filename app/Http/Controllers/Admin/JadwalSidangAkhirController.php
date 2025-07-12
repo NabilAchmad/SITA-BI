@@ -58,19 +58,16 @@ class JadwalSidangAkhirController extends Controller
     /**
      * Menyimpan jadwal sidang baru.
      */
-    public function store(StoreJadwalRequest $request): JsonResponse
+    public function store(StoreJadwalRequest $request)
     {
         try {
             $this->jadwalSidangService->createJadwal($request->validated());
-            return response()->json([
-                'success' => true,
-                'message' => 'Jadwal sidang akhir berhasil disimpan.',
-            ]);
+            return redirect()->route('jurusan.penjadwalan-sidang.index')
+                ->with('success', 'Jadwal sidang akhir berhasil disimpan.');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 422);
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $e->getMessage()]);
         }
     }
 
