@@ -72,9 +72,9 @@ class PendaftaranSidangController extends Controller
             ->with(['tugasAkhir.sidang.nilaiSidang.dosen', 'tugasAkhir.mahasiswa.user'])
             ->firstOrFail();
 
-        $sidang = $mahasiswa->tugasAkhir ? $mahasiswa->tugasAkhir->sidang : null;
+        $sidang = $mahasiswa->tugasAkhir ? $mahasiswa->tugasAkhir->sidang : collect();
 
-        return view('mahasiswa.sidang.views.nilaiSidang', compact('sidang'));
+        return view('mahasiswa.sidang.views.nilaiSidang', compact('sidang', 'mahasiswa'));
     }
 
     /**

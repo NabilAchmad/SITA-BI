@@ -12,16 +12,16 @@
             <div
                 class="col-md-4 bg-primary text-white text-center p-5 rounded-start-4 d-flex flex-column justify-content-center align-items-center">
                 @php
-                    $user = $sidang && $sidang->first() ? $sidang->first()->tugasAkhir->mahasiswa->user : null;
+                    $user = $mahasiswa ? $mahasiswa->user : null;
                     $photoUrl = $user && $user->photo ? asset('storage/' . $user->photo) : asset('assets/img/placeholder.png');
                 @endphp
                 <img src="{{ $photoUrl }}" class="rounded-circle mb-4 border border-white shadow mx-auto"
                     alt="Foto Mahasiswa" style="width: 150px; height: 150px; object-fit: cover;">
                 <h4 class="fw-semibold mb-1">
-                    {{ $sidang && $sidang->first() ? $sidang->first()->tugasAkhir->mahasiswa->user->name : 'Nama Mahasiswa' }}
+                    {{ $mahasiswa ? $mahasiswa->user->name : 'Nama Mahasiswa' }}
                 </h4>
                 <p class="fs-5 mb-0">NIM:
-                    {{ $sidang && $sidang->first() ? $sidang->first()->tugasAkhir->mahasiswa->nim : '-' }}
+                    {{ $mahasiswa ? $mahasiswa->nim : '-' }}
                 </p>
             </div>
 
