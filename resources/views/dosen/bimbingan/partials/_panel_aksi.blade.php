@@ -16,7 +16,7 @@
             @if ($pembimbing1)
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <span><i class="bi bi-person-check-fill me-2"></i>Pembimbing 1:
-                        {{ Str::limit($pembimbing1->dosen->user->name, 50) }}</span>
+                        {{ Str::limit($pembimbing1->user->name, 50) }}</span>
                     <span
                         class="badge {{ $bimbinganCountP1 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">{{ $bimbinganCountP1 }}
                         / 7</span>
@@ -25,7 +25,7 @@
             @if ($pembimbing2)
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <span><i class="bi bi-person-check me-2"></i>Pembimbing 2:
-                        {{ Str::limit($pembimbing2->dosen->user->name, 50) }}</span>
+                        {{ Str::limit($pembimbing2->user->name, 50) }}</span>
                     <span
                         class="badge {{ $bimbinganCountP2 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">{{ $bimbinganCountP2 }}
                         / 7</span>
@@ -55,7 +55,7 @@
                             <span class="badge bg-primary bg-opacity-10 text-white mb-1 text-capitalize">
                                 {{ $item['pembimbing']->peran }}
                             </span>
-                            <h6 class="mb-0 fw-semibold">{{ $item['pembimbing']->dosen->user->name }}</h6>
+                            <h6 class="mb-0 fw-semibold">{{ $item['pembimbing']->user->name }}</h6>
                         </div>
                         @if ($item['sesi'])
                             <span

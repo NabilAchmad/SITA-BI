@@ -23,20 +23,57 @@ class RolesSeeder extends Seeder
             'manage tugas akhir',
             'manage bimbingan',
             'manage penilaian',
-            // Add other permissions as needed
+            'pantau-semua-bimbingan', // <-- DITAMBAHKAN
         ];
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Buat roles
+        // Buat roles dan berikan permissions
         $roles = [
-            'admin' => ['manage sidang', 'manage user accounts', 'view laporan', 'manage pengumuman', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
-            'kaprodi-d3' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
-            'kaprodi-d4' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
-            'kajur' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
-            'dosen' => ['manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
+            'admin' => [
+                'manage sidang',
+                'manage user accounts',
+                'view laporan',
+                'manage pengumuman',
+                'manage tugas akhir',
+                'manage bimbingan',
+                'manage penilaian',
+                'full access penugasan pembimbing'
+            ],
+            'kaprodi-d3' => [
+                'manage sidang',
+                'view laporan',
+                'manage tugas akhir',
+                'manage bimbingan',
+                'manage penilaian',
+                'pantau-semua-bimbingan', // <-- DITAMBAHKAN
+                'full access penugasan pembimbing'
+            ],
+            'kaprodi-d4' => [
+                'manage sidang',
+                'view laporan',
+                'manage tugas akhir',
+                'manage bimbingan',
+                'manage penilaian',
+                'pantau-semua-bimbingan', // <-- DITAMBAHKAN
+                'full access penugasan pembimbing'
+            ],
+            'kajur' => [
+                'manage sidang',
+                'view laporan',
+                'manage tugas akhir',
+                'manage bimbingan',
+                'manage penilaian',
+                'pantau-semua-bimbingan', // <-- DITAMBAHKAN
+                'full access penugasan pembimbing'
+            ],
+            'dosen' => [
+                'manage tugas akhir',
+                'manage bimbingan',
+                'manage penilaian'
+            ],
             'mahasiswa' => [],
         ];
 

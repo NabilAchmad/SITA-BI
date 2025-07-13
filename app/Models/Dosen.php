@@ -21,11 +21,6 @@ class Dosen extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * PERBAIKAN: Mendefinisikan relasi ke TawaranTopik melalui user_id.
-     * Foreign Key di tabel 'tawaran_topik' adalah 'user_id'.
-     * Local Key di tabel 'dosen' adalah 'user_id'.
-     */
     public function topik(): HasMany
     {
         return $this->hasMany(TawaranTopik::class, 'user_id', 'user_id');

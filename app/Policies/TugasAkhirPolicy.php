@@ -9,37 +9,43 @@ use Illuminate\Auth\Access\Response;
 class TugasAkhirPolicy
 {
     /**
-     * Otorisasi untuk melihat halaman validasi (apakah menu boleh muncul).
+     * Otorisasi untuk melihat menu validasi.
      */
     public function viewAny(User $user): bool
     {
-        // ✅ PERBAIKAN: Mengambil ulang data user yang "segar" untuk memastikan peran terbaca.
-        $freshUser = User::find($user->id);
-        return $freshUser && $freshUser->hasAnyRole(['admin', 'kajur', 'kaprodi-d3', 'kaprodi-d4']);
+        return $this->isUserWithRole($user, ['admin', 'kajur', 'kaprodi-d3', 'kaprodi-d4']);
     }
 
     /**
-     * ✅ PERBAIKAN: Otorisasi untuk MELIHAT DETAIL dan CEK KEMIRIPAN.
-     * Sekarang memanggil helper yang sama untuk konsistensi.
+     * Otorisasi untuk MELIHAT DETAIL dan CEK KEMIRIPAN.
      */
     public function view(User $user, TugasAkhir $tugasAkhir): bool
     {
-        // Panggil metode helper dengan aturan yang mengizinkan admin dan kajur tanpa syarat.
-        return $this->isAuthorizedForAction($user, $tugasAkhir, ['admin', 'kajur'], ['kaprodi-d3', 'kaprodi-d4']);
+        return $this->isAuthorizedForAction(
+            $user,
+            $tugasAkhir,
+            ['admin', 'kajur'],          // Peran tanpa syarat
+            ['kaprodi-d3', 'kaprodi-d4'], // Peran dengan syarat prodi
+            true                         // Aktifkan pengecekan pembimbing
+        );
     }
 
     /**
-     * ✅ PERBAIKAN: Otorisasi untuk MENYETUJUI, MENOLAK, atau MENGEDIT PEMBIMBING.
-     * Logika ini sekarang benar-benar tahan banting terhadap masalah sesi.
+     * Otorisasi untuk MENYETUJUI, MENOLAK, atau MENGEDIT PEMBIMBING.
      */
     public function update(User $user, TugasAkhir $tugasAkhir): bool
     {
-        // Panggil metode helper dengan aturan yang lebih ketat (Admin tidak bisa update).
-        return $this->isAuthorizedForAction($user, $tugasAkhir, ['kajur'], ['kaprodi-d3', 'kaprodi-d4']);
+        return $this->isAuthorizedForAction(
+            $user,
+            $tugasAkhir,
+            ['kajur'],
+            ['kaprodi-d3', 'kaprodi-d4'],
+            false // Pembimbing tidak boleh melakukan update validasi
+        );
     }
 
     /**
-     * Otorisasi untuk Cek Kemiripan.
+     * Otorisasi untuk Cek Kemiripan (alias dari 'view').
      */
     public function cekKemiripan(User $user, TugasAkhir $tugasAkhir): bool
     {
@@ -51,7 +57,6 @@ class TugasAkhirPolicy
      */
     public function delete(User $user, TugasAkhir $tugasAkhir): bool
     {
-        // Menggunakan kembali logika 'update' karena hak aksesnya sama.
         return $this->update($user, $tugasAkhir);
     }
 
@@ -60,8 +65,7 @@ class TugasAkhirPolicy
      */
     public function restore(User $user, TugasAkhir $tugasAkhir): bool
     {
-        $freshUser = User::find($user->id);
-        return $freshUser && $freshUser->hasAnyRole(['admin', 'kajur']);
+        return $this->isUserWithRole($user, ['admin', 'kajur']);
     }
 
     /**
@@ -69,54 +73,61 @@ class TugasAkhirPolicy
      */
     public function forceDelete(User $user, TugasAkhir $tugasAkhir): bool
     {
-        $freshUser = User::find($user->id);
-        return $freshUser && $freshUser->hasRole('kajur');
+        return $this->isUserWithRole($user, ['kajur']);
     }
 
-    /**
-     * ======================================================================
-     * METODE HELPER "TAHAN BANTING" (INTI DARI PERBAIKAN)
-     * ======================================================================
-     * Metode ini tidak mempercayai objek User dari sesi. Ia akan selalu
-     * mengambil data yang segar dari database untuk memastikan peran terbaca.
-     *
-     * @param User $staleUser Objek user dari sesi yang mungkin usang.
-     * @param TugasAkhir $tugasAkhir Model yang akan diotorisasi.
-     * @param array $unconditionalRoles Peran yang diizinkan tanpa syarat (e.g., 'kajur').
-     * @param array $conditionalRoles Peran yang diizinkan dengan syarat prodi (e.g., 'kaprodi-d3').
-     * @return bool
-     */
-    private function isAuthorizedForAction(User $staleUser, TugasAkhir $tugasAkhir, array $unconditionalRoles, array $conditionalRoles): bool
+    // ======================================================================
+    // METODE HELPER
+    // ======================================================================
+
+    private function isUserWithRole(User $staleUser, array $roles): bool
     {
-        // Langkah 1: Ambil objek User yang "segar" dari database, lengkap dengan perannya.
+        $freshUser = User::find($staleUser->id);
+        return $freshUser && $freshUser->hasAnyRole($roles);
+    }
+
+    private function isAuthorizedForAction(
+        User $staleUser,
+        TugasAkhir $tugasAkhir,
+        array $unconditionalRoles,
+        array $conditionalRoles,
+        bool $checkPembimbing = false
+    ): bool {
         $freshUser = User::with('roles')->find($staleUser->id);
         if (!$freshUser) {
             return false;
         }
 
-        // Langkah 2: Periksa apakah pengguna memiliki peran yang diizinkan tanpa syarat.
+        if ($checkPembimbing) {
+            // ✅ PERBAIKAN: Panggil accessor secara langsung.
+            // Tidak perlu load/loadMissing karena ini bukan relasi.
+            // Accessor akan mengambil data dari relasi 'dosenPembimbing' yang sudah di-load oleh Service.
+            $pembimbing1 = $tugasAkhir->pembimbing_satu;
+            $pembimbing2 = $tugasAkhir->pembimbing_dua;
+
+            if (($pembimbing1 && $freshUser->id === $pembimbing1->user_id) || ($pembimbing2 && $freshUser->id === $pembimbing2->user_id)) {
+                return true;
+            }
+        }
+
         if ($freshUser->hasAnyRole($unconditionalRoles)) {
             return true;
         }
 
-        // Langkah 3: Pastikan relasi mahasiswa dimuat untuk pengecekan prodi.
-        // `loadMissing` lebih efisien karena hanya memuat jika belum ada.
+        // ✅ PERBAIKAN: Pastikan relasi mahasiswa di-load jika belum ada,
+        // karena ini tidak terkait dengan accessor pembimbing.
         $tugasAkhir->loadMissing('mahasiswa');
         if (!$tugasAkhir->mahasiswa?->prodi) {
             return false;
         }
 
-        // Langkah 4: Periksa peran kondisional (Kaprodi) dengan perbandingan yang aman.
         $mahasiswaProdi = strtolower(trim($tugasAkhir->mahasiswa->prodi));
-
         foreach ($conditionalRoles as $role) {
-            // Contoh: jika peran adalah 'kaprodi-d4' dan prodi mahasiswa adalah 'd4'
             if ($freshUser->hasRole($role) && str_ends_with($role, $mahasiswaProdi)) {
                 return true;
             }
         }
 
-        // Jika tidak ada kondisi yang cocok, tolak akses.
         return false;
     }
 }
