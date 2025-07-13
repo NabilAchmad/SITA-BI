@@ -9,6 +9,8 @@ use App\Models\TugasAkhir;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\UnauthorizedException;
+use Illuminate\Support\Facades\DB; // Import DB Facade untuk transaction
+use Illuminate\Support\Facades\Log;
 
 class BimbinganService
 {
@@ -33,9 +35,7 @@ class BimbinganService
         // 2. Cari semua Tugas Akhir tersebut yang memiliki sesi bimbingan dengan status 'diajukan'.
         //    Kita gunakan distinct() agar setiap mahasiswa hanya muncul sekali meskipun ada 2 record 'diajukan'.
         return TugasAkhir::whereIn('id', $tugasAkhirIds)
-            ->whereHas('bimbinganTa', function ($query) {
-                $query->where('status_bimbingan', 'diajukan');
-            })
+            ->whereHas('bimbinganTa')
             ->with('mahasiswa.user')
             ->distinct()
             ->get();
@@ -155,18 +155,68 @@ class BimbinganService
     }
 
     /**
-     * [DIREVISI] Menandai sesi bimbingan sebagai 'selesai' hanya untuk dosen yang login.
+     * Menyelesaikan sesi bimbingan dan memvalidasi dokumen TA terbaru.
+     *
+     * @param BimbinganTA $bimbingan
+     * @return void
+     * @throws \Exception
      */
     public function selesaikanSesi(BimbinganTA $bimbingan): void
     {
+        // Pengecekan otorisasi
         if ($bimbingan->dosen_id !== $this->dosen->id) {
             throw new UnauthorizedException('Anda tidak berwenang menyelesaikan sesi bimbingan ini.');
         }
+
+        // Pengecekan status bimbingan
         if ($bimbingan->status_bimbingan !== 'dijadwalkan') {
-            throw new \Exception('Hanya bimbingan yang dijadwalkan yang bisa diselesaikan.');
+            throw new \Exception('Hanya bimbingan yang berstatus "dijadwalkan" yang bisa diselesaikan.');
         }
 
-        $bimbingan->update(['status_bimbingan' => 'selesai']);
+        DB::transaction(function () use ($bimbingan) {
+            // 1. Selesaikan sesi bimbingan
+            $bimbingan->update(['status_bimbingan' => 'selesai']);
+
+            $tugasAkhir = $bimbingan->tugasAkhir;
+            $dokumenTerkait = $tugasAkhir->dokumenTa()->orderBy('version', 'desc')->first();
+
+            if (!$dokumenTerkait) {
+                Log::warning('Proses dihentikan: Tidak ditemukan dokumen TA untuk Tugas Akhir ID: ' . $tugasAkhir->id);
+                return;
+            }
+
+            $updateData = [];
+            $dosenId = $this->dosen->id;
+
+            // =================================================================
+            // PERUBAHAN UTAMA: Cek peran dosen dari tabel pivot 'peran_dosen_ta'
+            // =================================================================
+            $peranDosen = $tugasAkhir->peranDosenTa()
+                ->where('dosen_id', $dosenId)
+                ->first(); // Mengambil data peran dari relasi
+
+            if ($peranDosen) {
+                if ($peranDosen->peran === 'pembimbing1') {
+                    $updateData['divalidasi_oleh_p1'] = $dosenId;
+                } elseif ($peranDosen->peran === 'pembimbing2') {
+                    $updateData['divalidasi_oleh_p2'] = $dosenId;
+                }
+            }
+            // =================================================================
+
+            // Lakukan update HANYA JIKA dosen adalah pembimbing yang sah
+            if (!empty($updateData)) {
+                $dokumenTerkait->update($updateData);
+                $dokumenTerkait->refresh();
+
+                // Ubah status validasi menjadi 'disetujui' HANYA JIKA KEDUA pembimbing sudah validasi
+                if ($dokumenTerkait->divalidasi_oleh_p1 && $dokumenTerkait->divalidasi_oleh_p2) {
+                    $dokumenTerkait->update(['status_validasi' => 'disetujui']);
+                }
+            } else {
+                Log::warning("Dosen ID {$dosenId} mencoba menyelesaikan sesi untuk TA ID {$tugasAkhir->id} namun perannya tidak ditemukan di tabel peran_dosen_ta.");
+            }
+        });
     }
 
     /**

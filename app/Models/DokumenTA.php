@@ -20,20 +20,18 @@ class DokumenTa extends Model
 
     /**
      * Atribut yang boleh diisi secara massal (mass assignable).
-     * Ini penting agar metode create() bisa berfungsi.
      *
      * @var array<int, string>
      */
     protected $fillable = [
         'tugas_akhir_id',
         'tipe_dokumen',
-        'file_path',
-        'version',
-        'nama_file_asli',
         'status_validasi',
-        'divalidasi_oleh',
-        'catatan_reviewer',
-        // 'bimbingan_ta_id' // <-- Jika Anda mengikuti rekomendasi saya sebelumnya untuk menambah kolom ini
+        'divalidasi_oleh_p1', // <-- Diperbarui dari divalidasi_oleh
+        'divalidasi_oleh_p2', // <-- Kolom baru untuk Pembimbing 2
+        'file_path',
+        'nama_file_asli',
+        'version',
     ];
 
     /**
@@ -45,22 +43,22 @@ class DokumenTa extends Model
     }
 
     /**
-     * Relasi ke user yang melakukan validasi.
-     * Kolom 'divalidasi_oleh' akan terhubung ke primary key di tabel users.
+     * Relasi ke Dosen yang melakukan validasi sebagai Pembimbing 1.
+     * Menggunakan foreign key 'divalidasi_oleh_p1'.
      */
-    public function divalidasiOleh(): BelongsTo
+    public function validatorP1(): BelongsTo
     {
-        // Relasi ini terhubung ke kolom 'divalidasi_oleh' pada tabel ini.
-        return $this->belongsTo(User::class, 'divalidasi_oleh');
+        // Ganti Dosen::class dengan User::class jika Anda menggunakan model User untuk dosen.
+        return $this->belongsTo(Dosen::class, 'divalidasi_oleh_p1');
     }
 
     /**
-     * Relasi ke user yang melakukan scan.
-     * Kolom 'scanned_by' akan terhubung ke primary key di tabel users.
+     * Relasi ke Dosen yang melakukan validasi sebagai Pembimbing 2.
+     * Menggunakan foreign key 'divalidasi_oleh_p2'.
      */
-    public function scannedBy(): BelongsTo
+    public function validatorP2(): BelongsTo
     {
-        // Relasi ini terhubung ke kolom 'scanned_by' pada tabel ini.
-        return $this->belongsTo(User::class, 'scanned_by');
+        // Ganti Dosen::class dengan User::class jika Anda menggunakan model User untuk dosen.
+        return $this->belongsTo(Dosen::class, 'divalidasi_oleh_p2');
     }
 }

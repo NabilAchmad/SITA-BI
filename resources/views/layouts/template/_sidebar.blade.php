@@ -153,11 +153,6 @@
                             <p>Tugas Akhir</p>
                         </a>
                     </li>
-                    <li class="nav-item {{ request()->is('mahasiswa/bimbingan*') ? 'active' : '' }}">
-                        <a href="{{ route('mahasiswa.bimbingan.dashboard') }}"><i class="fas fa-users"></i>
-                            <p>Bimbingan</p>
-                        </a>
-                    </li>
                     <li class="nav-item {{ request()->is('mahasiswa/sidang*') ? 'active' : '' }}">
                         <a href="{{ route('mahasiswa.sidang.dashboard') }}"><i class="fas fa-gavel"></i>
                             <p>Sidang</p>

@@ -57,50 +57,44 @@ class TugasAkhirService
 
         DB::transaction(function () use ($tugasAkhir, $file, $tipeDokumen, $catatan, $pembimbing1, $pembimbing2, $mahasiswaId) {
 
-            $sesiKe = ($tugasAkhir->bimbinganTa()->where('status_bimbingan', 'selesai')->distinct('sesi_ke')->count()) + 1;
-            $dataBimbingan = [
-                'sesi_ke'           => $sesiKe,
-                'status_bimbingan'  => 'diajukan',
-                'tanggal_bimbingan' => null,
-                'jam_bimbingan'     => null,
-            ];
+            // Cek apakah sudah ada sesi yang 'diajukan' untuk tugas akhir ini.
+            $sesiAktif = $tugasAkhir->bimbinganTa()->where('status_bimbingan', 'diajukan')->get();
 
-            // Cari atau buat sesi untuk Pembimbing 1
-            $sesiBimbinganP1 = $tugasAkhir->bimbinganTa()->firstOrCreate(
-                ['dosen_id' => $pembimbing1->dosen_id, 'status_bimbingan' => 'diajukan'],
-                array_merge($dataBimbingan, ['peran' => $pembimbing1->peran])
-            );
+            if ($sesiAktif->isNotEmpty()) {
+                // LOGIKA 1: Sesi 'diajukan' sudah ada. Gunakan sesi yang ada.
+                $sesiBimbinganP1 = $sesiAktif->where('dosen_id', $pembimbing1->dosen_id)->first();
+                $sesiBimbinganP2 = $sesiAktif->where('dosen_id', $pembimbing2->dosen_id)->first();
+            } else {
+                // LOGIKA 2: Tidak ada sesi 'diajukan'. Buat sesi baru.
+                $sesiKe = ($tugasAkhir->bimbinganTa()->where('status_bimbingan', 'selesai')->distinct('sesi_ke')->count()) + 1;
 
-            // Cari atau buat sesi untuk Pembimbing 2
-            $sesiBimbinganP2 = $tugasAkhir->bimbinganTa()->firstOrCreate(
-                ['dosen_id' => $pembimbing2->dosen_id, 'status_bimbingan' => 'diajukan'],
-                array_merge($dataBimbingan, ['peran' => $pembimbing2->peran])
-            );
+                $dataBimbingan = [
+                    'sesi_ke'           => $sesiKe,
+                    'status_bimbingan'  => 'diajukan',
+                    'tanggal_bimbingan' => null,
+                    'jam_bimbingan'     => null,
+                ];
 
-            // Hapus dokumen lama yang terkait dengan tugas akhir ini jika ada.
-            $dokumenLama = $tugasAkhir->dokumenTa()->latest()->first();
-            if ($dokumenLama) {
-                Storage::disk('public')->delete($dokumenLama->file_path);
-                $dokumenLama->forceDelete();
+                $sesiBimbinganP1 = $tugasAkhir->bimbinganTa()->create(array_merge($dataBimbingan, ['dosen_id' => $pembimbing1->dosen_id, 'peran' => $pembimbing1->peran]));
+                $sesiBimbinganP2 = $tugasAkhir->bimbinganTa()->create(array_merge($dataBimbingan, ['dosen_id' => $pembimbing2->dosen_id, 'peran' => $pembimbing2->peran]));
             }
 
             // Simpan file dan buat record dokumen yang BARU.
             $latestVersion = ($tugasAkhir->dokumenTa()->where('tipe_dokumen', $tipeDokumen)->max('version') ?? 0) + 1;
             $filePath = $file->store("dokumen_ta/{$tugasAkhir->id}/sesi_{$sesiBimbinganP1->sesi_ke}", 'public');
 
-            // ✅ PERBAIKAN UTAMA: Menyimpan nama asli file ke database.
             $tugasAkhir->dokumenTa()->create([
                 'tipe_dokumen'   => $tipeDokumen,
                 'file_path'      => $filePath,
-                'nama_file_asli' => $file->getClientOriginalName(), // <-- Baris ini ditambahkan
+                'nama_file_asli' => $file->getClientOriginalName(),
                 'version'        => $latestVersion,
             ]);
 
             // Simpan catatan baru jika ada.
             if (!empty($catatan)) {
                 $dataCatatan = ['catatan' => $catatan, 'author_type' => Mahasiswa::class, 'author_id' => $mahasiswaId];
-                $sesiBimbinganP1->catatan()->create($dataCatatan);
-                $sesiBimbinganP2->catatan()->create($dataCatatan);
+                if ($sesiBimbinganP1) $sesiBimbinganP1->catatan()->create($dataCatatan);
+                if ($sesiBimbinganP2) $sesiBimbinganP2->catatan()->create($dataCatatan);
             }
         });
     }

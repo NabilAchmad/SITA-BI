@@ -24,7 +24,6 @@ use App\Http\Controllers\Dosen\TawaranTopikController;
 use App\Http\Controllers\Dosen\JadwalBimbinganController;
 use App\Http\Controllers\Dosen\CatatanBimbinganController;
 // Panel Mahasiswa
-use App\Http\Controllers\Mahasiswa\BimbinganController;
 use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboardController;
 use App\Http\Controllers\Mahasiswa\MahasiswaProfileController;
 use App\Http\Controllers\Mahasiswa\PendaftaranSidangController;
@@ -93,14 +92,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{tugasAkhir}/cancel', [TugasAkhirController::class, 'cancel'])->name('cancel');
 
             Route::post('tugas-akhir/{tugasAkhir}/catatan', [MahasiswaCatatanController::class, 'store'])->name('catatan.store');
-        });
-
-        Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
-            Route::get('/', [BimbinganController::class, 'dashboard'])->name('dashboard');
-            Route::get('/ajukan-jadwal', [BimbinganController::class, 'ajukanJadwal'])->name('ajukanJadwal');
-            Route::post('/store', [BimbinganController::class, 'store'])->name('store');
-            Route::get('/jadwal-bimbingan', [BimbinganController::class, 'jadwalBimbingan'])->name('jadwal');
-            Route::put('/jadwal/{id}', [BimbinganController::class, 'ubahJadwal'])->name('updateJadwal');
         });
 
         Route::prefix('sidang')->name('sidang.')->group(function () {
