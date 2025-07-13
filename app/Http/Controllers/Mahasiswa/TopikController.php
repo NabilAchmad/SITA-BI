@@ -35,7 +35,7 @@ class TopikController extends Controller
             $mahasiswa = Auth::user()->mahasiswa;
             $this->topikPengajuanService->applyForTopic($topik, $mahasiswa);
 
-            return redirect()->route('tugas-akhir.dashboard')->with('alert', [
+            return redirect()->route('mahasiswa.tugas-akhir.dashboard')->with('alert', [
                 'type' => 'success',
                 'title' => 'Berhasil',
                 'message' => 'Pengajuan topik telah berhasil dikirim. Mohon tunggu persetujuan dari dosen.'
