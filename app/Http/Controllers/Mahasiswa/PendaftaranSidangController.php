@@ -3,44 +3,46 @@
 namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Mahasiswa\StoreSeminarProposalRequest; // Gunakan Form Request yang baru
+use Illuminate\Http\Request;
 use App\Models\Mahasiswa;
-use App\Services\Mahasiswa\SeminarProposalService; // Gunakan Service yang baru
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log; // Untuk mencatat error
 
 class PendaftaranSidangController extends Controller
 {
-    // Inject service melalui constructor agar bisa digunakan di semua method.
-    protected $seminarProposalService;
-
-    public function __construct(SeminarProposalService $seminarProposalService)
-    {
-        $this->seminarProposalService = $seminarProposalService;
-    }
-
     /**
      * Menampilkan halaman form pendaftaran seminar proposal.
      */
     public function form()
     {
-        $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
+        $mahasiswa = Mahasiswa::where('user_id', Auth::id())
+            ->with('tugasAkhir.dosenPembimbing')
+            ->firstOrFail();
         // Nama view bisa disesuaikan, 'create' lebih mengikuti konvensi RESTful
-        return view('mahasiswa.sidang.views.sempro', compact('mahasiswa'));
+        return view('mahasiswa.sidang.views.form', compact('mahasiswa'));
+    }
+
+    /**
+     * Menampilkan dashboard sidang.
+     */
+    public function dashboard()
+    {
+        $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
+        // Sesuaikan view dashboard sidang sesuai kebutuhan
+        return view('mahasiswa.sidang.dashboard.dashboard', compact('mahasiswa'));
     }
 
     /**
      * Menyimpan data pendaftaran seminar proposal.
      */
-    public function store(StoreSeminarProposalRequest $request)
+    public function store(Request $request)
     {
         try {
             $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
 
-            // Panggil service untuk menjalankan logika bisnis.
-            $this->seminarProposalService->createProposal($request, $mahasiswa);
+            // TODO: Implement the logic to save seminar proposal data here.
 
-            return redirect()->route('tugas-akhir.progress')
+            return redirect()->route('mahasiswa.sidang.dashboard')
                 ->with('alert', [
                     'title'   => 'Berhasil Disimpan!',
                     'message' => 'Draft proposal Anda telah berhasil disimpan. Silakan lanjutkan ke tahap berikutnya.',
@@ -59,5 +61,33 @@ class PendaftaranSidangController extends Controller
                 ])
                 ->withInput(); // Kembalikan input sebelumnya ke form
         }
+    }
+
+    /**
+     * Menampilkan halaman nilai sidang untuk mahasiswa.
+     */
+    public function nilaiSidang()
+    {
+        $mahasiswa = Mahasiswa::where('user_id', Auth::id())
+            ->with(['tugasAkhir.sidang.nilaiSidang.dosen', 'tugasAkhir.mahasiswa.user'])
+            ->firstOrFail();
+
+        $sidang = $mahasiswa->tugasAkhir ? $mahasiswa->tugasAkhir->sidang : null;
+
+        return view('mahasiswa.sidang.views.nilaiSidang', compact('sidang'));
+    }
+
+    /**
+     * Menampilkan jadwal sidang yang sudah diberikan oleh admin.
+     */
+    public function jadwalSidang()
+    {
+        $mahasiswa = Mahasiswa::where('user_id', Auth::id())
+            ->with(['tugasAkhir.sidang.jadwalSidang.ruangan', 'tugasAkhir.sidang.nilaiSidang.dosen.user'])
+            ->firstOrFail();
+
+        $sidangs = $mahasiswa->tugasAkhir ? $mahasiswa->tugasAkhir->sidang : collect();
+
+        return view('mahasiswa.sidang.views.jadwal', compact('sidangs'));
     }
 }

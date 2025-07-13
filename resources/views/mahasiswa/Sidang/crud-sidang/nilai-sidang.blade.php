@@ -1,151 +1,123 @@
-<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light py-5">
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light py-5 position-relative">
+    
+    <a href="{{ route('mahasiswa.sidang.dashboard') }}" class="btn position-absolute top-0 end-0 mt-3 me-3 z-3"
+       style="background-color: transparent; color: inherit; border: 2px solid #00050b; box-shadow: none; border-radius: 20px; padding: 0.375rem 0.75rem;">
+        <i class="bi bi-arrow-left-circle me-2"></i> Kembali ke Dashboard
+    </a>
+
     <div class="card shadow-lg rounded-4 w-100" style="max-width: 1000px;">
+        
         <div class="row g-0">
             <!-- Profil Mahasiswa -->
             <div
                 class="col-md-4 bg-primary text-white text-center p-5 rounded-start-4 d-flex flex-column justify-content-center align-items-center">
-                <img src="{{ asset('assets/img/team/kasih.jpg') }}" class="rounded-circle mb-4 border border-white shadow mx-auto"
+                @php
+                    $user = $sidang && $sidang->first() ? $sidang->first()->tugasAkhir->mahasiswa->user : null;
+                    $photoUrl = $user && $user->photo ? asset('storage/' . $user->photo) : asset('assets/img/placeholder.png');
+                @endphp
+                <img src="{{ $photoUrl }}" class="rounded-circle mb-4 border border-white shadow mx-auto"
                     alt="Foto Mahasiswa" style="width: 150px; height: 150px; object-fit: cover;">
-                <h4 class="fw-semibold mb-1">Kasih Ananda Nardi</h4>
-                <p class="fs-5 mb-0">NIM: 12345678</p>
+                <h4 class="fw-semibold mb-1">
+                    {{ $sidang && $sidang->first() ? $sidang->first()->tugasAkhir->mahasiswa->user->name : 'Nama Mahasiswa' }}
+                </h4>
+                <p class="fs-5 mb-0">NIM:
+                    {{ $sidang && $sidang->first() ? $sidang->first()->tugasAkhir->mahasiswa->nim : '-' }}
+                </p>
             </div>
 
-
             <!-- Informasi Sidang -->
-            <div class="col-md-8 p-5">
-                <!-- Tabs -->
-                <ul class="nav nav-tabs justify-content-center mb-4 fs-5" id="nilaiSidangTab" role="tablist">
-                    <li class="nav-item">
-                        <button class="nav-link active px-4" id="sempro-tab" data-bs-toggle="tab"
-                            data-bs-target="#sempro" type="button" role="tab">
-                            Sidang Sempro
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link px-4" id="akhir-tab" data-bs-toggle="tab" data-bs-target="#akhir"
-                            type="button" role="tab">
-                            Sidang Akhir
-                        </button>
-                    </li>
-                </ul>
+            <div class="col-md-8 p-5 position-relative">
+                <h5 class="fw-bold mb-3 text-secondary">Nilai Sidang Akhir</h5>
 
-                <!-- Tab Content -->
-                <div class="tab-content" id="nilaiSidangTabContent">
-                    <!-- Sidang Sempro -->
-                    <div class="tab-pane fade show active" id="sempro" role="tabpanel">
-                        <h5 class="fw-bold mb-3 text-secondary">Judul Sidang</h5>
-                        <p class="fs-5 text-muted mb-4">Sistem Informasi Akademik</p>
+                @if($sidang && $sidang->count() > 0)
+                    @foreach($sidang as $s)
+                        <div class="mb-4">
+                            <h6 class="fw-bold">Judul Sidang:</h6>
+                            <p>{{ $s->tugasAkhir->judul ?? '-' }}</p>
 
-                        <div class="row mb-2">
-                            <div class="col-sm-5 fw-semibold">Tanggal Sidang</div>
-                            <div class="col-sm-7">10 April 2025</div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col-sm-5 fw-semibold">Dosen Pembimbing</div>
-                            <div class="col-sm-7">Dr. Budi Santoso, M.Kom</div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col-sm-5 fw-semibold">Dosen Penguji</div>
-                            <div class="col-sm-7">Prof. Sari Dewi, M.T. dan Dr. Agus Salim, M.Kom,
-                                 Dr. Wawan Setiawan, M.Kom, Dr. Lina Marlina, M.Kom</div>
-                        </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 fw-semibold">Tanggal Sidang</div>
+                                <div class="col-sm-7">{{ $s->tanggal_sidang ? $s->tanggal_sidang->format('d F Y') : '-' }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 fw-semibold">Dosen Pembimbing</div>
+                                <div class="col-sm-7">
+                                    @if($s->tugasAkhir && $s->tugasAkhir->dosenPembimbing)
+                                        {{ $s->tugasAkhir->dosenPembimbing->pluck('user.name')->join(', ') }}
+                                    @else
+                                        -
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5 fw-semibold">Dosen Penguji</div>
+                                <div class="col-sm-7">
+                                    @php
+                                        $pengujiNames = $s->nilaiSidang->pluck('dosen.user.name')->unique()->join(', ');
+                                    @endphp
+                                    {{ $pengujiNames ?: '-' }}
+                                </div>
+                            </div>
 
-                        <div class="mt-4">
-                            <h6 class="fw-bold text-secondary mb-2">Rincian Nilai</h6>
-                            <ul class="list-unstyled ms-3 fs-6">
-                                <li><i class="bi bi-file-earmark-text me-2 text-primary"></i> Kelengkapan Dokumen:
-                                    <strong>20</strong></li>
-                                <li><i class="bi bi-journal-text me-2 text-primary"></i> Pemahaman Materi:
-                                    <strong>30</strong></li>
-                                <li><i class="bi bi-easel me-2 text-primary"></i> Penyajian Sidang: <strong>25</strong>
-                                </li>
-                                <li><i class="bi bi-chat-left-dots me-2 text-primary"></i> Tanya Jawab:
-                                    <strong>20</strong></li>
-                            </ul>
-                        </div>
-                        
-                        <!-- Nilai Per Dosen Penguji -->
-                        <div class="mt-4">
-                            <h6 class="fw-bold text-secondary mb-2">Nilai dari Masing-masing Dosen Penguji</h6>
-                            <ul class="list-unstyled ms-3 fs-6">
-                                <li><i class="bi bi-person-square me-2 text-primary"></i> Prof. Sari Dewi, M.T.: <strong>94</strong></li>
-                                <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Agus Salim, M.Kom: <strong>96</strong></li>
-                                <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Wawan Setiawan, M.Kom: <strong>93</strong></li>
-                                <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Lina Marlina, M.Kom: <strong>97</strong></li>
-                            </ul>
-                        </div>
+                            <div class="mt-4">
+                                <h6 class="fw-bold text-secondary mb-2">Rincian Nilai</h6>
+                                @if($s->nilaiSidang->count() > 0)
+                                    <ul class="list-unstyled ms-3 fs-6">
+                                        @foreach($s->nilaiSidang as $nilai)
+                                            <li>
+                                                <i class="bi bi-person-square me-2 text-primary"></i>
+                                                {{ $nilai->dosen->user->name ?? 'Dosen' }} - {{ $nilai->aspek }}:
+                                                <strong>{{ $nilai->skor }}</strong>
+                                                @if($nilai->komentar)
+                                                    <br><small class="text-muted">Komentar: {{ $nilai->komentar }}</small>
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <div class="alert alert-warning">
+                                        Nilai belum ada, silakan cek kembali nanti.
+                                    </div>
+                                @endif
+                            </div>
 
-                        <!-- Status Sidang -->
-                        <div class="mt-3">
-                            <h6 class="fw-bold text-secondary mb-3">Status Sidang</h6>
-                            <span class="badge bg-success px-4 py-3 rounded-pill d-inline-flex align-items-center">
-                                <i class="bi bi-check-circle me-6"></i> Lulus
-                            </span>
-                        </div>
+                            <div class="mt-4">
+                                <h6 class="fw-bold text-secondary mb-3">Status Sidang</h6>
+                                @php
+                                    $status = $s->status ?? 'Belum ada status';
+                                    $badgeClass = 'bg-secondary';
+                                    if (stripos($status, 'lulus') !== false) {
+                                        $badgeClass = 'bg-success';
+                                    } elseif (stripos($status, 'revisi') !== false) {
+                                        $badgeClass = 'bg-warning text-dark';
+                                    } elseif (stripos($status, 'tidak lulus') !== false) {
+                                        $badgeClass = 'bg-danger';
+                                    }
+                                @endphp
+                                <span class="badge {{ $badgeClass }} px-4 py-3 rounded-pill d-inline-flex align-items-center">
+                                    <i class="bi bi-info-circle me-2"></i> {{ ucfirst($status) }}
+                                </span>
+                            </div>
 
-
-                        <div class="text-center mt-4">
-                            <h1 class="display-4 fw-bold text-success">95</h1>
-                            <p class="text-muted">Nilai Akhir Sidang Sempro</p>
+                            <div class="text-center mt-4">
+                                <h1 class="display-4 fw-bold text-primary">
+                                    @php
+                                        $average = $s->nilaiSidang->avg('skor');
+                                    @endphp
+                                    {{ $average ? number_format($average, 2) : '-' }}
+                                </h1>
+                                <p class="text-muted">Nilai Akhir Sidang</p>
+                            </div>
                         </div>
+                    @endforeach
+                @else
+                    <div class="alert alert-warning">
+                        Nilai sidang belum tersedia. Silakan cek kembali nanti.
                     </div>
+                @endif
 
-                    <!-- Sidang Akhir -->
-                    <div class="tab-pane fade" id="akhir" role="tabpanel">
-                        <h5 class="fw-bold mb-3 text-secondary">Judul Sidang</h5>
-                        <p class="fs-5 text-muted mb-4">Sistem Informasi Akademik</p>
-
-                        <div class="row mb-2">
-                            <div class="col-sm-5 fw-semibold">Tanggal Sidang</div>
-                            <div class="col-sm-7">15 Mei 2025</div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col-sm-5 fw-semibold">Dosen Pembimbing</div>
-                            <div class="col-sm-7">Dr. Budi Santoso, M.Kom</div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col-sm-5 fw-semibold">Dosen Penguji</div>
-                            <div class="col-sm-7">Prof. Sari Dewi, M.T., Dr. Agus Salim, M.Kom,
-                                 Dr. Wawan Setiawan, M.Kom,  Dr. Lina Marlina, M.Kom </div>
-                        </div>
-
-                        <div class="mt-4">
-                        <h6 class="fw-bold text-secondary mb-2">Rincian Nilai</h6>
-                        <ul class="list-unstyled ms-3 fs-6">
-                            <li><i class="bi bi-file-earmark-text me-2 text-primary"></i> Kelengkapan Dokumen: <strong>24</strong></li>
-                            <li><i class="bi bi-journal-text me-2 text-primary"></i> Pemahaman Materi: <strong>28</strong></li>
-                            <li><i class="bi bi-easel me-2 text-primary"></i> Penyajian Sidang: <strong>26</strong></li>
-                            <li><i class="bi bi-chat-left-dots me-2 text-primary"></i> Tanya Jawab: <strong>25</strong></li>
-                        </ul>
-                    </div>  
-
-                    <!-- Nilai Per Dosen Penguji -->
-                    <div class="mt-4">
-                        <h6 class="fw-bold text-secondary mb-2">Nilai dari Masing-masing Dosen Penguji</h6>
-                        <ul class="list-unstyled ms-3 fs-6">
-                            <li><i class="bi bi-person-square me-2 text-primary"></i> Prof. Sari Dewi, M.T.: <strong>91</strong></li>
-                            <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Agus Salim, M.Kom: <strong>90</strong></li>
-                            <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Wawan Setiawan, M.Kom: <strong>60</strong></li>
-                            <li><i class="bi bi-person-square me-2 text-primary"></i> Dr. Lina Marlina, M.Kom: <strong>55</strong></li>
-                        </ul>
-                    </div>
-
-                    <div class="mt-4">
-                        <h6 class="fw-bold text-secondary mb-3">Status Sidang</h6>
-                        <span class="badge bg-warning text-dark px-4 py-3 rounded-pill d-inline-flex align-items-center">
-                            <i class="bi bi-exclamation-triangle me-6"></i> Lulus dengan Revisi
-                        </span>
-                    </div>
-
-                    <div class="text-center mt-4">
-                        <h1 class="display-4 fw-bold text-success">74</h1>
-                        <p class="text-muted">Nilai Akhir Sidang Tugas Akhir</p>
-                    </div>
-                    </div>
-                    </div>
-                </div> <!-- end tab-content -->
+                
             </div>
         </div>
     </div>
 </div>
-
