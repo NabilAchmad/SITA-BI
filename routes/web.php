@@ -149,8 +149,8 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('tawaran-topik', TawaranTopikController::class)->except(['show']);
         // Rute tambahan untuk tawaran topik
-        Route::post('tawaran-topik/approve/{application}', [TawaranTopikController::class, 'approveApplication'])->name('tawaran-topik.approve');
-        Route::post('tawaran-topik/reject/{application}', [TawaranTopikController::class, 'rejectApplication'])->name('tawaran-topik.reject');
+        // Route::post('tawaran-topik/approve/{application}', [TawaranTopikController::class, 'approveApplication'])->name('tawaran-topik.approve');
+        // Route::post('tawaran-topik/reject/{application}', [TawaranTopikController::class, 'rejectApplication'])->name('tawaran-topik.reject');
     });
 
     //------------------------------------------------------------------
