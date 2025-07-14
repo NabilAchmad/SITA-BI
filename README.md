@@ -1,3 +1,10 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/user/repo/main/public/logo.png" width="250">
+</p>
+
+
+
+
 # 📘 SITA-BI (Sistem Informasi Tugas Akhir Bahasa Inggris)
 
 **SITA-BI** adalah sistem informasi berbasis web yang dirancang untuk mempermudah pengelolaan proses tugas akhir di Jurusan Bahasa Inggris, mulai dari pengajuan judul, proses bimbingan, hingga pelaksanaan sidang. Sistem ini mendukung transparansi, efisiensi, dan aksesibilitas bagi mahasiswa, dosen pembimbing/penguji, dan kaprodi.
