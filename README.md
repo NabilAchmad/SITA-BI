@@ -3,10 +3,10 @@
 **SITA-BI** adalah sistem informasi berbasis web yang dirancang untuk mempermudah pengelolaan proses tugas akhir di Jurusan Bahasa Inggris, mulai dari pengajuan judul, proses bimbingan, hingga pelaksanaan sidang. Sistem ini mendukung transparansi, efisiensi, dan aksesibilitas bagi mahasiswa, dosen pembimbing/penguji, dan kaprodi.
 
 ## 👥 Tim Pengembang
-- **Nabil Achmad** – 2311082032 (PM)
-- **Erland Agsya** – 2311083007
-- **Gilang Dwi Y** – 2311081016
-- **Kasih Ananda** – 2311081021
+- **Nabil Achmad Khoir** – 2311082032 (PM)
+- **Erland Agsya Agustian** – 2311083007
+- **Gilang Dwi Yuwana** – 2311081016
+- **Kasih Ananda Nardi** – 2311081021
 
 ---
 
@@ -37,41 +37,40 @@ Sebelum adanya SITA-BI, pengelolaan tugas akhir di Jurusan Bahasa Inggris dilaku
 ---
 
 ## 🚀 Cara Menjalankan Proyek Secara Lokal
-Clone repositori:
+**Clone repositori:**
 ```bash
 git clone https://github.com/NabilAchmad/SITA-BI.git
-cd SITA-BI
-Install semua dependencies Laravel:
 ```
+**Change Directory ke sita-bi**
+```bash
+cd SITA-BI
+```
+**Install semua dependencies yang ada di composer.json:**
 ```bash
 composer install
-Install package permission dari Spatie (jika belum):
 ```
-
+**Install package permission dari Spatie (jika belum):**
 ```bash
 composer require spatie/laravel-permission
-Salin file konfigurasi .env:
 ```
-
+**Salin file konfigurasi .env:**
 ```bash
 cp .env.example .env
-Generate application key:
 ```
-
+**Generate application key:**
 ```bash
 php artisan key:generate
-Switch ke branch admin_mhs:
 ```
-
+**Switch ke branch admin_mhs:**
 ```bash
 git switch admin_mhs
-Migrasi database:
 ```
-
+**Migrasi database:**
 ```bash
 php artisan migrate
-Seed database awal (roles, permissions, admin):
 ```
+
+**Seed database awal (roles, permissions, admin):**
 ```bash
 php artisan db:seed --class=RolesSeeder
 php artisan db:seed --class=PermissionSeeder
