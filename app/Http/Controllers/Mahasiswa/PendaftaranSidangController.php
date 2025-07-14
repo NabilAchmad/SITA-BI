@@ -40,26 +40,47 @@ class PendaftaranSidangController extends Controller
         try {
             $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
 
-            // TODO: Implement the logic to save seminar proposal data here.
+            $request->validate([
+                'judul_ta' => 'required|string|max:255',
+                'jumlah_bimbingan' => 'required|integer|min:7',
+                'file_ta' => 'required|file|mimes:pdf,doc,docx|max:10240', // max 10MB
+            ]);
+
+            if ($request->input('jumlah_bimbingan') < 7) {
+                return redirect()->back()->with('alert', [
+                    'title' => 'Gagal!',
+                    'message' => 'Jumlah bimbingan minimal 7 kali untuk mendaftar sidang akhir.',
+                    'type' => 'error',
+                ])->withInput();
+            }
+
+            // Simpan file tugas akhir
+            $filePath = $request->file('file_ta')->store('final_documents', 'public');
+
+            // Buat record sidang baru dengan status menunggu_verifikasi
+            $sidang = $mahasiswa->tugasAkhir->sidang()->create([
+                'judul' => $request->input('judul_ta'),
+                'status' => 'menunggu_verifikasi',
+                'file_path' => $filePath,
+                'jenis_sidang' => 'akhir',
+            ]);
 
             return redirect()->route('mahasiswa.sidang.dashboard')
                 ->with('alert', [
-                    'title'   => 'Berhasil Disimpan!',
-                    'message' => 'Draft proposal Anda telah berhasil disimpan. Silakan lanjutkan ke tahap berikutnya.',
-                    'type'    => 'success',
+                    'title' => 'Berhasil!',
+                    'message' => 'Pendaftaran sidang akhir berhasil, menunggu verifikasi dosen pembimbing.',
+                    'type' => 'success',
                 ]);
         } catch (\Exception $e) {
-            // Catat error ke log untuk debugging.
-            Log::error('Gagal menyimpan proposal: ' . $e->getMessage());
+            Log::error('Gagal menyimpan pendaftaran sidang akhir: ' . $e->getMessage());
 
-            // Kembalikan ke halaman sebelumnya dengan pesan error.
             return redirect()->back()
                 ->with('alert', [
-                    'title'   => 'Gagal!',
-                    'message' => $e->getMessage(), // Tampilkan pesan error dari service
-                    'type'    => 'error',
+                    'title' => 'Gagal!',
+                    'message' => $e->getMessage(),
+                    'type' => 'error',
                 ])
-                ->withInput(); // Kembalikan input sebelumnya ke form
+                ->withInput();
         }
     }
 

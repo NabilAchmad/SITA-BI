@@ -19,8 +19,8 @@ class PenugasanService
         // ✅ SESUAI MODEL: Menggunakan whereHas('peranDosenTa') untuk memeriksa
         // apakah ada entri di tabel `peran_dosen_ta` yang berelasi.
         // Ini adalah cara yang benar sesuai dengan relasi `peranDosenTa()` di model Anda.
-        return TugasAkhir::with(['mahasiswa.user', 'dosenPembimbing.dosen.user']) // Muat semua relasi yang dibutuhkan untuk view
-            ->whereHas('dosenPembimbing')
+        return TugasAkhir::with(['mahasiswa.user', 'peranDosenTa.dosen.user']) // Muat semua relasi yang dibutuhkan untuk view
+            ->whereHas('peranDosenTa')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();

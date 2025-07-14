@@ -24,6 +24,7 @@ class RolesSeeder extends Seeder
             'manage bimbingan',
             'manage penilaian',
             'pantau-semua-bimbingan', // <-- DITAMBAHKAN
+            'full access penugasan pembimbing', // <-- TAMBAHKAN PERMISSION BARU
         ];
 
         foreach ($permissions as $permission) {

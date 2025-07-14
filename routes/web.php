@@ -108,10 +108,14 @@ Route::middleware(['auth'])->group(function () {
     //------------------------------------------------------------------
     // PANEL DOSEN (Umum)
     //------------------------------------------------------------------
-    Route::prefix('dosen')->middleware('role:dosen|kajur|kaprodi-d3|kaprodi-d4')->name('dosen.')->group(function () {
-        Route::get('/dashboard', [DosenProfileController::class, 'index_dosen'])->name('dashboard');
-        Route::get('/profile', [DosenProfileController::class, 'profile'])->name('profile');
-        Route::put('/profile/update', [DosenProfileController::class, 'update'])->name('profile.update');
+        Route::prefix('dosen')->middleware('role:dosen|kajur|kaprodi-d3|kaprodi-d4')->name('dosen.')->group(function () {
+            Route::get('/dashboard', [DosenProfileController::class, 'index_dosen'])->name('dashboard');
+            Route::get('/profile', [DosenProfileController::class, 'profile'])->name('profile');
+            Route::put('/profile/update', [DosenProfileController::class, 'update'])->name('profile.update');
+
+            // Sidang approval routes
+            Route::get('/sidang/approvals', [\App\Http\Controllers\Dosen\SidangApprovalController::class, 'index'])->name('sidang.approvals.index');
+            Route::post('/sidang/approvals/{sidang}/approve', [\App\Http\Controllers\Dosen\SidangApprovalController::class, 'approve'])->name('sidang.approvals.approve');
 
         // Grup untuk halaman utama bimbingan
         Route::prefix('bimbingan-mahasiswa')->name('bimbingan.')->group(function () {

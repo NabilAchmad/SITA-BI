@@ -3,7 +3,7 @@
     <div class="card-body">
         <h5 class="fw-bold text-dark mb-3"><i class="bi bi-speedometer2 me-2 text-info"></i>Status & Progress</h5>
         <ul class="list-group list-group-flush">
-            @if ($pembimbing1)
+            @if ($pembimbing1 && $pembimbing1->dosen && $pembimbing1->dosen->user)
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <span><i class="bi bi-person-check-fill me-2"></i>P1:
                         {{ Str::limit($pembimbing1->dosen->user->name, 15) }}</span>
@@ -12,7 +12,7 @@
                         / 7</span>
                 </li>
             @endif
-            @if ($pembimbing2)
+            @if ($pembimbing2 && $pembimbing2->dosen && $pembimbing2->dosen->user)
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <span><i class="bi bi-person-check me-2"></i>P2:
                         {{ Str::limit($pembimbing2->dosen->user->name, 15) }}</span>
