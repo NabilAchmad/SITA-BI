@@ -260,4 +260,5 @@ class BimbinganService
         // ❌ Kalau semua gagal, lempar unauthorized
         throw new UnauthorizedException('Anda tidak diizinkan mengakses tugas akhir ini.');
     }
+
 }
