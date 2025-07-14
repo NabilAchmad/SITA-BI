@@ -23,7 +23,12 @@ class RolesSeeder extends Seeder
             'manage tugas akhir',
             'manage bimbingan',
             'manage penilaian',
+<<<<<<< HEAD
             // Add other permissions as needed
+=======
+            'pantau-semua-bimbingan', // <-- DITAMBAHKAN
+            'full access penugasan pembimbing', // <-- TAMBAHKAN PERMISSION BARU
+>>>>>>> 2586b3657da907332fa67cf7713a46e78eb33a16
         ];
 
         foreach ($permissions as $permission) {

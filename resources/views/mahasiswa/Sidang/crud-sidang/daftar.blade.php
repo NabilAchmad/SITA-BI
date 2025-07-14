@@ -4,7 +4,7 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-<form action="{{ route('pendaftaran_sidang.store') }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('mahasiswa.sidang.store-akhir') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     <div class="mb-3">
@@ -25,14 +25,14 @@
     <div class="mb-3">
         <label>Dosen Pembimbing 1</label>
         <input type="text" class="form-control"
-            value="{{ $mahasiswa->tugasAkhir && $mahasiswa->tugasAkhir->pembimbing1Dosen ? $mahasiswa->tugasAkhir->pembimbing1Dosen->user->name : '-' }}"
+            value="{{ $mahasiswa->tugasAkhir && $mahasiswa->tugasAkhir->pembimbingSatu ? $mahasiswa->tugasAkhir->pembimbingSatu->user->name : '-' }}"
             readonly>
     </div>
 
     <div class="mb-3">
         <label>Dosen Pembimbing 2</label>
         <input type="text" class="form-control"
-            value="{{ $mahasiswa->tugasAkhir && $mahasiswa->tugasAkhir->pembimbing2Dosen ? $mahasiswa->tugasAkhir->pembimbing2Dosen->user->name : '-' }}"
+            value="{{ $mahasiswa->tugasAkhir && $mahasiswa->tugasAkhir->pembimbingDua ? $mahasiswa->tugasAkhir->pembimbingDua->user->name : '-' }}"
             readonly>
     </div>
 
