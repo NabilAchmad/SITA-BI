@@ -19,26 +19,9 @@
     <!-- Sidang Cards -->
    <div class="row g-4">
 
-     <!-- Sidang Sempro -->
-        <div class="col-md-6 col-xl-3">
-            <a href="{{ route('daftar-sempro') }}" class="text-decoration-none">
-                <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="icon icon-shape bg-info text-white rounded-circle me-3">
-                                <i class="fas fa-comments"></i>
-                            </div>
-                            <h6 class="mb-0 fw-semibold text-dark">Daftar Sidang Sempro</h6>
-                        </div>
-                        <p class="mb-0 text-muted">Ajukan dan pantau status Seminar Proposal Anda.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
     <!-- Daftar Sidang -->
     <div class="col-md-6 col-xl-3">
-        <a href="{{ url('/mahasiswa/sidang/daftar-sidang') }}" class="text-decoration-none">
+        <a href="{{ route('mahasiswa.sidang.daftar-akhir') }}" class="text-decoration-none">
             <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
@@ -53,11 +36,9 @@
         </a>
     </div>
 
-   
-
     <!-- Nilai Sidang -->
     <div class="col-md-6 col-xl-3">
-        <a href="{{ url('/mahasiswa/sidang/lihat-nilai') }}" class="text-decoration-none">
+        <a href="{{ route('mahasiswa.sidang.nilai') }}" class="text-decoration-none">
             <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
@@ -74,7 +55,7 @@
 
     <!-- Jadwal Sidang -->
     <div class="col-md-6 col-xl-3">
-        <a href="{{ url('/mahasiswa/sidang/lihat-jadwal') }}" class="text-decoration-none">
+        <a href="{{ route('mahasiswa.sidang.jadwal') }}" class="text-decoration-none">
             <div class="card card-hover border border-dark-subtle shadow-sm h-100 transition-scale">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">

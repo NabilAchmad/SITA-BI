@@ -17,7 +17,7 @@ return new class extends Migration
                 $table->foreignId('divalidasi_oleh_p1')
                     ->nullable()
                     ->after('status_validasi')
-                    ->constrained('dosens') // default ke kolom id
+                    ->constrained('dosen') // default ke kolom id
                     ->onDelete('set null');
             }
 
@@ -25,7 +25,7 @@ return new class extends Migration
                 $table->foreignId('divalidasi_oleh_p2')
                     ->nullable()
                     ->after('divalidasi_oleh_p1')
-                    ->constrained('dosens')
+                    ->constrained('dosen')
                     ->onDelete('set null');
             }
         });

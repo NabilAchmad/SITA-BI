@@ -176,43 +176,39 @@ class TugasAkhirService
      */
     public function getProgressPageData(): array
     {
+        // Guard clause jika tidak ada konteks mahasiswa
         if (!$this->mahasiswa) {
             return $this->getEmptyProgressData();
         }
 
+        // 1. Ambil data utama menggunakan helper yang sudah dioptimalkan
+        // Helper ini bertanggung jawab untuk eager loading semua relasi
         $tugasAkhir = $this->getActiveTugasAkhirForProgressPage();
 
+        // Guard clause jika mahasiswa tidak memiliki tugas akhir aktif
         if (!$tugasAkhir) {
             return $this->getEmptyProgressData();
         }
 
-        // ✅ PERBAIKAN: Mengambil semua catatan tanpa de-duplikasi dan memuat relasi 'bimbinganTa'.
-        // Ini penting agar view bisa memfilter berdasarkan dosen.
-        $catatanList = CatatanBimbingan::whereIn('bimbingan_ta_id', $tugasAkhir->bimbinganTa()->pluck('id'))
-            ->with(['author.user', 'bimbinganTa']) // Memuat relasi bimbinganTa
-            ->orderBy('created_at', 'asc')
-            ->get();
-
-        $riwayatDokumen = $tugasAkhir->dokumenTa()->orderBy('created_at', 'asc')->get();
-
+        // 2. Gunakan koleksi yang SUDAH di-load (tidak ada query baru ke DB)
+        $allBimbingan = $tugasAkhir->bimbinganTa;
+        $riwayatDokumen = $tugasAkhir->dokumenTa;
         $pembimbing1 = $tugasAkhir->pembimbing_satu;
         $pembimbing2 = $tugasAkhir->pembimbing_dua;
 
-        $allBimbingan = $tugasAkhir->bimbinganTa; // Gunakan koleksi yang sudah ada di memori
+        // 3. Olah data di memori untuk mendapatkan jadwal aktif
         $jadwalAktif = collect(); // Buat Laravel Collection kosong
-
         if ($pembimbing1) {
             $jadwalP1 = $allBimbingan
                 ->where('dosen_id', $pembimbing1->id)
                 ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
-                ->sortByDesc('sesi_ke') // Urutkan berdasarkan sesi terbaru
+                ->sortByDesc('sesi_ke') // Ambil sesi terbaru
                 ->first();
 
             if ($jadwalP1) {
                 $jadwalAktif->push($jadwalP1);
             }
         }
-
         if ($pembimbing2) {
             $jadwalP2 = $allBimbingan
                 ->where('dosen_id', $pembimbing2->id)
@@ -225,18 +221,21 @@ class TugasAkhirService
             }
         }
 
-        $bimbinganCountP1 = $pembimbing1 ? $tugasAkhir->bimbinganTa->where('dosen_id', $pembimbing1->id)->where('status_bimbingan', 'selesai')->count() : 0;
-        $bimbinganCountP2 = $pembimbing2 ? $tugasAkhir->bimbinganTa->where('dosen_id', $pembimbing2->id)->where('status_bimbingan', 'selesai')->count() : 0;
+        // 4. Hitung jumlah bimbingan dari koleksi di memori (sudah diperbaiki)
+        $bimbinganCountP1 = $pembimbing1 ? $allBimbingan->where('dosen_id', $pembimbing1->id)->where('status_bimbingan', 'selesai')->count() : 0;
+        $bimbinganCountP2 = $pembimbing2 ? $allBimbingan->where('dosen_id', $pembimbing2->id)->where('status_bimbingan', 'selesai')->count() : 0;
 
+        // 5. Kembalikan semua data yang sudah matang dan siap ditampilkan
         return [
             'tugasAkhir'       => $tugasAkhir,
             'riwayatDokumen'   => $riwayatDokumen,
             'dokumenTerbaru'   => $riwayatDokumen->last(),
-            'catatanList'      => $catatanList, // <-- Data ini sekarang siap untuk difilter di view
+            'catatanList'      => $tugasAkhir->catatanBimbingan, // Langsung dari relasi yang di-load
             'bimbinganCountP1' => $bimbinganCountP1,
             'bimbinganCountP2' => $bimbinganCountP2,
             'pembimbing1'      => $pembimbing1,
             'pembimbing2'      => $pembimbing2,
+            'jadwalAktif'      => $jadwalAktif,
         ];
     }
 

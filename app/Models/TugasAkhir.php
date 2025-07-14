@@ -87,6 +87,11 @@ class TugasAkhir extends Model
      * Relasi dasar Many-to-Many ke Dosen melalui tabel pivot.
      * Ini menjadi FONDASI untuk mengambil data pembimbing.
      */
+    public function peranDosenTa()
+    {
+        return $this->hasMany(PeranDosenTa::class, 'tugas_akhir_id');
+    }
+
     public function dosenPembimbing()
     {
         return $this->belongsToMany(Dosen::class, 'peran_dosen_ta', 'tugas_akhir_id', 'dosen_id')
