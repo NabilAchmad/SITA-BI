@@ -11,9 +11,9 @@
                     <i class="bi bi-person-badge me-2"></i>Detail Bimbingan
                 </h2>
             </div>
-            <a href="{{ route('dosen.bimbingan.index') }}" class="btn btn-outline-secondary rounded-pill">
-                <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar
-            </a>
+            <button onclick="window.history.back()" class="btn btn-outline-secondary rounded-pill">
+                <i class="bi bi-arrow-left me-1"></i> Kembali
+            </button>
         </div>
 
         {{-- Kartu Informasi Mahasiswa & TA --}}
@@ -37,7 +37,8 @@
                             @endif
                             Angkatan {{ $mahasiswa->angkatan }}
                         </p>
-                        <h5 class="fw-semibold mt-3"><span class="text-muted">Judul Tugas Akhir:</span> "{{ $tugasAkhir->judul ?? 'Judul Belum Ditentukan' }}"</h5>
+                        <h5 class="fw-semibold mt-3"><span class="text-muted">Judul Tugas Akhir:</span>
+                            "{{ $tugasAkhir->judul ?? 'Judul Belum Ditentukan' }}"</h5>
                     </div>
                 </div>
             </div>

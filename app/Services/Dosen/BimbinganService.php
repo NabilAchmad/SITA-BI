@@ -27,29 +27,63 @@ class BimbinganService
 
     public function getPengajuanBimbingan(Request $request)
     {
+        // Cek dulu apakah pengguna yang login adalah dosen
         if (!$this->dosen) {
-            return collect();
+            return collect(); // Kembalikan koleksi kosong jika bukan dosen
         }
 
-        $dosenId = $this->dosen->id;
-        $topikIds = $this->dosen->topik()->pluck('id');
+        // =================================================================
+        // LOGIKA UNTUK MODE PANTAU SEMUA
+        // =================================================================
+        // Cek apakah mode=pantau_semua dan user punya hak akses
+        if ($request->input('mode') == 'pantau_semua' && auth()->user()->can('pantau-semua-bimbingan')) {
 
-        $pengajuanDariTopikDosen = TugasAkhir::whereIn('tawaran_topik_id', $topikIds)
-            ->where('status', 'disetujui')
-            ->with('mahasiswa.user', 'tawaranTopik')
-            ->get();
+            // 1. Dapatkan ID dosen yang sedang login.
+            // Tanda tanya (?->) digunakan untuk keamanan jika user bukan seorang dosen.
+            $loggedInDosenId = auth()->user()->dosen?->id;
 
-        $pengajuanDariMahasiswa = TugasAkhir::whereNull('tawaran_topik_id')
-            ->where('status', 'disetujui')
-            ->whereHas('dosenPembimbing', function ($query) use ($dosenId) {
-                $query->where('dosen_id', $dosenId);
-            })
-            ->with('mahasiswa.user', 'dosenPembimbing.user')
-            ->get();
+            // Ambil SEMUA tugas akhir yang statusnya sudah disetujui...
+            $query = TugasAkhir::where('status', 'disetujui');
 
-        $semuaPengajuan = $pengajuanDariTopikDosen->merge($pengajuanDariMahasiswa);
+            // 2. Tambahkan filter HANYA JIKA user tersebut adalah dosen.
+            if ($loggedInDosenId) {
+                // ...KECUALI tugas akhir yang memiliki relasi 'dosenPembimbing'
+                // di mana ID dosennya adalah ID dosen yang login.
+                $query->whereDoesntHave('dosenPembimbing', function ($q) use ($loggedInDosenId) {
+                    $q->where('dosen.id', $loggedInDosenId);
+                });
+            }
 
-        return $semuaPengajuan->unique('id')->values();
+            // Kembalikan hasilnya beserta relasi yang dibutuhkan oleh view.
+            return $query->with([
+                'mahasiswa.user',
+                'dosenPembimbing.user' // Untuk menampilkan nama P1 di view
+            ])
+                ->get();
+        } else {
+            $dosenId = $this->dosen->id;
+            $topikIds = $this->dosen->topik()->pluck('id');
+
+            // 1. Pengajuan dari topik yang ditawarkan dosen
+            $pengajuanDariTopikDosen = TugasAkhir::whereIn('tawaran_topik_id', $topikIds)
+                ->where('status', 'disetujui')
+                ->with('mahasiswa.user', 'tawaranTopik')
+                ->get();
+
+            // 2. Pengajuan dari mahasiswa langsung ke dosen
+            $pengajuanDariMahasiswa = TugasAkhir::whereNull('tawaran_topik_id')
+                ->where('status', 'disetujui')
+                ->whereHas('dosenPembimbing', function ($query) use ($dosenId) {
+                    $query->where('dosen_id', $dosenId);
+                })
+                ->with('mahasiswa.user', 'dosenPembimbing.user')
+                ->get();
+
+            // Gabungkan keduanya
+            $semuaPengajuan = $pengajuanDariTopikDosen->merge($pengajuanDariMahasiswa);
+
+            return $semuaPengajuan->unique('id')->values();
+        }
     }
 
     public function getAllBimbinganAktif(Request $request)
