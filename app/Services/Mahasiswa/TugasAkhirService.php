@@ -198,6 +198,33 @@ class TugasAkhirService
         $pembimbing1 = $tugasAkhir->pembimbing_satu;
         $pembimbing2 = $tugasAkhir->pembimbing_dua;
 
+        $allBimbingan = $tugasAkhir->bimbinganTa; // Gunakan koleksi yang sudah ada di memori
+        $jadwalAktif = collect(); // Buat Laravel Collection kosong
+
+        if ($pembimbing1) {
+            $jadwalP1 = $allBimbingan
+                ->where('dosen_id', $pembimbing1->id)
+                ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
+                ->sortByDesc('sesi_ke') // Urutkan berdasarkan sesi terbaru
+                ->first();
+
+            if ($jadwalP1) {
+                $jadwalAktif->push($jadwalP1);
+            }
+        }
+
+        if ($pembimbing2) {
+            $jadwalP2 = $allBimbingan
+                ->where('dosen_id', $pembimbing2->id)
+                ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
+                ->sortByDesc('sesi_ke')
+                ->first();
+
+            if ($jadwalP2) {
+                $jadwalAktif->push($jadwalP2);
+            }
+        }
+
         $bimbinganCountP1 = $pembimbing1 ? $tugasAkhir->bimbinganTa->where('dosen_id', $pembimbing1->id)->where('status_bimbingan', 'selesai')->count() : 0;
         $bimbinganCountP2 = $pembimbing2 ? $tugasAkhir->bimbinganTa->where('dosen_id', $pembimbing2->id)->where('status_bimbingan', 'selesai')->count() : 0;
 
@@ -255,7 +282,12 @@ class TugasAkhirService
 
         return $this->mahasiswa->tugasAkhir()
             ->active()
-            ->with(['dosenPembimbing.user', 'dokumenTa', 'bimbinganTa'])
+            ->with([
+                'dosenPembimbing.user',
+                'dokumenTa',
+                'bimbinganTa',
+                'catatanBimbingan.author.user', // <-- PENYESUAIAN DI SINI
+            ])
             ->first();
     }
 
