@@ -34,14 +34,10 @@ class BimbinganMahasiswaController extends Controller
         return view('dosen.bimbingan.dashboard.dashboard', compact('mahasiswaList'));
     }
 
-    public function show(TugasAkhir $tugasAkhir, Request $request)
+    public function show(TugasAkhir $tugasAkhir)
     {
         try {
-            $isPantauSemuaMode = $request->input('mode') === 'pantau_semua' && auth()->user()->can('pantau-semua-bimbingan');
-
-            if (!$isPantauSemuaMode) {
-                $this->authorize('view', $tugasAkhir);
-            }
+            $this->authorize('view', $tugasAkhir);
 
             $data = $this->bimbinganService->getDataForBimbinganDetailPage($tugasAkhir);
 

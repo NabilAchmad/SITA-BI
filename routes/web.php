@@ -219,13 +219,6 @@ Route::middleware(['auth'])->group(function () {
         // ROUTE SIDANG
         Route::prefix('sidang')->group(function () {
             Route::get('dashboard-sidang', [JadwalSidangAkhirController::class, 'dashboard'])->name('dosen.sidang.index');
-            // Route::prefix('sempro')->group(function () {
-            //     Route::get('/jadwal-sidang-sempro', [JadwalSidangSemproController::class, 'SidangSempro'])->name('dosen.sidang.kelola.sempro');
-            //     Route::post('/simpan-penguji/{sidang_id}', [JadwalSidangSemproController::class, 'simpanPenguji'])->name('dosen.jadwal-sempro.simpanPenguji');
-            //     Route::post('/jadwal-sidang', [JadwalSidangSemproController::class, 'store'])->name('dosen.jadwal-sempro.store');
-            //     Route::get('/detail-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'show'])->name('dosen.jadwal-sempro.show');
-            //     Route::post('/tandai-sidang/{sidang_id}', [JadwalSidangSemproController::class, 'tandaiSidangSempro'])->name('dosen.jadwal-sidang-sempro.mark-done');
-            // });
             Route::prefix('akhir')->group(function () {
                 Route::get('/jadwal-sidang-akhir', [JadwalSidangAkhirController::class, 'sidangAkhir'])->name('dosen.jadwal.sidang.akhir');
                 Route::get('/menunggu', [JadwalSidangAkhirController::class, 'sidangAkhir'])->name('dosen.sidang.menunggu.penjadwalan.akhir');

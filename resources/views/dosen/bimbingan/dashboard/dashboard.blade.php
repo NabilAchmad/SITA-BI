@@ -184,11 +184,11 @@
                                                 <td class="py-3">
                                                     <div>
                                                         <small><span class="fw-semibold">P1:</span>
-                                                            {{ $tugasAkhir->pembimbingSatu->dosen->user->name ?? '-' }}</small>
+                                                            {{ $tugasAkhir->pembimbingSatu->user->name ?? '-' }}</small>
                                                     </div>
                                                     <div>
                                                         <small><span class="fw-semibold">P2:</span>
-                                                            {{ $tugasAkhir->pembimbingDua->dosen->user->name ?? '-' }}</small>
+                                                            {{ $tugasAkhir->pembimbingDua->user->name ?? '-' }}</small>
                                                     </div>
                                                 </td>
                                             @else
@@ -273,4 +273,4 @@
         });
     </script>
 @endsection
-```
+

@@ -48,7 +48,7 @@
                     @forelse ($tugasAkhirList as $index => $ta)
                         @php
                             $mahasiswa = $ta->mahasiswa;
-                            $pembimbing1 = $ta->peranDosenTA->where('peran', 'pembimbing1')->first();
+                            $pembimbing1 = $ta->dosenPembimbing->where('peran', 'pembimbing1')->first();
                         @endphp
                         <tr>
                             <td class="text-center">{{ ($tugasAkhirList->firstItem() ?? 0) + $index }}</td>

@@ -97,7 +97,7 @@ class BimbinganService
         ]);
 
         $sesiAktif = $tugasAkhir->bimbinganTa
-            ->whereIn('status_bimbingan', ['disetujui', 'dijadwalkan']);
+            ->whereIn('status_bimbingan', ['diajukan','disetujui', 'dijadwalkan']);
 
         $allCatatan = CatatanBimbingan::whereIn('bimbingan_ta_id', $tugasAkhir->bimbinganTa->pluck('id'))
             ->with('author.user')
@@ -116,11 +116,11 @@ class BimbinganService
 
         // Tidak ada perubahan di sini, accessor dipanggil secara otomatis
         // dan menggunakan data dari 'dosenPembimbing' yang sudah di-load.
-        $pembimbing1 = $tugasAkhir->pembimbing_satu;
+        $pembimbing1 = $tugasAkhir->pembimbingSatu;
         $pembimbing2 = $tugasAkhir->pembimbing_dua;
 
-        $bimbinganCountP1 = $pembimbing1 ? $tugasAkhir->bimbinganTa->where('dosen_id', $pembimbing1->id)->where('status_bimbingan', 'selesai')->count() : 0;
-        $bimbinganCountP2 = $pembimbing2 ? $tugasAkhir->bimbinganTa->where('dosen_id', $pembimbing2->id)->where('status_bimbingan', 'selesai')->count() : 0;
+        $bimbinganCountP1 = $pembimbing1 ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
+        $bimbinganCountP2 = $pembimbing2 ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
 
         return [
             'tugasAkhir'       => $tugasAkhir,
@@ -237,8 +237,27 @@ class BimbinganService
 
     private function authorizeDosenIsPembimbing(TugasAkhir $tugasAkhir): void
     {
-        if (!$this->dosen || !$tugasAkhir->dosenPembimbing()->where('dosen_id', $this->dosen->id)->exists()) {
-            throw new UnauthorizedException('Anda bukan pembimbing untuk tugas akhir ini atau tidak memiliki hak akses sebagai dosen.');
+        $user = auth()->user();
+
+        // ✅ Izinkan jika user punya permission pantau semua
+        if ($user->can('pantau-semua-bimbingan')) {
+            return;
         }
+
+        // ✅ Izinkan jika policy `view` mengizinkan
+        if ($user->can('view', $tugasAkhir)) {
+            return;
+        }
+
+        // ✅ Izinkan jika user adalah pembimbing (fallback jika belum lolos di atas)
+        if (
+            $this->dosen &&
+            $tugasAkhir->dosenPembimbing()->where('dosen_id', $this->dosen->id)->exists()
+        ) {
+            return;
+        }
+
+        // ❌ Kalau semua gagal, lempar unauthorized
+        throw new UnauthorizedException('Anda tidak diizinkan mengakses tugas akhir ini.');
     }
 }

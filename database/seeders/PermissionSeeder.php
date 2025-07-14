@@ -11,47 +11,53 @@ class PermissionSeeder extends Seeder
 {
     public function run()
     {
-        // Reset cache
+        // ✅ Reset cache permission & role
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 1. BUAT SEMUA PERMISSIONS YANG DIPERLUKAN
-        // Kelola Akun
-        Permission::findOrCreate('manage user accounts', 'web');
+        // ✅ 1. Buat semua permissions yang dibutuhkan
+        $permissions = [
+            'manage user accounts',
+            'view pengumuman',
+            'manage pengumuman',
+            'full access penugasan pembimbing',
+            'manage sidang',
+            'view laporan',
+            'view logs',
+            'manage tugas akhir',
+            'manage bimbingan',
+            'manage penilaian',
+            'pantau-semua-bimbingan',
+        ];
 
-        // Pengumuman
-        Permission::findOrCreate('view pengumuman', 'web');
-        Permission::findOrCreate('manage pengumuman', 'web'); // Izin untuk CRUD
+        foreach ($permissions as $perm) {
+            Permission::findOrCreate($perm, 'web');
+        }
 
-        // Penugasan Bimbingan
-        Permission::findOrCreate('full access penugasan pembimbing', 'web'); // Hak akses penuh
-
-        // Fitur Lainnya
-        Permission::findOrCreate('manage sidang', 'web');
-        Permission::findOrCreate('view laporan', 'web');
-        Permission::findOrCreate('view logs', 'web');
-
-
-        // 2. AMBIL SEMUA ROLE
-        $adminRole = Role::findByName('admin');
-        $kajurRole = Role::findByName('kajur');
+        // ✅ 2. Ambil semua roles
+        $adminRole     = Role::findByName('admin');
+        $kajurRole     = Role::findByName('kajur');
         $kaprodiD3Role = Role::findByName('kaprodi-d3');
         $kaprodiD4Role = Role::findByName('kaprodi-d4');
 
+        // ✅ 3. Tetapkan permission per role
 
-        // 3. BERIKAN PERMISSIONS KE SETIAP ROLE
+        // Admin dapat semua permission
+        $adminRole->syncPermissions(Permission::all());
 
-        // >> Aturan untuk Admin
-        $adminRole->syncPermissions(Permission::all()); // Admin dapat semua izin
-
-        // >> Aturan untuk Kajur
+        // Kajur
         $kajurRole->syncPermissions([
-            'view pengumuman', // Hanya lihat
-            'full access penugasan pembimbing', // Akses penuh
+            'view pengumuman',
+            'manage pengumuman',
+            'full access penugasan pembimbing',
             'manage sidang',
             'view laporan',
+            'manage tugas akhir',
+            'manage bimbingan',
+            'manage penilaian',
+            'pantau-semua-bimbingan',
         ]);
 
-        // >> Aturan untuk Kaprodi (Diberi izin yang sama dengan Kajur)
+        // Kaprodi D3 & D4: permission sama seperti Kajur
         $kaprodiD3Role->syncPermissions($kajurRole->permissions);
         $kaprodiD4Role->syncPermissions($kajurRole->permissions);
     }
