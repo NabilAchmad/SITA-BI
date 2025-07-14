@@ -120,13 +120,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/show/{tugasAkhir}', [BimbinganMahasiswaController::class, 'show'])->name('show');
         });
 
-        Route::resource('tawaran-topik', TawaranTopikController::class)->except(['show']);
-
-
-        Route::prefix('sidang-akhir')->name('sidang-akhir.')->group(function () {
-            Route::get('/', [])->name('index');
-        });
-
         // Grup untuk aksi-aksi spesifik terkait bimbingan
         Route::prefix('tugas-akhir/{tugasAkhir}')->group(function () {
             Route::post('/jadwal', [JadwalBimbinganController::class, 'store'])->name('jadwal.store');
@@ -154,6 +147,10 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/reject/{application}', [TawaranTopikController::class, 'rejectApplication'])->name('rejectApplication');
         });
 
+        Route::resource('tawaran-topik', TawaranTopikController::class)->except(['show']);
+        // Rute tambahan untuk tawaran topik
+        // Route::post('tawaran-topik/approve/{application}', [TawaranTopikController::class, 'approveApplication'])->name('tawaran-topik.approve');
+        // Route::post('tawaran-topik/reject/{application}', [TawaranTopikController::class, 'rejectApplication'])->name('tawaran-topik.reject');
     });
 
     //------------------------------------------------------------------
