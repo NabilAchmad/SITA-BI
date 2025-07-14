@@ -1,9 +1,8 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/user/repo/main/public/logo-seven.jpg" width="250">
+  <img src="https://raw.githubusercontent.com/NabilAchmad/SITA-BI/main/public/logo-seven.jpg" alt="SITA-BI Logo" width="250"/>
 </p>
 
-
-
+---
 
 # 📘 SITA-BI (Sistem Informasi Tugas Akhir Bahasa Inggris)
 
