@@ -121,27 +121,23 @@ class TugasAkhirService
     }
 
     // revisi bagian model
-    public function createCatatanForMahasiswa(TugasAkhir $tugasAkhir, array $data)
+    public function createCatatanForMahasiswa(TugasAkhir $tugasAkhir, array $data): void
     {
         if (optional($this->mahasiswa)->id !== $tugasAkhir->mahasiswa_id) {
             throw new UnauthorizedException('Anda tidak berwenang untuk tugas akhir ini.');
         }
 
-        // Cari sesi bimbingan yang aktif untuk kedua dosen.
-        $sesiBimbinganAktif = $tugasAkhir->bimbinganTa()->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])->get();
+        // Validasi bimbingan_ta_id benar-benar milik tugas akhir ini
+        $bimbingan = $tugasAkhir->bimbinganTa()
+            ->where('id', $data['bimbingan_ta_id'])
+            ->firstOrFail();
 
-        if ($sesiBimbinganAktif->isEmpty()) {
-            throw new \Exception('Tidak bisa mengirim catatan. Tidak ada sesi bimbingan yang sedang aktif.');
-        }
-
-        // Simpan catatan ke setiap sesi aktif agar log tetap sinkron.
-        foreach ($sesiBimbinganAktif as $sesi) {
-            $sesi->catatan()->create([
-                'catatan'     => $data['catatan'],
-                'author_type' => Mahasiswa::class,
-                'author_id'   => $this->mahasiswa->id,
-            ]);
-        }
+        // Simpan catatan untuk dosen yang dipilih
+        $bimbingan->catatan()->create([
+            'catatan'     => $data['catatan'],
+            'author_type' => Mahasiswa::class,
+            'author_id'   => $this->mahasiswa->id,
+        ]);
     }
 
     /**
@@ -176,61 +172,60 @@ class TugasAkhirService
      */
     public function getProgressPageData(): array
     {
-        // Guard clause jika tidak ada konteks mahasiswa
         if (!$this->mahasiswa) {
             return $this->getEmptyProgressData();
         }
 
-        // 1. Ambil data utama menggunakan helper yang sudah dioptimalkan
-        // Helper ini bertanggung jawab untuk eager loading semua relasi
+        // Panggil helper yang sudah memuat semua relasi (termasuk bimbinganTa)
         $tugasAkhir = $this->getActiveTugasAkhirForProgressPage();
 
-        // Guard clause jika mahasiswa tidak memiliki tugas akhir aktif
         if (!$tugasAkhir) {
             return $this->getEmptyProgressData();
         }
 
-        // 2. Gunakan koleksi yang SUDAH di-load (tidak ada query baru ke DB)
+        // ✅ AMBIL KOLEKSI SEKALI SAJA DARI DATA YANG SUDAH DI-LOAD
         $allBimbingan = $tugasAkhir->bimbinganTa;
-        $riwayatDokumen = $tugasAkhir->dokumenTa;
+        $allDokumen = $tugasAkhir->dokumenTa;
+
         $pembimbing1 = $tugasAkhir->pembimbing_satu;
         $pembimbing2 = $tugasAkhir->pembimbing_dua;
 
-        // 3. Olah data di memori untuk mendapatkan jadwal aktif
-        $jadwalAktif = collect(); // Buat Laravel Collection kosong
+        // Olah koleksi di memori untuk mendapatkan jadwal aktif
+        $jadwalAktif = collect();
         if ($pembimbing1) {
+            // ✅ GUNAKAN $allBimbingan, BUKAN ->bimbinganTa()
             $jadwalP1 = $allBimbingan
                 ->where('dosen_id', $pembimbing1->id)
                 ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
-                ->sortByDesc('sesi_ke') // Ambil sesi terbaru
+                ->sortByDesc('sesi_ke')
                 ->first();
 
-            if ($jadwalP1) {
-                $jadwalAktif->push($jadwalP1);
-            }
+            if ($jadwalP1) $jadwalAktif->push($jadwalP1);
         }
         if ($pembimbing2) {
+            // ✅ GUNAKAN $allBimbingan, BUKAN ->bimbinganTa()
             $jadwalP2 = $allBimbingan
                 ->where('dosen_id', $pembimbing2->id)
                 ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
                 ->sortByDesc('sesi_ke')
                 ->first();
 
-            if ($jadwalP2) {
-                $jadwalAktif->push($jadwalP2);
-            }
+            if ($jadwalP2) $jadwalAktif->push($jadwalP2);
         }
 
-        // 4. Hitung jumlah bimbingan dari koleksi di memori (sudah diperbaiki)
-        $bimbinganCountP1 = $pembimbing1 ? $allBimbingan->where('dosen_id', $pembimbing1->id)->where('status_bimbingan', 'selesai')->count() : 0;
-        $bimbinganCountP2 = $pembimbing2 ? $allBimbingan->where('dosen_id', $pembimbing2->id)->where('status_bimbingan', 'selesai')->count() : 0;
+        // Hitung jumlah bimbingan dari koleksi yang sama
+        $bimbinganCountP1 = $pembimbing1 ? $tugasAkhir->bimbinganTa->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
+        $bimbinganCountP2 = $pembimbing2 ? $tugasAkhir->bimbinganTa->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
 
-        // 5. Kembalikan semua data yang sudah matang dan siap ditampilkan
+        // Ambil catatan (contoh jika diperlukan)
+        $bimbinganIds = $allBimbingan->pluck('id');
+        $catatanList = $bimbinganIds->isNotEmpty() ? CatatanBimbingan::whereIn('bimbingan_ta_id', $bimbinganIds)->with('author.user')->get() : collect();
+
         return [
             'tugasAkhir'       => $tugasAkhir,
-            'riwayatDokumen'   => $riwayatDokumen,
-            'dokumenTerbaru'   => $riwayatDokumen->last(),
-            'catatanList'      => $tugasAkhir->catatanBimbingan, // Langsung dari relasi yang di-load
+            'riwayatDokumen'   => $allDokumen, // ✅ GUNAKAN KOLEKSI YANG SUDAH ADA
+            'dokumenTerbaru'   => $allDokumen->last(),
+            'catatanList'      => $catatanList,
             'bimbinganCountP1' => $bimbinganCountP1,
             'bimbinganCountP2' => $bimbinganCountP2,
             'pembimbing1'      => $pembimbing1,
@@ -284,8 +279,7 @@ class TugasAkhirService
             ->with([
                 'dosenPembimbing.user',
                 'dokumenTa',
-                'bimbinganTa',
-                'catatanBimbingan.author.user', // <-- PENYESUAIAN DI SINI
+                'bimbinganTa', // <-- PENYESUAIAN DI SINI
             ])
             ->first();
     }

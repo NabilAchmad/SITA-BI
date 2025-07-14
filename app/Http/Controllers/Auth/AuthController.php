@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -104,18 +105,55 @@ class AuthController extends Controller
             'email'    => ['required', 'email', 'max:255', 'unique:users'],
             'nim'      => ['required', 'string', 'max:10', 'unique:mahasiswa'],
             'prodi'    => ['required', 'in:d3,d4'],
-            'kelas'    => ['required', 'string', 'max:1'],
+            'kelas'    => ['required', function ($attribute, $value, $fail) use ($request) {
+                $allowed = [
+                    'd3' => ['a', 'b', 'c'],
+                    'd4' => ['a', 'b'],
+                ];
+                $prodi = $request->input('prodi');
+
+                if (!isset($allowed[$prodi]) || !in_array(strtolower($value), $allowed[$prodi])) {
+                    $fail('Kelas yang dipilih tidak sesuai dengan program studi.');
+                }
+            }],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
-        // Simpan data registrasi sementara di session
-        session(['registration_data' => $validated]);
+        try {
+            // Memulai transaksi database
+            DB::beginTransaction();
 
-        // Kirim email verifikasi OTP menggunakan email yang divalidasi
-        $this->sendEmailVerification($validated['email']);
+            $user = User::create([
+                'name'     => $validated['name'],
+                'email'    => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
 
-        // Redirect ke halaman form OTP
-        return redirect()->route('auth.otp.form')->with('success', 'Registrasi berhasil. Silakan periksa email Anda untuk kode OTP.');
+            // Memberikan role 'mahasiswa' menggunakan metode dari Spatie
+            $user->assignRole('mahasiswa');
+
+            Mahasiswa::create([
+                'user_id'  => $user->id,
+                'nim'      => $validated['nim'],
+                'prodi'    => $validated['prodi'],
+                'kelas'    => $validated['kelas'],
+                'angkatan' => 2000 + intval(substr($validated['nim'], 0, 2)),
+            ]);
+
+            // Jika semua berhasil, simpan perubahan
+            DB::commit();
+        } catch (\Exception $e) {
+            // Jika ada error, batalkan semua operasi
+            DB::rollBack();
+            // Tampilkan pesan error
+            return back()->with('error', 'Registrasi gagal, terjadi kesalahan pada server. Silakan coba lagi.')->withInput();
+        }
+
+        $this->sendEmailVerification($user);
+
+        session(['otp_user_id' => $user->id]);
+
+        return redirect()->route('auth.otp.verify.form')->with('success', 'Registrasi berhasil. Silakan masukkan kode OTP yang telah dikirim ke email Anda.');
     }
 
     /**
@@ -175,7 +213,7 @@ class AuthController extends Controller
                     'kelas'    => $registrationData['kelas'],
                     'angkatan' => '20' . substr($registrationData['nim'], 0, 2), // Logika angkatan yang lebih aman
                 ]);
-                
+
                 return $user;
             });
 
@@ -189,7 +227,6 @@ class AuthController extends Controller
             Auth::login($user);
 
             return redirect($this->redirectByRole($user))->with('success', 'Verifikasi berhasil! Selamat datang.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             // Log error jika perlu: Log::error($e->getMessage());
@@ -226,18 +263,13 @@ class AuthController extends Controller
      * Metode Helper: Membuat dan mengirim token verifikasi email.
      * Diperbaiki untuk menggunakan email, bukan User object.
      */
-    private function sendEmailVerification(string $email)
+    private function sendEmailVerification(User $user)
     {
         $otpCode = random_int(100000, 999999);
-
-        // Simpan atau perbarui token berdasarkan email
         EmailVerificationToken::updateOrCreate(
-            ['email' => $email],
+            ['user_id' => $user->id],
             ['token' => $otpCode, 'created_at' => now()]
         );
-
-        // Kirim email. Anda bisa membuat User object sementara jika Mailable Anda membutuhkannya.
-        $tempData = ['email' => $email, 'name' => session('registration_data.name', 'Pengguna Baru')];
-        Mail::to($email)->send(new VerifyEmail((object)$tempData, $otpCode));
+        Mail::to($user->email)->send(new VerifyEmail($user, $otpCode));
     }
 }

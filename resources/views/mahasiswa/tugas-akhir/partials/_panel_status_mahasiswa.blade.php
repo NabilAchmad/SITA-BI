@@ -6,7 +6,7 @@
             @if ($pembimbing1 && $pembimbing1->dosen && $pembimbing1->dosen->user)
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <span><i class="bi bi-person-check-fill me-2"></i>P1:
-                        {{ Str::limit($pembimbing1->user->name ?? '-', 50) }}</span>
+                        {{ Str::limit($pembimbing1->dosen->user->name ?? '-', 50) }}</span>
                     <span
                         class="badge {{ $bimbinganCountP1 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">{{ $bimbinganCountP1 }}
                         / 7</span>
@@ -15,14 +15,14 @@
             @if ($pembimbing2 && $pembimbing2->dosen && $pembimbing2->dosen->user)
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <span><i class="bi bi-person-check me-2"></i>P2:
-                        {{ Str::limit($pembimbing2->user->name ?? '-', 50) }}</span>
+                        {{ Str::limit($pembimbing2->dosen->user->name ?? '-', 50) }}</span>
                     <span
                         class="badge {{ $bimbinganCountP2 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">{{ $bimbinganCountP2 }}
                         / 7</span>
                 </li>
             @endif
             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                <span>Kelayakan Sidang</span>
+                <span>Kelayakan Sidang Akhir</span>
                 @php
                     $statusKelayakan = match ($tugasAkhir->status) {
                         'menunggu_acc_p1' => ['text' => 'Menunggu P1', 'class' => 'bg-warning text-dark'],
@@ -38,72 +38,142 @@
 </div>
 
 {{-- Panel Jadwal Aktif --}}
-@php
-    $jadwalAktif = [];
-
-    // Ambil jadwal terbaru untuk Pembimbing 1 jika ada
-    if ($pembimbing1) {
-        $jadwalP1 = $tugasAkhir->bimbinganTa()->where('peran', 'pembimbing1')->latest('sesi_ke')->first();
-        // Tampilkan hanya jika statusnya aktif (diajukan atau dijadwalkan)
-        if ($jadwalP1 && in_array($jadwalP1->status_bimbingan, ['diajukan', 'dijadwalkan'])) {
-            $jadwalAktif[] = $jadwalP1;
-        }
-    }
-
-    // Ambil jadwal terbaru untuk Pembimbing 2 jika ada
-    if ($pembimbing2) {
-        $jadwalP2 = $tugasAkhir->bimbinganTa()->where('peran', 'pembimbing2')->latest('sesi_ke')->first();
-        // Tampilkan hanya jika statusnya aktif (diajukan atau dijadwalkan)
-        if ($jadwalP2 && in_array($jadwalP2->status_bimbingan, ['diajukan', 'dijadwalkan'])) {
-            $jadwalAktif[] = $jadwalP2;
-        }
-    }
-@endphp
 
 @forelse ($jadwalAktif as $jadwal)
-    <div class="card shadow-sm border-0 rounded-4 mb-4">
-        <div class="card-body">
-            <h5 class="fw-bold text-dark mb-3">
-                <i
-                    class="bi bi-calendar-event me-2
-                    @if ($jadwal->status_bimbingan == 'dijadwalkan') text-success
-                    @elseif($jadwal->status_bimbingan == 'diajukan') text-warning @endif"></i>
-                Jadwal Aktif - {{ $jadwal->peran == 'pembimbing1' ? 'Pembimbing 1' : 'Pembimbing 2' }}
-            </h5>
-
-            <p class="mb-1"><strong>Status:</strong>
-                <span
-                    class="text-capitalize badge rounded-pill
-                    @if ($jadwal->status_bimbingan == 'dijadwalkan') bg-success
-                    @elseif($jadwal->status_bimbingan == 'diajukan') bg-warning text-dark @endif">
-                    {{ $jadwal->status_bimbingan }}
+    <div class="card shadow-lg border-0 rounded-4 mb-4 overflow-hidden">
+        <!-- Header dengan gradient -->
+        <div class="card-header bg-gradient position-relative"
+            style="background: linear-gradient(135deg, #0dcaf0 0%, #0d6efd 100%);">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="mb-0 fw-bold text-white">
+                    <i class="bi bi-calendar-check me-2"></i>
+                    Jadwal Bimbingan Aktif
+                </h5>
+                <span class="badge bg-light text-primary fw-bold fs-6 px-3 py-2 rounded-pill">
+                    Sesi ke-{{ $jadwal->sesi_ke }}
                 </span>
-            </p>
-            <p class="mb-1"><strong>Dosen:</strong> {{ $jadwal->dosen->user->name ?? '-' }}</p>
+            </div>
+        </div>
 
-            @if ($jadwal->tanggal_bimbingan)
-                <p class="mb-1"><strong>Tanggal:</strong>
-                    {{ \Carbon\Carbon::parse($jadwal->tanggal_bimbingan)->format('d F Y') }}</p>
+        <div class="card-body p-4">
+            @if ($jadwal->status_bimbingan === 'dijadwalkan')
+                <!-- Status Dikonfirmasi -->
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-2 text-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                            style="width: 60px; height: 60px;">
+                            <i class="bi bi-check-circle-fill text-white fs-3"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <h6 class="fw-bold text-success mb-1">Jadwal Dikonfirmasi</h6>
+                        <p class="mb-0 text-muted">
+                            Jadwal bimbingan Anda dengan <strong
+                                class="text-primary">{{ $jadwal->dosen->user->name }}</strong> telah dikonfirmasi
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Informasi Jadwal -->
+                <div class="alert alert-success border-0 rounded-3 mb-3"
+                    style="background: linear-gradient(135deg, #f2ffeb 0%, #d0ffd7 100%);">
+                    <div class="row text-center">
+                        <div class="col-md-6 mb-2 mb-md-0">
+                            <i class="bi bi-calendar3 text-primary fs-4 d-block mb-2"></i>
+                            <div class="fw-bold text-dark fs-5">
+                                {{ optional($jadwal->tanggal_bimbingan)->translatedFormat('l, d F Y') }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <i class="bi bi-clock text-primary fs-4 d-block mb-2"></i>
+                            <div class="fw-bold text-dark fs-5">
+                                {{ \Carbon\Carbon::parse($jadwal->jam_bimbingan)->format('H:i') }} WIB
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-outline-primary rounded-pill px-4" data-bs-toggle="modal"
+                        data-bs-target="#modalUbahJadwal">
+                        <i class="bi bi-journal-text me-2"></i>Ajukan Perubahan Jadwal
+                    </button>
+                </div>
             @else
-                <p class="mb-1"><strong>Tanggal:</strong> <span class="text-muted">Menunggu konfirmasi</span></p>
+                <!-- Status Menunggu -->
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-2 text-center">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                            style="width: 60px; height: 60px;">
+                            <i class="bi bi-hourglass-split text-warning fs-3"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <h6 class="fw-bold text-warning mb-1">Menunggu Konfirmasi</h6>
+                        <p class="mb-0 text-muted">
+                            Menunggu konfirmasi jadwal bimbingan Sesi ke-{{ $jadwal->sesi_ke }} dari <strong
+                                class="text-primary">{{ $jadwal->dosen->user->name }}</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Status Waiting -->
+                <div class="alert alert-warning border-0 rounded-3 mb-3"
+                    style="background: linear-gradient(135deg, #fff3cd 0%, #fef3c7 100%);">
+                    <div class="text-center">
+                        <div class="spinner-border text-warning mb-3" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="fw-bold text-warning fs-5">
+                            Proses Konfirmasi Sedang Berlangsung
+                        </div>
+                        <small class="text-muted d-block mt-2">
+                            Dosen pembimbing akan segera mengkonfirmasi jadwal Anda
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="text-center">
+                    <button class="btn btn-outline-warning rounded-pill px-4">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Refresh Status
+                    </button>
+                </div>
             @endif
 
-            @if ($jadwal->jam_bimbingan)
-                <p class="mb-1"><strong>Jam:</strong>
-                    {{ \Carbon\Carbon::parse($jadwal->jam_bimbingan)->format('H:i') }} WIB</p>
-            @else
-                <p class="mb-1"><strong>Jam:</strong> <span class="text-muted">Menunggu konfirmasi</span></p>
-            @endif
-
-            {{-- Opsi Aksi Berdasarkan Status --}}
-            @if ($jadwal->status_bimbingan == 'dijadwalkan')
-                <a href="#" class="btn btn-sm btn-outline-warning rounded-pill w-100 mt-3">Ajukan Perubahan
-                    Jadwal</a>
-            @endif
+            <!-- Informasi Tambahan -->
+            <div class="row mt-4 pt-3 border-top">
+                <div class="col-md-4 text-center mb-2">
+                    <i class="bi bi-person-badge text-primary fs-5"></i>
+                    <div class="small text-muted mt-1">Pembimbing</div>
+                </div>
+                <div class="col-md-4 text-center mb-2">
+                    <i class="bi bi-hash text-primary fs-5"></i>
+                    <div class="small text-muted mt-1">Sesi Ke-{{ $jadwal->sesi_ke }}</div>
+                </div>
+                <div class="col-md-4 text-center mb-2">
+                    <i class="bi bi-info-circle text-primary fs-5"></i>
+                    <div class="small text-muted mt-1">Status: {{ ucfirst($jadwal->status_bimbingan) }}</div>
+                </div>
+            </div>
         </div>
     </div>
 @empty
-    <div class="alert alert-info">
-        Belum ada jadwal bimbingan aktif yang diajukan atau dijadwalkan.
+    <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
+        <div class="card-body text-center py-5">
+            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                style="width: 80px; height: 80px;">
+                <i class="bi bi-moon-stars text-muted" style="font-size: 2.5rem;"></i>
+            </div>
+            <h5 class="text-muted fw-bold mb-3">Tidak Ada Jadwal Aktif</h5>
+            <p class="text-muted mb-4">
+                Saat ini tidak ada jadwal bimbingan yang sedang aktif. <br>
+                Silakan ajukan jadwal bimbingan baru dengan dosen pembimbing Anda.
+            </p>
+            <button class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-plus-circle me-2"></i>Ajukan Jadwal Baru
+            </button>
+        </div>
     </div>
 @endforelse

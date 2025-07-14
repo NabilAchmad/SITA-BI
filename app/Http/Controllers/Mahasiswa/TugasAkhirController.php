@@ -37,6 +37,7 @@ class TugasAkhirController extends Controller
             'bimbinganCountP2' => $data['bimbinganCountP2'],
             'pembimbing1'      => $data['pembimbing1'],
             'pembimbing2'      => $data['pembimbing2'],
+            'jadwalAktif' => $data['jadwalAktif'],
         ]);
     }
 

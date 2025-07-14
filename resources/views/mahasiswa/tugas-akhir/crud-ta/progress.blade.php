@@ -47,6 +47,13 @@
                 </h2>
                 <p class="text-muted mb-0">Semua progres, jadwal, dan catatan bimbingan Anda ada di sini.</p>
             </div>
+
+            <div>
+                <a href="{{ route('mahasiswa.tugas-akhir.dashboard') }}"
+                    class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
+                    <i class="bi bi-arrow-left me-2"></i> Kembali ke Dashboard TA
+                </a>
+            </div>
         </div>
 
         {{-- KONDISI JIKA MAHASISWA BELUM PUNYA TA AKTIF --}}
@@ -58,17 +65,35 @@
                 {{-- Kolom Kiri: Log Bimbingan & Aksi Upload --}}
                 <div class="col-lg-8">
                     <!-- Tombol Aksi Utama Mahasiswa -->
-                    <div class="card shadow-sm border-0 rounded-4 mb-4 card-hover">
-                        <div class="card-body text-center p-4">
-                            <h5 class="fw-bold">Langkah Anda Selanjutnya</h5>
-                            <p class="text-muted">Unggah draf atau revisi terbaru Anda untuk direview oleh dosen.</p>
-                            <button type="button" class="btn btn-primary btn-lg rounded-pill shadow-sm"
-                                data-bs-toggle="modal" data-bs-target="#uploadFileModal{{ $tugasAkhir->id }}">
-                                <i class="bi bi-cloud-arrow-up-fill me-2"></i> Ganti File / Upload Versi Baru
-                            </button>
+                    @if ($tugasAkhir->status === 'diajukan')
+                        <div class="card shadow-sm border-0 rounded-4 mb-4 card-hover">
+                            <div class="card-body text-center p-4">
+                                <h5 class="fw-bold">Menunggu Persetujuan Kaprodi</h5>
+                                <p class="text-muted"><i class="bi bi-clock-fill me-2"></i>Judul tugas akhir anda sedang
+                                    diajukan.</p>
+                            </div>
                         </div>
-                    </div>
+                    @elseif($tugasAkhir->status === 'disetujui')
+                        <div class="card shadow-sm border-0 rounded-4 mb-4 card-hover">
+                            <div class="card-body text-center p-4">
+                                <h5 class="fw-bold">Langkah Anda Selanjutnya</h5>
 
+                                @if ($jadwalAktif->isNotEmpty())
+                                    <p class="text-muted"><i class="bi bi-info-circle me-2"></i>Anda sedang dalam sesi
+                                        bimbingan. Silakan tunggu hingga sesi selesai sebelum mengunggah versi baru.</p>
+                                    <button class="btn btn-secondary btn-lg rounded-pill shadow-sm" disabled>
+                                        <i class="bi bi-cloud-slash me-2"></i> Upload Dinonaktifkan
+                                    </button>
+                                @else
+                                    <p class="text-muted">Unggah file untuk memulai bimbingan dengan dosen anda.</p>
+                                    <button type="button" class="btn btn-primary btn-lg rounded-pill shadow-sm"
+                                        data-bs-toggle="modal" data-bs-target="#uploadFileModal{{ $tugasAkhir->id }}">
+                                        <i class="bi bi-cloud-arrow-up-fill me-2"></i> Ganti File / Upload Versi Baru
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                     <!-- Log Bimbingan Terpusat -->
                     <div class="card shadow-sm border-0 rounded-4">
                         <div class="card-header bg-white border-0 py-3">

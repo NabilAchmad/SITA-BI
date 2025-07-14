@@ -31,7 +31,6 @@ class BimbinganMahasiswaController extends Controller
         return view('dosen.bimbingan.dashboard.dashboard', compact('mahasiswaList'));
     }
 
-<<<<<<< HEAD
     /**
      * [PERBAIKAN UTAMA] Menampilkan halaman "Pusat Komando Bimbingan".
      * Metode ini sekarang menerima objek TugasAkhir secara langsung.
@@ -39,13 +38,6 @@ class BimbinganMahasiswaController extends Controller
     public function show(TugasAkhir $tugasAkhir)
     {
         try {
-=======
-    public function show(TugasAkhir $tugasAkhir)
-    {
-        try {
-            $this->authorize('view', $tugasAkhir);
-
->>>>>>> 3df1fd510611b5e3307655a98a748e9727b836b1
             $data = $this->bimbinganService->getDataForBimbinganDetailPage($tugasAkhir);
         } catch (UnauthorizedException $e) {
             return redirect()->route('dosen.bimbingan.index')->with('alert', [
@@ -67,6 +59,7 @@ class BimbinganMahasiswaController extends Controller
             'riwayatDokumen'   => $data['riwayatDokumen'], // <-- PASTIKAN BARIS INI ADA
             'pembimbing1'      => $data['pembimbing1'],
             'pembimbing2'      => $data['pembimbing2'],
+            'timelineItems'    => $data['timelineItems'], // <-- Pastikan ini ada untuk view
         ]);
     }
 }

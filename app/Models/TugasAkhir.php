@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Dosen; // Jangan lupa import
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class TugasAkhir extends Model
 {
@@ -40,6 +41,11 @@ class TugasAkhir extends Model
     public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class);
+    }
+
+    public function tawaranTopik()
+    {
+        return $this->belongsTo(TawaranTopik::class, 'tawaran_topik_id');
     }
 
     public function peranDosenTa(): HasMany

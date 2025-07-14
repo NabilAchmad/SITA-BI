@@ -22,11 +22,11 @@ class CatatanBimbinganController extends Controller
     public function store(Request $request, TugasAkhir $tugasAkhir)
     {
         $data = $request->validate([
-            'catatan' => 'required|string|max:2000',
+            'catatan'         => 'required|string|max:2000',
+            'bimbingan_ta_id' => 'required|exists:bimbingan_ta,id', // ✅ Tambahkan ini
         ]);
 
         try {
-            // Memanggil metode baru di service untuk menyimpan catatan
             $this->tugasAkhirService->createCatatanForMahasiswa($tugasAkhir, $data);
 
             return redirect()->back()->with('alert', [

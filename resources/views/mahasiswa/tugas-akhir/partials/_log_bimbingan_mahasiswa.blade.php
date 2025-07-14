@@ -1,7 +1,7 @@
 {{-- Panel File Revisi Terbaru --}}
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light py-3">
-        <h6 class="fw-bold mb-0"><i class="bi bi-file-earmark-arrow-down-fill text-primary me-2"></i>File Revisi Terbaru
+        <h6 class="fw-bold mb-0"><i class="bi bi-file-earmark-arrow-down-fill text-primary me-2"></i>File Terbaru
         </h6>
     </div>
     <div class="card-body">
@@ -50,14 +50,32 @@
         <div class="card-body p-4">
             <form action="{{ route('mahasiswa.tugas-akhir.catatan.store', $tugasAkhir->id) }}" method="POST">
                 @csrf
+
+                <div class="mb-3">
+                    <label for="pembimbing" class="form-label fw-semibold">Kirim ke Pembimbing</label>
+                    <select name="bimbingan_ta_id" class="form-select" required>
+                        <option value="">-- Pilih Pembimbing --</option>
+                        @if ($pembimbing1)
+                            <option value="{{ $pembimbing1->id }}">Pembimbing 1 - {{ $pembimbing1->dosen->user->name }}
+                            </option>
+                        @endif
+                        @if ($pembimbing2)
+                            <option value="{{ $pembimbing2->id }}">Pembimbing 2 - {{ $pembimbing2->dosen->user->name }}
+                            </option>
+                        @endif
+                    </select>
+                </div>
+
                 <div class="mb-3">
                     <textarea name="catatan" class="form-control" rows="4"
-                        placeholder="Tuliskan pertanyaan atau catatan singkat di sini..." required
+                        placeholder="Tuliskan catatan untuk dosen pembimbing yang dipilih..." required
                         style="resize: vertical; min-height: 120px;"></textarea>
                 </div>
+
                 <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 py-2"><i
-                            class="bi bi-send me-2"></i>Kirim Catatan</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
+                        <i class="bi bi-send me-2"></i> Kirim Catatan
+                    </button>
                 </div>
             </form>
         </div>
@@ -65,6 +83,7 @@
 </div>
 
 {{-- Modal dengan Tab untuk setiap Pembimbing --}}
+{{-- Modal Riwayat Bimbingan --}}
 <div class="modal fade" id="riwayatLengkapModal" tabindex="-1" aria-labelledby="riwayatLengkapModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -103,26 +122,22 @@
                         <div class="p-4">
                             @php
                                 $catatanP1 = collect($catatanList)->filter(function ($catatan) use ($pembimbing1) {
+                                    if (!$catatan->bimbinganTa) {
+                                        return false;
+                                    }
+
+                                    if ($catatan->author_type === 'App\Models\Dosen') {
+                                        return $catatan->author_id == $pembimbing1->dosen_id;
+                                    }
+
                                     if ($catatan->author_type === 'App\Models\Mahasiswa') {
-                                        return true;
+                                        return $catatan->bimbinganTa->dosen_id == $pembimbing1->dosen_id;
                                     }
-                                    if (
-                                        $catatan->author_type === 'App\Models\Dosen' &&
-                                        $catatan->author_id == $pembimbing1->dosen_id
-                                    ) {
-                                        return true;
-                                    }
+
                                     return false;
                                 });
 
-                                $timelineP1 = $catatanP1
-                                    ->unique(
-                                        fn($item) => $item->created_at->toDateTimeString() .
-                                            $item->catatan .
-                                            $item->author_id,
-                                    )
-                                    ->concat($riwayatDokumen)
-                                    ->sortBy('created_at');
+                                $timelineP1 = $catatanP1->concat($riwayatDokumen)->sortBy('created_at');
                             @endphp
 
                             @if ($timelineP1->count() > 0)
@@ -130,6 +145,7 @@
                                     @foreach ($timelineP1 as $item)
                                         @include('mahasiswa.tugas-akhir.partials._timeline_item', [
                                             'item' => $item,
+                                            'pembimbingId' => $pembimbing1->dosen_id,
                                         ])
                                     @endforeach
                                 </div>
@@ -148,26 +164,22 @@
                         <div class="p-4">
                             @php
                                 $catatanP2 = collect($catatanList)->filter(function ($catatan) use ($pembimbing2) {
+                                    if (!$catatan->bimbinganTa) {
+                                        return false;
+                                    }
+
+                                    if ($catatan->author_type === 'App\Models\Dosen') {
+                                        return $catatan->author_id == $pembimbing2->dosen_id;
+                                    }
+
                                     if ($catatan->author_type === 'App\Models\Mahasiswa') {
-                                        return true;
+                                        return $catatan->bimbinganTa->dosen_id == $pembimbing2->dosen_id;
                                     }
-                                    if (
-                                        $catatan->author_type === 'App\Models\Dosen' &&
-                                        $catatan->author_id == $pembimbing2->dosen_id
-                                    ) {
-                                        return true;
-                                    }
+
                                     return false;
                                 });
 
-                                $timelineP2 = $catatanP2
-                                    ->unique(
-                                        fn($item) => $item->created_at->toDateTimeString() .
-                                            $item->catatan .
-                                            $item->author_id,
-                                    )
-                                    ->concat($riwayatDokumen)
-                                    ->sortBy('created_at');
+                                $timelineP2 = $catatanP2->concat($riwayatDokumen)->sortBy('created_at');
                             @endphp
 
                             @if ($timelineP2->count() > 0)
@@ -175,6 +187,7 @@
                                     @foreach ($timelineP2 as $item)
                                         @include('mahasiswa.tugas-akhir.partials._timeline_item', [
                                             'item' => $item,
+                                            'pembimbingId' => $pembimbing2->dosen_id,
                                         ])
                                     @endforeach
                                 </div>
@@ -197,6 +210,7 @@
         </div>
     </div>
 </div>
+
 @push('styles')
     <style>
         .timeline {

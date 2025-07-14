@@ -27,7 +27,6 @@ class RolesSeeder extends Seeder
             'manage bimbingan',
             'manage penilaian',
             'pantau-semua-bimbingan', // <-- DITAMBAHKAN
-            'full access penugasan pembimbing', // <-- TAMBAHKAN PERMISSION BARU
         ];
 
         foreach ($permissions as $permission) {
@@ -36,10 +35,10 @@ class RolesSeeder extends Seeder
 
         // Buat roles
         $roles = [
-            'admin' => ['manage sidang', 'manage user accounts', 'view laporan', 'manage pengumuman', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
-            'kaprodi-d3' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
-            'kaprodi-d4' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
-            'kajur' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
+            'admin' => ['manage sidang', 'manage user accounts', 'view laporan', 'manage pengumuman', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian', 'full access penugasan pembimbing'],
+            'kaprodi-d3' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian', 'pantau-semua-bimbingan', 'full access penugasan pembimbing'],
+            'kaprodi-d4' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian', 'pantau-semua-bimbingan', 'full access penugasan pembimbing'],
+            'kajur' => ['manage sidang', 'view laporan', 'manage tugas akhir', 'manage bimbingan', 'manage penilaian', 'pantau-semua-bimbingan', 'full access penugasan pembimbing'],
             'dosen' => ['manage tugas akhir', 'manage bimbingan', 'manage penilaian'],
             'mahasiswa' => [],
         ];

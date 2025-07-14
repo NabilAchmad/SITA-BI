@@ -24,35 +24,21 @@
             @if ($pembimbing1)
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <span><i class="bi bi-person-check-fill me-2"></i>Pembimbing 1:
-<<<<<<< HEAD
-                        {{ Str::limit($pembimbing1->dosen->user->name, 50) }}</span>
-                    <span
-                        class="badge {{ $bimbinganCountP1 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">{{ $bimbinganCountP1 }}
-                        / 7</span>
-=======
                         {{-- Pemanggilan aman menggunakan optional chaining --}}
-                        {{ Str::limit($pembimbing1?->user?->name, 50) }}</span>
+                        {{ Str::limit($pembimbing1?->dosen->user?->name, 50) }}</span>
                     <span class="badge {{ $bimbinganCountP1 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">
                         {{ $bimbinganCountP1 }} / 7
                     </span>
->>>>>>> 3df1fd510611b5e3307655a98a748e9727b836b1
                 </li>
             @endif
             @if ($pembimbing2)
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <span><i class="bi bi-person-check me-2"></i>Pembimbing 2:
-<<<<<<< HEAD
-                        {{ Str::limit($pembimbing2->dosen->user->name, 50) }}</span>
-                    <span
-                        class="badge {{ $bimbinganCountP2 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">{{ $bimbinganCountP2 }}
-                        / 7</span>
-=======
                         {{-- Pemanggilan aman menggunakan optional chaining --}}
-                        {{ Str::limit($pembimbing2?->user?->name, 50) }}</span>
+                        {{ Str::limit($pembimbing2?->dosen->user?->name, 50) }}</span>
                     <span class="badge {{ $bimbinganCountP2 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">
                         {{ $bimbinganCountP2 }} / 7
                     </span>
->>>>>>> 3df1fd510611b5e3307655a98a748e9727b836b1
                 </li>
             @endif
         </ul>
@@ -70,26 +56,15 @@
     <div class="card-body p-0">
         <div class="list-group list-group-flush">
             @foreach ([['pembimbing' => $pembimbing1, 'sesi' => $sesiP1, 'isDosen' => $isP1], ['pembimbing' => $pembimbing2, 'sesi' => $sesiP2, 'isDosen' => $isP2]] as $item)
-<<<<<<< HEAD
-                {{-- [1] Menggunakan Flexbox untuk layout vertikal yang konsisten --}}
-                <div class="list-group-item py-4 px-4 bg-light border-bottom d-flex flex-column">
-
-                    {{-- Bagian Atas: Informasi Pembimbing & Status Badge --}}
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <span class="badge bg-primary bg-opacity-10 text-white mb-1 text-capitalize">
-                                {{ $item['pembimbing']->peran }}
-                            </span>
-                            <h6 class="mb-0 fw-semibold">{{ $item['pembimbing']->dosen->user->name }}</h6>
-=======
                 @if ($item['pembimbing'])
                     <div class="list-group-item py-4 px-4 bg-light border-bottom d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
                                 <span class="badge bg-primary bg-opacity-25 text-white mb-1 text-capitalize">
-                                    {{-- Perbaikan 2: Menggunakan $loop->iteration untuk peran --}}
-                                    Pembimbing {{ $loop->iteration }}
+                                    Pembimbing {{ $loop->iteration }}:
+                                    {{ $item['pembimbing']->dosen->user->name ?? 'Tidak Diketahui' }}
                                 </span>
+
                                 {{-- Pemanggilan aman menggunakan optional chaining --}}
                                 <h6 class="mb-0 fw-semibold">{{ $item['pembimbing']?->user?->name }}</h6>
                             </div>
@@ -102,7 +77,6 @@
                                     {{ str_replace('_', ' ', $item['sesi']->status_bimbingan) }}
                                 </span>
                             @endif
->>>>>>> 3df1fd510611b5e3307655a98a748e9727b836b1
                         </div>
 
                         <div class="flex-grow-1">
@@ -132,14 +106,14 @@
                                     <i class="bi bi-info-circle fs-5 mt-1"></i>
                                     <div>
                                         <div class="fw-semibold">Belum Ada Sesi Aktif</div>
-                                        <div class="small">Silakan ajukan bimbingan baru jika diperlukan.</div>
+                                        <div class="small">Beri arahan kepada mahasiswa untuk upload file tugas akhir.</div>
                                     </div>
                                 </div>
                             @endif
                         </div>
 
                         {{-- Tombol Aksi untuk Dosen Pembimbing --}}
-                        <div class="mt-3" style="min-height: 38px;">
+                        <div class="mt-3" style="min-height: 5px;">
                             {{-- Perbaikan 1 memastikan $item['isDosen'] bernilai benar --}}
                             @if ($item['isDosen'])
                                 @if ($item['sesi'] && $item['sesi']->status_bimbingan === 'dijadwalkan')

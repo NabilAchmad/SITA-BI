@@ -11,12 +11,10 @@
                 </h1>
                 <p class="text-muted mb-0">Pilih topik tugas akhir yang sesuai dengan minat dan bidang keahlian Anda.</p>
             </div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('mahasiswa.tugas-akhir.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Topik TA</li>
-                </ol>
-            </nav>
+            <a href="{{ route('mahasiswa.tugas-akhir.dashboard') }}"
+                class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
+                <i class="bi bi-arrow-left me-2"></i> Kembali ke Dashboard TA
+            </a>
         </div>
 
         <!-- Search Box -->
@@ -58,7 +56,8 @@
                                     <td class="text-center">{{ $topik->kuota }}</td>
                                     @if (!$mahasiswaSudahPunyaTA)
                                         <td class="text-center">
-                                            <form action="{{ route('mahasiswa.tugas-akhir.topik.ambil', $topik->id) }}" method="POST"> 
+                                            <form action="{{ route('mahasiswa.tugas-akhir.topik.ambil', $topik->id) }}"
+                                                method="POST">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-success px-4">
                                                     <i class="bi bi-check-circle me-1"></i> Ambil Topik
