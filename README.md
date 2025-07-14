@@ -11,12 +11,12 @@
 ---
 
 ## 📌 Fitur Utama
-- Pengajuan dan persetujuan judul tugas akhir
-- Upload dokumen proposal dan laporan akhir
-- Log bimbingan dan komentar dosen
-- Pendaftaran dan penjadwalan sidang
-- Penilaian sidang akhir
-- Dashboard kaprodi/admin untuk monitoring
+- ✅ Pengajuan dan persetujuan judul tugas akhir
+- 📄 Upload dokumen proposal dan laporan akhir
+- ✍️ Log bimbingan dan komentar dosen pembimbing
+- 📅 Pendaftaran dan penjadwalan sidang akhir
+- 🧾 Penilaian hasil sidang oleh dosen penguji
+- 📊 Dashboard monitoring untuk Kaprodi/Admin
 
 ---
 
@@ -30,13 +30,50 @@ Sebelum adanya SITA-BI, pengelolaan tugas akhir di Jurusan Bahasa Inggris dilaku
 - **MySQL** – Database Management
 - **HTML, CSS, JavaScript** – Frontend
 - **Blade Template Engine** – Laravel View
+- **Spatie Laravel-Permission** – Manajemen hak akses
 - **Git & GitHub** – Version Control
 - **XAMPP / Laravel Valet** – Local Development
 
 ---
 
-## 🚀 Cara Menjalankan Proyek
+## 🚀 Cara Menjalankan Proyek Secara Lokal
+Clone repositori:
+```bash
+git clone https://github.com/NabilAchmad/SITA-BI.git
+cd SITA-BI
+Install semua dependencies Laravel:
+```
+```bash
+composer install
+Install package permission dari Spatie (jika belum):
+```
 
-1. Clone repositori:
-   ```bash
-   git clone https://github.com/NabilAchmad/SITA-BI.git
+```bash
+composer require spatie/laravel-permission
+Salin file konfigurasi .env:
+```
+
+```bash
+cp .env.example .env
+Generate application key:
+```
+
+```bash
+php artisan key:generate
+Switch ke branch admin_mhs:
+```
+
+```bash
+git switch admin_mhs
+Migrasi database:
+```
+
+```bash
+php artisan migrate
+Seed database awal (roles, permissions, admin):
+```
+```bash
+php artisan db:seed --class=RolesSeeder
+php artisan db:seed --class=PermissionSeeder
+php artisan db:seed --class=AdminSeeder
+```
