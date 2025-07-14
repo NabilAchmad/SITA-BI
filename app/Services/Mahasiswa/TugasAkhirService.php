@@ -31,13 +31,15 @@ class TugasAkhirService
     }
 
     /**
-     * [DIREVISI FINAL] Menangani upload file.
+     * [REVISI FINAL] Menangani upload file.
      * - Membuat DUA record bimbingan, satu untuk setiap pembimbing.
-     * - Memastikan tanggal bimbingan NULL saat dibuat.
-     * - Mengizinkan penggantian file jika sesi masih 'diajukan'.
+     * - Disesuaikan untuk model TugasAkhir yang menggunakan Accessor.
      */
     public function ajukanBimbinganDenganFile(TugasAkhir $tugasAkhir, UploadedFile $file, string $tipeDokumen, ?string $catatan = null): void
     {
+        // Pastikan relasi dasar dimuat untuk efisiensi accessor (N+1 fix)
+        $tugasAkhir->loadMissing('dosenPembimbing');
+
         if (optional($this->mahasiswa)->id !== $tugasAkhir->mahasiswa_id) {
             throw new UnauthorizedException('Anda tidak berwenang untuk tugas akhir ini.');
         }
@@ -46,11 +48,12 @@ class TugasAkhirService
             throw new \Exception('Gagal mengunggah file baru. Sesi bimbingan sudah dijadwalkan oleh dosen.');
         }
 
+        // Mengambil objek Dosen melalui accessor
         $pembimbing1 = $tugasAkhir->pembimbingSatu;
         $pembimbing2 = $tugasAkhir->pembimbingDua;
 
-        if (!$pembimbing1 || !$pembimbing2) {
-            throw new \Exception('Tidak dapat mengajukan bimbingan. Dosen Pembimbing 1 dan 2 harus ditetapkan terlebih dahulu.');
+        if (!$pembimbing1) { // Cukup cek pembimbing 1 karena biasanya wajib ada
+            throw new \Exception('Tidak dapat mengajukan bimbingan. Dosen Pembimbing 1 harus ditetapkan terlebih dahulu.');
         }
 
         $mahasiswaId = $tugasAkhir->mahasiswa_id;
@@ -62,8 +65,9 @@ class TugasAkhirService
 
             if ($sesiAktif->isNotEmpty()) {
                 // LOGIKA 1: Sesi 'diajukan' sudah ada. Gunakan sesi yang ada.
-                $sesiBimbinganP1 = $sesiAktif->where('dosen_id', $pembimbing1->dosen_id)->first();
-                $sesiBimbinganP2 = $sesiAktif->where('dosen_id', $pembimbing2->dosen_id)->first();
+                // ✅ PERBAIKAN: Gunakan ->id karena $pembimbing1 adalah model Dosen
+                $sesiBimbinganP1 = $sesiAktif->where('dosen_id', $pembimbing1->id)->first();
+                $sesiBimbinganP2 = $pembimbing2 ? $sesiAktif->where('dosen_id', $pembimbing2->id)->first() : null;
             } else {
                 // LOGIKA 2: Tidak ada sesi 'diajukan'. Buat sesi baru.
                 $sesiKe = ($tugasAkhir->bimbinganTa()->where('status_bimbingan', 'selesai')->distinct('sesi_ke')->count()) + 1;
@@ -75,8 +79,23 @@ class TugasAkhirService
                     'jam_bimbingan'     => null,
                 ];
 
-                $sesiBimbinganP1 = $tugasAkhir->bimbinganTa()->create(array_merge($dataBimbingan, ['dosen_id' => $pembimbing1->dosen_id, 'peran' => $pembimbing1->peran]));
-                $sesiBimbinganP2 = $tugasAkhir->bimbinganTa()->create(array_merge($dataBimbingan, ['dosen_id' => $pembimbing2->dosen_id, 'peran' => $pembimbing2->peran]));
+                // ✅ PERBAIKAN: Gunakan ->id dan tentukan peran secara eksplisit
+                $sesiBimbinganP1 = $tugasAkhir->bimbinganTa()->create(array_merge($dataBimbingan, [
+                    'dosen_id' => $pembimbing1->id,
+                    'peran'    => 'pembimbing1'
+                ]));
+
+                if ($pembimbing2) {
+                    $sesiBimbinganP2 = $tugasAkhir->bimbinganTa()->create(array_merge($dataBimbingan, [
+                        'dosen_id' => $pembimbing2->id,
+                        'peran'    => 'pembimbing2'
+                    ]));
+                }
+            }
+
+            // Pastikan $sesiBimbinganP1 ada sebelum melanjutkan
+            if (!$sesiBimbinganP1) {
+                throw new \Exception("Gagal menemukan atau membuat sesi bimbingan untuk Pembimbing 1.");
             }
 
             // Simpan file dan buat record dokumen yang BARU.
@@ -93,8 +112,10 @@ class TugasAkhirService
             // Simpan catatan baru jika ada.
             if (!empty($catatan)) {
                 $dataCatatan = ['catatan' => $catatan, 'author_type' => Mahasiswa::class, 'author_id' => $mahasiswaId];
-                if ($sesiBimbinganP1) $sesiBimbinganP1->catatan()->create($dataCatatan);
-                if ($sesiBimbinganP2) $sesiBimbinganP2->catatan()->create($dataCatatan);
+                $sesiBimbinganP1->catatan()->create($dataCatatan);
+                if ($pembimbing2 && isset($sesiBimbinganP2)) {
+                    $sesiBimbinganP2->catatan()->create($dataCatatan);
+                }
             }
         });
     }
@@ -155,39 +176,66 @@ class TugasAkhirService
      */
     public function getProgressPageData(): array
     {
+        // Guard clause jika tidak ada konteks mahasiswa
         if (!$this->mahasiswa) {
             return $this->getEmptyProgressData();
         }
 
+        // 1. Ambil data utama menggunakan helper yang sudah dioptimalkan
+        // Helper ini bertanggung jawab untuk eager loading semua relasi
         $tugasAkhir = $this->getActiveTugasAkhirForProgressPage();
 
+        // Guard clause jika mahasiswa tidak memiliki tugas akhir aktif
         if (!$tugasAkhir) {
             return $this->getEmptyProgressData();
         }
 
-        // ✅ PERBAIKAN: Mengambil semua catatan tanpa de-duplikasi dan memuat relasi 'bimbinganTa'.
-        // Ini penting agar view bisa memfilter berdasarkan dosen.
-        $catatanList = CatatanBimbingan::whereIn('bimbingan_ta_id', $tugasAkhir->bimbinganTa()->pluck('id'))
-            ->with(['author.user', 'bimbinganTa']) // Memuat relasi bimbinganTa
-            ->orderBy('created_at', 'asc')
-            ->get();
+        // 2. Gunakan koleksi yang SUDAH di-load (tidak ada query baru ke DB)
+        $allBimbingan = $tugasAkhir->bimbinganTa;
+        $riwayatDokumen = $tugasAkhir->dokumenTa;
+        $pembimbing1 = $tugasAkhir->pembimbing_satu;
+        $pembimbing2 = $tugasAkhir->pembimbing_dua;
 
-        $riwayatDokumen = $tugasAkhir->dokumenTa()->orderBy('created_at', 'asc')->get();
+        // 3. Olah data di memori untuk mendapatkan jadwal aktif
+        $jadwalAktif = collect(); // Buat Laravel Collection kosong
+        if ($pembimbing1) {
+            $jadwalP1 = $allBimbingan
+                ->where('dosen_id', $pembimbing1->id)
+                ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
+                ->sortByDesc('sesi_ke') // Ambil sesi terbaru
+                ->first();
 
-        $pembimbing1 = $tugasAkhir->pembimbingSatu;
-        $pembimbing2 = $tugasAkhir->pembimbingDua;
-        $bimbinganCountP1 = $pembimbing1 ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
-        $bimbinganCountP2 = $pembimbing2 ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
+            if ($jadwalP1) {
+                $jadwalAktif->push($jadwalP1);
+            }
+        }
+        if ($pembimbing2) {
+            $jadwalP2 = $allBimbingan
+                ->where('dosen_id', $pembimbing2->id)
+                ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
+                ->sortByDesc('sesi_ke')
+                ->first();
 
+            if ($jadwalP2) {
+                $jadwalAktif->push($jadwalP2);
+            }
+        }
+
+        // 4. Hitung jumlah bimbingan dari koleksi di memori (sudah diperbaiki)
+        $bimbinganCountP1 = $pembimbing1 ? $allBimbingan->where('dosen_id', $pembimbing1->id)->where('status_bimbingan', 'selesai')->count() : 0;
+        $bimbinganCountP2 = $pembimbing2 ? $allBimbingan->where('dosen_id', $pembimbing2->id)->where('status_bimbingan', 'selesai')->count() : 0;
+
+        // 5. Kembalikan semua data yang sudah matang dan siap ditampilkan
         return [
             'tugasAkhir'       => $tugasAkhir,
             'riwayatDokumen'   => $riwayatDokumen,
             'dokumenTerbaru'   => $riwayatDokumen->last(),
-            'catatanList'      => $catatanList, // <-- Data ini sekarang siap untuk difilter di view
+            'catatanList'      => $tugasAkhir->catatanBimbingan, // Langsung dari relasi yang di-load
             'bimbinganCountP1' => $bimbinganCountP1,
             'bimbinganCountP2' => $bimbinganCountP2,
             'pembimbing1'      => $pembimbing1,
             'pembimbing2'      => $pembimbing2,
+            'jadwalAktif'      => $jadwalAktif,
         ];
     }
 
@@ -229,9 +277,16 @@ class TugasAkhirService
      */
     protected function getActiveTugasAkhirForProgressPage(): ?TugasAkhir
     {
+        if (!$this->mahasiswa) return null;
+
         return $this->mahasiswa->tugasAkhir()
             ->active()
-            ->with(['peranDosenTa.dosen.user', 'dokumenTa', 'bimbinganTa'])
+            ->with([
+                'dosenPembimbing.user',
+                'dokumenTa',
+                'bimbinganTa',
+                'catatanBimbingan.author.user', // <-- PENYESUAIAN DI SINI
+            ])
             ->first();
     }
 

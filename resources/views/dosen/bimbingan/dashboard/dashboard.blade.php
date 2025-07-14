@@ -151,6 +151,7 @@
                                                     @endif
                                                 </div>
                                             </td>
+<<<<<<< HEAD
                                             <td class="text-center py-3">
                                                 {{-- ✅ PERBAIKAN: Mencari peran dosen yang sedang login dari relasi --}}
                                                 @php
@@ -166,6 +167,58 @@
                                                     </span>
                                                 @endif
                                             </td>
+=======
+
+                                            {{-- Konten kolom dinamis --}}
+                                            @if (request('mode') == 'pantau_semua')
+                                                <td class="py-3">
+                                                    <div>
+                                                        <small><span class="fw-semibold">P1:</span>
+                                                            {{ $tugasAkhir->pembimbingSatu->user->name ?? '-' }}</small>
+                                                    </div>
+                                                    <div>
+                                                        <small><span class="fw-semibold">P2:</span>
+                                                            {{ $tugasAkhir->pembimbingDua->user->name ?? '-' }}</small>
+                                                    </div>
+                                                </td>
+                                            @else
+                                                <td class="text-center py-3">
+                                                    @php
+                                                        // Ambil data dosen yang sedang login, jika ada.
+                                                        $dosenAuth = auth()->user()->dosen;
+
+                                                        // Inisialisasi peran sebagai null untuk keamanan.
+                                                        $peranDosenIni = null;
+
+                                                        // Hanya jalankan query jika user yang login adalah dosen.
+                                                        if ($dosenAuth) {
+                                                            // 1. Gunakan relasi yang benar: dosenPembimbing.
+                                                            // 2. Filter koleksi untuk menemukan dosen yang sedang login.
+                                                            $pembimbingIni = $tugasAkhir->dosenPembimbing->firstWhere(
+                                                                'id',
+                                                                $dosenAuth->id,
+                                                            );
+
+                                                            // 3. Jika ditemukan, ambil perannya dari data 'pivot'.
+                                                            if ($pembimbingIni) {
+                                                                // Variabel $peranDosenIni sekarang berisi STRING, contoh: "pembimbing1"
+                                                                $peranDosenIni = $pembimbingIni->pivot->peran;
+                                                            }
+                                                        }
+                                                    @endphp
+
+                                                    {{-- ✅ PERBAIKAN: Gunakan variabel $peranDosenIni sebagai string biasa --}}
+                                                    @if ($peranDosenIni)
+                                                        <span
+                                                            class="badge {{ $peranDosenIni === 'pembimbing1' ? 'bg-primary' : 'bg-info' }} rounded-pill px-3 py-2">
+                                                            <i class="bi bi-person-badge me-1"></i>
+                                                            {{ $peranDosenIni === 'pembimbing1' ? 'Pembimbing 1' : 'Pembimbing 2' }}
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                            @endif
+
+>>>>>>> 3df1fd510611b5e3307655a98a748e9727b836b1
                                             <td class="text-center py-3 pe-4">
                                                 <div class="d-flex justify-content-center gap-1">
                                                     {{-- ✅ PERBAIKAN: Meneruskan objek $tugasAkhir ke route --}}
@@ -213,3 +266,7 @@
         });
     </script>
 @endsection
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3df1fd510611b5e3307655a98a748e9727b836b1

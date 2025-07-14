@@ -6,7 +6,7 @@
             @if ($pembimbing1 && $pembimbing1->dosen && $pembimbing1->dosen->user)
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <span><i class="bi bi-person-check-fill me-2"></i>P1:
-                        {{ Str::limit($pembimbing1->dosen->user->name, 15) }}</span>
+                        {{ Str::limit($pembimbing1->user->name ?? '-', 50) }}</span>
                     <span
                         class="badge {{ $bimbinganCountP1 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">{{ $bimbinganCountP1 }}
                         / 7</span>
@@ -15,7 +15,7 @@
             @if ($pembimbing2 && $pembimbing2->dosen && $pembimbing2->dosen->user)
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <span><i class="bi bi-person-check me-2"></i>P2:
-                        {{ Str::limit($pembimbing2->dosen->user->name, 15) }}</span>
+                        {{ Str::limit($pembimbing2->user->name ?? '-', 50) }}</span>
                     <span
                         class="badge {{ $bimbinganCountP2 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">{{ $bimbinganCountP2 }}
                         / 7</span>
@@ -79,7 +79,7 @@
                     {{ $jadwal->status_bimbingan }}
                 </span>
             </p>
-            <p class="mb-1"><strong>Dosen:</strong> {{ $jadwal->dosen->user->name }}</p>
+            <p class="mb-1"><strong>Dosen:</strong> {{ $jadwal->dosen->user->name ?? '-' }}</p>
 
             @if ($jadwal->tanggal_bimbingan)
                 <p class="mb-1"><strong>Tanggal:</strong>

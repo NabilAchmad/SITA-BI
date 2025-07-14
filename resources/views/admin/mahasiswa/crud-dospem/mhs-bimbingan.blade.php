@@ -15,22 +15,21 @@
             <!-- Filter Prodi -->
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item">
-                    {{-- Asumsi route name adalah 'penugasan-pembimbing.list' --}}
                     <a class="nav-link {{ request('prodi') == null ? 'active' : '' }}"
-                        href="{{ route('jurusan.penugasan-pembimbing.sudah') }}">All</a>
+                        href="{{ route('jurusan.penugasan-pembimbing.index') }}">All</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request('prodi') === 'D4' ? 'active' : '' }}"
-                        href="{{ route('jurusan.penugasan-pembimbing.sudah', ['prodi' => 'D4']) }}">D4</a>
+                        href="{{ route('jurusan.penugasan-pembimbing.index', ['prodi' => 'D4']) }}">D4</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request('prodi') === 'D3' ? 'active' : '' }}"
-                        href="{{ route('jurusan.penugasan-pembimbing.sudah', ['prodi' => 'D3']) }}">D3</a>
+                        href="{{ route('jurusan.penugasan-pembimbing.index', ['prodi' => 'D3']) }}">D3</a>
                 </li>
             </ul>
 
             <!-- Search -->
-            <form method="GET" action="{{ route('jurusan.penugasan-pembimbing.sudah') }}" class="row g-2 mb-3 justify-content-end">
+            <form method="GET" action="{{ route('jurusan.penugasan-pembimbing.index') }}" class="row g-2 mb-3 justify-content-end">
                 <input type="hidden" name="prodi" value="{{ request('prodi') }}">
                 <div class="col-auto">
                     <input type="text" name="search" class="form-control form-control-sm"
@@ -59,26 +58,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- ========================================================================= --}}
-                        {{-- PERBAIKAN: Iterasi menggunakan $tugasAkhirList sesuai data dari controller --}}
-                        {{-- ========================================================================= --}}
                         @forelse ($tugasAkhirList as $index => $ta)
                             @php
                                 // Helper untuk membuat kode di dalam <td> lebih bersih
                                 $mahasiswa = $ta->mahasiswa;
-                                $pembimbing1 = $ta->peranDosenTA->where('peran', 'pembimbing1')->first();
-                                $pembimbing2 = $ta->peranDosenTA->where('peran', 'pembimbing2')->first();
+                                // Menggunakan accessor yang sudah kita definisikan di model TugasAkhir
+                                $pembimbing1 = $ta->pembimbing_satu;
+                                $pembimbing2 = $ta->pembimbing_dua;
                             @endphp
                             <tr>
-                                {{-- PERBAIKAN: Menggunakan $tugasAkhirList untuk paginasi --}}
-                                <td>{{ ($tugasAkhirList->firstItem() ?? 0) + $index }}</td>
+                                <td>{{ $tugasAkhirList->firstItem() + $index }}</td>
                                 <td>{{ $mahasiswa->user->name }}</td>
                                 <td>{{ $mahasiswa->nim }}</td>
                                 <td>{{ strtoupper($mahasiswa->prodi) }} Bahasa Inggris</td>
                                 <td>{{ $ta->judul ?? '-' }}</td>
-                                {{-- PERBAIKAN: Menggunakan helper untuk menampilkan nama pembimbing --}}
-                                <td>{{ $pembimbing1->dosen->user->name ?? '-' }}</td>
-                                <td>{{ $pembimbing2->dosen->user->name ?? '-' }}</td>
+                                {{-- ✅ PERBAIKAN: Memanggil ->user langsung dari objek $pembimbing1 (Dosen) --}}
+                                <td>{{ $pembimbing1?->user?->name ?? '-' }}</td>
+                                {{-- ✅ PERBAIKAN: Memanggil ->user langsung dari objek $pembimbing2 (Dosen) --}}
+                                <td>{{ $pembimbing2?->user?->name ?? '-' }}</td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
                                         data-bs-target="#modalEditPembimbing-{{ $ta->id }}">
@@ -103,11 +100,10 @@
     </div>
 
     <!-- Semua Modal Ditempatkan di Luar Tabel -->
-    {{-- PERBAIKAN: Iterasi menggunakan $tugasAkhirList untuk menyertakan modal --}}
     @foreach ($tugasAkhirList as $ta)
         @include('admin.mahasiswa.partials.modal-edit-pembimbing', [
             'tugasAkhir' => $ta,
-            'dosenList' => $dosenList, // Pastikan nama variabel 'dosen' menjadi 'dosenList'
+            'dosenList' => $dosenList,
         ])
     @endforeach
 @endsection

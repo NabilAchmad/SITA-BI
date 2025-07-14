@@ -1,6 +1,6 @@
 @php
     // Cek apakah tugas akhir ini sudah memiliki pembimbing 1 dari alur tawaran topik
-    $pembimbing1 = $tugasAkhir->peranDosenTa->where('peran', 'pembimbing1')->first();
+    $pembimbing1 = $tugasAkhir->dosenPembimbing->where('peran', 'pembimbing1')->first();
 @endphp
 
 <div class="modal fade" id="modalTetapkanPembimbing-{{ $tugasAkhir->id }}" tabindex="-1"

@@ -16,19 +16,18 @@ class RolesSeeder extends Seeder
 
         // Buat permissions
         $permissions = [
-            'manage sidang',
             'manage user accounts',
-            'view laporan',
+            'view pengumuman',
             'manage pengumuman',
+            'full access penugasan pembimbing',
+            'manage sidang',
+            'view laporan',
+            'view logs',
             'manage tugas akhir',
             'manage bimbingan',
             'manage penilaian',
-<<<<<<< HEAD
-            // Add other permissions as needed
-=======
             'pantau-semua-bimbingan', // <-- DITAMBAHKAN
             'full access penugasan pembimbing', // <-- TAMBAHKAN PERMISSION BARU
->>>>>>> 2586b3657da907332fa67cf7713a46e78eb33a16
         ];
 
         foreach ($permissions as $permission) {
