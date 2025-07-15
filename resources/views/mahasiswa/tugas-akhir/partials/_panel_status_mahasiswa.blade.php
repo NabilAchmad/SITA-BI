@@ -177,20 +177,24 @@
 
 {{-- Syarat Panel Pendaftaran Sidang --}}
 @php
-    // ==================================================================
-    // == PERBAIKAN FINAL: Logika perhitungan syarat dipindahkan ke sini ==
-    // ==================================================================
+    // Calculate if bimbingan requirements are met
     $syaratJumlahBimbinganTerpenuhi = false;
     if (isset($bimbinganCountP1) && isset($bimbinganCountP2)) {
-        // Jika ada dua pembimbing
         $syaratJumlahBimbinganTerpenuhi = $bimbinganCountP1 >= 7 && $bimbinganCountP2 >= 7;
     } elseif (isset($bimbinganCountP1)) {
-        // Jika hanya ada satu pembimbing
         $syaratJumlahBimbinganTerpenuhi = $bimbinganCountP1 >= 7;
     }
+
+    // Status badge configuration
+    $statusConfig = [
+        'menunggu' => ['text' => 'Menunggu', 'class' => 'bg-warning text-dark'],
+        'disetujui' => ['text' => 'Disetujui', 'class' => 'bg-success'],
+        'ditolak' => ['text' => 'Ditolak', 'class' => 'bg-danger'],
+        'berkas_tidak_lengkap' => ['text' => 'Berkas Tidak Lengkap', 'class' => 'bg-danger'],
+    ];
 @endphp
 
-{{-- Panel Pendaftaran Sidang (Hanya Muncul Jika Syarat Terpenuhi) --}}
+{{-- Panel Pendaftaran Sidang --}}
 @if ($syaratJumlahBimbinganTerpenuhi)
     <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-body">
@@ -199,65 +203,179 @@
                 Pendaftaran Sidang Akhir
             </h5>
 
+            {{-- Case 1: Already registered --}}
             @if (isset($pendaftaranTerbaru) && $pendaftaranTerbaru)
-                {{-- LOGIKA 1: Mahasiswa SUDAH pernah mendaftar. Tampilkan status pendaftaran. --}}
+                @switch($pendaftaranTerbaru->status_verifikasi)
+                    @case('disetujui')
+                        <div class="alert alert-success">
+                            <h6 class="alert-heading fw-bold">Pendaftaran Disetujui!</h6>
+                            <p class="mb-0">Selamat! Pendaftaran sidang Anda telah disetujui. Silakan tunggu informasi
+                                jadwal sidang dari program studi.</p>
+                        </div>
+                    @break
 
-                @if ($pendaftaranTerbaru->status_verifikasi === 'disetujui')
-                    <div class="alert alert-success">
-                        <h6 class="alert-heading fw-bold">Pendaftaran Disetujui!</h6>
-                        <p class="mb-0">Selamat! Pendaftaran sidang Anda telah disetujui. Silakan tunggu informasi
-                            jadwal sidang dari program studi.</p>
-                    </div>
-                @elseif ($pendaftaranTerbaru->status_verifikasi === 'berkas_tidak_lengkap')
-                    <div class="alert alert-danger">
-                        <h6 class="alert-heading fw-bold">Pendaftaran Ditolak</h6>
-                        <p>Pendaftaran sidang Anda ditolak. Silakan perbaiki berkas sesuai catatan dari dosen dan
-                            lakukan pendaftaran ulang.</p>
-                        <hr>
-                        <a href="{{-- Ganti dengan route ke form daftar ulang --}}" class="btn btn-danger w-100">
-                            <i class="bi bi-arrow-repeat me-1"></i> Daftar Ulang Sidang
-                        </a>
-                    </div>
-                @elseif ($pendaftaranTerbaru->status_verifikasi === 'menunggu_verifikasi')
-                    <p>Pendaftaran Anda sedang dalam proses verifikasi oleh dosen pembimbing. Mohon tunggu.</p>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>Status Pembimbing 1</span>
-                            @php
-                                $statusP1 = match ($pendaftaranTerbaru->status_pembimbing_1) {
-                                    'menunggu' => ['text' => 'Menunggu', 'class' => 'bg-warning text-dark'],
-                                    'disetujui' => ['text' => 'Disetujui', 'class' => 'bg-success'],
-                                    'ditolak' => ['text' => 'Ditolak', 'class' => 'bg-danger'],
-                                };
-                            @endphp
-                            <span class="badge {{ $statusP1['class'] }} rounded-pill">{{ $statusP1['text'] }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>Status Pembimbing 2</span>
-                            @php
-                                $statusP2 = match ($pendaftaranTerbaru->status_pembimbing_2) {
-                                    'menunggu' => ['text' => 'Menunggu', 'class' => 'bg-warning text-dark'],
-                                    'disetujui' => ['text' => 'Disetujui', 'class' => 'bg-success'],
-                                    'ditolak' => ['text' => 'Ditolak', 'class' => 'bg-danger'],
-                                };
-                            @endphp
-                            <span class="badge {{ $statusP2['class'] }} rounded-pill">{{ $statusP2['text'] }}</span>
-                        </li>
-                    </ul>
-                @endif
+                    @case('berkas_tidak_lengkap')
+                        <div class="alert alert-danger">
+                            <h6 class="alert-heading fw-bold">Perbaikan Berkas Diperlukan</h6>
+                            <p class="mb-3">Pendaftaran sidang Anda memerlukan perbaikan berkas:</p>
+                            @if ($pendaftaranTerbaru->catatan)
+                                <div class="bg-light p-3 mb-3 rounded">
+                                    <strong>Catatan:</strong> {{ $pendaftaranTerbaru->catatan }}
+                                </div>
+                            @endif
+                            <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal"
+                                data-bs-target="#sidangModal">
+                                <i class="bi bi-arrow-repeat me-1"></i> Perbaiki & Daftar Ulang
+                            </button>
+                        </div>
+                    @break
+
+                    @case('menunggu_verifikasi')
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading fw-bold">Pendaftaran Sedang Diproses</h6>
+                            <p class="mb-3">Pendaftaran Anda sedang dalam proses verifikasi oleh dosen pembimbing.</p>
+
+                            <ul class="list-group list-group-flush mb-3">
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+                                    <span>Pembimbing 1</span>
+                                    @php $status = $statusConfig[$pendaftaranTerbaru->status_pembimbing_1] ?? $statusConfig['menunggu']; @endphp
+                                    <span class="badge {{ $status['class'] }} rounded-pill">{{ $status['text'] }}</span>
+                                </li>
+                                @if ($pendaftaranTerbaru->pembimbing2_id)
+                                    <li
+                                        class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+                                        <span>Pembimbing 2</span>
+                                        @php $status = $statusConfig[$pendaftaranTerbaru->status_pembimbing_2] ?? $statusConfig['menunggu']; @endphp
+                                        <span class="badge {{ $status['class'] }} rounded-pill">{{ $status['text'] }}</span>
+                                    </li>
+                                @endif
+                            </ul>
+
+                            @if ($pendaftaranTerbaru->created_at)
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-clock-history me-1"></i>
+                                    Didaftarkan pada: {{ $pendaftaranTerbaru->created_at->format('d M Y H:i') }}
+                                </p>
+                            @endif
+                        </div>
+                    @break
+
+                    @default
+                        <div class="alert alert-secondary">
+                            <h6 class="alert-heading fw-bold">Status Pendaftaran</h6>
+                            <p class="mb-0">Status pendaftaran Anda: {{ $pendaftaranTerbaru->status_verifikasi }}</p>
+                        </div>
+                @endswitch
             @else
-                {{-- LOGIKA 2: Mahasiswa BELUM mendaftar, tapi sudah memenuhi syarat. --}}
-                <div class="alert alert-info text-center">
-                    <p class="mb-2">Anda telah memenuhi syarat minimal bimbingan.</p>
-                    <h6 class="fw-bold">Anda sudah bisa mendaftar Sidang Akhir.</h6>
+                {{-- Case 2: Eligible but not registered yet --}}
+                <div class="alert alert-success">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">Anda Memenuhi Syarat Sidang</h6>
+                            <p class="mb-0">Anda telah memenuhi syarat minimal bimbingan untuk mendaftar sidang
+                                akhir.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="d-grid">
-                    <a href="{{ route('mahasiswa.sidang.daftar-akhir') }}" class="btn btn-success w-100">
-                        <i class="bi bi-send-check me-1"></i> Lanjutkan ke Pendaftaran Sidang
-                    </a>
-                </div>
-            @endif
 
+                <button type="button" class="btn btn-success w-100 py-2" data-bs-toggle="modal"
+                    data-bs-target="#sidangModal">
+                    <i class="bi bi-send-check me-1"></i> Ajukan Pendaftaran Sidang
+                </button>
+            @endif
+        </div>
+    </div>
+
+    {{-- Modal Form Pendaftaran --}}
+    <div class="modal fade" id="sidangModal" tabindex="-1" aria-labelledby="sidangModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h1 class="modal-title fs-5" id="sidangModalLabel">Form Pendaftaran Sidang Tugas Akhir</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
+
+                    <form id="formSidang" action="{{ route('mahasiswa.sidang.store-akhir') }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+
+                        @if (isset($pendaftaranTerbaru) && $pendaftaranTerbaru)
+                            <input type="hidden" name="is_edit" value="1">
+                        @endif
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nama Mahasiswa</label>
+                                <input type="text" class="form-control"
+                                    value="{{ $mahasiswa->user->name ?? '-' }}" readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">NIM</label>
+                                <input type="text" class="form-control" value="{{ $mahasiswa->nim ?? '-' }}"
+                                    readonly>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Judul Tugas Akhir <span class="text-danger">*</span></label>
+                                <input type="text" name="judul_ta" class="form-control"
+                                    value="{{ old('judul_ta', $pendaftaranTerbaru->judul_ta ?? '') }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Dosen Pembimbing 1</label>
+                                <input type="text" class="form-control"
+                                    value="{{ $mahasiswa->tugasAkhir?->pembimbingSatu?->dosen?->user?->name ?? '-' }}"
+                                    readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Dosen Pembimbing 2</label>
+                                <input type="text" class="form-control"
+                                    value="{{ $mahasiswa->tugasAkhir?->pembimbingDua?->dosen?->user?->name ?? '-' }}"
+                                    readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Jumlah Bimbingan <span class="text-danger">*</span></label>
+                                <input type="number" name="jumlah_bimbingan" class="form-control" min="7"
+                                    value="{{ old('jumlah_bimbingan', $bimbinganCountP1 ?? 0) }}" required>
+                                <small class="text-muted">Minimal 7 kali bimbingan</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Upload File Tugas Akhir <span
+                                        class="text-danger">*</span></label>
+                                <input type="file" name="file_ta" class="form-control" accept=".pdf,.doc,.docx"
+                                    required>
+                                <small class="text-muted">Format: PDF/DOC/DOCX (Max: 5MB)</small>
+
+                                @if (isset($pendaftaranTerbaru) && $pendaftaranTerbaru?->file_ta)
+                                    <div class="mt-2">
+                                        <span class="badge bg-info">File Terupload:
+                                            {{ basename($pendaftaranTerbaru->file_ta) }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-top-0 pt-4">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x-circle me-1"></i> Tutup
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i> Simpan Pendaftaran
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 @endif
