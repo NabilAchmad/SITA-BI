@@ -98,8 +98,8 @@ Route::middleware(['auth'])->group(function () {
 
         Route::prefix('sidang')->name('sidang.')->group(function () {
             Route::get('/', [PendaftaranSidangController::class, 'dashboard'])->name('dashboard');
-            Route::get('/daftar-sempro', [PendaftaranSidangController::class, 'form'])->name('daftar-sempro');
-            Route::post('/store-sempro', [PendaftaranSidangController::class, 'store'])->name('store-sempro');
+            // Route::get('/daftar-sempro', [PendaftaranSidangController::class, 'form'])->name('daftar-sempro');
+            // Route::post('/store-sempro', [PendaftaranSidangController::class, 'store'])->name('store-sempro');
             Route::get('/daftar-sidang-akhir', [PendaftaranSidangController::class, 'form'])->name('daftar-akhir');
             Route::post('/store-sidang-akhir', [PendaftaranSidangController::class, 'store'])->name('store-akhir');
             Route::get('/nilai', [PendaftaranSidangController::class, 'nilaiSidang'])->name('nilai');

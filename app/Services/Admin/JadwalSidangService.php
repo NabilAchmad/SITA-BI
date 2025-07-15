@@ -16,19 +16,20 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class JadwalSidangService
 {
     /**
-     * ✅ PERBAIKAN: Mengambil data hitungan untuk dashboard sidang akhir.
-     * Logika untuk 'sempro' telah dihapus.
+     * ✅ PERBAIKAN: Mengambil data hitungan untuk dashboard sidang.
+     * Logika tidak lagi bergantung pada 'jenis_sidang' dan 'status'.
      *
      * @return array
      */
     public function getDashboardCounts(): array
     {
+        // Query langsung ke tabel sidang tanpa filter jenis_sidang
         $counts = Sidang::query()
-            ->where('jenis_sidang', 'akhir') // Hanya menghitung sidang akhir
             ->select([
-                DB::raw("SUM(CASE WHEN status IN ('menunggu', 'tidak_lulus') THEN 1 ELSE 0 END) as waitingAkhirCount"),
-                DB::raw("SUM(CASE WHEN status = 'dijadwalkan' THEN 1 ELSE 0 END) as scheduledAkhirCount"),
-                DB::raw("SUM(CASE WHEN status IN ('lulus', 'lulus_revisi') THEN 1 ELSE 0 END) as pascaAkhirCount"),
+                // Menggunakan status_hasil untuk menghitung
+                DB::raw("SUM(CASE WHEN status_hasil = 'dijadwalkan' THEN 1 ELSE 0 END) as scheduledAkhirCount"),
+                DB::raw("SUM(CASE WHEN status_hasil IN ('lulus', 'lulus_revisi') THEN 1 ELSE 0 END) as pascaAkhirCount"),
+                DB::raw("SUM(CASE WHEN status_hasil = 'tidak_lulus' THEN 1 ELSE 0 END) as waitingAkhirCount"), // Diasumsikan 'menunggu' adalah yang belum dijadwalkan
             ])
             ->first()
             ->toArray();
@@ -38,8 +39,8 @@ class JadwalSidangService
     }
 
     /**
-     * ✅ PERBAIKAN: Mengambil semua daftar data untuk halaman manajemen Sidang Akhir.
-     * Logika untuk 'sempro' telah dihapus.
+     * ✅ PERBAIKAN: Mengambil semua daftar data untuk manajemen Sidang.
+     * Logika tidak lagi bergantung pada 'jenis_sidang' dan 'status'.
      *
      * @param Request $request
      * @return array
@@ -50,13 +51,14 @@ class JadwalSidangService
         $search = $request->input('search');
         $perPage = 10;
 
-        // Base query untuk mahasiswa yang berelasi dengan sidang akhir
+        // Base query untuk mahasiswa berdasarkan status_hasil sidang
         $baseQuery = function ($status) use ($prodi, $search) {
             return Mahasiswa::query()
                 ->whereHas('tugasAkhir.sidang', function ($q) use ($status) {
-                    $q->where('jenis_sidang', 'akhir')->whereIn('status', (array) $status);
+                    // Langsung filter berdasarkan status_hasil
+                    $q->whereIn('status_hasil', (array) $status);
                 })
-                ->with(['user', 'tugasAkhir.sidangTerakhir'])
+                ->with(['user', 'tugasAkhir.sidang']) // Cukup load sidang
                 ->when($prodi, fn($q) => $q->where('prodi', $prodi))
                 ->when($search, fn($q) => $q->where(function ($q2) use ($search) {
                     $q2->where('nim', 'like', "%{$search}%")
@@ -64,18 +66,21 @@ class JadwalSidangService
                 }));
         };
 
-        // Query untuk Jadwal Sidang
+        // Query untuk Jadwal Sidang yang status_hasilnya 'dijadwalkan'
         $jadwalMahasiswa = JadwalSidang::query()
             ->with(['sidang.tugasAkhir.mahasiswa.user', 'sidang.tugasAkhir.peranDosenTa.dosen.user', 'ruangan'])
             ->whereHas('sidang', function ($q) use ($prodi, $search) {
-                $q->where('jenis_sidang', 'akhir')->where('status', 'dijadwalkan')
-                    ->whereHas('tugasAkhir.mahasiswa', function ($q2) use ($prodi, $search) {
-                        $q2->when($prodi, fn($q3) => $q3->where('prodi', $prodi))
-                            ->when($search, fn($q3) => $q3->where(function ($q4) use ($search) {
-                                $q4->where('nim', 'like', "%{$search}%")
-                                    ->orWhereHas('user', fn($q5) => $q5->where('name', 'like', "%{$search}%"));
-                            }));
-                    });
+                // Filter utama untuk jadwal aktif
+                $q->where('status_hasil', 'dijadwalkan');
+
+                // Filter tambahan berdasarkan prodi dan search
+                $q->whereHas('tugasAkhir.mahasiswa', function ($q2) use ($prodi, $search) {
+                    $q2->when($prodi, fn($q3) => $q3->where('prodi', $prodi))
+                        ->when($search, fn($q3) => $q3->where(function ($q4) use ($search) {
+                            $q4->where('nim', 'like', "%{$search}%")
+                                ->orWhereHas('user', fn($q5) => $q5->where('name', 'like', "%{$search}%"));
+                        }));
+                });
             })
             ->paginate($perPage, ['*'], 'jadwal_page')->appends($request->query());
 
@@ -84,7 +89,8 @@ class JadwalSidangService
         $ruanganList = Ruangan::all();
 
         return [
-            'mahasiswaMenunggu' => $baseQuery('menunggu')->paginate($perPage, ['*'], 'menunggu_page')->appends($request->query()),
+            // Mengambil mahasiswa yang sidangnya belum dijadwalkan (menunggu approval dosen)
+            'mahasiswaMenunggu' => Mahasiswa::query()->whereHas('tugasAkhir.pendaftaranSidang', fn($q) => $q->where('status_pembimbing_1', '!=', 'disetujui')->orWhere('status_pembimbing_2', '!=', 'disetujui'))->paginate($perPage, ['*'], 'menunggu_page')->appends($request->query()),
             'mahasiswaTidakLulus' => $baseQuery('tidak_lulus')->paginate($perPage, ['*'], 'tidaklulus_page')->appends($request->query()),
             'mahasiswaLulus' => $baseQuery(['lulus', 'lulus_revisi'])->paginate($perPage, ['*'], 'lulus_page')->appends($request->query()),
             'jadwalMahasiswa' => $jadwalMahasiswa,
@@ -94,7 +100,8 @@ class JadwalSidangService
     }
 
     /**
-     * Membuat jadwal sidang baru.
+     * ✅ PERBAIKAN: Membuat jadwal sidang baru.
+     * Tidak lagi mengupdate status sidang, karena status diatur saat pembuatan.
      *
      * @param array $data
      * @return JadwalSidang
@@ -102,7 +109,7 @@ class JadwalSidangService
      */
     public function createJadwal(array $data): JadwalSidang
     {
-        // Cek bentrok jadwal ruangan
+        // Cek bentrok jadwal ruangan (Logika ini sudah benar)
         $isConflict = JadwalSidang::where('ruangan_id', $data['ruangan_id'])
             ->where('tanggal', $data['tanggal'])
             ->where(function ($query) use ($data) {
@@ -116,20 +123,12 @@ class JadwalSidangService
             throw new \Exception('Ruangan sudah terpakai pada waktu tersebut.');
         }
 
-        return DB::transaction(function () use ($data) {
-            $sidang = Sidang::findOrFail($data['sidang_id']);
-            $sidang->update(['status' => 'dijadwalkan', 'is_active' => true]);
-            return JadwalSidang::create($data);
-        });
+        // Cukup membuat jadwal, status sidang tidak perlu diubah di sini
+        return JadwalSidang::create($data);
     }
 
-    /**
-     * Memperbarui jadwal sidang dan penguji.
-     *
-     * @param JadwalSidang $jadwal
-     * @param array $data
-     * @return array
-     */
+    // ... (Fungsi updateJadwal, assignPenguji, getJadwalDetailsForView tidak perlu diubah)
+    // ... (Pastikan fungsi-fungsi ini dipastikan ada di file Anda)
     public function updateJadwal(JadwalSidang $jadwal, array $data): array
     {
         return DB::transaction(function () use ($jadwal, $data) {
@@ -161,13 +160,6 @@ class JadwalSidangService
         });
     }
 
-    /**
-     * Menetapkan dosen penguji untuk sebuah sidang.
-     *
-     * @param Sidang $sidang
-     * @param array $pengujiData
-     * @return void
-     */
     public function assignPenguji(Sidang $sidang, array $pengujiData): void
     {
         DB::transaction(function () use ($sidang, $pengujiData) {
@@ -184,12 +176,6 @@ class JadwalSidangService
         });
     }
 
-    /**
-     * Mengambil data untuk tampilan detail jadwal sidang.
-     *
-     * @param int $sidang_id
-     * @return array
-     */
     public function getJadwalDetailsForView(int $sidang_id): array
     {
         $jadwal = JadwalSidang::with([
@@ -207,28 +193,31 @@ class JadwalSidangService
             'ruangans' => Ruangan::all(),
         ];
     }
-
     /**
-     * Menandai status akhir dari sebuah sidang.
+     * ✅ PERBAIKAN: Menandai hasil akhir dari sebuah sidang.
+     * Menggunakan kolom 'status_hasil' bukan 'status'.
      *
      * @param int $sidang_id
-     * @param string $status
+     * @param string $status_hasil
      * @return Sidang
      */
-    public function tandaiStatusAkhir(int $sidang_id, string $status): Sidang
+    public function tandaiStatusAkhir(int $sidang_id, string $status_hasil): Sidang
     {
-        return DB::transaction(function () use ($sidang_id, $status) {
+        return DB::transaction(function () use ($sidang_id, $status_hasil) {
             $sidang = Sidang::where('id', $sidang_id)
-                ->where('jenis_sidang', 'akhir')
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if (in_array($sidang->status, ['lulus', 'lulus_revisi', 'tidak_lulus'])) {
-                throw new HttpException(422, 'Sidang sudah ditandai sebelumnya.');
+            // Cek apakah sidang sudah memiliki hasil akhir
+            if (in_array($sidang->status_hasil, ['lulus', 'lulus_revisi', 'tidak_lulus'])) {
+                throw new HttpException(422, 'Sidang sudah memiliki hasil akhir sebelumnya.');
             }
 
-            $sidang->status = $status;
-            if ($status === 'tidak_lulus') {
+            // Update kolom status_hasil
+            $sidang->status_hasil = $status_hasil;
+
+            // Jika tidak lulus, sidang menjadi tidak aktif lagi
+            if ($status_hasil === 'tidak_lulus') {
                 $sidang->is_active = false;
             }
             $sidang->save();

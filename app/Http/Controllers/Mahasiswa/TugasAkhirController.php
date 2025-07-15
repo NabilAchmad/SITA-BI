@@ -38,6 +38,8 @@ class TugasAkhirController extends Controller
             'pembimbing1'      => $data['pembimbing1'],
             'pembimbing2'      => $data['pembimbing2'],
             'jadwalAktif' => $data['jadwalAktif'],
+            'isEligibleForRegistration' => $data['isEligibleForRegistration'], // <-- Variabel baru ditambahkan
+            'mahasiswa' => $data['mahasiswa'], // <-- Variabel mahasiswa ditambahkan
         ]);
     }
 

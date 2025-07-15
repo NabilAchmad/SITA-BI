@@ -174,28 +174,8 @@
     </div>
 @endforelse
 
-
-{{-- Syarat Panel Pendaftaran Sidang --}}
-@php
-    // Calculate if bimbingan requirements are met
-    $syaratJumlahBimbinganTerpenuhi = false;
-    if (isset($bimbinganCountP1) && isset($bimbinganCountP2)) {
-        $syaratJumlahBimbinganTerpenuhi = $bimbinganCountP1 >= 7 && $bimbinganCountP2 >= 7;
-    } elseif (isset($bimbinganCountP1)) {
-        $syaratJumlahBimbinganTerpenuhi = $bimbinganCountP1 >= 7;
-    }
-
-    // Status badge configuration
-    $statusConfig = [
-        'menunggu' => ['text' => 'Menunggu', 'class' => 'bg-warning text-dark'],
-        'disetujui' => ['text' => 'Disetujui', 'class' => 'bg-success'],
-        'ditolak' => ['text' => 'Ditolak', 'class' => 'bg-danger'],
-        'berkas_tidak_lengkap' => ['text' => 'Berkas Tidak Lengkap', 'class' => 'bg-danger'],
-    ];
-@endphp
-
 {{-- Panel Pendaftaran Sidang --}}
-@if ($syaratJumlahBimbinganTerpenuhi)
+@if ($isEligibleForRegistration)
     <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-body">
             <h5 class="fw-bold text-dark mb-3">
@@ -289,91 +269,244 @@
 
     {{-- Modal Form Pendaftaran --}}
     <div class="modal fade" id="sidangModal" tabindex="-1" aria-labelledby="sidangModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h1 class="modal-title fs-5" id="sidangModalLabel">Form Pendaftaran Sidang Tugas Akhir</h1>
+                    <h1 class="modal-title fs-4" id="sidangModalLabel">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        Form Pendaftaran Sidang Tugas Akhir
+                    </h1>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    @if (session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
+                <div class="modal-body p-4">
+                    {{-- Menampilkan error validasi --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger border-0 shadow-sm" role="alert">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                                <h5 class="alert-heading mb-0">Terdapat Kesalahan!</h5>
+                            </div>
+                            <p class="mb-2">Silakan periksa kembali isian Anda. Semua berkas wajib diunggah.</p>
+                            <ul class="mb-0 ps-3">
+                                @foreach ($errors->all() as $error)
+                                    <li class="mb-1">{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                     @endif
 
-                    <form id="formSidang" action="{{ route('mahasiswa.sidang.store-akhir') }}" method="POST"
-                        enctype="multipart/form-data">
+                    <form id="formPendaftaranSidang" action="{{ route('mahasiswa.sidang.store-akhir') }}"
+                        method="POST" enctype="multipart/form-data">
                         @csrf
 
-                        @if (isset($pendaftaranTerbaru) && $pendaftaranTerbaru)
-                            <input type="hidden" name="is_edit" value="1">
-                        @endif
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Nama Mahasiswa</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $mahasiswa->user->name ?? '-' }}" readonly>
+                        {{-- Bagian Data Mahasiswa (Read-only) --}}
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-light border-0">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-person-badge me-2 text-primary"></i>
+                                    Data Mahasiswa
+                                </h5>
                             </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">NIM</label>
-                                <input type="text" class="form-control" value="{{ $mahasiswa->nim ?? '-' }}"
-                                    readonly>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label">Judul Tugas Akhir <span class="text-danger">*</span></label>
-                                <input type="text" name="judul_ta" class="form-control"
-                                    value="{{ old('judul_ta', $pendaftaranTerbaru->judul_ta ?? '') }}" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Dosen Pembimbing 1</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $mahasiswa->tugasAkhir?->pembimbingSatu?->dosen?->user?->name ?? '-' }}"
-                                    readonly>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Dosen Pembimbing 2</label>
-                                <input type="text" class="form-control"
-                                    value="{{ $mahasiswa->tugasAkhir?->pembimbingDua?->dosen?->user?->name ?? '-' }}"
-                                    readonly>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Jumlah Bimbingan <span class="text-danger">*</span></label>
-                                <input type="number" name="jumlah_bimbingan" class="form-control" min="7"
-                                    value="{{ old('jumlah_bimbingan', $bimbinganCountP1 ?? 0) }}" required>
-                                <small class="text-muted">Minimal 7 kali bimbingan</small>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Upload File Tugas Akhir <span
-                                        class="text-danger">*</span></label>
-                                <input type="file" name="file_ta" class="form-control" accept=".pdf,.doc,.docx"
-                                    required>
-                                <small class="text-muted">Format: PDF/DOC/DOCX (Max: 5MB)</small>
-
-                                @if (isset($pendaftaranTerbaru) && $pendaftaranTerbaru?->file_ta)
-                                    <div class="mt-2">
-                                        <span class="badge bg-info">File Terupload:
-                                            {{ basename($pendaftaranTerbaru->file_ta) }}</span>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            <i class="bi bi-person me-1"></i>
+                                            Nama Mahasiswa
+                                        </label>
+                                        <input type="text" class="form-control bg-light border-0"
+                                            value="{{ $mahasiswa?->user?->name ?? 'Tidak ada data' }}" readonly>
                                     </div>
-                                @endif
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            <i class="bi bi-credit-card me-1"></i>
+                                            NIM
+                                        </label>
+                                        <input type="text" class="form-control bg-light border-0"
+                                            value="{{ $mahasiswa?->nim ?? '-' }}" readonly>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">
+                                            <i class="bi bi-book me-1"></i>
+                                            Judul Tugas Akhir
+                                        </label>
+                                        <textarea class="form-control bg-light border-0" rows="3" readonly>{{ $tugasAkhir?->judul ?? 'Judul TA belum ditetapkan' }}</textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            <i class="bi bi-mortarboard me-1"></i>
+                                            Dosen Pembimbing 1
+                                        </label>
+                                        <input type="text" class="form-control bg-light border-0"
+                                            value="{{ $pembimbing1?->dosen?->user?->name ?? '-' }}" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">
+                                            <i class="bi bi-mortarboard me-1"></i>
+                                            Dosen Pembimbing 2
+                                        </label>
+                                        <input type="text" class="form-control bg-light border-0"
+                                            value="{{ $pembimbing2?->dosen?->user?->name ?? '-' }}" readonly>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="modal-footer border-top-0 pt-4">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                <i class="bi bi-x-circle me-1"></i> Tutup
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save me-1"></i> Simpan Pendaftaran
-                            </button>
+                        {{-- Bagian Upload Berkas (Checklist Digital) --}}
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-light border-0">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-cloud-upload me-2 text-primary"></i>
+                                    Kelengkapan Berkas Pendaftaran
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info border-0 shadow-sm mb-4" role="alert">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                                        <div>
+                                            <p class="mb-1">
+                                                Silakan unggah semua dokumen yang disyaratkan sesuai dengan
+                                                <a href="#" target="_blank" class="text-decoration-none">
+                                                    <i class="bi bi-file-pdf me-1"></i>Buku Panduan TA
+                                                </a>.
+                                            </p>
+                                            <small class="text-muted">
+                                                Semua file harus dalam format yang ditentukan dan ukuran sesuai
+                                                ketentuan.
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div
+                                            class="border border-2 border-dashed rounded-3 p-4 bg-light bg-opacity-50">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                                    <i class="bi bi-file-earmark-text text-white fs-4"></i>
+                                                </div>
+                                                <div>
+                                                    <label for="file_naskah_ta" class="form-label fw-bold mb-0">
+                                                        1. Naskah Final Tugas Akhir
+                                                        <span class="badge bg-danger ms-2">Wajib</span>
+                                                    </label>
+                                                    <small class="d-block text-muted">Format: PDF, DOC, DOCX •
+                                                        Maksimal: 10MB</small>
+                                                </div>
+                                            </div>
+                                            <input type="file" name="file_naskah_ta" id="file_naskah_ta"
+                                                class="form-control form-control-lg border-2" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div
+                                            class="border border-2 border-dashed rounded-3 p-4 bg-light bg-opacity-50">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                                    <i class="bi bi-award text-white fs-4"></i>
+                                                </div>
+                                                <div>
+                                                    <label for="file_toeic" class="form-label fw-bold mb-0">
+                                                        2. Sertifikat TOEIC
+                                                        <span class="badge bg-danger ms-2">Wajib</span>
+                                                    </label>
+                                                    <small class="d-block text-muted">Skor minimal 500 • Format: PDF •
+                                                        Maksimal: 2MB</small>
+                                                </div>
+                                            </div>
+                                            <input type="file" name="file_toeic" id="file_toeic"
+                                                class="form-control form-control-lg border-2" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div
+                                            class="border border-2 border-dashed rounded-3 p-4 bg-light bg-opacity-50">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                                                    <i class="bi bi-journal-text text-white fs-4"></i>
+                                                </div>
+                                                <div>
+                                                    @if ($mahasiswa?->prodi === 'd3')
+                                                        <label for="file_rapor" class="form-label fw-bold mb-0">
+                                                            3. Scan Rapor Semester 1-5
+                                                            <span class="badge bg-danger ms-2">Wajib</span>
+                                                        </label>
+                                                    @elseif($mahasiswa?->prodi === 'd4')
+                                                        <label for="file_rapor" class="form-label fw-bold mb-0">
+                                                            3. Scan Rapor Semester 1-7
+                                                            <span class="badge bg-danger ms-2">Wajib</span>
+                                                        </label>
+                                                    @endif
+                                                    <small class="d-block text-muted">Jadikan dalam satu file PDF •
+                                                        Maksimal: 5MB</small>
+                                                </div>
+                                            </div>
+                                            <input type="file" name="file_rapor" id="file_rapor"
+                                                class="form-control form-control-lg border-2" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div
+                                            class="border border-2 border-dashed rounded-3 p-4 bg-light bg-opacity-50">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                                    <i class="bi bi-patch-check text-white fs-4"></i>
+                                                </div>
+                                                <div>
+                                                    <label for="file_ijazah_slta" class="form-label fw-bold mb-0">
+                                                        4. Scan Ijazah SLTA
+                                                        <span class="badge bg-danger ms-2">Wajib</span>
+                                                    </label>
+                                                    <small class="d-block text-muted">Format: PDF • Maksimal:
+                                                        2MB</small>
+                                                </div>
+                                            </div>
+                                            <input type="file" name="file_ijazah_slta" id="file_ijazah_slta"
+                                                class="form-control form-control-lg border-2" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div
+                                            class="border border-2 border-dashed rounded-3 p-4 bg-light bg-opacity-50">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="bg-secondary bg-opacity-10 rounded-circle p-2 me-3">
+                                                    <i class="bi bi-shield-check text-white fs-4"></i>
+                                                </div>
+                                                <div>
+                                                    <label for="file_bebas_jurusan" class="form-label fw-bold mb-0">
+                                                        5. Surat Keterangan Bebas Jurusan
+                                                        <span class="badge bg-danger ms-2">Wajib</span>
+                                                    </label>
+                                                    <small class="d-block text-muted">Format: PDF • Maksimal:
+                                                        2MB</small>
+                                                </div>
+                                            </div>
+                                            <input type="file" name="file_bebas_jurusan" id="file_bebas_jurusan"
+                                                class="form-control form-control-lg border-2" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
+                </div>
+
+                <div class="modal-footer bg-light border-top-0">
+                    <div class="d-flex gap-2 w-100 justify-content-end">
+                        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i> Batal
+                        </button>
+                        <button type="submit" form="formPendaftaranSidang" class="btn btn-primary px-4">
+                            <i class="bi bi-send me-1"></i> Kirim Pendaftaran
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

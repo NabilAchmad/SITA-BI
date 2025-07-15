@@ -14,7 +14,7 @@ class Sidang extends Model
 
     protected $table = 'sidang';
 
-    protected $fillable = ['tugas_akhir_id', 'jenis_sidang', 'status'];
+    protected $fillable = ['tugas_akhir_id', 'status'];
 
     public function tugasAkhir()
     {

@@ -3,108 +3,111 @@
 namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Mahasiswa;
+use App\Models\PendaftaranSidang;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log; // Untuk mencatat error
+use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Mahasiswa\PendaftaranSidangRequest; // Pastikan namespace ini benar
+use App\Services\Mahasiswa\PendaftaranSidangService;
 
 class PendaftaranSidangController extends Controller
 {
+    protected $pendaftaranSidangService; // Deklarasi service
+
+    public function __construct(PendaftaranSidangService $pendaftaranSidangService)
+    {
+        $this->pendaftaranSidangService = $pendaftaranSidangService;
+    }
+
     /**
-     * Menampilkan halaman form pendaftaran seminar proposal.
+     * ✅ PERBAIKAN: Menampilkan form pendaftaran dengan pengecekan.
      */
     public function form()
     {
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())
-            ->with('tugasAkhir.dosenPembimbing')
+            ->with('tugasAkhir')
             ->firstOrFail();
-        // Nama view bisa disesuaikan, 'create' lebih mengikuti konvensi RESTful
+
+        // Pengecekan: Apakah mahasiswa sudah memiliki pendaftaran yang sedang diproses?
+        $pendaftaranAktif = PendaftaranSidang::where('tugas_akhir_id', $mahasiswa->tugasAkhir->id)
+            ->whereIn('status_verifikasi', ['menunggu_verifikasi']) // Sesuaikan statusnya
+            ->exists();
+
+        if ($pendaftaranAktif) {
+            return redirect()->route('mahasiswa.sidang.dashboard')->with('alert', [
+                'title'   => 'Informasi',
+                'message' => 'Anda sudah memiliki pendaftaran sidang yang sedang diproses.',
+                'type'    => 'info',
+            ]);
+        }
+
         return view('mahasiswa.sidang.views.form', compact('mahasiswa'));
     }
 
     /**
-     * Menampilkan dashboard sidang.
+     * ✅ PERBAIKAN: Menampilkan dashboard dengan data pendaftaran terakhir.
      */
     public function dashboard()
     {
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
-        // Sesuaikan view dashboard sidang sesuai kebutuhan
-        return view('mahasiswa.sidang.dashboard.dashboard', compact('mahasiswa'));
+
+        // Mengambil pendaftaran terakhir untuk ditampilkan di dashboard
+        $pendaftaranTerbaru = PendaftaranSidang::whereHas('tugasAkhir', function ($query) use ($mahasiswa) {
+            $query->where('mahasiswa_id', $mahasiswa->id);
+        })->latest()->first();
+
+        return view('mahasiswa.sidang.dashboard.dashboard', compact('mahasiswa', 'pendaftaranTerbaru'));
     }
 
     /**
-     * Menyimpan data pendaftaran seminar proposal.
+     * Menyimpan data pendaftaran sidang (sudah benar).
      */
-    public function store(Request $request)
+    public function store(PendaftaranSidangRequest $request)
     {
         try {
-            $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
-
-            $request->validate([
-                'judul_ta' => 'required|string|max:255',
-                'jumlah_bimbingan' => 'required|integer|min:7',
-                'file_ta' => 'required|file|mimes:pdf,doc,docx|max:10240', // max 10MB
-            ]);
-
-            if ($request->input('jumlah_bimbingan') < 7) {
-                return redirect()->back()->with('alert', [
-                    'title' => 'Gagal!',
-                    'message' => 'Jumlah bimbingan minimal 7 kali untuk mendaftar sidang akhir.',
-                    'type' => 'error',
-                ])->withInput();
-            }
-
-            // Simpan file tugas akhir
-            $filePath = $request->file('file_ta')->store('final_documents', 'public');
-
-            // Buat record sidang baru dengan status menunggu_verifikasi
-            $sidang = $mahasiswa->tugasAkhir->sidang()->create([
-                'judul' => $request->input('judul_ta'),
-                'status' => 'menunggu_verifikasi',
-                'file_path' => $filePath,
-                'jenis_sidang' => 'akhir',
-            ]);
+            $this->pendaftaranSidangService->handleRegistration($request);
 
             return redirect()->route('mahasiswa.sidang.dashboard')
                 ->with('alert', [
-                    'title' => 'Berhasil!',
-                    'message' => 'Pendaftaran sidang akhir berhasil, menunggu verifikasi dosen pembimbing.',
-                    'type' => 'success',
+                    'title'   => 'Berhasil!',
+                    'message' => 'Pendaftaran sidang berhasil dikirim. Silakan tunggu verifikasi dari dosen pembimbing.',
+                    'type'    => 'success',
                 ]);
         } catch (\Exception $e) {
-            Log::error('Gagal menyimpan pendaftaran sidang akhir: ' . $e->getMessage());
-
-            return redirect()->back()
-                ->with('alert', [
-                    'title' => 'Gagal!',
-                    'message' => $e->getMessage(),
-                    'type' => 'error',
-                ])
-                ->withInput();
+            Log::error('Gagal menyimpan pendaftaran sidang: ' . $e->getMessage());
+            return redirect()->back()->with('alert', [
+                'title'   => 'Gagal!',
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'type'    => 'error',
+            ])->withInput();
         }
     }
 
     /**
-     * Menampilkan halaman nilai sidang untuk mahasiswa.
+     * ✅ PERBAIKAN: Menampilkan nilai sidang dengan query yang lebih efisien.
      */
     public function nilaiSidang()
     {
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())
-            ->with(['tugasAkhir.sidang.nilaiSidang.dosen', 'tugasAkhir.mahasiswa.user'])
+            ->with(['tugasAkhir.sidang.nilaiSidang.dosen.user']) // Muat relasi yang diperlukan
             ->firstOrFail();
 
-        $sidang = $mahasiswa->tugasAkhir ? $mahasiswa->tugasAkhir->sidang : collect();
+        // Ambil koleksi sidang jika tugas akhir ada
+        $sidangs = $mahasiswa->tugasAkhir ? $mahasiswa->tugasAkhir->sidang : collect();
 
-        return view('mahasiswa.sidang.views.nilaiSidang', compact('sidang', 'mahasiswa'));
+        return view('mahasiswa.sidang.views.nilaiSidang', compact('sidangs', 'mahasiswa'));
     }
 
     /**
-     * Menampilkan jadwal sidang yang sudah diberikan oleh admin.
+     * ✅ PERBAIKAN: Menampilkan jadwal sidang dengan query yang lebih sederhana.
      */
     public function jadwalSidang()
     {
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())
-            ->with(['tugasAkhir.sidang.jadwalSidang.ruangan', 'tugasAkhir.sidang.nilaiSidang.dosen.user'])
+            ->with(['tugasAkhir.sidang' => function ($query) {
+                // Eager load relasi jadwalSidang hanya untuk sidang yang relevan
+                $query->with('jadwalSidang.ruangan');
+            }])
             ->firstOrFail();
 
         $sidangs = $mahasiswa->tugasAkhir ? $mahasiswa->tugasAkhir->sidang : collect();

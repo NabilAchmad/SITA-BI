@@ -176,63 +176,91 @@ class TugasAkhirService
             return $this->getEmptyProgressData();
         }
 
-        // Panggil helper yang sudah memuat semua relasi (termasuk bimbinganTa)
+        // Helper untuk mengambil Tugas Akhir aktif dengan semua relasi yang dibutuhkan
         $tugasAkhir = $this->getActiveTugasAkhirForProgressPage();
 
         if (!$tugasAkhir) {
             return $this->getEmptyProgressData();
         }
 
-        // ✅ AMBIL KOLEKSI SEKALI SAJA DARI DATA YANG SUDAH DI-LOAD
+        // Ambil koleksi relasi sekali saja untuk diolah di memori
         $allBimbingan = $tugasAkhir->bimbinganTa;
         $allDokumen = $tugasAkhir->dokumenTa;
 
         $pembimbing1 = $tugasAkhir->pembimbing_satu;
         $pembimbing2 = $tugasAkhir->pembimbing_dua;
 
-        // Olah koleksi di memori untuk mendapatkan jadwal aktif
+        // --- Di sinilah perbaikan utamanya ---
+
+        // 1. Hitung jumlah bimbingan yang selesai dari koleksi yang sudah di-load
+        $bimbinganCountP1 = 0;
+        if ($pembimbing1) {
+            // Gunakan koleksi $allBimbingan, bukan query baru
+            $bimbinganCountP1 = $allBimbingan
+                ->where('dosen_id', $pembimbing1->dosen_id)
+                ->where('status_bimbingan', 'selesai')
+                ->count();
+        }
+
+        $bimbinganCountP2 = 0;
+        if ($pembimbing2) {
+            // Gunakan koleksi $allBimbingan, bukan query baru
+            $bimbinganCountP2 = $allBimbingan
+                ->where('dosen_id', $pembimbing2->dosen_id)
+                ->where('status_bimbingan', 'selesai')
+                ->count();
+        }
+
+        // 2. Olah koleksi yang sama untuk mendapatkan jadwal aktif
         $jadwalAktif = collect();
         if ($pembimbing1) {
-            // ✅ GUNAKAN $allBimbingan, BUKAN ->bimbinganTa()
             $jadwalP1 = $allBimbingan
-                ->where('dosen_id', $pembimbing1->id)
+                ->where('dosen_id', $pembimbing1->dosen_id)
                 ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
                 ->sortByDesc('sesi_ke')
                 ->first();
-
             if ($jadwalP1) $jadwalAktif->push($jadwalP1);
         }
         if ($pembimbing2) {
-            // ✅ GUNAKAN $allBimbingan, BUKAN ->bimbinganTa()
             $jadwalP2 = $allBimbingan
-                ->where('dosen_id', $pembimbing2->id)
+                ->where('dosen_id', $pembimbing2->dosen_id)
                 ->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])
                 ->sortByDesc('sesi_ke')
                 ->first();
-
             if ($jadwalP2) $jadwalAktif->push($jadwalP2);
         }
 
-        // Hitung jumlah bimbingan dari koleksi yang sama
-        $bimbinganCountP1 = $pembimbing1 ? $tugasAkhir->bimbinganTa->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
-        $bimbinganCountP2 = $pembimbing2 ? $tugasAkhir->bimbinganTa->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
-
-        // Ambil catatan (contoh jika diperlukan)
+        // Ambil catatan berdasarkan ID bimbingan dari koleksi
         $bimbinganIds = $allBimbingan->pluck('id');
-        $catatanList = $bimbinganIds->isNotEmpty() ? CatatanBimbingan::whereIn('bimbingan_ta_id', $bimbinganIds)->with('author.user')->get() : collect();
+        $catatanList = $bimbinganIds->isNotEmpty()
+            ? CatatanBimbingan::whereIn('bimbingan_ta_id', $bimbinganIds)->with('author.user')->get()
+            : collect();
 
+        $isEligible = false;
+        if (isset($bimbinganCountP1) && isset($bimbinganCountP2)) {
+            // Logika jika ada dua pembimbing
+            $isEligible = $bimbinganCountP1 >= 7 && $bimbinganCountP2 >= 7;
+        } elseif (isset($bimbinganCountP1)) {
+            // Logika jika hanya ada satu pembimbing
+            $isEligible = $bimbinganCountP1 >= 7;
+        }
+
+        // 3. Kembalikan semua data yang sudah diolah ke controller
         return [
+            'mahasiswa'        => $this->mahasiswa,
             'tugasAkhir'       => $tugasAkhir,
-            'riwayatDokumen'   => $allDokumen, // ✅ GUNAKAN KOLEKSI YANG SUDAH ADA
+            'riwayatDokumen'   => $allDokumen,
             'dokumenTerbaru'   => $allDokumen->last(),
             'catatanList'      => $catatanList,
-            'bimbinganCountP1' => $bimbinganCountP1,
-            'bimbinganCountP2' => $bimbinganCountP2,
+            'bimbinganCountP1' => $bimbinganCountP1, // <-- Data ini sekarang dihitung dengan benar
+            'bimbinganCountP2' => $bimbinganCountP2, // <-- Data ini sekarang dihitung dengan benar
             'pembimbing1'      => $pembimbing1,
             'pembimbing2'      => $pembimbing2,
             'jadwalAktif'      => $jadwalAktif,
+            'isEligibleForRegistration' => $isEligible,
         ];
     }
+
 
     /**
      * Mengajukan pembatalan Tugas Akhir.
