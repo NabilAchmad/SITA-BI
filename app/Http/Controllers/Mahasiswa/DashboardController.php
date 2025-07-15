@@ -43,16 +43,16 @@ class DashboardController extends Controller
                 ? round(($jumlahBimbingan / 9) * 100) . '% Berjalan'
                 : 'Belum Mulai';
 
-            $seminarProposal = \App\Models\Sidang::where('tugas_akhir_id', $ta->id)
-                ->where('jenis_sidang', 'proposal')
-                ->first();
+            // $seminarProposal = \App\Models\Sidang::where('tugas_akhir_id', $ta->id)
+            //     ->where('jenis_sidang', 'proposal')
+            //     ->first();
 
-            $statusSempro = $seminarProposal
-                ? 'Sudah Dijadwalkan'
-                : 'Belum Dijadwalkan (Syarat belum terpenuhi)';
+            // $statusSempro = $seminarProposal
+            //     ? 'Sudah Dijadwalkan'
+            //     : 'Belum Dijadwalkan (Syarat belum terpenuhi)';
 
             $sidangAkhir = \App\Models\Sidang::where('tugas_akhir_id', $ta->id)
-                ->where('jenis_sidang', 'akhir')
+                ->where('status_hasil', 'akhir')
                 ->first();
 
             $statusSidang = $sidangAkhir

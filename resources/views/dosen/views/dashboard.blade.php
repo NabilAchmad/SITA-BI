@@ -21,36 +21,42 @@
 
     {{-- ✅ PERBAIKAN: Kondisi sekarang menggunakan variabel boolean yang bersih dari controller --}}
 
-    <!-- JADWAL BIMBINGAN KHUSUS PEMBIMBING -->
-    @if ($isPembimbing)
-        @include('layouts.components.content-dosen.jadwal-bimbingan', [
-            'jadwalBimbingan' => $jadwalBimbingan,
-        ])
-    @endif
+    <!-- RIWAYAT PENGAJUAN TA HANYA UNTUK PIMPINAN JURUSAN -->
 
-    <!-- JADWAL SIDANG KHUSUS PENGUJI -->
-    @if ($isPenguji)
-        @include('layouts.components.content-dosen.jadwal-sidang', ['jadwalSidang' => $jadwalSidang])
-    @endif
-
-    {{-- <!-- Topik: wajib tampil untuk semua dosen (tidak perlu @if) --> --}}
     <div class="row">
-        <div class="col-md-12">
+        <!-- JADWAL BIMBINGAN KHUSUS PEMBIMBING -->
+        @if ($isPembimbing)
+            @include('layouts.components.content-dosen.jadwal-bimbingan', [
+                'jadwalBimbingan' => $jadwalBimbingan,
+            ])
+        @endif
+
+        <!-- JADWAL SIDANG KHUSUS PENGUJI -->
+        @if ($isPenguji)
+            @include('layouts.components.content-dosen.jadwal-sidang', ['jadwalSidang' => $jadwalSidang])
+        @endif
+
+        @if ($isPimpinan)
+            <div class="row">
+                @include('layouts.components.content-dosen.riwayatpengajuanta', [
+                    'riwayatTA' => $riwayatTA,
+                ])
+            </div>
+        @endif
+        <div class="col-md-6">
+            @include('layouts.components.content-dosen.pengumuman', ['pengumumans' => $pengumumans])
+        </div>
+        <div class="col-md-6">
             @include('layouts.components.content-dosen.topik', ['tawaranTopik' => $tawaranTopik])
         </div>
     </div>
 
-    <!-- Pengumuman: wajib tampil -->
+    {{-- <!-- Topik: wajib tampil untuk semua dosen (tidak perlu @if) --> --}}
     <div class="row">
-        <div class="col-md-12">
-            @include('layouts.components.content-dosen.pengumuman', ['pengumumans' => $pengumumans])
-        </div>
     </div>
 
-    <!-- RIWAYAT PENGAJUAN TA HANYA UNTUK PIMPINAN JURUSAN -->
-    @if ($isPimpinan)
-        <div class="row">
-            @include('layouts.components.content-dosen.riwayatpengajuanta', ['riwayatTA' => $riwayatTA])
-        </div>
-    @endif
+    <!-- Pengumuman: wajib tampil -->
+    <div class="row">
+    </div>
+
 @endsection

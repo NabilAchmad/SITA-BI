@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\VerifyEmail; // Asumsi Anda punya Mailable ini
+use App\Mail\VerifyEmail;
 use App\Models\EmailVerificationToken;
 use App\Models\Mahasiswa;
 use App\Models\User;
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Log;
 class AuthController extends Controller
 {
     // ===========================================
-    // Metode Login, Logout, dan Helper (Tidak Diubah)
+    // Metode Login, Logout, dan Helper
     // ===========================================
 
     /**
@@ -31,7 +31,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Menangani proses login.
+     * Menangani proses login dengan bypass verifikasi untuk admin/dosen.
      */
     public function login(Request $request)
     {
@@ -40,6 +40,24 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
+        $user = User::where('email', $credentials['email'])->first();
+
+        // 🛑 Pengecekan Bypass Verifikasi
+        if ($user && is_null($user->email_verified_at)) {
+            // Cek apakah user BUKAN admin atau dosen.
+            // Hanya peran selain ini (seperti mahasiswa) yang WAJIB verifikasi.
+            if (!$user->hasRole('admin') && !$user->hasAnyRole(['kajur', 'kaprodi-d3', 'kaprodi-d4', 'dosen'])) {
+
+                // Arahkan ke halaman verifikasi OTP karena ini bukan admin/dosen
+                session(['otp_user_id' => $user->id]);
+                return redirect()->route('auth.otp.verify.form')
+                    ->with('error', 'Akun Anda belum diverifikasi. Silakan cek email Anda untuk kode OTP.');
+            }
+            // Jika user adalah admin atau dosen, maka kode ini akan dilewati
+            // dan proses login dilanjutkan di bawah.
+        }
+
+        // Proses otentikasi
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
@@ -96,7 +114,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Langkah 1: Menangani data registrasi, menyimpan ke session, dan mengirim OTP.
+     * Langkah 1: Menangani registrasi, membuat user (belum terverifikasi), dan mengirim OTP.
      */
     public function register(Request $request)
     {
@@ -121,39 +139,44 @@ class AuthController extends Controller
 
         try {
             // Memulai transaksi database
-            DB::beginTransaction();
+            $user = DB::transaction(function () use ($validated) {
+                $user = User::create([
+                    'name'     => $validated['name'],
+                    'email'    => $validated['email'],
+                    'password' => Hash::make($validated['password']),
+                    // email_verified_at tetap NULL secara default
+                ]);
 
-            $user = User::create([
-                'name'     => $validated['name'],
-                'email'    => $validated['email'],
-                'password' => Hash::make($validated['password']),
-            ]);
+                // Memberikan role 'mahasiswa'
+                $user->assignRole('mahasiswa');
 
-            // Memberikan role 'mahasiswa' menggunakan metode dari Spatie
-            $user->assignRole('mahasiswa');
+                Mahasiswa::create([
+                    'user_id'  => $user->id,
+                    'nim'      => $validated['nim'],
+                    'prodi'    => $validated['prodi'],
+                    'kelas'    => $validated['kelas'],
+                    'angkatan' => '20' . substr($validated['nim'], 0, 2),
+                ]);
 
-            Mahasiswa::create([
-                'user_id'  => $user->id,
-                'nim'      => $validated['nim'],
-                'prodi'    => $validated['prodi'],
-                'kelas'    => $validated['kelas'],
-                'angkatan' => 2000 + intval(substr($validated['nim'], 0, 2)),
-            ]);
+                return $user;
+            });
 
-            // Jika semua berhasil, simpan perubahan
-            DB::commit();
-        } catch (\Exception $e) {
-            // Jika ada error, batalkan semua operasi
+            // Mengirim OTP verifikasi
+            $this->sendEmailVerification($user);
+
+            // Menyimpan ID user yang perlu diverifikasi ke dalam sesi
+            session(['otp_user_id' => $user->id]);
+
+            return redirect()->route('auth.otp.verify.form')->with('success', 'Registrasi awal berhasil. Silakan masukkan kode OTP yang telah dikirim ke email Anda.');
+        } catch (\RuntimeException $e) {
             DB::rollBack();
-            // Tampilkan pesan error
+            Log::error('Registrasi Gagal - Pengiriman Email: ' . $e->getMessage());
+            return back()->with('error', 'Registrasi gagal karena email tidak dapat dikirim. Silakan coba lagi.')->withInput();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Registrasi Gagal - DB Error: ' . $e->getMessage());
             return back()->with('error', 'Registrasi gagal, terjadi kesalahan pada server. Silakan coba lagi.')->withInput();
         }
-
-        $this->sendEmailVerification($user);
-
-        session(['otp_user_id' => $user->id]);
-
-        return redirect()->route('auth.otp.verify.form')->with('success', 'Registrasi berhasil. Silakan masukkan kode OTP yang telah dikirim ke email Anda.');
     }
 
     /**
@@ -161,76 +184,61 @@ class AuthController extends Controller
      */
     public function showOtpVerificationForm()
     {
-        // Pastikan pengguna datang dari halaman registrasi, bukan akses langsung
-        if (!session()->has('registration_data')) {
-            return redirect()->route('auth.register')->with('error', 'Sesi registrasi tidak ditemukan. Silakan mulai dari awal.');
+        if (!session()->has('otp_user_id')) {
+            return redirect()->route('auth.register')->with('error', 'Sesi verifikasi tidak ditemukan. Silakan registrasi atau login.');
         }
-        return view('auth.otp_verification'); // Pastikan nama view-nya benar
+
+        $user = User::find(session('otp_user_id'));
+        if (!$user) {
+            session()->forget('otp_user_id');
+            return redirect()->route('auth.register')->with('error', 'Data pengguna tidak ditemukan. Silakan registrasi ulang.');
+        }
+
+        return view('auth.otp_verification', ['email' => $user->email]);
     }
 
     /**
-     * Langkah 3: Memverifikasi OTP dan membuat user jika valid.
+     * Langkah 3: Memverifikasi OTP dan mengaktifkan user jika valid.
      */
     public function verifyOtp(Request $request)
     {
         $request->validate(['otp_code' => ['required', 'numeric', 'digits:6']]);
 
-        // Ambil data dari session
-        $registrationData = session('registration_data');
-        if (!$registrationData) {
+        $userId = session('otp_user_id');
+        if (!$userId) {
             return redirect()->route('auth.register')->with('error', 'Sesi Anda telah berakhir. Silakan registrasi ulang.');
         }
 
-        $email = $registrationData['email'];
+        $user = User::find($userId);
+        if (!$user) {
+            return redirect()->route('auth.register')->with('error', 'User tidak ditemukan. Silakan registrasi ulang.');
+        }
+
         $otpCode = $request->input('otp_code');
 
-        // Cari token berdasarkan email dan kode OTP yang dimasukkan
-        $verificationToken = EmailVerificationToken::where('email', $email)
+        $verificationToken = EmailVerificationToken::where('email', $user->email)
             ->where('token', $otpCode)
             ->first();
 
-        // Cek jika token tidak ada atau sudah kedaluwarsa (misal: lebih dari 10 menit)
         if (!$verificationToken || Carbon::parse($verificationToken->created_at)->addMinutes(10)->isPast()) {
             return back()->withErrors(['otp_code' => 'Kode OTP tidak valid atau sudah kedaluwarsa.']);
         }
 
-        // Jika OTP valid, simpan data ke database
         try {
-            $user = DB::transaction(function () use ($registrationData) {
-                $user = User::create([
-                    'name'              => $registrationData['name'],
-                    'email'             => $registrationData['email'],
-                    'password'          => Hash::make($registrationData['password']),
-                    'email_verified_at' => now(), // Langsung set terverifikasi
-                ]);
-
-                $user->assignRole('mahasiswa');
-
-                Mahasiswa::create([
-                    'user_id'  => $user->id,
-                    'nim'      => $registrationData['nim'],
-                    'prodi'    => $registrationData['prodi'],
-                    'kelas'    => $registrationData['kelas'],
-                    'angkatan' => '20' . substr($registrationData['nim'], 0, 2), // Logika angkatan yang lebih aman
-                ]);
-
-                return $user;
+            DB::transaction(function () use ($user, $verificationToken) {
+                $user->email_verified_at = now();
+                $user->save();
+                $verificationToken->delete();
             });
 
-            // Hapus token setelah berhasil digunakan
-            $verificationToken->delete();
+            session()->forget('otp_user_id');
 
-            // Hapus data dari session
-            session()->forget(['registration_data']);
-
-            // Login-kan user secara otomatis
             Auth::login($user);
 
             return redirect($this->redirectByRole($user))->with('success', 'Verifikasi berhasil! Selamat datang.');
         } catch (\Exception $e) {
-            DB::rollBack();
-            // Log error jika perlu: Log::error($e->getMessage());
-            return redirect()->route('auth.register')->with('error', 'Registrasi gagal karena terjadi kesalahan server. Silakan coba lagi.');
+            Log::error('Verifikasi OTP Gagal: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat verifikasi. Silakan coba lagi.');
         }
     }
 
@@ -239,37 +247,38 @@ class AuthController extends Controller
      */
     public function resendOtp(Request $request)
     {
-        $registrationData = session('registration_data');
-        if (!$registrationData) {
+        $userId = session('otp_user_id');
+        if (!$userId) {
             return redirect()->route('auth.register')->with('error', 'Sesi Anda telah berakhir. Silakan registrasi ulang.');
         }
 
-        $email = $registrationData['email'];
-        $name = $registrationData['name'];
-        $token = EmailVerificationToken::where('email', $email)->first();
+        $user = User::find($userId);
+        if (!$user) {
+            return redirect()->route('auth.register')->with('error', 'User tidak ditemukan. Silakan registrasi ulang.');
+        }
 
-        // Tambahkan cooldown 60 detik untuk mencegah spam
+        $token = EmailVerificationToken::where('email', $user->email)->first();
+
         if ($token && Carbon::parse($token->created_at)->addSeconds(60)->isFuture()) {
             $secondsLeft = Carbon::parse($token->created_at)->addSeconds(60)->diffInSeconds(now());
             return back()->with('error', "Harap tunggu {$secondsLeft} detik lagi sebelum meminta kode baru.");
         }
 
-        // Kirim email verifikasi baru
-        $this->sendEmailVerification($email, $name);
-
-        return back()->with('success', 'Kode OTP baru telah berhasil dikirim ke email Anda.');
+        try {
+            $this->sendEmailVerification($user);
+            return back()->with('success', 'Kode OTP baru telah berhasil dikirim ke email Anda.');
+        } catch (\RuntimeException $e) {
+            return back()->with('error', 'Gagal mengirim ulang OTP. Silakan coba beberapa saat lagi.');
+        }
     }
 
     /**
      * Metode Helper: Membuat dan mengirim token verifikasi email.
-     * Diperbaiki untuk menggunakan email, bukan User object.
      */
     private function sendEmailVerification(User $user): void
     {
-        // Generate 6 digit OTP
         $otpCode = random_int(100000, 999999);
 
-        // Simpan/update token dengan masa berlaku 30 menit
         EmailVerificationToken::updateOrCreate(
             ['email' => $user->email],
             [
@@ -279,12 +288,10 @@ class AuthController extends Controller
         );
 
         try {
-            // Kirim email secara synchronous
             Mail::to($user->email)->send(new VerifyEmail($user, $otpCode));
         } catch (\Exception $e) {
-            // Hapus token yang sudah disimpan jika email gagal dikirim
+            Log::error('Gagal mengirim email verifikasi ke ' . $user->email . ': ' . $e->getMessage());
             EmailVerificationToken::where('email', $user->email)->delete();
-
             throw new \RuntimeException('Gagal mengirim email verifikasi: ' . $e->getMessage());
         }
     }

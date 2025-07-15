@@ -24,12 +24,16 @@ class Sidang extends Model
 
     public function jadwalSidang()
     {
-        return $this->hasOne(JadwalSidang::class);
+        return $this->hasMany(JadwalSidang::class);
     }
 
-    public function nilai(): HasMany
+    public function nilaiSidang(): HasMany
     {
         return $this->hasMany(NilaiSidang::class);
+    }
+
+    public function jadwal() {
+        return $this->hasOne(JadwalSidang::class, 'sidang_id');
     }
 
     public function beritaAcaraPasca()
