@@ -25,7 +25,7 @@
                 </div>
             </div>
         @else
-            <p class="text-muted text-center mb-0 py-3">Mahasiswa belum mengunggah file revisi untuk sesi ini.</p>
+            <p class="text-muted text-center mb-0 py-3">Mahasiswa belum mengunggah file untuk sesi ini.</p>
         @endif
     </div>
 </div>
