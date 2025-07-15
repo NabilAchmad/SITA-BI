@@ -73,9 +73,9 @@
                                 <td>{{ strtoupper($mahasiswa->prodi) }} Bahasa Inggris</td>
                                 <td>{{ $ta->judul ?? '-' }}</td>
                                 {{-- ✅ PERBAIKAN: Memanggil ->user langsung dari objek $pembimbing1 (Dosen) --}}
-                                <td>{{ $pembimbing1?->user?->name ?? '-' }}</td>
+                                <td>{{ $pembimbing1?->dosen->user?->name ?? '-' }}</td>
                                 {{-- ✅ PERBAIKAN: Memanggil ->user langsung dari objek $pembimbing2 (Dosen) --}}
-                                <td>{{ $pembimbing2?->user?->name ?? '-' }}</td>
+                                <td>{{ $pembimbing2?->dosen->user?->name ?? '-' }}</td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
                                         data-bs-target="#modalEditPembimbing-{{ $ta->id }}">

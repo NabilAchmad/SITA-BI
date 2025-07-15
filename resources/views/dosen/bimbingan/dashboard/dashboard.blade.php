@@ -151,23 +151,6 @@
                                                     @endif
                                                 </div>
                                             </td>
-<<<<<<< HEAD
-                                            <td class="text-center py-3">
-                                                {{-- ✅ PERBAIKAN: Mencari peran dosen yang sedang login dari relasi --}}
-                                                @php
-                                                    $peranDosenIni = $tugasAkhir->peranDosenTa
-                                                        ->where('dosen_id', auth()->user()->dosen->id)
-                                                        ->first();
-                                                @endphp
-                                                @if ($peranDosenIni)
-                                                    <span
-                                                        class="badge {{ $peranDosenIni->peran === 'pembimbing1' ? 'bg-primary' : 'bg-info' }} rounded-pill px-3 py-2">
-                                                        <i class="bi bi-person-badge me-1"></i>
-                                                        {{ $peranDosenIni->peran === 'pembimbing1' ? 'Pembimbing 1' : 'Pembimbing 2' }}
-                                                    </span>
-                                                @endif
-                                            </td>
-=======
 
                                             {{-- Konten kolom dinamis --}}
                                             @if (request('mode') == 'pantau_semua')
@@ -218,7 +201,6 @@
                                                 </td>
                                             @endif
 
->>>>>>> 3df1fd510611b5e3307655a98a748e9727b836b1
                                             <td class="text-center py-3 pe-4">
                                                 <div class="d-flex justify-content-center gap-1">
                                                     {{-- ✅ PERBAIKAN: Meneruskan objek $tugasAkhir ke route --}}
@@ -266,7 +248,3 @@
         });
     </script>
 @endsection
-<<<<<<< HEAD
-=======
-
->>>>>>> 3df1fd510611b5e3307655a98a748e9727b836b1

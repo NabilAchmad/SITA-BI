@@ -285,7 +285,7 @@ class TugasAkhirService
                 'dosenPembimbing.user',
                 'dokumenTa',
                 'bimbinganTa',
-                'catatanBimbingan.author.user', // <-- PENYESUAIAN DI SINI
+                // 'catatanBimbingan.author.user', // <-- PENYESUAIAN DI SINI
             ])
             ->first();
     }

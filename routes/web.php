@@ -23,6 +23,7 @@ use App\Http\Controllers\Dosen\PenilaianSidangController;
 use App\Http\Controllers\Dosen\TawaranTopikController;
 use App\Http\Controllers\Dosen\JadwalBimbinganController;
 use App\Http\Controllers\Dosen\CatatanBimbinganController;
+use App\Http\Controllers\Dosen\DosenSidangController;
 // Panel Mahasiswa
 use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboardController;
 use App\Http\Controllers\Mahasiswa\MahasiswaProfileController;
@@ -112,6 +113,18 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/dashboard', [DosenProfileController::class, 'index_dosen'])->name('dashboard');
             Route::get('/profile', [DosenProfileController::class, 'profile'])->name('profile');
             Route::put('/profile/update', [DosenProfileController::class, 'update'])->name('profile.update');
+
+            //verifikasi Sidang 
+            Route::prefix('verifikasi-sidang')->name('verifikasi-sidang.')->group(function () {
+            // Halaman utama, menampilkan daftar pendaftaran yang perlu diverifikasi
+            Route::get('/', [DosenSidangController::class, 'index'])->name('index');
+            
+            // Halaman detail untuk melihat berkas dan form keputusan
+            Route::get('/{pendaftaran}', [DosenSidangController::class, 'show'])->name('show');
+            
+            // Aksi untuk menyimpan keputusan (Setuju/Tolak)
+            Route::post('/{pendaftaran}', [DosenSidangController::class, 'prosesVerifikasi'])->name('verifikasi');
+        });
 
             // Sidang approval routes
             Route::get('/sidang/approvals', [\App\Http\Controllers\Dosen\SidangApprovalController::class, 'index'])->name('sidang.approvals.index');

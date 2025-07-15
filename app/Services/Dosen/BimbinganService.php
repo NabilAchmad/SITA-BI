@@ -143,7 +143,7 @@ class BimbinganService
         $this->authorizeDosenIsPembimbing($tugasAkhir);
 
         $pengajuanBimbingan = $tugasAkhir->bimbinganTa()
-            ->where('status_bimbingan', 'disetujui')
+            ->where('status_bimbingan', 'diajukan')
             ->where('dosen_id', $this->dosen->id)
             ->firstOrFail();
 

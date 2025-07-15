@@ -77,7 +77,7 @@ class TugasAkhirController extends Controller
             return redirect()->route('mahasiswa.tugas-akhir.progress')->with('alert', [
                 'type' => 'success',
                 'title' => 'Berhasil!',
-                'message' => 'File revisi telah diunggah dan pengajuan bimbingan terkirim.'
+                'message' => 'File berhasil diunggah dan pengajuan bimbingan terkirim.'
             ]);
         } catch (\Throwable $e) { // Menggunakan \Throwable untuk menangkap semua jenis error
 

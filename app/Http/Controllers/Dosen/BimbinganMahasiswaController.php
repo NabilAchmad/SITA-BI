@@ -9,9 +9,12 @@ use App\Models\TugasAkhir;
 use App\Services\Dosen\BimbinganService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\UnauthorizedException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // <-- DITAMBAHKAN
 
 class BimbinganMahasiswaController extends Controller
 {
+    use AuthorizesRequests; // <-- DITAMBAHKAN
+
     protected BimbinganService $bimbinganService;
 
     public function __construct(BimbinganService $bimbinganService)
@@ -34,6 +37,7 @@ class BimbinganMahasiswaController extends Controller
     public function show(TugasAkhir $tugasAkhir)
     {
         try {
+            // Baris ini sekarang akan berfungsi dengan benar
             $this->authorize('view', $tugasAkhir);
 
             $data = $this->bimbinganService->getDataForBimbinganDetailPage($tugasAkhir);
@@ -53,8 +57,8 @@ class BimbinganMahasiswaController extends Controller
             'catatanList'      => $data['catatanList'],
             'bimbinganCountP1' => $data['bimbinganCountP1'],
             'bimbinganCountP2' => $data['bimbinganCountP2'],
-            'dokumenTerbaru'   => $data['dokumenTerbaru'], // <-- Variabel yang hilang sekarang ditambahkan
-            'riwayatDokumen'   => $data['riwayatDokumen'], // <-- PASTIKAN BARIS INI ADA
+            'dokumenTerbaru'   => $data['dokumenTerbaru'],
+            'riwayatDokumen'   => $data['riwayatDokumen'],
             'pembimbing1'      => $data['pembimbing1'],
             'pembimbing2'      => $data['pembimbing2'],
         ]);
