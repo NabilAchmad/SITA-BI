@@ -66,32 +66,40 @@
 
             {{-- Kolom Kanan: Panel Status & Aksi --}}
             <div class="col-lg-4">
-                {{-- ✅ PERBAIKAN: Mengirim semua variabel baru ke partial _panel_aksi --}}
+                {{-- ✅ PERBAIKAN: Mengirim semua variabel yang dibutuhkan oleh _panel_aksi --}}
                 @include('dosen.bimbingan.partials._panel_aksi', [
+                    // Variabel data utama
                     'tugasAkhir' => $tugasAkhir,
-                    'bimbinganCountP1' => $bimbinganCountP1,
-                    'bimbinganCountP2' => $bimbinganCountP2,
                     'pembimbing1' => $pembimbing1,
                     'pembimbing2' => $pembimbing2,
+                    'pendaftaranTerbaru' => $pendaftaranTerbaru,
+                
+                    // Variabel hasil perhitungan
+                    'bimbinganCountP1' => $bimbinganCountP1,
+                    'bimbinganCountP2' => $bimbinganCountP2,
+                
+                    // Variabel boolean (flags) hasil logika dari service
+                    'isDosenP1' => $isDosenP1,
+                    'isDosenP2' => $isDosenP2,
+                    'apakahSyaratBimbinganTerpenuhi' => $apakahSyaratBimbinganTerpenuhi,
                 ])
             </div>
         </div>
-    </div>
 
-    {{-- Memuat partial untuk modal penjadwalan --}}
-    @include('dosen.bimbingan.partials._modal_jadwal', [
-        'tugasAkhir' => $tugasAkhir,
-        'mahasiswa' => $mahasiswa,
-    ])
-@endsection
+        {{-- Memuat partial untuk modal penjadwalan --}}
+        @include('dosen.bimbingan.partials._modal_jadwal', [
+            'tugasAkhir' => $tugasAkhir,
+            'mahasiswa' => $mahasiswa,
+        ])
+    @endsection
 
-@push('styles')
-    <style>
-        .text-gradient {
-            background: linear-gradient(90deg, #4e73df 0%, #224abe 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-    </style>
-@endpush
+    @push('styles')
+        <style>
+            .text-gradient {
+                background: linear-gradient(90deg, #4e73df 0%, #224abe 100%);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+        </style>
+    @endpush

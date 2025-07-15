@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne; // <-- Tambahkan ini
+use Illuminate\Database\Eloquent\Relations\MorphMany; // <-- Tambahkan ini
 
 class PendaftaranSidang extends Model
 {
@@ -60,5 +61,10 @@ class PendaftaranSidang extends Model
     public function sidang(): HasOne
     {
         return $this->hasOne(Sidang::class, 'pendaftaran_sidang_id');
+    }
+
+    public function files(): MorphMany
+    {
+        return $this->morphMany(FileUpload::class, 'fileable');
     }
 }

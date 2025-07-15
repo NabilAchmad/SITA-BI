@@ -1,207 +1,218 @@
-@php
-    // =================================================================
-    // BLOK LOGIKA YANG SUDAH DIPERBAIKI
-    // =================================================================
-    $dosenLogin = Auth::user()->dosen;
-
-    // Perbaikan 1: Menggunakan '->id' karena $pembimbing1 adalah objek Dosen
-    $isP1 = $pembimbing1 && $dosenLogin && $dosenLogin->id === $pembimbing1->id;
-    $isP2 = $pembimbing2 && $dosenLogin && $dosenLogin->id === $pembimbing2->id;
-
-    // Logika ini sudah benar, menggunakan ->id untuk perbandingan
-    $sesiP1 = $pembimbing1 ? $sesiAktif->where('dosen_id', $pembimbing1->id)->first() : null;
-    $sesiP2 = $pembimbing2 ? $sesiAktif->where('dosen_id', $pembimbing2->id)->first() : null;
-
-    // Syarat jumlah bimbingan
-    $syaratJumlahBimbinganTerpenuhi = $bimbinganCountP1 >= 7 && ($pembimbing2 ? $bimbinganCountP2 >= 7 : true);
-@endphp
-
-{{-- Panel Status & Progress --}}
+{{-- Panel 1: Status & Progress Bimbingan --}}
 <div class="card shadow-sm border-0 rounded-4 mb-4">
-    <div class="card-body">
-        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-speedometer2 me-2 text-info"></i>Status & Progress</h5>
-        <ul class="list-group list-group-flush">
-            @if ($pembimbing1)
-                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                    <span><i class="bi bi-person-check-fill me-2"></i>Pembimbing 1:
-                        {{-- Pemanggilan aman menggunakan optional chaining --}}
-                        {{ Str::limit($pembimbing1?->dosen->user?->name, 50) }}</span>
-                    <span class="badge {{ $bimbinganCountP1 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">
-                        {{ $bimbinganCountP1 }} / 7
-                    </span>
-                </li>
-            @endif
-            @if ($pembimbing2)
-                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                    <span><i class="bi bi-person-check me-2"></i>Pembimbing 2:
-                        {{-- Pemanggilan aman menggunakan optional chaining --}}
-                        {{ Str::limit($pembimbing2?->dosen->user?->name, 50) }}</span>
-                    <span class="badge {{ $bimbinganCountP2 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill">
-                        {{ $bimbinganCountP2 }} / 7
-                    </span>
-                </li>
-            @endif
-        </ul>
-    </div>
-</div>
-
-{{-- Panel Status Bimbingan --}}
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-    <div class="card-header bg-primary bg-opacity-10 py-3 border-0">
-        <h5 class="mb-0 fw-bold text-white">
-            <i class="bi bi-calendar2-week me-2 text-white"></i> Status Bimbingan Tugas Akhir
+    <div class="card-body p-4">
+        <h5 class="fw-bold text-dark mb-4 d-flex align-items-center">
+            <i class="bi bi-speedometer2 me-2 text-info"></i>
+            Status & Progress Bimbingan
         </h5>
-    </div>
 
-    <div class="card-body p-0">
-        <div class="list-group list-group-flush">
-            @foreach ([['pembimbing' => $pembimbing1, 'sesi' => $sesiP1, 'isDosen' => $isP1], ['pembimbing' => $pembimbing2, 'sesi' => $sesiP2, 'isDosen' => $isP2]] as $item)
-                @if ($item['pembimbing'])
-                    <div class="list-group-item py-4 px-4 bg-light border-bottom d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="row g-3">
+            @if ($pembimbing1)
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3 border">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-check-fill me-3 text-primary fs-5"></i>
                             <div>
-                                <span class="badge bg-primary bg-opacity-25 text-white mb-1 text-capitalize">
-                                    Pembimbing {{ $loop->iteration }}:
-                                    {{ $item['pembimbing']->dosen->user->name ?? 'Tidak Diketahui' }}
-                                </span>
-
-                                {{-- Pemanggilan aman menggunakan optional chaining --}}
-                                <h6 class="mb-0 fw-semibold">{{ $item['pembimbing']?->user?->name }}</h6>
+                                <div class="fw-semibold text-dark">Pembimbing 1</div>
+                                <div class="text-muted small">{{ Str::limit($pembimbing1?->dosen?->user?->name, 50) }}
+                                </div>
                             </div>
-                            @if ($item['sesi'])
-                                <span
-                                    class="badge rounded-pill fs-6 text-capitalize
-                                    @if ($item['sesi']->status_bimbingan === 'dijadwalkan') bg-success
-                                    @elseif($item['sesi']->status_bimbingan === 'diajukan') bg-warning text-dark
-                                    @elseif($item['sesi']->status_bimbingan === 'selesai') bg-info @endif">
-                                    {{ str_replace('_', ' ', $item['sesi']->status_bimbingan) }}
-                                </span>
-                            @endif
                         </div>
-
-                        <div class="flex-grow-1">
-                            @if ($item['sesi'] && $item['sesi']->status_bimbingan === 'dijadwalkan')
-                                <div class="alert alert-success d-flex align-items-start gap-3 py-2 px-3 h-100">
-                                    <i class="bi bi-check-circle-fill fs-5 mt-1"></i>
-                                    <div>
-                                        <div class="fw-semibold">Jadwal Telah Dikonfirmasi</div>
-                                        <div class="small">
-                                            {{ optional($item['sesi']->tanggal_bimbingan)->translatedFormat('l, d F Y') }}
-                                            |
-                                            {{ \Carbon\Carbon::parse($item['sesi']->jam_bimbingan)->format('H:i') }}
-                                            WIB
-                                        </div>
-                                    </div>
-                                </div>
-                            @elseif($item['sesi'] && $item['sesi']->status_bimbingan === 'diajukan')
-                                <div class="alert alert-warning d-flex align-items-start gap-3 py-2 px-3 h-100">
-                                    <i class="bi bi-hourglass-split fs-5 mt-1"></i>
-                                    <div>
-                                        <div class="fw-semibold">Menunggu Konfirmasi Jadwal</div>
-                                        <div class="small">Pengajuan bimbingan Anda sedang ditinjau oleh dosen.</div>
-                                    </div>
-                                </div>
-                            @else
-                                <div class="alert alert-secondary d-flex align-items-start gap-3 py-2 px-3 h-100">
-                                    <i class="bi bi-info-circle fs-5 mt-1"></i>
-                                    <div>
-                                        <div class="fw-semibold">Belum Ada Sesi Aktif</div>
-                                        <div class="small">Beri arahan kepada mahasiswa untuk upload file tugas akhir.</div>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-
-                        {{-- Tombol Aksi untuk Dosen Pembimbing --}}
-                        <div class="mt-3" style="min-height: 5px;">
-                            {{-- Perbaikan 1 memastikan $item['isDosen'] bernilai benar --}}
-                            @if ($item['isDosen'])
-                                @if ($item['sesi'] && $item['sesi']->status_bimbingan === 'dijadwalkan')
-                                    <div class="d-flex gap-2">
-                                        <form method="POST"
-                                            action="{{ route('dosen.jadwal.selesai', ['tugasAkhir' => $tugasAkhir, 'bimbingan' => $item['sesi']]) }}">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-primary px-3 rounded-pill">
-                                                <i class="bi bi-check-circle me-1"></i> Tandai Selesai
-                                            </button>
-                                        </form>
-                                        <form method="POST"
-                                            action="{{ route('dosen.jadwal.cancel', ['tugasAkhir' => $tugasAkhir, 'bimbingan' => $item['sesi']]) }}">
-                                            @csrf
-                                            <button type="submit"
-                                                class="btn btn-sm btn-outline-danger px-3 rounded-pill">
-                                                <i class="bi bi-x-circle me-1"></i> Batalkan
-                                            </button>
-                                        </form>
-                                    </div>
-                                @elseif ($item['sesi'] && $item['sesi']->status_bimbingan === 'diajukan')
-                                    {{-- Di dalam @if ($item['sesi'] && $item['sesi']->status_bimbingan === 'diajukan') --}}
-
-                                    <button type="button" class="btn btn-sm btn-success rounded-pill px-3"
-                                        data-bs-toggle="modal" {{-- ✅ PERBAIKAN 1: Targetkan ID modal yang statis --}} data-bs-target="#modalBuatJadwal"
-                                        {{-- ✅ PERBAIKAN 2: Simpan URL unik di data-action --}}
-                                        data-action="{{ route('dosen.jadwal.store', ['tugasAkhir' => $tugasAkhir, 'bimbingan' => $item['sesi']]) }}">
-
-                                        <i class="bi bi-calendar-plus me-1"></i> Atur Jadwal
-                                    </button>
-                                @endif
-                            @endif
+                        <div class="text-end">
+                            <span
+                                class="badge {{ $bimbinganCountP1 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill px-3 py-2 fs-6">
+                                {{ $bimbinganCountP1 }} / 7
+                            </span>
+                            <div class="small text-muted mt-1">
+                                {{ $bimbinganCountP1 >= 7 ? 'Selesai' : 'Dalam Progress' }}
+                            </div>
                         </div>
                     </div>
-                @endif
-            @endforeach
+                </div>
+            @endif
+
+            @if ($pembimbing2)
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3 border">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-check me-3 text-primary fs-5"></i>
+                            <div>
+                                <div class="fw-semibold text-dark">Pembimbing 2</div>
+                                <div class="text-muted small">{{ Str::limit($pembimbing2?->dosen?->user?->name, 50) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span
+                                class="badge {{ $bimbinganCountP2 >= 7 ? 'bg-success' : 'bg-primary' }} rounded-pill px-3 py-2 fs-6">
+                                {{ $bimbinganCountP2 }} / 7
+                            </span>
+                            <div class="small text-muted mt-1">
+                                {{ $bimbinganCountP2 >= 7 ? 'Selesai' : 'Dalam Progress' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </div>
 
+{{-- Panel 2: Status & Aksi Bimbingan Aktif --}}
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+    <div class="card-header bg-primary bg-opacity-10 py-3 border-0">
+        <h5 class="mb-0 fw-bold text-white d-flex align-items-center">
+            <i class="bi bi-calendar2-week me-2 text-white"></i>
+            Status Bimbingan Aktif
+        </h5>
+    </div>
 
-{{-- Panel Verifikasi Pendaftaran Sidang (Menggantikan Panel Persetujuan Lama) --}}
-@if ($syaratJumlahBimbinganTerpenuhi)
+    <div class="card-body p-0">
+        {{-- Loop untuk Pembimbing 1 dan 2 --}}
+        @foreach ([['pembimbing' => $pembimbing1, 'isDosen' => $isDosenP1], ['pembimbing' => $pembimbing2, 'isDosen' => $isDosenP2]] as $item)
+            @if ($item['pembimbing'])
+                @php
+                    // Mengambil sesi aktif untuk pembimbing saat ini dari koleksi
+                    $sesi = $sesiAktif->where('dosen_id', $item['pembimbing']->dosen_id)->first();
+                @endphp
+
+                <div class="border-bottom {{ $loop->last ? 'border-0' : '' }}">
+                    <div class="p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="bi bi-person-badge text-white"></i>
+                            </div>
+                            <h6 class="fw-bold mb-0 text-dark">
+                                {{ $loop->iteration === 1 ? 'Pembimbing 1' : 'Pembimbing 2' }}
+                            </h6>
+                        </div>
+
+                        @if ($sesi)
+                            {{-- Tampilkan status sesi bimbingan --}}
+                            @if ($sesi->status_bimbingan === 'dijadwalkan')
+                                <div class="alert alert-success d-flex align-items-start border-0 rounded-3 mb-3">
+                                    <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-check-circle-fill text-white"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold text-success mb-1">Jadwal Telah Dikonfirmasi</div>
+                                        <div class="text-muted small">
+                                            <i class="bi bi-calendar-event me-1"></i>
+                                            {{ optional($sesi->tanggal_bimbingan)->translatedFormat('l, d M Y') }}
+                                        </div>
+                                        <div class="text-muted small">
+                                            <i class="bi bi-clock me-1"></i>
+                                            {{ \Carbon\Carbon::parse($sesi->jam_bimbingan)->format('H:i') }} WIB
+                                        </div>
+                                    </div>
+                                </div>
+                            @elseif($sesi->status_bimbingan === 'diajukan')
+                                <div class="alert alert-warning d-flex align-items-start border-0 rounded-3 mb-3">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-hourglass-split text-white"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold text-warning mb-1">Menunggu Konfirmasi Jadwal</div>
+                                        <div class="text-muted small">Mahasiswa telah mengajukan sesi bimbingan.</div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Tampilkan tombol aksi HANYA untuk dosen yang bersangkutan --}}
+                            @if ($item['isDosen'])
+                                <div class="d-flex gap-2 flex-wrap">
+                                    @if ($sesi->status_bimbingan === 'diajukan')
+                                        <button type="button" class="btn btn-success btn-sm rounded-pill px-3"
+                                            data-bs-toggle="modal" data-bs-target="#modalBuatJadwal"
+                                            data-action="{{ route('dosen.jadwal.store', ['tugasAkhir' => $tugasAkhir, 'bimbingan' => $sesi]) }}">
+                                            <i class="bi bi-calendar-plus me-1"></i>
+                                            Atur Jadwal
+                                        </button>
+                                    @elseif ($sesi->status_bimbingan === 'dijadwalkan')
+                                        <form method="POST" class="d-inline"
+                                            action="{{ route('dosen.jadwal.selesai', ['tugasAkhir' => $tugasAkhir, 'bimbingan' => $sesi]) }}">
+                                            @csrf
+                                            <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">
+                                                <i class="bi bi-check-circle me-1"></i>
+                                                Tandai Selesai
+                                            </button>
+                                        </form>
+                                        <form method="POST" class="d-inline"
+                                            action="{{ route('dosen.jadwal.cancel', ['tugasAkhir' => $tugasAkhir, 'bimbingan' => $sesi]) }}">
+                                            @csrf
+                                            <button type="submit"
+                                                class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                                <i class="bi bi-x-circle me-1"></i>
+                                                Batalkan
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            @endif
+                        @else
+                            {{-- Tampilan jika tidak ada sesi aktif --}}
+                            <div class="alert alert-secondary text-center border-0 rounded-3 mb-0">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Belum ada sesi bimbingan yang aktif.
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
+        @endforeach
+    </div>
+</div>
+
+{{-- Panel 3: Verifikasi Pendaftaran Sidang --}}
+@if ($apakahSyaratBimbinganTerpenuhi)
     <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body">
-            <h5 class="fw-bold text-dark mb-3">
+        <div class="card-body p-4">
+            <h5 class="fw-bold text-dark mb-4 d-flex align-items-center">
                 <i class="bi bi-file-earmark-check-fill me-2 text-primary"></i>
                 Verifikasi Pendaftaran Sidang
             </h5>
-            <div class="d-grid gap-2">
 
-                {{-- FIX: Menggunakan @isset untuk memeriksa apakah variabel $pendaftaranTerbaru telah dikirim dari controller --}}
-                @if (isset($pendaftaranTerbaru) && $pendaftaranTerbaru)
-                    {{-- LOGIKA 1: Mahasiswa SUDAH mendaftar sidang. --}}
-                    
+            <div class="d-grid gap-2">
+                @if (isset($pendaftaranTerbaru))
                     @php
-                        // Menentukan status untuk dosen yang sedang login
-                        $statusDosenIni = $isP1 ? $pendaftaranTerbaru->status_pembimbing_1 : $pendaftaranTerbaru->status_pembimbing_2;
+                        $statusDosenIni = $isDosenP1
+                            ? $pendaftaranTerbaru->status_pembimbing_1
+                            : ($isDosenP2
+                                ? $pendaftaranTerbaru->status_pembimbing_2
+                                : null);
                     @endphp
 
                     @if ($statusDosenIni === 'menunggu')
-                        {{-- Dosen ini belum memberikan keputusan. Tampilkan tombol verifikasi. --}}
-                        <a href="{{ route('dosen.verifikasi-sidang.show', $pendaftaranTerbaru->id) }}" class="btn btn-primary w-100">
-                            <i class="bi bi-search me-1"></i> Lihat Berkas & Verifikasi
+                        <a href="{{ route('dosen.verifikasi-sidang.show', $pendaftaranTerbaru->id) }}"
+                            class="btn btn-primary btn-lg rounded-pill">
+                            <i class="bi bi-search me-2"></i>
+                            Lihat Berkas & Verifikasi
                         </a>
-                        <div class="form-text text-center">Mahasiswa telah mengunggah berkas pendaftaran sidang.</div>
-
                     @elseif ($statusDosenIni === 'disetujui')
-                        {{-- Dosen ini SUDAH menyetujui. --}}
-                        <div class="alert alert-success text-center py-2">
-                            <i class="bi bi-check-circle-fill me-1"></i> Anda telah menyetujui pendaftaran ini.
+                        <div class="alert alert-success text-center border-0 rounded-3 py-3 mb-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3 mx-auto mb-2"
+                                style="width: fit-content;">
+                                <i class="bi bi-check-circle-fill text-white fs-4"></i>
+                            </div>
+                            <div class="fw-semibold">Anda telah menyetujui pendaftaran sidang</div>
                         </div>
-
                     @elseif ($statusDosenIni === 'ditolak')
-                         {{-- Dosen ini SUDAH menolak. --}}
-                        <div class="alert alert-danger text-center py-2">
-                            <i class="bi bi-x-circle-fill me-1"></i> Anda telah menolak pendaftaran ini.
+                        <div class="alert alert-danger text-center border-0 rounded-3 py-3 mb-0">
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-3 mx-auto mb-2"
+                                style="width: fit-content;">
+                                <i class="bi bi-x-circle-fill text-white fs-4"></i>
+                            </div>
+                            <div class="fw-semibold">Anda telah menolak pendaftaran sidang</div>
                         </div>
                     @endif
-
                 @else
-                    {{-- LOGIKA 2: Mahasiswa BELUM mendaftar sidang, meskipun syarat sudah terpenuhi. --}}
-                    <div class="alert alert-info text-center py-2">
-                        <i class="bi bi-hourglass-split me-1"></i> Menunggu mahasiswa mendaftar sidang.
+                    <div class="alert alert-info text-center border-0 rounded-3 py-3 mb-0">
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3 mx-auto mb-2" style="width: fit-content;">
+                            <i class="bi bi-hourglass-split text-info fs-4"></i>
+                        </div>
+                        <div class="fw-semibold">Menunggu mahasiswa mendaftar sidang</div>
                     </div>
-                    <div class="form-text text-center">Mahasiswa sudah memenuhi syarat bimbingan dan dapat mendaftar sidang kapan saja.</div>
                 @endif
-
             </div>
         </div>
     </div>

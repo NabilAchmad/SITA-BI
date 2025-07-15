@@ -76,27 +76,16 @@ class Mahasiswa extends Model
         return $this->hasMany(Sidang::class, 'tugas_akhir_id', 'id');
     }
 
-    public function jadwalSidangSempro()
+    public function jadwalSidangAkhir(): HasManyThrough
     {
+        // Pastikan foreign & local keys sudah sesuai dengan struktur Anda
         return $this->hasManyThrough(
             JadwalSidang::class,
-            Sidang::class,
-            'tugas_akhir_id', // Foreign key on Sidang table...
-            'sidang_id', // Foreign key on JadwalSidang table...
-            'id', // Local key on Mahasiswa table...
-            'id'  // Local key on Sidang table...
-        )->where('sidang.jenis_sidang', 'proposal');
-    }
-
-    public function jadwalSidangAkhir()
-    {
-        return $this->hasManyThrough(
-            JadwalSidang::class,
-            Sidang::class,
-            'tugas_akhir_id',
-            'sidang_id',
-            'id',
-            'id'
-        )->where('sidang.jenis_sidang', 'akhir');
+            TugasAkhir::class,
+            'mahasiswa_id',   // Foreign key di tabel TugasAkhir
+            'tugas_akhir_id', // Foreign key di tabel JadwalSidang (melalui Sidang)
+            'id',             // Local key di tabel Mahasiswa
+            'id'              // Local key di tabel TugasAkhir
+        );
     }
 }

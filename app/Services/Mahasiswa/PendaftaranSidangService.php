@@ -20,53 +20,52 @@ class PendaftaranSidangService
      */
     public function handleRegistration(PendaftaranSidangRequest $request): PendaftaranSidang
     {
-        // Ambil mahasiswa yang sedang login
+        // 1. Ambil data mahasiswa dan tugas akhir yang aktif.
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
 
-        // ✅ PERBAIKAN: Mengambil Tugas Akhir yang aktif dan berelasi dengan mahasiswa.
-        // Ini lebih aman karena secara eksplisit mencari TA yang relevan dan aktif.
-        $tugasAkhir = $mahasiswa->tugasAkhir()
-            ->where('status', 'disetujui') // Asumsi ada kolom 'is_active' untuk menandai TA yang berjalan
-            ->first();
+        $tugasAkhir = $mahasiswa->tugasAkhir()->where('status', 'disetujui')->first();
 
-        // Jika tidak ada tugas akhir yang aktif, lempar exception.
         if (!$tugasAkhir) {
-            throw new \Exception("Anda tidak memiliki data tugas akhir yang sedang aktif.");
+            throw new \Exception("Anda tidak memiliki data tugas akhir yang disetujui dan aktif untuk didaftarkan sidang.");
         }
 
-        // Memulai transaksi untuk memastikan semua data tersimpan atau tidak sama sekali
+        // 2. Gunakan transaksi database untuk menjaga integritas data.
         return DB::transaction(function () use ($request, $tugasAkhir, $mahasiswa) {
 
-            // Definisikan berkas dan path penyimpanannya
-            $filesToStore = [
-                'file_naskah_ta'     => $request->file('file_naskah_ta'),
-                'file_toeic'         => $request->file('file_toeic'),
-                'file_rapor'         => $request->file('file_rapor'),
-                'file_ijazah_slta'   => $request->file('file_ijazah_slta'),
-                'file_bebas_jurusan' => $request->file('file_bebas_jurusan'),
-            ];
-
-            $storedPaths = [];
-            foreach ($filesToStore as $key => $file) {
-                // Simpan setiap file dan dapatkan path-nya
-                $path = $file->store("pendaftaran_sidang/{$tugasAkhir->id}", 'public');
-                $storedPaths[$key] = $path;
-            }
-
-            // Buat record baru di tabel pendaftaran_sidang
+            // 3. Buat record pendaftaran sidang terlebih dahulu (tanpa file).
             $pendaftaran = PendaftaranSidang::create([
                 'tugas_akhir_id'        => $tugasAkhir->id,
                 'status_verifikasi'     => 'menunggu_verifikasi',
                 'status_pembimbing_1'   => 'menunggu',
                 'status_pembimbing_2'   => 'menunggu',
-                'file_naskah_ta'        => $storedPaths['file_naskah_ta'],
-                'file_rapor'            => $storedPaths['file_rapor'],
-                'file_toeic'            => $storedPaths['file_toeic'],
-                'file_ijazah_slta'      => $storedPaths['file_ijazah_slta'],
-                'file_bebas_jurusan'    => $storedPaths['file_bebas_jurusan'],
             ]);
 
-            Log::info("Pendaftaran sidang berhasil dibuat untuk mahasiswa ID: {$mahasiswa->id}, Pendaftaran ID: {$pendaftaran->id}");
+            // 4. Definisikan file-file yang akan diunggah.
+            $filesToUpload = [
+                'naskah_ta'     => $request->file('file_naskah_ta'),
+                'toeic'         => $request->file('file_toeic'),
+                'rapor'         => $request->file('file_rapor'),
+                'ijazah_slta'   => $request->file('file_ijazah_slta'),
+                'bebas_jurusan' => $request->file('file_bebas_jurusan'),
+            ];
+
+            // 5. Loop, simpan setiap file, dan buat record di tabel 'file_uploads'.
+            foreach ($filesToUpload as $type => $file) {
+                if ($file) {
+                    $originalName = $file->getClientOriginalName();
+                    $filePath = $file->store("pendaftaran_sidang/{$pendaftaran->id}", 'public');
+
+                    // Buat record FileUpload yang terhubung ke $pendaftaran
+                    // menggunakan relasi polimorfik 'files()'.
+                    $pendaftaran->files()->create([
+                        'file_path'     => $filePath,
+                        'original_name' => $originalName,
+                        'file_type'     => $type, // Menyimpan tipe file, mis: 'naskah_ta'
+                    ]);
+                }
+            }
+
+            Log::info("Pendaftaran sidang #{$pendaftaran->id} berhasil dibuat untuk mahasiswa #{$mahasiswa->id}.");
 
             return $pendaftaran;
         });

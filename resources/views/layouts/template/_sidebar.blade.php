@@ -110,6 +110,11 @@
                             <p>Tawaran Topik</p>
                         </a>
                     </li>
+                    <li class="nav-item {{ request()->is('dosen/penguji*') ? 'active' : '' }}">
+                        <a href="{{ route('dosen.penguji.index') }}"><i class="fas fa-user-tie"></i>
+                            <p>Penguji Page</p>
+                        </a>
+                    </li>
                 @endif
 
 

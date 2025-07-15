@@ -5,7 +5,7 @@
         {{-- ================================================================= --}}
         {{-- CASE 1: MAHASISWA MENUNGGU DIJADWALKAN (STATUS TUGAS AKHIR: DRAFT) --}}
         {{-- ================================================================= --}}
-        @case('menunggu')
+        @case('menunggu_penjadwalan')
             <tr>
                 <td class="text-center">{{ $loop->iteration + $collection->firstItem() - 1 }}</td>
                 <td>{{ $item->user->name ?? '-' }}</td>
@@ -22,14 +22,16 @@
                     @endif
                 </td>
                 <td>{{ $item->tugasAkhir->judul ?? '-' }}</td>
-                <td class="text-center"><span class="badge bg-secondary">Draft</span></td>
                 <td class="text-center">
-                        <button type="button" class="btn btn-primary btn-sm btn-jadwalkan"
-                            data-tugas-akhir-id="{{ $item->tugasAkhir->id }}" data-nama="{{ $item->user->name ?? '-' }}"
-                            data-nim="{{ $item->nim ?? '-' }}" data-judul="{{ $item->tugasAkhir->judul ?? '-' }}"
-                            data-url-penguji="{{ route('jurusan.penjadwalan-sidang.simpan-penguji', ['sidang' => $item->tugasAkhir->id]) }}">
-                            Jadwalkan
-                        </button>
+                    {!! $item->tugasAkhir?->sidangTerakhir?->status_hasil_formatted ?? '<span class="badge bg-secondary">-</span>' !!}
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-primary btn-sm btn-jadwalkan"
+                        data-tugas-akhir-id="{{ $item->tugasAkhir->id }}" data-nama="{{ $item->user->name ?? '-' }}"
+                        data-nim="{{ $item->nim ?? '-' }}" data-judul="{{ $item->tugasAkhir->judul ?? '-' }}"
+                        data-url-penguji="{{ route('jurusan.penjadwalan-sidang.simpan-penguji', ['sidang' => $item->tugasAkhir->id]) }}">
+                        Jadwalkan
+                    </button>
                 </td>
             </tr>
         @break
@@ -45,21 +47,14 @@
             <tr>
                 <td class="text-center">{{ $loop->iteration + $collection->firstItem() - 1 }}</td>
                 <td>{{ $mahasiswa->user->name ?? '-' }}</td>
-                <td class="text-center">{{ $mahasiswa->nim ?? '-' }}</td>
-                <td class="text-center">
-                    {{ $mahasiswa->prodi
-                        ? (strtolower($mahasiswa->prodi) == 'd4'
-                            ? 'D4 Bahasa Inggris'
-                            : 'D' . substr($mahasiswa->prodi, -1))
-                        : '-' }}
-                </td>
                 <td>{{ $item->sidang->tugasAkhir->judul ?? '-' }}</td>
                 <td class="text-center">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d M Y') }}</td>
                 <td class="text-center">{{ \Carbon\Carbon::parse($item->waktu_mulai)->format('H:i') }} -
                     {{ \Carbon\Carbon::parse($item->waktu_selesai)->format('H:i') }}</td>
                 <td>{{ $item->ruangan->nama_ruangan ?? '-' }}</td>
                 <td class="text-center">
-                    <a href="{{ route('jurusan.penjadwalan-sidang.show', ['sidang' => $item->sidang_id]) }}" class="btn btn-info btn-sm">
+                    <a href="{{ route('jurusan.penjadwalan-sidang.show', ['sidang' => $item->sidang_id]) }}"
+                        class="btn btn-info btn-sm">
                         Detail
                     </a>
                 </td>
@@ -77,7 +72,9 @@
                 <td class="text-center">{{ $item->prodi ? 'D' . substr($item->prodi, -1) : '-' }}</td>
                 <td>{{ $item->tugasAkhir->judul ?? '-' }}</td>
                 <td class="text-center">
-                    <span class="badge bg-danger">Tidak Lulus</span>
+                <td class="text-center">
+                    {!! $item->tugasAkhir?->sidangTerakhir?->status_hasil_formatted ?? '<span class="badge bg-secondary">-</span>' !!}
+                </td>
                 </td>
                 <td class="text-center">
                     {{-- Tombol ini bisa memicu alur pendaftaran ulang --}}
@@ -89,7 +86,7 @@
         {{-- ================================================================= --}}
         {{-- CASE 4: MAHASISWA SUDAH LULUS AKHIR --}}
         {{-- ================================================================= --}}
-        @case('lulus-sempro')
+        @case('lulus')
             @php
                 $sidangTerakhir = $item->tugasAkhir->sidangTerakhir ?? null;
             @endphp
@@ -103,11 +100,26 @@
                     {{ $sidangTerakhir ? \Carbon\Carbon::parse($sidangTerakhir->jadwalSidang->tanggal)->translatedFormat('d M Y') : '-' }}
                 </td>
                 <td class="text-center">
-                    @if ($sidangTerakhir)
-                        <span class="badge bg-success">{{ Str::title(str_replace('_', ' ', $sidangTerakhir->status)) }}</span>
-                    @else
-                        -
-                    @endif
+                    {!! $item->tugasAkhir?->sidangTerakhir?->status_hasil_formatted ?? '<span class="badge bg-secondary">-</span>' !!}
+                </td>
+            </tr>
+        @break
+
+        @case('lulus-revisi')
+            @php
+                $sidangTerakhir = $item->tugasAkhir->sidangTerakhir ?? null;
+            @endphp
+            <tr>
+                <td class="text-center">{{ $loop->iteration + $collection->firstItem() - 1 }}</td>
+                <td>{{ $item->user->name ?? '-' }}</td>
+                <td class="text-center">{{ $item->nim ?? '-' }}</td>
+                <td class="text-center">{{ $item->prodi ? 'D' . substr($item->prodi, -1) : '-' }}</td>
+                <td>{{ $item->tugasAkhir->judul ?? '-' }}</td>
+                <td class="text-center">
+                    {{ $sidangTerakhir ? \Carbon\Carbon::parse($sidangTerakhir->jadwalSidang->tanggal)->translatedFormat('d M Y') : '-' }}
+                </td>
+                <td class="text-center">
+                    {!! $item->tugasAkhir?->sidangTerakhir?->status_hasil_formatted ?? '<span class="badge bg-secondary">-</span>' !!}
                 </td>
             </tr>
         @break

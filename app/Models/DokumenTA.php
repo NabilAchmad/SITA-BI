@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class DokumenTa extends Model
 {
@@ -30,7 +31,6 @@ class DokumenTa extends Model
         'divalidasi_oleh_p1', // <-- Diperbarui dari divalidasi_oleh
         'divalidasi_oleh_p2', // <-- Kolom baru untuk Pembimbing 2
         'file_path',
-        'nama_file_asli',
         'version',
     ];
 
@@ -60,5 +60,10 @@ class DokumenTa extends Model
     {
         // Ganti Dosen::class dengan User::class jika Anda menggunakan model User untuk dosen.
         return $this->belongsTo(Dosen::class, 'divalidasi_oleh_p2');
+    }
+
+    public function files(): MorphMany
+    {
+        return $this->morphMany(FileUpload::class, 'fileable');
     }
 }

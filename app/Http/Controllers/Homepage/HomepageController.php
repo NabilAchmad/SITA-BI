@@ -18,9 +18,6 @@ class HomepageController extends Controller
 
         // Fetch jadwal sidang akhir scheduled by Admin
         $jadwalSidangAkhir = JadwalSidang::with('sidang', 'ruangan')
-            ->whereHas('sidang', function ($query) {
-                $query->where('jenis_sidang', 'akhir');
-            })
             ->orderBy('tanggal')
             ->orderBy('waktu_mulai')
             ->get();

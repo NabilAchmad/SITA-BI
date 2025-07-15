@@ -22,22 +22,43 @@ class DosenSidangController extends Controller
      */
     public function index()
     {
-        $dosenId = Auth::user()->dosen->id;
+        // Dapatkan ID dosen yang sedang login. Gunakan optional chaining (?) untuk keamanan.
+        $dosenId = Auth::user()?->dosen?->id;
 
-        $pendaftaranList = PendaftaranSidang::where(function ($query) use ($dosenId) {
-            $query->whereHas('tugasAkhir', function ($q) use ($dosenId) {
-                $q->where('pembimbing_1_id', $dosenId);
-            })->where('status_pembimbing_1', 'menunggu');
-        })->orWhere(function ($query) use ($dosenId) {
-            $query->whereHas('tugasAkhir', function ($q) use ($dosenId) {
-                $q->where('pembimbing_2_id', $dosenId);
-            })->where('status_pembimbing_2', 'menunggu');
-        })
-        ->with('tugasAkhir.mahasiswa.user') // Eager loading untuk efisiensi
-        ->latest()
-        ->get();
+        // Jika user bukan dosen atau tidak punya relasi, kembalikan daftar kosong untuk mencegah error.
+        if (!$dosenId) {
+            return view('dosen.sidang.approvals.index', ['pendaftaranList' => []]);
+        }
 
-        return view('dosen.sidang.index', compact('pendaftaranList'));
+        // --- QUERY BARU YANG SUDAH DIPERBAIKI ---
+        // Logika:
+        // Ambil pendaftaran sidang DI MANA:
+        // (status pembimbing 1 adalah 'menunggu' DAN dosen yang login adalah 'pembimbing1' untuk TA tersebut)
+        // ATAU
+        // (status pembimbing 2 adalah 'menunggu' DAN dosen yang login adalah 'pembimbing2' untuk TA tersebut)
+        $pendaftaranList = PendaftaranSidang::query()
+            ->where(function ($query) use ($dosenId) {
+                // Kondisi untuk Pembimbing 1
+                $query->where('status_pembimbing_1', 'menunggu')
+                    ->whereHas('tugasAkhir.peranDosenTa', function ($subQuery) use ($dosenId) {
+                        $subQuery->where('dosen_id', $dosenId)
+                            ->where('peran', 'pembimbing1');
+                    });
+            })
+            ->orWhere(function ($query) use ($dosenId) {
+                // Kondisi untuk Pembimbing 2
+                $query->where('status_pembimbing_2', 'menunggu')
+                    ->whereHas('tugasAkhir.peranDosenTa', function ($subQuery) use ($dosenId) {
+                        $subQuery->where('dosen_id', $dosenId)
+                            ->where('peran', 'pembimbing2');
+                    });
+            })
+            ->with('tugasAkhir.mahasiswa.user') // Eager load untuk performa
+            ->latest() // Urutkan dari yang paling baru
+            ->get();
+
+        // Kirim data yang sudah benar ke view. Nama view diperbarui sesuai permintaan.
+        return view('dosen.sidang.approvals.index', compact('pendaftaranList'));
     }
 
     /**
@@ -46,33 +67,7 @@ class DosenSidangController extends Controller
     public function show(PendaftaranSidang $pendaftaran)
     {
         // Otorisasi bisa ditambahkan di sini jika perlu
-        $pendaftaran->load('tugasAkhir.mahasiswa.user');
-        return view('dosen.sidang.show', compact('pendaftaran'));
-    }
-
-    /**
-     * Memproses form keputusan (Setuju/Tolak) dari dosen.
-     */
-    public function prosesVerifikasi(Request $request, PendaftaranSidang $pendaftaran)
-    {
-        $request->validate([
-            'status' => 'required|in:disetujui,ditolak',
-            'catatan' => 'nullable|string|max:5000',
-        ]);
-
-        try {
-            $dosen = Auth::user()->dosen;
-            $this->sidangService->prosesKeputusanDosen(
-                $pendaftaran,
-                $dosen,
-                $request->input('status'),
-                $request->input('catatan')
-            );
-            
-            return redirect()->route('dosen.sidang.index')->with('success', 'Keputusan verifikasi berhasil disimpan.');
-
-        } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-        }
+        $pendaftaran->load('tugasAkhir.mahasiswa.user', 'files');
+        return view('dosen.sidang.approvals.index', compact('pendaftaran'));
     }
 }

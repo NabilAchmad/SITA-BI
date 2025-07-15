@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\PendaftaranSidang;
 
 class BimbinganService
 {
@@ -122,71 +123,63 @@ class BimbinganService
     {
         $loggedInDosenId = $this->dosen?->id;
 
+        // 1. Eager load semua relasi yang dibutuhkan untuk efisiensi.
         $tugasAkhir->load([
-            'dosenPembimbing.user',
+            'peranDosenTa.dosen.user',
             'mahasiswa.user',
             'bimbinganTa',
             'dokumenTa'
         ]);
 
-        // Ambil bimbinganTa_id milik dosen ini
-        $bimbinganTa = $tugasAkhir->bimbinganTa
-            ->firstWhere('dosen_id', $loggedInDosenId);
-        $bimbinganTaId = $bimbinganTa?->id;
+        // 2. Siapkan variabel dasar dari koleksi yang sudah di-load.
+        $allBimbingan = $tugasAkhir->bimbinganTa;
+        $allDokumen = $tugasAkhir->dokumenTa;
+        $pembimbings = $tugasAkhir->peranDosenTa;
 
-        $sesiAktif = $tugasAkhir->bimbinganTa
-            ->whereIn('status_bimbingan', ['diajukan', 'disetujui', 'dijadwalkan']);
+        $pembimbing1 = $pembimbings->firstWhere('peran', 'pembimbing1');
+        $pembimbing2 = $pembimbings->firstWhere('peran', 'pembimbing2');
 
-        $allCatatan = CatatanBimbingan::whereIn('bimbingan_ta_id', $tugasAkhir->bimbinganTa->pluck('id'))
-            ->with('author.user')
-            ->orderBy('created_at', 'asc')
-            ->get();
+        // 3. Lakukan semua logika dan perhitungan di sini.
+        $bimbinganCountP1 = $pembimbing1 ? $allBimbingan->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
+        $bimbinganCountP2 = $pembimbing2 ? $allBimbingan->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count() : 0;
 
-        // ✅ Filter: mahasiswa → hanya jika bimbingan_ta_id cocok, dosen → hanya dirinya
-        $catatanList = $allCatatan->filter(function ($catatan) use ($loggedInDosenId, $bimbinganTaId) {
-            if ($catatan->author_type === 'App\Models\Mahasiswa') {
-                return $catatan->bimbingan_ta_id == $bimbinganTaId;
-            }
+        $isDosenP1 = $pembimbing1 && $loggedInDosenId === $pembimbing1->dosen_id;
+        $isDosenP2 = $pembimbing2 && $loggedInDosenId === $pembimbing2->dosen_id;
 
-            if (is_null($loggedInDosenId)) return false;
+        $apakahSyaratBimbinganTerpenuhi = $bimbinganCountP1 >= 7 && ($pembimbing2 ? $bimbinganCountP2 >= 7 : true);
 
-            if ($catatan->author_type === 'App\Models\Dosen' && $catatan->author_id === $loggedInDosenId) {
-                return true;
-            }
+        // Ambil data pendaftaran sidang dan data untuk timeline/log.
+        $pendaftaranTerbaru = PendaftaranSidang::where('tugas_akhir_id', $tugasAkhir->id)->latest()->first();
+        $dokumenTerbaru = $allDokumen->last();
 
-            return false;
-        })->values();
+        $bimbinganIds = $allBimbingan->pluck('id');
+        $catatanList = $bimbinganIds->isNotEmpty()
+            ? CatatanBimbingan::whereIn('bimbingan_ta_id', $bimbinganIds)->with('author.user')->get()
+            : collect();
 
-        $riwayatDokumen = $tugasAkhir->dokumenTa->sortBy('created_at');
-        $dokumenTerbaru = $riwayatDokumen->last();
+        $timelineItems = collect($catatanList)->concat($allDokumen)->sortBy('created_at')->values();
 
-        $timelineItems = collect($catatanList)
-            ->concat($riwayatDokumen)
-            ->sortBy('created_at')
-            ->values();
-
-        $pembimbing1 = $tugasAkhir->pembimbingSatu;
-        $pembimbing2 = $tugasAkhir->pembimbingDua;
-
-        $bimbinganCountP1 = $pembimbing1
-            ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing1->dosen_id)->where('status_bimbingan', 'selesai')->count()
-            : 0;
-
-        $bimbinganCountP2 = $pembimbing2
-            ? $tugasAkhir->bimbinganTa()->where('dosen_id', $pembimbing2->dosen_id)->where('status_bimbingan', 'selesai')->count()
-            : 0;
-
+        // 4. Kembalikan semua variabel yang dibutuhkan oleh SEMUA partial dalam satu array.
         return [
-            'tugasAkhir'       => $tugasAkhir,
-            'sesiAktif'        => $sesiAktif,
-            'catatanList'      => $catatanList,
-            'riwayatDokumen'   => $riwayatDokumen,
-            'dokumenTerbaru'   => $dokumenTerbaru,
-            'pembimbing1'      => $pembimbing1,
-            'pembimbing2'      => $pembimbing2,
+            // Data utama
+            'tugasAkhir' => $tugasAkhir,
+            'mahasiswa' => $tugasAkhir->mahasiswa,
+
+            // Data untuk _panel_aksi
+            'pembimbing1' => $pembimbing1,
+            'pembimbing2' => $pembimbing2,
             'bimbinganCountP1' => $bimbinganCountP1,
             'bimbinganCountP2' => $bimbinganCountP2,
-            'timelineItems'    => $timelineItems,
+            'pendaftaranTerbaru' => $pendaftaranTerbaru,
+            'isDosenP1' => $isDosenP1,
+            'isDosenP2' => $isDosenP2,
+            'apakahSyaratBimbinganTerpenuhi' => $apakahSyaratBimbinganTerpenuhi,
+
+            // Data untuk _log_bimbingan dan modal riwayat
+            'dokumenTerbaru' => $dokumenTerbaru,
+            'timelineItems' => $timelineItems,
+            'catatanList' => $catatanList, // Jika masih dibutuhkan secara terpisah
+            'sesiAktif' => $allBimbingan->whereIn('status_bimbingan', ['disetujui', 'dijadwalkan', 'diajukan']),
         ];
     }
 

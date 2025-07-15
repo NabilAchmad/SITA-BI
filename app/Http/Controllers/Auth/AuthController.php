@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -264,13 +264,28 @@ class AuthController extends Controller
      * Metode Helper: Membuat dan mengirim token verifikasi email.
      * Diperbaiki untuk menggunakan email, bukan User object.
      */
-    private function sendEmailVerification(User $user)
+    private function sendEmailVerification(User $user): void
     {
+        // Generate 6 digit OTP
         $otpCode = random_int(100000, 999999);
+
+        // Simpan/update token dengan masa berlaku 30 menit
         EmailVerificationToken::updateOrCreate(
-            ['user_id' => $user->id],
-            ['token' => $otpCode, 'created_at' => now()]
+            ['email' => $user->email],
+            [
+                'token' => $otpCode,
+                'created_at' => now()
+            ]
         );
-        Mail::to($user->email)->send(new VerifyEmail($user, $otpCode));
+
+        try {
+            // Kirim email secara synchronous
+            Mail::to($user->email)->send(new VerifyEmail($user, $otpCode));
+        } catch (\Exception $e) {
+            // Hapus token yang sudah disimpan jika email gagal dikirim
+            EmailVerificationToken::where('email', $user->email)->delete();
+
+            throw new \RuntimeException('Gagal mengirim email verifikasi: ' . $e->getMessage());
+        }
     }
 }

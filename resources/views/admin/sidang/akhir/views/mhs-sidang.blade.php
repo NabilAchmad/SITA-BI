@@ -12,7 +12,8 @@
             </div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('jurusan.penjadwalan-sidang.index') }}">Dashboard Sidang</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('jurusan.penjadwalan-sidang.index') }}">Dashboard Sidang</a>
+                    </li>
                     <li class="breadcrumb-item active" aria-current="page">Kelola Jadwal Akhir</li>
                 </ol>
             </nav>
@@ -48,6 +49,12 @@
                             type="button" role="tab" aria-controls="lulus-pane" aria-selected="false">Lulus <span
                                 class="badge bg-success rounded-pill">{{ $mahasiswaLulus?->total() ?? 0 }}</span></button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="lulus-revisi-tab" data-bs-toggle="tab"
+                            data-bs-target="#lulus-revisi-pane" type="button" role="tab"
+                            aria-controls="lulus-revisi-pane" aria-selected="false">Lulus Revisi<span
+                                class="badge bg-success rounded-pill">{{ $mahasiswaLulus?->total() ?? 0 }}</span></button>
+                    </li>
                 </ul>
 
                 @php
@@ -59,13 +66,16 @@
                 {{-- Konten Tabs --}}
                 <div class="tab-content" id="jadwalTabContent">
                     <x-admin.sidang.tab-pane id="menunggu-pane" labelledby="menunggu-tab" :isActive="true"
-                        :columns="$headersMahasiswa" :tableData="$mahasiswaMenunggu" partial="admin.sidang.akhir.partials._table-rows" :type="'menunggu'" />
+                        :columns="$headersMahasiswa" :tableData="$mahasiswaMenunggu" partial="admin.sidang.akhir.partials._table-rows"
+                        :type="'menunggu_penjadwalan'" />
                     <x-admin.sidang.tab-pane id="dijadwalkan-pane" labelledby="dijadwalkan-tab" :columns="$headersJadwal"
                         :tableData="$jadwalMahasiswa" partial="admin.sidang.akhir.partials._table-rows" :type="'dijadwalkan'" />
                     <x-admin.sidang.tab-pane id="tidak-lulus-pane" labelledby="tidak-lulus-tab" :columns="$headersMahasiswa"
                         :tableData="$mahasiswaTidakLulus" partial="admin.sidang.akhir.partials._table-rows" :type="'tidak-lulus'" />
                     <x-admin.sidang.tab-pane id="lulus-pane" labelledby="lulus-tab" :columns="$headersMahasiswa" :tableData="$mahasiswaLulus"
-                        partial="admin.sidang.akhir.partials._table-rows" :type="'lulus-sempro'" />
+                        partial="admin.sidang.akhir.partials._table-rows" :type="'lulus'" />
+                    <x-admin.sidang.tab-pane id="lulus-revisi-pane" labelledby="lulus-revisi-tab" :columns="$headersMahasiswa"
+                        :tableData="$mahasiswaLulus" partial="admin.sidang.akhir.partials._table-rows" :type="'lulus-revisi'" />
                 </div>
             </div>
         </div>

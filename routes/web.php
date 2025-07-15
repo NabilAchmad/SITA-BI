@@ -24,6 +24,8 @@ use App\Http\Controllers\Dosen\TawaranTopikController;
 use App\Http\Controllers\Dosen\JadwalBimbinganController;
 use App\Http\Controllers\Dosen\CatatanBimbinganController;
 use App\Http\Controllers\Dosen\DosenSidangController;
+use \App\Http\Controllers\Dosen\SidangApprovalController;
+use App\Http\Controllers\Dosen\PengujiController;
 
 // Panel Mahasiswa
 use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboardController;
@@ -110,26 +112,23 @@ Route::middleware(['auth'])->group(function () {
     //------------------------------------------------------------------
     // PANEL DOSEN (Umum)
     //------------------------------------------------------------------
-        Route::prefix('dosen')->middleware('role:dosen|kajur|kaprodi-d3|kaprodi-d4')->name('dosen.')->group(function () {
-            Route::get('/dashboard', [DosenProfileController::class, 'index_dosen'])->name('dashboard');
-            Route::get('/profile', [DosenProfileController::class, 'profile'])->name('profile');
-            Route::put('/profile/update', [DosenProfileController::class, 'update'])->name('profile.update');
+    Route::prefix('dosen')->middleware('role:dosen|kajur|kaprodi-d3|kaprodi-d4')->name('dosen.')->group(function () {
+        Route::get('/dashboard', [DosenProfileController::class, 'index_dosen'])->name('dashboard');
+        Route::get('/profile', [DosenProfileController::class, 'profile'])->name('profile');
+        Route::put('/profile/update', [DosenProfileController::class, 'update'])->name('profile.update');
 
-            //verifikasi Sidang 
-            Route::prefix('verifikasi-sidang')->name('verifikasi-sidang.')->group(function () {
+        //verifikasi Sidang 
+        Route::prefix('verifikasi-sidang')->name('verifikasi-sidang.')->group(function () {
             // Halaman utama, menampilkan daftar pendaftaran yang perlu diverifikasi
             Route::get('/', [DosenSidangController::class, 'index'])->name('index');
-            
+
             // Halaman detail untuk melihat berkas dan form keputusan
             Route::get('/{pendaftaran}', [DosenSidangController::class, 'show'])->name('show');
-            
-            // Aksi untuk menyimpan keputusan (Setuju/Tolak)
-            Route::post('/{pendaftaran}', [DosenSidangController::class, 'prosesVerifikasi'])->name('verifikasi');
+            Route::post('/sidang/approvals/{pendaftaranId}/approve', [SidangApprovalController::class, 'approve'])->name('approve');
+            Route::post('/sidang/rejects/{pendaftaranId}/approve', [SidangApprovalController::class, 'reject'])->name('reject');
         });
 
-            // Sidang approval routes
-            Route::get('/sidang/approvals', [\App\Http\Controllers\Dosen\SidangApprovalController::class, 'index'])->name('sidang.approvals.index');
-            Route::post('/sidang/approvals/{sidang}/approve', [\App\Http\Controllers\Dosen\SidangApprovalController::class, 'approve'])->name('sidang.approvals.approve');
+        // Sidang approval routes
 
         // Grup untuk halaman utama bimbingan
         Route::prefix('bimbingan-mahasiswa')->name('bimbingan.')->group(function () {
@@ -168,9 +167,12 @@ Route::middleware(['auth'])->group(function () {
         });
 
         Route::resource('tawaran-topik', TawaranTopikController::class)->except(['show']);
-        // Rute tambahan untuk tawaran topik
-        // Route::post('tawaran-topik/approve/{application}', [TawaranTopikController::class, 'approveApplication'])->name('tawaran-topik.approve');
-        // Route::post('tawaran-topik/reject/{application}', [TawaranTopikController::class, 'rejectApplication'])->name('tawaran-topik.reject');
+        
+        Route::prefix('penguji')->name('penguji.')->group(function () {
+            Route::get('/', [PengujiController::class, 'index'])->name('index');
+            Route::get('/{sidang}', [PengujiController::class, 'show'])->name('show');
+            Route::post('/{sidang}/simpan-penguji', [PengujiController::class, 'simpanPenguji'])->name('simpan-penguji');
+        });
     });
 
     //------------------------------------------------------------------

@@ -41,46 +41,56 @@
 <hr class="my-4">
 
 {{-- Form untuk Mahasiswa Memberi Catatan Baru --}}
-<div class="mt-4">
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-light border-0 py-3">
-            <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-pencil-square me-2 text-primary"></i>Tulis Pertanyaan /
-                Catatan untuk Dosen</h6>
-        </div>
-        <div class="card-body p-4">
-            <form action="{{ route('mahasiswa.tugas-akhir.catatan.store', $tugasAkhir->id) }}" method="POST">
-                @csrf
+@if ($tugasAkhir->status === 'disetujui')
+    <div class="mt-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light border-0 py-3">
+                <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-pencil-square me-2 text-primary"></i>Tulis Pertanyaan
+                    /
+                    Catatan untuk Dosen</h6>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ route('mahasiswa.tugas-akhir.catatan.store', $tugasAkhir->id) }}" method="POST">
+                    @csrf
 
-                <div class="mb-3">
-                    <label for="pembimbing" class="form-label fw-semibold">Kirim ke Pembimbing</label>
-                    <select name="bimbingan_ta_id" class="form-select" required>
-                        <option value="">-- Pilih Pembimbing --</option>
-                        @if ($pembimbing1)
-                            <option value="{{ $pembimbing1->id }}">Pembimbing 1 - {{ $pembimbing1->dosen->user->name }}
-                            </option>
-                        @endif
-                        @if ($pembimbing2)
-                            <option value="{{ $pembimbing2->id }}">Pembimbing 2 - {{ $pembimbing2->dosen->user->name }}
-                            </option>
-                        @endif
-                    </select>
-                </div>
+                    <div class="mb-3">
+                        <label for="pembimbing" class="form-label fw-semibold">Kirim ke Pembimbing</label>
+                        <select name="bimbingan_ta_id" class="form-select" required>
+                            <option value="">-- Pilih Pembimbing --</option>
+                            @if ($pembimbing1)
+                                <option value="{{ $pembimbing1->id }}">Pembimbing 1 -
+                                    {{ $pembimbing1->dosen->user->name }}
+                                </option>
+                            @endif
+                            @if ($pembimbing2)
+                                <option value="{{ $pembimbing2->id }}">Pembimbing 2 -
+                                    {{ $pembimbing2->dosen->user->name }}
+                                </option>
+                            @endif
+                        </select>
+                    </div>
 
-                <div class="mb-3">
-                    <textarea name="catatan" class="form-control" rows="4"
-                        placeholder="Tuliskan catatan untuk dosen pembimbing yang dipilih..." required
-                        style="resize: vertical; min-height: 120px;"></textarea>
-                </div>
+                    <div class="mb-3">
+                        <textarea name="catatan" class="form-control" rows="4"
+                            placeholder="Tuliskan catatan untuk dosen pembimbing yang dipilih..." required
+                            style="resize: vertical; min-height: 120px;"></textarea>
+                    </div>
 
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
-                        <i class="bi bi-send me-2"></i> Kirim Catatan
-                    </button>
-                </div>
-            </form>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
+                            <i class="bi bi-send me-2"></i> Kirim Catatan
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+@else
+    <div class="alert alert-info mt-4" role="alert">
+        <i class="bi bi-info-circle me-2"></i>
+        Anda hanya dapat mengirim catatan jika tugas akhir anda telah disetujui oleh dosen pembimbing.
+    </div>
+@endif
 
 {{-- Modal dengan Tab untuk setiap Pembimbing --}}
 {{-- Modal Riwayat Bimbingan --}}

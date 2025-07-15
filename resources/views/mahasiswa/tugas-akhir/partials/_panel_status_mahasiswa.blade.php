@@ -155,23 +155,37 @@
         </div>
     </div>
 @empty
+    @if ($tugasAkhir->status === 'diajukan')
     <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
         <div class="card-body text-center py-5">
             <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
                 style="width: 80px; height: 80px;">
-                <i class="bi bi-moon-stars text-muted" style="font-size: 2.5rem;"></i>
+                <i class="bi bi-calendar-x text-muted" style="font-size: 2.5rem;"></i>
             </div>
-            <h5 class="text-muted fw-bold mb-3">Tidak Ada Jadwal Aktif</h5>
+            <h5 class="text-muted fw-bold mb-3">Menunggu Persetujuan Tugas Akhir dari Kaprodi</h5>
             <p class="text-muted mb-4">
-                Saat ini tidak ada jadwal bimbingan yang sedang aktif. <br>
-                Silakan ajukan jadwal bimbingan baru dengan dosen pembimbing Anda.
+                Harap tunggu persetujuan dari ketua program studi anda.
             </p>
-            <button type="button" class="btn btn-primary btn-lg rounded-pill shadow-sm" data-bs-toggle="modal"
-                data-bs-target="#uploadFileModal{{ $tugasAkhir->id }}">
-                <i class="bi bi-plus-circle me-2"> Ajukan Jadwal Baru</i>
-            </button>
-        </div>
     </div>
+    @else
+        <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
+            <div class="card-body text-center py-5">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                    style="width: 80px; height: 80px;">
+                    <i class="bi bi-moon-stars text-muted" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="text-muted fw-bold mb-3">Tidak Ada Jadwal Aktif</h5>
+                <p class="text-muted mb-4">
+                    Saat ini tidak ada jadwal bimbingan yang sedang aktif. <br>
+                    Silakan ajukan jadwal bimbingan baru dengan dosen pembimbing Anda.
+                </p>
+                <button type="button" class="btn btn-primary btn-lg rounded-pill shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#uploadFileModal{{ $tugasAkhir->id }}">
+                    <i class="bi bi-plus-circle me-2"> Ajukan Jadwal Baru</i>
+                </button>
+            </div>
+        </div>
+    @endif
 @endforelse
 
 {{-- Panel Pendaftaran Sidang --}}

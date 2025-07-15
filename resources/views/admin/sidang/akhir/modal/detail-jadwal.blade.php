@@ -171,14 +171,14 @@
                                 <i class="bi bi-pencil-square"></i> Edit Jadwal
                             </button>
 
-                            <form action="{{ route('jadwal-akhir.destroy', $jadwal->id) }}" method="POST"
+                            {{-- <form action="{{ route('jadwal-akhir.destroy', $jadwal->id) }}" method="POST"
                                 onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')" class="m-0">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash me-1"></i>
                                     Hapus</button>
-                            </form>
-                            <a href="{{ route('sidang.kelola.akhir') }}" class="btn btn-outline-dark btn-sm">
+                            </form> --}}
+                            <a href="{{ route('jurusan.penjadwalan-sidang.index') }}" class="btn btn-outline-dark btn-sm">
                                 <i class="bi bi-arrow-left-circle me-1"></i> Kembali
                             </a>
                         </div>
@@ -192,7 +192,7 @@
                         <i class="bi bi-pencil-square me-2"></i> Edit Jadwal Sidang
                     </div>
                     <div class="card-body p-lg-5 p-4">
-                        <form id="editJadwalForm" method="POST" action="{{ route('jadwal-sidang.update', $jadwal->id) }}">
+                        <form id="editJadwalForm" method="POST" action="{{ route('jurusan.penjadwalan-sidang.update', $jadwal->id) }}">
                             @csrf
                             @method('PUT')
                             <div class="row g-3">

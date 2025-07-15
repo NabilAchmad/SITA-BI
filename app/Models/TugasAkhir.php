@@ -63,9 +63,15 @@ class TugasAkhir extends Model
         return $this->hasMany(DokumenTa::class, 'tugas_akhir_id');
     }
 
-    public function sidang(): HasMany
+    public function sidang(): HasOne
     {
-        return $this->hasMany(Sidang::class);
+        // Menggunakan hasOne karena satu TA hanya akan memiliki satu entri sidang aktif
+        return $this->hasOne(Sidang::class, 'tugas_akhir_id')->latestOfMany();
+    }
+
+    public function pendaftaranSidang(): HasOne
+    {
+        return $this->hasOne(PendaftaranSidang::class, 'tugas_akhir_id');
     }
 
     /**

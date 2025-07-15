@@ -51,18 +51,6 @@ class BimbinganMahasiswaController extends Controller
         }
 
         // ✅ PERBAIKAN: Memastikan semua data dari service diteruskan ke view.
-        return view('dosen.bimbingan.detail-bimbingan.detail', [
-            'mahasiswa'        => $tugasAkhir->mahasiswa,
-            'tugasAkhir'       => $data['tugasAkhir'],
-            'sesiAktif'        => $data['sesiAktif'],
-            'catatanList'      => $data['catatanList'],
-            'bimbinganCountP1' => $data['bimbinganCountP1'],
-            'bimbinganCountP2' => $data['bimbinganCountP2'],
-            'dokumenTerbaru'   => $data['dokumenTerbaru'],
-            'riwayatDokumen'   => $data['riwayatDokumen'],
-            'pembimbing1'      => $data['pembimbing1'],
-            'pembimbing2'      => $data['pembimbing2'],
-            'timelineItems'    => $data['timelineItems'], // <-- Pastikan ini ada untuk view
-        ]);
+        return view('dosen.bimbingan.detail-bimbingan.detail', $data);
     }
 }
