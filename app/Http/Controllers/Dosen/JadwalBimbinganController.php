@@ -29,7 +29,7 @@ class JadwalBimbinganController extends Controller
         ]);
 
         try {
-            // 2. Panggil fungsi 'setJadwal' dari service yang ada di Canvas
+            // 2. Panggil fungsi 'setJadwal' dari service
             $this->bimbinganService->setJadwal($tugasAkhir, $data);
 
             // 3. Redirect kembali ke halaman detail dengan pesan sukses
@@ -48,6 +48,7 @@ class JadwalBimbinganController extends Controller
             ])->withInput();
         }
     }
+
 
     /**
      * [BARU] Menangani aksi pembatalan sesi bimbingan oleh dosen.

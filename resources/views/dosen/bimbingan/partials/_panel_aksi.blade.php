@@ -155,21 +155,53 @@
 </div>
 
 
-{{-- Panel Persetujuan Sidang --}}
-@if ($syaratJumlahBimbinganTerpenuhi && $tugasAkhir->status !== 'layak_sidang')
+{{-- Panel Verifikasi Pendaftaran Sidang (Menggantikan Panel Persetujuan Lama) --}}
+@if ($syaratJumlahBimbinganTerpenuhi)
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body">
-            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-patch-check-fill me-2 text-primary"></i>Persetujuan
-                Sidang</h5>
+            <h5 class="fw-bold text-dark mb-3">
+                <i class="bi bi-file-earmark-check-fill me-2 text-primary"></i>
+                Verifikasi Pendaftaran Sidang
+            </h5>
             <div class="d-grid gap-2">
-                @if (($isP1 && $tugasAkhir->status === 'menunggu_acc_p1') || ($isP2 && $tugasAkhir->status === 'menunggu_acc_p2'))
-                    <form action="{{ route('dosen.sidang.setujui', $tugasAkhir->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-primary w-100">Beri Persetujuan Sidang</button>
-                    </form>
+
+                {{-- FIX: Menggunakan @isset untuk memeriksa apakah variabel $pendaftaranTerbaru telah dikirim dari controller --}}
+                @if (isset($pendaftaranTerbaru) && $pendaftaranTerbaru)
+                    {{-- LOGIKA 1: Mahasiswa SUDAH mendaftar sidang. --}}
+                    
+                    @php
+                        // Menentukan status untuk dosen yang sedang login
+                        $statusDosenIni = $isP1 ? $pendaftaranTerbaru->status_pembimbing_1 : $pendaftaranTerbaru->status_pembimbing_2;
+                    @endphp
+
+                    @if ($statusDosenIni === 'menunggu')
+                        {{-- Dosen ini belum memberikan keputusan. Tampilkan tombol verifikasi. --}}
+                        <a href="{{ route('dosen.verifikasi-sidang.show', $pendaftaranTerbaru->id) }}" class="btn btn-primary w-100">
+                            <i class="bi bi-search me-1"></i> Lihat Berkas & Verifikasi
+                        </a>
+                        <div class="form-text text-center">Mahasiswa telah mengunggah berkas pendaftaran sidang.</div>
+
+                    @elseif ($statusDosenIni === 'disetujui')
+                        {{-- Dosen ini SUDAH menyetujui. --}}
+                        <div class="alert alert-success text-center py-2">
+                            <i class="bi bi-check-circle-fill me-1"></i> Anda telah menyetujui pendaftaran ini.
+                        </div>
+
+                    @elseif ($statusDosenIni === 'ditolak')
+                         {{-- Dosen ini SUDAH menolak. --}}
+                        <div class="alert alert-danger text-center py-2">
+                            <i class="bi bi-x-circle-fill me-1"></i> Anda telah menolak pendaftaran ini.
+                        </div>
+                    @endif
+
                 @else
-                    <button class="btn btn-outline-secondary w-100" disabled>Menunggu Aksi Lain</button>
+                    {{-- LOGIKA 2: Mahasiswa BELUM mendaftar sidang, meskipun syarat sudah terpenuhi. --}}
+                    <div class="alert alert-info text-center py-2">
+                        <i class="bi bi-hourglass-split me-1"></i> Menunggu mahasiswa mendaftar sidang.
+                    </div>
+                    <div class="form-text text-center">Mahasiswa sudah memenuhi syarat bimbingan dan dapat mendaftar sidang kapan saja.</div>
                 @endif
+
             </div>
         </div>
     </div>

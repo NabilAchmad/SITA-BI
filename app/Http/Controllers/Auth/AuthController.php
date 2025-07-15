@@ -159,13 +159,13 @@ class AuthController extends Controller
     /**
      * Langkah 2: Menampilkan form untuk memasukkan OTP.
      */
-    public function showOtpForm()
+    public function showOtpVerificationForm()
     {
         // Pastikan pengguna datang dari halaman registrasi, bukan akses langsung
         if (!session()->has('registration_data')) {
             return redirect()->route('auth.register')->with('error', 'Sesi registrasi tidak ditemukan. Silakan mulai dari awal.');
         }
-        return view('auth.otp-verify'); // Pastikan nama view-nya benar
+        return view('auth.otp_verification'); // Pastikan nama view-nya benar
     }
 
     /**
@@ -245,6 +245,7 @@ class AuthController extends Controller
         }
 
         $email = $registrationData['email'];
+        $name = $registrationData['name'];
         $token = EmailVerificationToken::where('email', $email)->first();
 
         // Tambahkan cooldown 60 detik untuk mencegah spam
@@ -254,7 +255,7 @@ class AuthController extends Controller
         }
 
         // Kirim email verifikasi baru
-        $this->sendEmailVerification($email);
+        $this->sendEmailVerification($email, $name);
 
         return back()->with('success', 'Kode OTP baru telah berhasil dikirim ke email Anda.');
     }

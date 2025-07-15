@@ -25,14 +25,14 @@
     <div class="mb-3">
         <label>Dosen Pembimbing 1</label>
         <input type="text" class="form-control"
-            value="{{ $mahasiswa->tugasAkhir && $mahasiswa->tugasAkhir->pembimbingSatu ? $mahasiswa->tugasAkhir->pembimbingSatu->user->name : '-' }}"
+            value="{{ $mahasiswa->tugasAkhir && $mahasiswa->tugasAkhir->pembimbingSatu ? $mahasiswa->tugasAkhir->pembimbingSatu->dosen->user->name : '-' }}"
             readonly>
     </div>
 
     <div class="mb-3">
         <label>Dosen Pembimbing 2</label>
         <input type="text" class="form-control"
-            value="{{ $mahasiswa->tugasAkhir && $mahasiswa->tugasAkhir->pembimbingDua ? $mahasiswa->tugasAkhir->pembimbingDua->user->name : '-' }}"
+            value="{{ $mahasiswa->tugasAkhir && $mahasiswa->tugasAkhir->pembimbingDua ? $mahasiswa->tugasAkhir->pembimbingDua->dosen->user->name : '-' }}"
             readonly>
     </div>
 
