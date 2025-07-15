@@ -100,19 +100,24 @@
                     <li class="nav-section"><span class="sidebar-mini-icon"><i class="fa fa-ellipsis-h"></i></span>
                         <h4 class="text-section">Aktivitas Dosen</h4>
                     </li>
-                    <li class="nav-item {{ request()->is('dosen/bimbingan-mahasiswa*') ? 'active' : '' }}">
-                        <a href="{{ route('dosen.bimbingan.index') }}"><i class="fas fa-chalkboard-teacher"></i>
-                            <p>Bimbingan Mahasiswa</p>
-                        </a>
-                    </li>
+                    @if (auth()->user()->dosen->peranDosenTa()->where('peran', 'like', 'pembimbing%')->exists())
+                        <li class="nav-item {{ request()->is('dosen/bimbingan-mahasiswa*') ? 'active' : '' }}">
+                            <a href="{{ route('dosen.bimbingan.index') }}"><i class="fas fa-chalkboard-teacher"></i>
+                                <p>Bimbingan Mahasiswa</p>
+                            </a>
+                        </li>
+                    @endif
+                    {{-- Cek apakah user dosen ini memiliki setidaknya satu peran sebagai 'penguji' --}}
+                    @if (auth()->user()->dosen->peranDosenTa()->where('peran', 'like', 'penguji%')->exists())
+                        <li class="nav-item {{ request()->is('dosen/penguji*') ? 'active' : '' }}">
+                            <a href="{{ route('dosen.penguji.index') }}"><i class="fas fa-user-tie"></i>
+                                <p>Penguji Page</p>
+                            </a>
+                        </li>
+                    @endif
                     <li class="nav-item {{ request()->is('dosen/tawaran-topik*') ? 'active' : '' }}">
                         <a href="{{ route('dosen.tawaran-topik.index') }}"><i class="fas fa-clipboard-list"></i>
                             <p>Tawaran Topik</p>
-                        </a>
-                    </li>
-                    <li class="nav-item {{ request()->is('dosen/penguji*') ? 'active' : '' }}">
-                        <a href="{{ route('dosen.penguji.index') }}"><i class="fas fa-user-tie"></i>
-                            <p>Penguji Page</p>
                         </a>
                     </li>
                 @endif

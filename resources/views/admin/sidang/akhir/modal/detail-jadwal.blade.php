@@ -170,14 +170,6 @@
                             <button id="btnEdit" type="button" class="btn btn-warning btn-sm">
                                 <i class="bi bi-pencil-square"></i> Edit Jadwal
                             </button>
-
-                            {{-- <form action="{{ route('jadwal-akhir.destroy', $jadwal->id) }}" method="POST"
-                                onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')" class="m-0">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash me-1"></i>
-                                    Hapus</button>
-                            </form> --}}
                             <a href="{{ route('jurusan.penjadwalan-sidang.index') }}" class="btn btn-outline-dark btn-sm">
                                 <i class="bi bi-arrow-left-circle me-1"></i> Kembali
                             </a>
