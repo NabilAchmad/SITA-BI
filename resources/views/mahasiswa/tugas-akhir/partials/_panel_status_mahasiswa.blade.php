@@ -35,7 +35,7 @@
             </li>
         </ul>
     </div>
-</div> --}}
+</div>
 
 {{-- Panel Jadwal Aktif --}}
 
@@ -106,7 +106,7 @@
                     <div class="col-md-2 text-center">
                         <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
                             style="width: 60px; height: 60px;">
-                            <i class="bi bi-hourglass-split text-warning fs-3"></i>
+                            <i class="bi bi-hourglass-split text-white fs-3"></i>
                         </div>
                     </div>
                     <div class="col-md-10">
@@ -122,9 +122,11 @@
                 <div class="alert alert-warning border-0 rounded-3 mb-3"
                     style="background: linear-gradient(135deg, #fff3cd 0%, #fef3c7 100%);">
                     <div class="text-center">
-                        <div class="spinner-border text-warning mb-3" role="status" style="width: 3rem; height: 3rem;">
+                        <div class="spinner-border text-warning mb-3"
+                            style="width: 3rem; height: 3rem; animation-duration: 5s;">
                             <span class="visually-hidden">Loading...</span>
                         </div>
+
                         <div class="fw-bold text-warning fs-5">
                             Proses Konfirmasi Sedang Berlangsung
                         </div>
@@ -132,13 +134,6 @@
                             Dosen pembimbing akan segera mengkonfirmasi jadwal Anda
                         </small>
                     </div>
-                </div>
-
-                <!-- Action Button -->
-                <div class="text-center">
-                    <button class="btn btn-outline-warning rounded-pill px-4">
-                        <i class="bi bi-arrow-clockwise me-2"></i>Refresh Status
-                    </button>
                 </div>
             @endif
 
@@ -171,8 +166,9 @@
                 Saat ini tidak ada jadwal bimbingan yang sedang aktif. <br>
                 Silakan ajukan jadwal bimbingan baru dengan dosen pembimbing Anda.
             </p>
-            <button class="btn btn-primary rounded-pill px-4">
-                <i class="bi bi-plus-circle me-2"></i>Ajukan Jadwal Baru
+            <button type="button" class="btn btn-primary btn-lg rounded-pill shadow-sm" data-bs-toggle="modal"
+                data-bs-target="#uploadFileModal{{ $tugasAkhir->id }}">
+                <i class="bi bi-plus-circle me-2"> Ajukan Jadwal Baru</i>
             </button>
         </div>
     </div>
@@ -187,10 +183,10 @@
     $syaratJumlahBimbinganTerpenuhi = false;
     if (isset($bimbinganCountP1) && isset($bimbinganCountP2)) {
         // Jika ada dua pembimbing
-        $syaratJumlahBimbinganTerpenuhi = ($bimbinganCountP1 >= 7 && $bimbinganCountP2 >= 7);
+        $syaratJumlahBimbinganTerpenuhi = $bimbinganCountP1 >= 7 && $bimbinganCountP2 >= 7;
     } elseif (isset($bimbinganCountP1)) {
         // Jika hanya ada satu pembimbing
-        $syaratJumlahBimbinganTerpenuhi = ($bimbinganCountP1 >= 7);
+        $syaratJumlahBimbinganTerpenuhi = $bimbinganCountP1 >= 7;
     }
 @endphp
 
@@ -209,19 +205,19 @@
                 @if ($pendaftaranTerbaru->status_verifikasi === 'disetujui')
                     <div class="alert alert-success">
                         <h6 class="alert-heading fw-bold">Pendaftaran Disetujui!</h6>
-                        <p class="mb-0">Selamat! Pendaftaran sidang Anda telah disetujui. Silakan tunggu informasi jadwal sidang dari program studi.</p>
+                        <p class="mb-0">Selamat! Pendaftaran sidang Anda telah disetujui. Silakan tunggu informasi
+                            jadwal sidang dari program studi.</p>
                     </div>
-
                 @elseif ($pendaftaranTerbaru->status_verifikasi === 'berkas_tidak_lengkap')
                     <div class="alert alert-danger">
                         <h6 class="alert-heading fw-bold">Pendaftaran Ditolak</h6>
-                        <p>Pendaftaran sidang Anda ditolak. Silakan perbaiki berkas sesuai catatan dari dosen dan lakukan pendaftaran ulang.</p>
+                        <p>Pendaftaran sidang Anda ditolak. Silakan perbaiki berkas sesuai catatan dari dosen dan
+                            lakukan pendaftaran ulang.</p>
                         <hr>
                         <a href="{{-- Ganti dengan route ke form daftar ulang --}}" class="btn btn-danger w-100">
                             <i class="bi bi-arrow-repeat me-1"></i> Daftar Ulang Sidang
                         </a>
                     </div>
-
                 @elseif ($pendaftaranTerbaru->status_verifikasi === 'menunggu_verifikasi')
                     <p>Pendaftaran Anda sedang dalam proses verifikasi oleh dosen pembimbing. Mohon tunggu.</p>
                     <ul class="list-group list-group-flush">
@@ -238,7 +234,7 @@
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span>Status Pembimbing 2</span>
-                             @php
+                            @php
                                 $statusP2 = match ($pendaftaranTerbaru->status_pembimbing_2) {
                                     'menunggu' => ['text' => 'Menunggu', 'class' => 'bg-warning text-dark'],
                                     'disetujui' => ['text' => 'Disetujui', 'class' => 'bg-success'],
@@ -249,7 +245,6 @@
                         </li>
                     </ul>
                 @endif
-
             @else
                 {{-- LOGIKA 2: Mahasiswa BELUM mendaftar, tapi sudah memenuhi syarat. --}}
                 <div class="alert alert-info text-center">

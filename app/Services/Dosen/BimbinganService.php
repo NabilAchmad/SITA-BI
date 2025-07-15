@@ -207,6 +207,7 @@ class BimbinganService
                 'tanggal_bimbingan' => $data['tanggal_bimbingan'],
                 'jam_bimbingan'     => $data['jam_bimbingan'],
                 'status_bimbingan'  => 'dijadwalkan',
+                'status_bimbingan'  => 'dijadwalkan',
             ]);
 
             // Tambahkan catatan otomatis

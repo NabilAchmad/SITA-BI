@@ -23,12 +23,9 @@
                             Dokumen</label>
                         {{-- ✅ PERBAIKAN 2: Mengubah name dari 'jenis_dokumen' menjadi 'tipe_dokumen' --}}
                         <select name="tipe_dokumen" id="tipe_dokumen_{{ $tugasAkhir->id }}"
-                            class="form-select form-select-lg" required>
-                            <option value="" disabled selected>-- Pilih Tipe Dokumen --</option>
-                            <option value="proposal">Proposal</option>
-                            <option value="draft">Draft</option>
-                            <option value="final">Final</option>
-                            <option value="lainnya">Lainnya</option>
+                            class="form-select form-select-lg" required readonly onfocus="this.blur()"
+                            style="pointer-events: none; background-color: #e9ecef;">
+                            <option value="bimbingan" selected>Bimbingan</option>
                         </select>
                     </div>
 

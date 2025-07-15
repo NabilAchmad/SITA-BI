@@ -28,19 +28,8 @@ class UploadFileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Validasi untuk file yang diunggah.
-            // Nama field 'file_bimbingan' harus sama dengan atribut 'name' di form HTML.
-            'file_bimbingan' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:25600'], // Batas 25MB
-
-            // Validasi untuk tipe dokumen.
-            // Nama field 'tipe_dokumen' harus sama dengan atribut 'name' di form HTML.
-            'tipe_dokumen' => [
-                'required',
-                'string',
-                Rule::in(['proposal', 'draft', 'final', 'lainnya']),
-            ],
-
-            // Validasi untuk catatan (opsional).
+            'file_bimbingan' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:25600'],
+            'tipe_dokumen' => ['required', 'string', Rule::in(['bimbingan'])],
             'catatan' => ['nullable', 'string', 'max:1000'],
         ];
     }
