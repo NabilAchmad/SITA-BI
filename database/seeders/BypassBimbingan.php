@@ -20,8 +20,8 @@ class BypassBimbingan extends Seeder
         $additionalSessions = 8;
 
         // Dosen pembimbing
-        $dosenPembimbing1 = 1;
-        $dosenPembimbing2 = 2;
+        $dosenPembimbing1 = 2;
+        $dosenPembimbing2 = 3;
 
         // Tanggal awal untuk bimbingan
         $startDate = Carbon::create(2025, 7, 1);
@@ -33,7 +33,7 @@ class BypassBimbingan extends Seeder
 
             // Bimbingan dengan pembimbing 1
             DB::table('bimbingan_ta')->insert([
-                'tugas_akhir_id' => 1,
+                'tugas_akhir_id' => 4,
                 'dosen_id' => $dosenPembimbing1,
                 'peran' => 'pembimbing1',
                 'sesi_ke' => $sessionNumber,
@@ -46,7 +46,7 @@ class BypassBimbingan extends Seeder
 
             // Bimbingan dengan pembimbing 2 (untuk sesi yang sama)
             DB::table('bimbingan_ta')->insert([
-                'tugas_akhir_id' => 1,
+                'tugas_akhir_id' => 4,
                 'dosen_id' => $dosenPembimbing2,
                 'peran' => 'pembimbing2',
                 'sesi_ke' => $sessionNumber,

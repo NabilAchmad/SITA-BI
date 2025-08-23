@@ -115,23 +115,28 @@ class TugasAkhirService
     }
 
     // revisi bagian model
-    public function createCatatanForMahasiswa(TugasAkhir $tugasAkhir, array $data): void
+    public function createCatatanForMahasiswa(TugasAkhir $tugasAkhir, array $data)
     {
         if (optional($this->mahasiswa)->id !== $tugasAkhir->mahasiswa_id) {
             throw new UnauthorizedException('Anda tidak berwenang untuk tugas akhir ini.');
         }
 
-        // Validasi bimbingan_ta_id benar-benar milik tugas akhir ini
-        $bimbingan = $tugasAkhir->bimbinganTa()
-            ->where('id', $data['bimbingan_ta_id'])
-            ->firstOrFail();
+        // Cari sesi bimbingan yang aktif untuk kedua dosen.
+        $sesiBimbinganAktif = $tugasAkhir->bimbinganTa()->whereIn('status_bimbingan', ['diajukan', 'dijadwalkan'])->get();
 
-        // Simpan catatan untuk dosen yang dipilih
-        $bimbingan->catatan()->create([
-            'catatan'     => $data['catatan'],
-            'author_type' => Mahasiswa::class,
-            'author_id'   => $this->mahasiswa->id,
-        ]);
+        if ($sesiBimbinganAktif->isEmpty()) {
+            // Pesan ini yang seharusnya muncul jika mahasiswa mencoba mengirim catatan di waktu yang salah.
+            throw new \Exception('Gagal: Tidak ada sesi bimbingan yang sedang menunggu atau dijadwalkan. Anda tidak dapat mengirim catatan saat ini.');
+        }
+
+        // Simpan catatan ke setiap sesi aktif agar log tetap sinkron.
+        foreach ($sesiBimbinganAktif as $sesi) {
+            $sesi->catatan()->create([
+                'catatan'     => $data['catatan'],
+                'author_type' => Mahasiswa::class,
+                'author_id'   => $this->mahasiswa->id,
+            ]);
+        }
     }
 
     /**

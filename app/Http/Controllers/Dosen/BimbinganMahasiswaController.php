@@ -34,7 +34,8 @@ class BimbinganMahasiswaController extends Controller
         } else {
             $mahasiswaList = $this->bimbinganService->getPengajuanBimbingan($request);
         }
-
+        
+        $mahasiswaList = $this->bimbinganService->getPengajuanBimbingan($request);
 
         // Pastikan path view ini benar sesuai struktur folder Anda
         return view('dosen.bimbingan.dashboard.dashboard', compact('mahasiswaList'));

@@ -12,6 +12,7 @@ use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\PendaftaranSidang;
+use Illuminate\Database\Eloquent\Collection;
 
 class BimbinganService
 {
@@ -26,7 +27,7 @@ class BimbinganService
         }
     }
 
-    public function getPengajuanBimbingan(Request $request)
+    public function getPengajuanBimbingan(Request $request): Collection
     {
         // Cek dulu apakah pengguna yang login adalah dosen
         if (!$this->dosen) {
